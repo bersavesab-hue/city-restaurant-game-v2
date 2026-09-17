@@ -5,14 +5,15 @@ import { app } from "../src/main.js";
 
 const {
   districtSystem,
-  propertySystem
+  propertySystem,
+  propertyFloorplanSystem
 } = app.systems;
 
 const {
   cityPropertyPageSystem
 } = app.ui;
 
-test("房源支持30到10000平米、多楼层和真实结构数据", () => {
+test("房源支持30到10000平米、多楼层、真实结构和自适应编辑模式", () => {
   districtSystem.load(
     [
       {
@@ -129,4 +130,53 @@ test("房源支持30到10000平米、多楼层和真实结构数据", () => {
   assert.equal(detail.property.floors[0].columnCount, 1);
   assert.equal(detail.layout.floors[0].polygon.length, 6);
   assert.equal(detail.suitability.frontageMeters, 3.6);
+
+  assert.deepEqual(
+    propertyFloorplanSystem.getEditingMode(tiny.id),
+    {
+      mode: "direct",
+      minimap: false,
+      zoneNavigator: false,
+      floorSelector: false
+    }
+  );
+
+  assert.deepEqual(
+    propertyFloorplanSystem.getEditingMode(huge.id),
+    {
+      mode: "floor_zone",
+      minimap: true,
+      zoneNavigator: true,
+      floorSelector: true
+    }
+  );
+
+  assert.equal(
+    propertyFloorplanSystem.validatePlacement(
+      tiny.id,
+      "tiny_1f",
+      { x: 0, y: 0, width: 2, height: 1 }
+    ),
+    true
+  );
+
+  assert.throws(
+    () =>
+      propertyFloorplanSystem.validatePlacement(
+        tiny.id,
+        "tiny_1f",
+        { x: 3, y: 3, width: 1, height: 1 }
+      ),
+    /fixed structure/
+  );
+
+  assert.throws(
+    () =>
+      propertyFloorplanSystem.validatePlacement(
+        tiny.id,
+        "tiny_1f",
+        { x: 4, y: 4, width: 2, height: 2 }
+      ),
+    /outside the rented floorplan/
+  );
 });
