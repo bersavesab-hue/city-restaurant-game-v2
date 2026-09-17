@@ -296,6 +296,33 @@ simulationSystem.advance(
 
 checkpoint(365, started);
 
+const finalEntityCount =
+  entitySystem
+    .listTypes()
+    .reduce(
+      (sum, type) =>
+        sum +
+        entitySystem.count(type),
+      0
+    );
+
+assert.ok(
+  finalEntityCount < 8000,
+  `365天实体过多: ${finalEntityCount}`
+);
+
+assert.ok(
+  entitySystem.count(
+    "customer_order"
+  ) < 1500
+);
+
+assert.ok(
+  entitySystem.count(
+    "cooking_record"
+  ) < 1500
+);
+
 assert.equal(
   gameState.getSection("time").day,
   366

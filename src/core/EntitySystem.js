@@ -277,6 +277,69 @@ class EntitySystem {
     return result.removed;
   }
 
+  removeMany(type, ids) {
+    const entityType =
+      normalizeType(type);
+
+    if (!Array.isArray(ids)) {
+      throw new TypeError(
+        "Entity ids must be an array"
+      );
+    }
+
+    for (const id of ids) {
+      if (typeof id !== "string") {
+        throw new TypeError(
+          "Entity id must be a string"
+        );
+      }
+    }
+
+    const uniqueIds =
+      [...new Set(ids)];
+
+    if (uniqueIds.length === 0) {
+      return 0;
+    }
+
+    const removed =
+      gameState.mutateSection(
+        "data",
+        (data) => {
+          ensureData(data);
+
+          const collection =
+            data.entities?.[
+              entityType
+            ] ?? {};
+
+          let count = 0;
+
+          for (const id of uniqueIds) {
+            if (collection[id]) {
+              delete collection[id];
+              count += 1;
+            }
+          }
+
+          return count;
+        },
+        `entity:removeMany:${entityType}`
+      );
+
+    if (removed > 0) {
+      eventBus.emit(
+        "entity:manyRemoved",
+        {
+          type: entityType,
+          count: removed
+        }
+      );
+    }
+
+    return removed;
+  }
+
   list(type) {
     const entityType =
       normalizeType(type);
