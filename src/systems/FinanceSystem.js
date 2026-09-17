@@ -3,8 +3,12 @@ import { gameState } from "../core/GameState.js";
 import { eventBus } from "../core/EventBus.js";
 
 const TRANSACTION_TYPE = Object.freeze({
+  CAPITAL: "capital",
   INCOME: "income",
-  EXPENSE: "expense"
+  EXPENSE: "expense",
+  HOLD: "hold",
+  RELEASE: "release",
+  APPLY_HOLD: "apply_hold"
 });
 
 const CATEGORY = Object.freeze({
@@ -13,6 +17,7 @@ const CATEGORY = Object.freeze({
   INGREDIENT: "ingredient",
   SALARY: "salary",
   RENT: "rent",
+  DEPOSIT: "deposit",
   UTILITIES: "utilities",
   EQUIPMENT: "equipment",
   DECORATION: "decoration",
@@ -30,16 +35,13 @@ function requirePositiveAmount(amount) {
   }
 }
 
-function requireRestaurant(restaurantId) {
+function requireRestaurant(id) {
   const restaurant =
-    entitySystem.get(
-      "restaurant",
-      restaurantId
-    );
+    entitySystem.get("restaurant", id);
 
   if (!restaurant) {
     throw new Error(
-      `Restaurant "${restaurantId}" does not exist`
+      `Restaurant "${id}" does not exist`
     );
   }
 
@@ -52,8 +54,7 @@ class FinanceSystem {
       .list("finance_account")
       .find(
         (account) =>
-          account.restaurantId ===
-          restaurantId
+          account.restaurantId === restaurantId
       );
   }
 
@@ -81,13 +82,13 @@ class FinanceSystem {
       initialBalance < 0
     ) {
       throw new RangeError(
-        "Initial balance must be a non-negative integer"
+        "Initial balance must be non-negative"
       );
     }
 
     if (this.findAccount(restaurantId)) {
       throw new Error(
-        `Restaurant "${restaurantId}" already has a finance account`
+        "Finance account already exists"
       );
     }
 
@@ -97,9 +98,14 @@ class FinanceSystem {
         {
           restaurantId,
           balance: initialBalance,
-          lifetimeIncome:
+
+          capitalContributions:
             initialBalance,
-          lifetimeExpense: 0
+
+          lifetimeIncome: 0,
+          lifetimeExpense: 0,
+
+          reservedDeposits: 0
         }
       );
 
@@ -108,25 +114,17 @@ class FinanceSystem {
         restaurantId,
         accountId: account.id,
         type:
-          TRANSACTION_TYPE.INCOME,
+          TRANSACTION_TYPE.CAPITAL,
         category:
           CATEGORY.INITIAL_CAPITAL,
-        amount: initialBalance,
+        amount:
+          initialBalance,
         balanceAfter:
           initialBalance,
         description:
           "初始资金"
       });
     }
-
-    eventBus.emit(
-      "finance:accountCreated",
-      {
-        restaurantId,
-        account:
-          structuredClone(account)
-      }
-    );
 
     return account;
   }
@@ -168,7 +166,7 @@ class FinanceSystem {
             balanceAfter,
 
           lifetimeIncome:
-            account.lifetimeIncome +
+            (account.lifetimeIncome ?? 0) +
             amount
         }
       );
@@ -184,19 +182,6 @@ class FinanceSystem {
         balanceAfter,
         description
       });
-
-    eventBus.emit(
-      "finance:income",
-      {
-        restaurantId,
-        amount,
-        category,
-        balance:
-          updated.balance,
-        transactionId:
-          transaction.id
-      }
-    );
 
     return {
       account: updated,
@@ -235,7 +220,7 @@ class FinanceSystem {
             balanceAfter,
 
           lifetimeExpense:
-            account.lifetimeExpense +
+            (account.lifetimeExpense ?? 0) +
             amount
         }
       );
@@ -252,18 +237,170 @@ class FinanceSystem {
         description
       });
 
-    eventBus.emit(
-      "finance:expense",
-      {
+    return {
+      account: updated,
+      transaction
+    };
+  }
+
+  holdDeposit(
+    restaurantId,
+    amount,
+    description = "租赁押金"
+  ) {
+    requirePositiveAmount(amount);
+
+    const account =
+      this.requireAccount(
+        restaurantId
+      );
+
+    if (account.balance < amount) {
+      throw new Error(
+        "Insufficient funds for deposit"
+      );
+    }
+
+    const balanceAfter =
+      account.balance - amount;
+
+    const updated =
+      entitySystem.update(
+        "finance_account",
+        account.id,
+        {
+          balance:
+            balanceAfter,
+
+          reservedDeposits:
+            (account.reservedDeposits ?? 0) +
+            amount
+        }
+      );
+
+    const transaction =
+      this.createTransaction({
         restaurantId,
+        accountId: account.id,
+        type:
+          TRANSACTION_TYPE.HOLD,
+        category:
+          CATEGORY.DEPOSIT,
         amount,
+        balanceAfter,
+        description
+      });
+
+    return {
+      account: updated,
+      transaction
+    };
+  }
+
+  releaseDeposit(
+    restaurantId,
+    amount,
+    description = "退还租赁押金"
+  ) {
+    requirePositiveAmount(amount);
+
+    const account =
+      this.requireAccount(
+        restaurantId
+      );
+
+    const reserved =
+      account.reservedDeposits ?? 0;
+
+    if (reserved < amount) {
+      throw new Error(
+        "Reserved deposit is insufficient"
+      );
+    }
+
+    const balanceAfter =
+      account.balance + amount;
+
+    const updated =
+      entitySystem.update(
+        "finance_account",
+        account.id,
+        {
+          balance:
+            balanceAfter,
+
+          reservedDeposits:
+            reserved - amount
+        }
+      );
+
+    const transaction =
+      this.createTransaction({
+        restaurantId,
+        accountId: account.id,
+        type:
+          TRANSACTION_TYPE.RELEASE,
+        category:
+          CATEGORY.DEPOSIT,
+        amount,
+        balanceAfter,
+        description
+      });
+
+    return {
+      account: updated,
+      transaction
+    };
+  }
+
+  applyHeldDeposit(
+    restaurantId,
+    amount,
+    category = CATEGORY.RENT,
+    description = "押金抵扣费用"
+  ) {
+    requirePositiveAmount(amount);
+
+    const account =
+      this.requireAccount(
+        restaurantId
+      );
+
+    const reserved =
+      account.reservedDeposits ?? 0;
+
+    if (reserved < amount) {
+      throw new Error(
+        "Reserved deposit is insufficient"
+      );
+    }
+
+    const updated =
+      entitySystem.update(
+        "finance_account",
+        account.id,
+        {
+          reservedDeposits:
+            reserved - amount,
+
+          lifetimeExpense:
+            (account.lifetimeExpense ?? 0) +
+            amount
+        }
+      );
+
+    const transaction =
+      this.createTransaction({
+        restaurantId,
+        accountId: account.id,
+        type:
+          TRANSACTION_TYPE.APPLY_HOLD,
         category,
-        balance:
-          updated.balance,
-        transactionId:
-          transaction.id
-      }
-    );
+        amount,
+        balanceAfter:
+          account.balance,
+        description
+      });
 
     return {
       account: updated,
@@ -292,14 +429,19 @@ class FinanceSystem {
         category,
         amount,
         balanceAfter,
+
         description:
           String(description ?? ""),
+
         createdAt:
           time.totalMinutes,
+
         day:
           time.day,
+
         hour:
           time.hour,
+
         minute:
           time.minute
       }
@@ -320,25 +462,19 @@ class FinanceSystem {
         "finance_transaction"
       )
       .filter(
-        (transaction) =>
-          transaction.restaurantId ===
+        (item) =>
+          item.restaurantId ===
           restaurantId
       )
       .filter(
-        (transaction) =>
+        (item) =>
           type === null ||
-          transaction.type === type
+          item.type === type
       )
       .filter(
-        (transaction) =>
+        (item) =>
           category === null ||
-          transaction.category ===
-            category
-      )
-      .sort(
-        (a, b) =>
-          a.createdAt -
-          b.createdAt
+          item.category === category
       );
   }
 
@@ -348,20 +484,39 @@ class FinanceSystem {
         restaurantId
       );
 
+    const income =
+      account.lifetimeIncome ?? 0;
+
+    const expense =
+      account.lifetimeExpense ?? 0;
+
+    const reserved =
+      account.reservedDeposits ?? 0;
+
     return {
       restaurantId,
+
       balance:
         account.balance,
 
+      reservedDeposits:
+        reserved,
+
+      availableAssets:
+        account.balance +
+        reserved,
+
+      capitalContributions:
+        account.capitalContributions ?? 0,
+
       lifetimeIncome:
-        account.lifetimeIncome,
+        income,
 
       lifetimeExpense:
-        account.lifetimeExpense,
+        expense,
 
       lifetimeProfit:
-        account.lifetimeIncome -
-        account.lifetimeExpense,
+        income - expense,
 
       transactionCount:
         this.getTransactions(

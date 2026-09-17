@@ -46,7 +46,10 @@ class LeaseSystem {
   }) {
     requireRestaurant(restaurantId);
 
-    if (!Number.isInteger(months) || months <= 0) {
+    if (
+      !Number.isInteger(months) ||
+      months <= 0
+    ) {
       throw new RangeError(
         "Lease months must be positive"
       );
@@ -64,16 +67,11 @@ class LeaseSystem {
       );
     }
 
-    const existing =
-      entitySystem
-        .list("lease")
-        .find(
-          (lease) =>
-            lease.restaurantId === restaurantId &&
-            lease.status === "active"
-        );
-
-    if (existing) {
+    if (
+      this.getByRestaurant(
+        restaurantId
+      )
+    ) {
       throw new Error(
         "Restaurant already has an active lease"
       );
@@ -87,15 +85,34 @@ class LeaseSystem {
       deposit +
       property.monthlyRent;
 
+    if (
+      financeSystem.getBalance(
+        restaurantId
+      ) < upfront
+    ) {
+      throw new Error(
+        "Insufficient funds for lease"
+      );
+    }
+
+    financeSystem.holdDeposit(
+      restaurantId,
+      deposit,
+      `铺位押金 ${property.name}`
+    );
+
     financeSystem.expense(
       restaurantId,
-      upfront,
+      property.monthlyRent,
       FINANCE_CATEGORY.RENT,
-      `签约铺位 ${property.name}`
+      `首月租金 ${property.name}`
     );
 
     const time =
       gameState.getSection("time");
+
+    const startDay =
+      time.day;
 
     const lease =
       entitySystem.create(
@@ -103,15 +120,35 @@ class LeaseSystem {
         {
           restaurantId,
           propertyId,
+
           monthlyRent:
             property.monthlyRent,
+
           deposit,
+
           months,
+
           status: "active",
+
+          startDay,
+
+          nextRentDay:
+            startDay + 30,
+
+          endDay:
+            startDay +
+            months * 30,
+
+          rentPayments: 1,
+
+          unpaidRent: 0,
+
           startedAt:
             time.totalMinutes,
+
           lastRentDay:
-            time.day,
+            startDay,
+
           endedAt: null
         }
       );
@@ -134,7 +171,9 @@ class LeaseSystem {
       "lease:signed",
       {
         lease:
-          structuredClone(lease)
+          structuredClone(
+            lease
+          )
       }
     );
 
@@ -152,8 +191,10 @@ class LeaseSystem {
       .list("lease")
       .find(
         (lease) =>
-          lease.restaurantId === restaurantId &&
-          lease.status === "active"
+          lease.restaurantId ===
+            restaurantId &&
+          lease.status ===
+            "active"
       );
   }
 
@@ -163,38 +204,186 @@ class LeaseSystem {
     const lease =
       requireLease(leaseId);
 
-    if (lease.status !== "active") {
+    if (
+      lease.status !== "active"
+    ) {
       throw new Error(
         "Lease is not active"
       );
     }
 
-    financeSystem.expense(
-      lease.restaurantId,
-      lease.monthlyRent,
-      FINANCE_CATEGORY.RENT,
-      "月租金"
-    );
+    const dueDay =
+      lease.nextRentDay;
 
-    const time =
-      gameState.getSection("time");
+    const nextRentDay =
+      dueDay + 30;
 
-    return entitySystem.update(
-      "lease",
-      leaseId,
+    if (
+      financeSystem.getBalance(
+        lease.restaurantId
+      ) >= lease.monthlyRent
+    ) {
+      financeSystem.expense(
+        lease.restaurantId,
+        lease.monthlyRent,
+        FINANCE_CATEGORY.RENT,
+        `第${dueDay}日月租金`
+      );
+
+      const updated =
+        entitySystem.update(
+          "lease",
+          leaseId,
+          {
+            lastRentDay:
+              dueDay,
+
+            nextRentDay,
+
+            rentPayments:
+              lease.rentPayments + 1
+          }
+        );
+
+      return {
+        paid: true,
+        lease: updated
+      };
+    }
+
+    const updated =
+      entitySystem.update(
+        "lease",
+        leaseId,
+        {
+          lastRentDay:
+            dueDay,
+
+          nextRentDay,
+
+          unpaidRent:
+            lease.unpaidRent +
+            lease.monthlyRent
+        }
+      );
+
+    eventBus.emit(
+      "lease:rentArrears",
       {
-        lastRentDay:
-          time.day
+        leaseId,
+        restaurantId:
+          lease.restaurantId,
+        amount:
+          lease.monthlyRent,
+        unpaidRent:
+          updated.unpaidRent
       }
     );
+
+    return {
+      paid: false,
+      lease: updated
+    };
   }
 
-  terminate(leaseId) {
+  processDay(currentDay) {
+    const leases =
+      entitySystem
+        .list("lease")
+        .filter(
+          (lease) =>
+            lease.status ===
+            "active"
+        );
+
+    for (
+      const original
+      of leases
+    ) {
+      let lease = original;
+
+      while (
+        lease.status === "active" &&
+        lease.nextRentDay <
+          lease.endDay &&
+        currentDay >=
+          lease.nextRentDay
+      ) {
+        lease =
+          this.chargeMonthlyRent(
+            lease.id
+          ).lease;
+      }
+
+      if (
+        lease.status === "active" &&
+        currentDay >=
+          lease.endDay
+      ) {
+        this.terminate(
+          lease.id,
+          {
+            reason:
+              "contract_expired"
+          }
+        );
+      }
+    }
+  }
+
+  terminate(
+    leaseId,
+    {
+      reason = "manual"
+    } = {}
+  ) {
     const lease =
       requireLease(leaseId);
 
-    if (lease.status !== "active") {
+    if (
+      lease.status !== "active"
+    ) {
       return lease;
+    }
+
+    let remainingDeposit =
+      lease.deposit;
+
+    let remainingArrears =
+      lease.unpaidRent ?? 0;
+
+    let depositApplied = 0;
+
+    if (
+      remainingArrears > 0 &&
+      remainingDeposit > 0
+    ) {
+      depositApplied =
+        Math.min(
+          remainingDeposit,
+          remainingArrears
+        );
+
+      financeSystem.applyHeldDeposit(
+        lease.restaurantId,
+        depositApplied,
+        FINANCE_CATEGORY.RENT,
+        "押金抵扣欠租"
+      );
+
+      remainingDeposit -=
+        depositApplied;
+
+      remainingArrears -=
+        depositApplied;
+    }
+
+    if (remainingDeposit > 0) {
+      financeSystem.releaseDeposit(
+        lease.restaurantId,
+        remainingDeposit,
+        "退还铺位押金"
+      );
     }
 
     const time =
@@ -205,9 +394,22 @@ class LeaseSystem {
         "lease",
         leaseId,
         {
-          status: "terminated",
+          status:
+            "terminated",
+
+          terminationReason:
+            reason,
+
           endedAt:
-            time.totalMinutes
+            time.totalMinutes,
+
+          depositApplied,
+
+          depositRefunded:
+            remainingDeposit,
+
+          unpaidRent:
+            remainingArrears
         }
       );
 
@@ -225,7 +427,10 @@ class LeaseSystem {
 
     eventBus.emit(
       "lease:terminated",
-      { leaseId }
+      {
+        leaseId,
+        reason
+      }
     );
 
     return updated;

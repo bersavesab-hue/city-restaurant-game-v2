@@ -1,36 +1,76 @@
 import { entitySystem } from "../core/EntitySystem.js";
 import { gameState } from "../core/GameState.js";
+
 import {
   financeSystem,
   FINANCE_CATEGORY
 } from "./FinanceSystem.js";
+
 import { employeeSystem } from "./EmployeeSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
 import { eventBus } from "../core/EventBus.js";
 
 class DailySettlementSystem {
-  settle(restaurantId) {
-    const time =
-      gameState.getSection("time");
+  find(
+    restaurantId,
+    day
+  ) {
+    return entitySystem
+      .list(
+        "daily_settlement"
+      )
+      .find(
+        (item) =>
+          item.restaurantId ===
+            restaurantId &&
+          item.day === day
+      );
+  }
 
-    const previousDay =
-      Math.max(1, time.day - 1);
+  settle(
+    restaurantId,
+    day = null
+  ) {
+    const time =
+      gameState.getSection(
+        "time"
+      );
+
+    const targetDay =
+      day ??
+      Math.max(
+        1,
+        time.day - 1
+      );
+
+    const existing =
+      this.find(
+        restaurantId,
+        targetDay
+      );
+
+    if (existing) {
+      return existing;
+    }
 
     const orders =
       entitySystem
-        .list("customer_order")
+        .list(
+          "customer_order"
+        )
         .filter(
           (order) =>
             order.restaurantId ===
               restaurantId &&
             order.day ===
-              previousDay
+              targetDay
         );
 
     const revenue =
       orders.reduce(
         (sum, order) =>
-          sum + order.totalRevenue,
+          sum +
+          order.totalRevenue,
         0
       );
 
@@ -47,61 +87,116 @@ class DailySettlementSystem {
         restaurantId
       );
 
-    const payroll =
+    const payrollDue =
       Math.round(
         monthlyPayroll / 30
       );
 
-    if (payroll > 0) {
+    let payrollPaid = 0;
+    let unpaidPayroll = 0;
+
+    if (payrollDue > 0) {
       const balance =
         financeSystem.getBalance(
           restaurantId
         );
 
-      if (balance >= payroll) {
+      if (
+        balance >= payrollDue
+      ) {
         financeSystem.expense(
           restaurantId,
-          payroll,
+          payrollDue,
           FINANCE_CATEGORY.SALARY,
-          `第${previousDay}日员工工资`
+          `第${targetDay}日员工工资`
+        );
+
+        payrollPaid =
+          payrollDue;
+      } else {
+        unpaidPayroll =
+          payrollDue;
+
+        entitySystem.create(
+          "payroll_arrear",
+          {
+            restaurantId,
+            day:
+              targetDay,
+            amount:
+              payrollDue,
+            status:
+              "unpaid",
+            createdAt:
+              time.totalMinutes
+          }
+        );
+
+        eventBus.emit(
+          "payroll:arrearCreated",
+          {
+            restaurantId,
+            day:
+              targetDay,
+            amount:
+              payrollDue
+          }
         );
       }
     }
 
-    const experience =
-      Math.max(
-        1,
+    let experience = 0;
+
+    if (orders.length > 0) {
+      experience =
         orders.length * 10 +
         Math.floor(
           revenue / 1000
-        )
-      );
+        );
 
-    storeProgressSystem.addExperience(
-      restaurantId,
-      experience
-    );
+      if (experience > 0) {
+        storeProgressSystem
+          .addExperience(
+            restaurantId,
+            experience
+          );
+      }
 
-    const employees =
-      employeeSystem.listByRestaurant(
-        restaurantId
-      );
+      const employees =
+        employeeSystem
+          .listByRestaurant(
+            restaurantId
+          );
 
-    for (const employee of employees) {
-      employeeSystem.addExperience(
-        employee.id,
-        Math.max(
-          1,
-          orders.length * 2
-        )
-      );
+      for (
+        const employee
+        of employees
+      ) {
+        employeeSystem
+          .addExperience(
+            employee.id,
+            Math.max(
+              1,
+              orders.length * 2
+            )
+          );
+      }
 
-      employeeSystem.changeFatigue(
-        employee.id,
-        Math.min(
-          20,
-          orders.length
-        )
+      const restaurant =
+        entitySystem.get(
+          "restaurant",
+          restaurantId
+        );
+
+      entitySystem.update(
+        "restaurant",
+        restaurantId,
+        {
+          totalOperatingDays:
+            restaurant
+              .totalOperatingDays +
+            1
+        }
       );
     }
 
@@ -110,17 +205,36 @@ class DailySettlementSystem {
         "daily_settlement",
         {
           restaurantId,
+
           day:
-            previousDay,
+            targetDay,
+
           orders:
             orders.length,
+
           revenue,
+
           ingredientCost,
-          payroll,
+
+          payroll:
+            payrollDue,
+
+          payrollDue,
+
+          payrollPaid,
+
+          unpaidPayroll,
+
           operatingProfit:
             revenue -
             ingredientCost -
-            payroll,
+            payrollDue,
+
+          cashOperatingProfit:
+            revenue -
+            ingredientCost -
+            payrollPaid,
+
           experienceGained:
             experience
         }
@@ -138,9 +252,83 @@ class DailySettlementSystem {
 
     return settlement;
   }
+
+  settleThrough(
+    restaurantId,
+    throughDay
+  ) {
+    if (
+      !Number.isInteger(
+        throughDay
+      ) ||
+      throughDay < 1
+    ) {
+      return [];
+    }
+
+    const restaurant =
+      entitySystem.get(
+        "restaurant",
+        restaurantId
+      );
+
+    if (!restaurant) {
+      return [];
+    }
+
+    const createdDay =
+      Math.floor(
+        restaurant.createdAt /
+        1440
+      ) + 1;
+
+    const settlements =
+      entitySystem
+        .list(
+          "daily_settlement"
+        )
+        .filter(
+          (item) =>
+            item.restaurantId ===
+            restaurantId
+        );
+
+    const lastDay =
+      settlements.length > 0
+        ? Math.max(
+            ...settlements.map(
+              (item) =>
+                item.day
+            )
+          )
+        : createdDay - 1;
+
+    const results = [];
+
+    for (
+      let day =
+        Math.max(
+          createdDay,
+          lastDay + 1
+        );
+      day <= throughDay;
+      day += 1
+    ) {
+      results.push(
+        this.settle(
+          restaurantId,
+          day
+        )
+      );
+    }
+
+    return results;
+  }
 }
 
 export const dailySettlementSystem =
   new DailySettlementSystem();
 
-export { DailySettlementSystem };
+export {
+  DailySettlementSystem
+};

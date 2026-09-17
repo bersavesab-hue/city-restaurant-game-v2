@@ -6,6 +6,7 @@ import { operatingScheduleSystem } from "./OperatingScheduleSystem.js";
 import { trafficSystem } from "./TrafficSystem.js";
 import { dailySettlementSystem } from "./DailySettlementSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
+import { leaseSystem } from "./LeaseSystem.js";
 
 class OperatingCycleSystem {
   constructor() {
@@ -54,7 +55,7 @@ class OperatingCycleSystem {
           }
         },
 
-        onDay: () => {
+        onDay: ({ current }) => {
           const restaurants =
             entitySystem.list(
               "restaurant"
@@ -65,10 +66,15 @@ class OperatingCycleSystem {
             of restaurants
           ) {
             dailySettlementSystem
-              .settle(
-                restaurant.id
+              .settleThrough(
+                restaurant.id,
+                current.day - 1
               );
           }
+
+          leaseSystem.processDay(
+            current.day
+          );
         }
       },
       {
