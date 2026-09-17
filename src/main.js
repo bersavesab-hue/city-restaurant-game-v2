@@ -38,6 +38,7 @@ import { trafficDemandSystem } from "./systems/TrafficDemandSystem.js";
 import { marketCompetitionSystem } from "./systems/MarketCompetitionSystem.js";
 import { marketInsightSystem } from "./systems/MarketInsightSystem.js";
 import { marketRankingSystem } from "./systems/MarketRankingSystem.js";
+import { marketActionSystem } from "./systems/MarketActionSystem.js";
 import { competitorDynamicsSystem } from "./systems/CompetitorDynamicsSystem.js";
 import { seatingSystem } from "./systems/SeatingSystem.js";
 import { dailySettlementSystem } from "./systems/DailySettlementSystem.js";
@@ -100,6 +101,7 @@ function bootstrap() {
       marketCompetitionSystem,
       marketInsightSystem,
       marketRankingSystem,
+      marketActionSystem,
       competitorDynamicsSystem,
       seatingSystem,
       dailySettlementSystem,

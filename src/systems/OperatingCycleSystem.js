@@ -13,6 +13,7 @@ import { inventorySystem } from "./InventorySystem.js";
 import { procurementSystem } from "./ProcurementSystem.js";
 import { autoProcurementSystem } from "./AutoProcurementSystem.js";
 import { competitorDynamicsSystem } from "./CompetitorDynamicsSystem.js";
+import { marketActionSystem } from "./MarketActionSystem.js";
 import { marketInsightSystem } from "./MarketInsightSystem.js";
 
 class OperatingCycleSystem {
@@ -125,6 +126,11 @@ class OperatingCycleSystem {
                 restaurant.id
               );
           }
+
+          marketActionSystem
+            .processDay(
+              current.day
+            );
 
           competitorDynamicsSystem
             .processDay(

@@ -14,6 +14,7 @@ import { inventorySystem } from "./InventorySystem.js";
 import { cookingSystem } from "./CookingSystem.js";
 import { customerSystem } from "./CustomerSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
+import { marketActionSystem } from "./MarketActionSystem.js";
 
 class OrderSystem {
   place({
@@ -37,6 +38,13 @@ class OrderSystem {
     if (!Array.isArray(items) || items.length === 0) {
       throw new Error("Order requires items");
     }
+
+    const priceMultiplier =
+      marketActionSystem
+        .getModifiers(
+          restaurantId
+        )
+        .priceMultiplier;
 
     const lines = [];
     const requirements = new Map();
@@ -76,8 +84,18 @@ class OrderSystem {
         );
       }
 
+      const effectiveUnitPrice =
+        Math.max(
+          1,
+          Math.round(
+            menuItem.price *
+            priceMultiplier
+          )
+        );
+
       const revenue =
-        menuItem.price * item.quantity;
+        effectiveUnitPrice *
+        item.quantity;
 
       totalRevenue += revenue;
 
@@ -145,7 +163,14 @@ class OrderSystem {
         menuItemId: line.menuItem.id,
         dishId: line.menuItem.dishId,
         quantity: line.quantity,
-        unitPrice: line.menuItem.price,
+        unitPrice:
+          Math.max(
+            1,
+            Math.round(
+              line.menuItem.price *
+              priceMultiplier
+            )
+          ),
         revenue: line.revenue,
         cookingRecordId: cooking.id,
         qualityScore: cooking.qualityScore
@@ -268,8 +293,25 @@ class OrderSystem {
           chef.effectiveSkill
       });
 
+    const priceMultiplier =
+      marketActionSystem
+        .getModifiers(
+          restaurantId
+        )
+        .priceMultiplier;
+
+    const effectiveUnitPrice =
+      Math.max(
+        1,
+        Math.round(
+          menuItem.price *
+          priceMultiplier
+        )
+      );
+
     const totalRevenue =
-      menuItem.price * portions;
+      effectiveUnitPrice *
+      portions;
 
     menuSystem.recordSale(
       menuItem.id,
@@ -314,7 +356,7 @@ class OrderSystem {
               quantity:
                 portions,
               unitPrice:
-                menuItem.price,
+                effectiveUnitPrice,
               revenue:
                 totalRevenue,
               cookingRecordId:

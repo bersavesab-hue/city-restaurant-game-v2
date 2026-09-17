@@ -12,6 +12,7 @@ import { trafficDemandSystem } from "./TrafficDemandSystem.js";
 import { customerChoiceSystem } from "./CustomerChoiceSystem.js";
 import { seatingSystem } from "./SeatingSystem.js";
 import { customerExperienceSystem } from "./CustomerExperienceSystem.js";
+import { marketActionSystem } from "./MarketActionSystem.js";
 
 import { eventBus } from "../core/EventBus.js";
 
@@ -79,11 +80,18 @@ class TrafficSystem {
       schedule.openHour;
 
     const serviceCapacity =
-      employeeWorkSystem
-        .getServiceCapacity(
-          restaurantId
-        ) *
-      openHours;
+      Math.floor(
+        employeeWorkSystem
+          .getServiceCapacity(
+            restaurantId
+          ) *
+        marketActionSystem
+          .getModifiers(
+            restaurantId
+          )
+          .serviceCapacityMultiplier *
+        openHours
+      );
 
     const dailyDemand =
       trafficDemandSystem
@@ -325,10 +333,20 @@ class TrafficSystem {
     }
 
     const serviceCapacity =
-      employeeWorkSystem
-        .getServiceCapacity(
-          restaurantId
-        );
+      Math.max(
+        1,
+        Math.floor(
+          employeeWorkSystem
+            .getServiceCapacity(
+              restaurantId
+            ) *
+          marketActionSystem
+            .getModifiers(
+              restaurantId
+            )
+            .serviceCapacityMultiplier
+        )
+      );
 
     const seating =
       seatingSystem.getHourFlow(

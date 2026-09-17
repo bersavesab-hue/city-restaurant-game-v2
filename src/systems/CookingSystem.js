@@ -6,6 +6,7 @@ import { recipeSystem } from "./RecipeSystem.js";
 import { dishCatalogSystem } from "./DishCatalogSystem.js";
 import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
+import { marketActionSystem } from "./MarketActionSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -224,12 +225,29 @@ class CookingSystem {
         100
       );
 
-    const qualityScore =
+    const baseQualityScore =
       Math.round(
         ingredientQualityScore * 0.4 +
         averageFreshness * 0.25 +
         chefSkill * 0.2 +
         skillMatch * 0.15
+      );
+
+    const qualityBonus =
+      marketActionSystem
+        .getModifiers(
+          restaurantId
+        )
+        .qualityBonus;
+
+    const qualityScore =
+      Math.round(
+        clamp(
+          baseQualityScore +
+          qualityBonus,
+          0,
+          100
+        )
       );
 
     let qualityGrade = "C";
