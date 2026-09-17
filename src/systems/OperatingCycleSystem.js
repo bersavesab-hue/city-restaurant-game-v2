@@ -7,6 +7,8 @@ import { trafficSystem } from "./TrafficSystem.js";
 import { dailySettlementSystem } from "./DailySettlementSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 import { leaseSystem } from "./LeaseSystem.js";
+import { inventorySystem } from "./InventorySystem.js";
+import { autoProcurementSystem } from "./AutoProcurementSystem.js";
 
 class OperatingCycleSystem {
   constructor() {
@@ -52,6 +54,11 @@ class OperatingCycleSystem {
                   restaurant.id
                 );
             }
+
+            autoProcurementSystem
+              .processRestaurant(
+                restaurant.id
+              );
           }
         },
 
@@ -69,6 +76,16 @@ class OperatingCycleSystem {
               .settleThrough(
                 restaurant.id,
                 current.day - 1
+              );
+          }
+
+          for (
+            const restaurant
+            of restaurants
+          ) {
+            inventorySystem
+              .discardSpoiled(
+                restaurant.id
               );
           }
 

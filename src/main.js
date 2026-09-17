@@ -17,6 +17,7 @@ import { ingredientCatalogSystem } from "./systems/IngredientCatalogSystem.js";
 import { inventorySystem } from "./systems/InventorySystem.js";
 import { supplierSystem } from "./systems/SupplierSystem.js";
 import { procurementSystem } from "./systems/ProcurementSystem.js";
+import { autoProcurementSystem } from "./systems/AutoProcurementSystem.js";
 
 import { dishCatalogSystem } from "./systems/DishCatalogSystem.js";
 import { recipeSystem } from "./systems/RecipeSystem.js";
@@ -60,6 +61,7 @@ function bootstrap() {
       inventorySystem,
       supplierSystem,
       procurementSystem,
+      autoProcurementSystem,
 
       dishCatalogSystem,
       recipeSystem,
