@@ -99,6 +99,13 @@ class RenovationMobilePageSystem {
       workspace: {
         width: editor.layout.width,
         height: editor.layout.height,
+        floorCount: editor.layout.floorCount ?? 1,
+        floors: structuredClone(editor.layout.floors ?? []),
+        activeFloorId: editor.layout.activeFloorId ?? null,
+        activeFloor: editor.layout.activeFloor
+          ? structuredClone(editor.layout.activeFloor)
+          : null,
+        totalPlacements: editor.layout.totalPlacements ?? editor.layout.placements.length,
         placements: editor.layout.placements.map(
           item => this.getPlacementView(item)
         ),
@@ -139,9 +146,25 @@ class RenovationMobilePageSystem {
       actions: {
         canSave: editor.actions.canSave && editor.budget.affordable,
         canActivate:
-          editor.actions.canActivate && editor.budget.affordable
+          editor.actions.canActivate && editor.budget.affordable,
+        canSwitchFloor:
+          Boolean(editor.actions.canSwitchFloor)
       }
     };
+  }
+
+  switchFloor(restaurantId, floorId) {
+    const ui = this.requireUiState(restaurantId);
+    const editor = renovationEditorSystem.setActiveFloor(
+      restaurantId,
+      floorId
+    );
+
+    ui.selectedPlacementId = null;
+    ui.selectedFurnitureId = null;
+    ui.pendingRotation = 0;
+
+    return this.getPage(restaurantId, editor);
   }
 
   selectCategory(restaurantId, categoryId) {
@@ -180,7 +203,7 @@ class RenovationMobilePageSystem {
     const editor = renovationEditorSystem.getPageState(restaurantId);
 
     if (!editor.layout.placements.some(item => item.id === placementId)) {
-      throw new Error(`Placement "${placementId}" does not exist`);
+      throw new Error(`Placement "${placementId}" does not exist on active floor`);
     }
 
     ui.selectedPlacementId = placementId;
@@ -200,9 +223,10 @@ class RenovationMobilePageSystem {
   previewPlacement(restaurantId, x, y, rotation = null) {
     const ui = this.requireUiState(restaurantId);
     const editor = renovationEditorSystem.getPageState(restaurantId);
+    const draft = renovationEditorSystem.getDraftLayout(restaurantId);
 
     let candidate = null;
-    let placements = editor.layout.placements;
+    let placements = draft.placements;
     let mode = null;
 
     if (ui.selectedFurnitureId) {
@@ -210,6 +234,7 @@ class RenovationMobilePageSystem {
       candidate = {
         id: "preview_new",
         furnitureId: ui.selectedFurnitureId,
+        floorId: editor.layout.activeFloorId,
         x,
         y,
         rotation: rotation ?? ui.pendingRotation,
