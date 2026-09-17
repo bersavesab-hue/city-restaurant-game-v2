@@ -1,1 +1,0 @@
-formal mobile renovation screen implementation
