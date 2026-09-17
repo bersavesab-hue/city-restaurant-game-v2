@@ -5,6 +5,7 @@ import {
   EMPLOYEE_STATUS
 } from "./EmployeeSystem.js";
 import { renovationSystem } from "./RenovationSystem.js";
+import { layoutFlowSystem } from "./LayoutFlowSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -180,17 +181,68 @@ class EmployeeWorkSystem {
           restaurantId
         );
 
-    const multiplier =
+    const renovationMultiplier =
       renovation.active
         ? renovation.serviceEfficiency
         : 1;
 
+    const flow =
+      layoutFlowSystem
+        .getOperationalEffects(
+          restaurantId
+        );
+
+    const serviceCapacity =
+      Math.max(
+        1,
+        Math.floor(
+          baseCapacity *
+          renovationMultiplier *
+          flow.serviceMultiplier
+        )
+      );
+
+    if (
+      !Number.isFinite(
+        flow.kitchenCapacityPerHour
+      )
+    ) {
+      return serviceCapacity;
+    }
+
     return Math.max(
       1,
-      Math.floor(
-        baseCapacity * multiplier
+      Math.min(
+        serviceCapacity,
+        flow.kitchenCapacityPerHour
       )
     );
+  }
+
+  getCapacityBreakdown(
+    restaurantId
+  ) {
+    const renovation =
+      renovationSystem
+        .getOperationalModifiers(
+          restaurantId
+        );
+
+    const flow =
+      layoutFlowSystem
+        .getOperationalEffects(
+          restaurantId
+        );
+
+    return {
+      restaurantId,
+      effectiveCapacity:
+        this.getServiceCapacity(
+          restaurantId
+        ),
+      renovation,
+      flow
+    };
   }
 
   recordWork(
