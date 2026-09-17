@@ -31,6 +31,7 @@ import { orderSystem } from "./systems/OrderSystem.js";
 
 import { operatingScheduleSystem } from "./systems/OperatingScheduleSystem.js";
 import { trafficSystem } from "./systems/TrafficSystem.js";
+import { trafficDemandSystem } from "./systems/TrafficDemandSystem.js";
 import { dailySettlementSystem } from "./systems/DailySettlementSystem.js";
 import { historyArchiveSystem } from "./systems/HistoryArchiveSystem.js";
 import { operatingCycleSystem } from "./systems/OperatingCycleSystem.js";
@@ -82,6 +83,7 @@ function bootstrap() {
 
       operatingScheduleSystem,
       trafficSystem,
+      trafficDemandSystem,
       dailySettlementSystem,
       historyArchiveSystem,
       operatingCycleSystem,

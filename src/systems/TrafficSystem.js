@@ -1,4 +1,5 @@
 import { randomSystem } from "../core/RandomSystem.js";
+import { gameState } from "../core/GameState.js";
 
 import { restaurantSystem } from "./RestaurantSystem.js";
 import { menuSystem } from "./MenuSystem.js";
@@ -7,6 +8,7 @@ import { recipeSystem } from "./RecipeSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
 import { operatingScheduleSystem } from "./OperatingScheduleSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
+import { trafficDemandSystem } from "./TrafficDemandSystem.js";
 
 import { eventBus } from "../core/EventBus.js";
 
@@ -80,11 +82,33 @@ class TrafficSystem {
         ) *
       openHours;
 
+    const dailyDemand =
+      trafficDemandSystem
+        .getDailyDemand(
+          restaurantId,
+          schedule.openHour,
+          schedule.closeHour
+        );
+
+    const expected =
+      dailyDemand
+        .expectedVisitors;
+
     const visitors =
       Math.min(
         randomSystem.int(
-          openHours,
-          openHours * 4
+          Math.max(
+            0,
+            Math.floor(
+              expected * 0.85
+            )
+          ),
+          Math.max(
+            0,
+            Math.ceil(
+              expected * 1.15
+            )
+          )
         ),
         capacity
       );
@@ -175,8 +199,8 @@ class TrafficSystem {
   simulateHour(
     restaurantId,
     {
-      minVisitors = 1,
-      maxVisitors = 4
+      minVisitors = null,
+      maxVisitors = null
     } = {}
   ) {
     if (
@@ -211,10 +235,42 @@ class TrafficSystem {
       };
     }
 
+    const time =
+      gameState.getSection(
+        "time"
+      );
+
+    const demand =
+      trafficDemandSystem
+        .getHourlyDemand(
+          restaurantId,
+          time.hour
+        );
+
+    const calculatedMin =
+      Math.max(
+        0,
+        Math.floor(
+          demand.expectedVisitors *
+          0.75
+        )
+      );
+
+    const calculatedMax =
+      Math.max(
+        calculatedMin,
+        Math.ceil(
+          demand.expectedVisitors *
+          1.25
+        )
+      );
+
     const incomingVisitors =
       randomSystem.int(
-        minVisitors,
-        maxVisitors
+        minVisitors ??
+          calculatedMin,
+        maxVisitors ??
+          calculatedMax
       );
 
     const chef =
