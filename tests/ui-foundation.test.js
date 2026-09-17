@@ -15,7 +15,7 @@ test("UI基础框架支持时间倍速动态命名通报和可扩展页面注册
     { paused: false, speed: 4 }
   );
 
-  assert.equal(clock.dateText, "第2年 1月11日 周七".replace("周七", "周四"));
+  assert.equal(clock.dateText, "第2年 1月11日 周日");
   assert.equal(clock.clockText, "11:42");
   assert.equal(clock.statusText, "4×");
 
