@@ -8,14 +8,8 @@ function normalizeUnitPrice(reference) {
   const unit = reference.unit;
   const price = reference.referencePrice;
 
-  if (unit === "kg") {
-    return price / 1000;
-  }
-
-  if (unit === "l") {
-    return price / 1000;
-  }
-
+  if (unit === "kg") return price / 1000;
+  if (unit === "l") return price / 1000;
   return price;
 }
 
@@ -43,9 +37,7 @@ class EconomicBaselineSystem {
 
   getIngredientReference(ingredientId) {
     const reference = this.snapshot.ingredientReference?.[ingredientId];
-    if (!reference) {
-      return null;
-    }
+    if (!reference) return null;
 
     return {
       ...structuredClone(reference),
@@ -56,6 +48,16 @@ class EconomicBaselineSystem {
   getLaborReference(roleId) {
     const value = this.snapshot.laborReference?.[roleId];
     return value ? structuredClone(value) : null;
+  }
+
+  getFurnitureReference(furnitureId) {
+    const value = this.snapshot.furnitureReference?.[furnitureId];
+    return Number.isFinite(value) ? value : null;
+  }
+
+  getCommercialRentReference(districtId) {
+    const value = this.snapshot.commercialRentReference?.[districtId];
+    return Number.isFinite(value) ? value : null;
   }
 
   getVenueRentMultiplier(venueType, district) {
@@ -76,6 +78,39 @@ class EconomicBaselineSystem {
     );
   }
 
+  calculateMonthlyRent({
+    districtId,
+    area,
+    venueType = null,
+    frontageFactor = 1,
+    floorFactor = 1,
+    eventFactor = 1
+  }) {
+    const referencePerSquareMeter = this.getCommercialRentReference(districtId);
+    if (!referencePerSquareMeter || !Number.isFinite(area) || area <= 0) {
+      return null;
+    }
+
+    const venueMultiplier = Number.isFinite(venueType?.baseRentMultiplier)
+      ? venueType.baseRentMultiplier
+      : 1;
+
+    const macro = this.snapshot.macro?.commercialRentIndex ?? 1;
+    const multiplier = clamp(
+      venueMultiplier * frontageFactor * floorFactor * eventFactor * macro,
+      0.35,
+      3
+    );
+
+    return {
+      districtId,
+      area,
+      referencePerSquareMeter,
+      multiplier,
+      monthlyRent: Math.max(1, Math.round(referencePerSquareMeter * area * multiplier))
+    };
+  }
+
   calculateIngredientPrice({
     ingredientId,
     districtFactor = 1,
@@ -86,10 +121,7 @@ class EconomicBaselineSystem {
     contractFactor = 1
   }) {
     const reference = this.getIngredientReference(ingredientId);
-
-    if (!reference) {
-      return null;
-    }
+    if (!reference) return null;
 
     const macro =
       (this.snapshot.macro?.foodPriceIndex ?? 1) *
@@ -136,11 +168,8 @@ class EconomicBaselineSystem {
     const markupPenalty =
       markup * sensitivity * rules.markupStrength / Math.max(0.5, venuePriceTolerance);
 
-    const discountLift =
-      discount * sensitivity * rules.discountStrength;
-
-    const spendingLift =
-      Math.max(0, spendingRelief) * rules.spendingPowerRelief;
+    const discountLift = discount * sensitivity * rules.discountStrength;
+    const spendingLift = Math.max(0, spendingRelief) * rules.spendingPowerRelief;
 
     const demandFactor = clamp(
       (1 - markupPenalty + discountLift + spendingLift) *
