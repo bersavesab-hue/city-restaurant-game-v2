@@ -1,11 +1,24 @@
 import { mapViewportSystem } from "../../systems/MapViewportSystem.js";
 
+function distance(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function midpoint(a, b) {
+  return {
+    x: (a.x + b.x) / 2,
+    y: (a.y + b.y) / 2
+  };
+}
+
 class CityMapViewportRuntime {
   constructor() {
     this.root = null;
     this.state = mapViewportSystem.reset();
     this.observer = null;
+    this.pointers = new Map();
     this.drag = null;
+    this.pinch = null;
     this.boundClick = (event) => this.handleClick(event);
     this.boundPointerDown = (event) => this.handlePointerDown(event);
     this.boundPointerMove = (event) => this.handlePointerMove(event);
@@ -40,6 +53,9 @@ class CityMapViewportRuntime {
     this.root.removeEventListener("wheel", this.boundWheel, true);
     this.observer?.disconnect();
     this.observer = null;
+    this.pointers.clear();
+    this.drag = null;
+    this.pinch = null;
     this.root = null;
   }
 
@@ -78,10 +94,12 @@ class CityMapViewportRuntime {
 
   apply() {
     const layers = this.getLayers();
+    const gesturing = this.drag || this.pinch;
+
     for (const layer of layers) {
       layer.style.transformOrigin = "50% 50%";
       layer.style.transform = `translate(${this.state.offsetX}px, ${this.state.offsetY}px) scale(${this.state.zoom})`;
-      layer.style.transition = this.drag ? "none" : "transform 140ms ease-out";
+      layer.style.transition = gesturing ? "none" : "transform 140ms ease-out";
     }
 
     const reset = document.querySelector('[data-map-runtime="reset"]');
@@ -131,33 +149,96 @@ class CityMapViewportRuntime {
     this.apply();
   }
 
+  startGesture() {
+    const points = [...this.pointers.values()];
+
+    if (points.length >= 2) {
+      const a = points[0];
+      const b = points[1];
+      this.drag = null;
+      this.pinch = {
+        distance: Math.max(1, distance(a, b)),
+        midpoint: midpoint(a, b),
+        state: { ...this.state }
+      };
+      return;
+    }
+
+    if (points.length === 1) {
+      const point = points[0];
+      this.pinch = null;
+      this.drag = {
+        pointerId: point.pointerId,
+        x: point.x,
+        y: point.y
+      };
+    }
+  }
+
   handlePointerDown(event) {
     const canvas = event.target.closest?.(".city-map-panel__canvas");
     if (!canvas || event.target.closest?.("button")) return;
 
-    this.drag = {
+    event.preventDefault();
+    this.pointers.set(event.pointerId, {
       pointerId: event.pointerId,
       x: event.clientX,
       y: event.clientY
-    };
+    });
     canvas.setPointerCapture?.(event.pointerId);
+    this.startGesture();
     this.apply();
   }
 
   handlePointerMove(event) {
-    if (!this.drag || event.pointerId !== this.drag.pointerId) return;
+    if (!this.pointers.has(event.pointerId)) return;
 
-    const dx = event.clientX - this.drag.x;
-    const dy = event.clientY - this.drag.y;
-    this.drag.x = event.clientX;
-    this.drag.y = event.clientY;
-    this.state = mapViewportSystem.pan(this.state, dx, dy);
-    this.apply();
+    event.preventDefault();
+    this.pointers.set(event.pointerId, {
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY
+    });
+
+    const points = [...this.pointers.values()];
+
+    if (points.length >= 2 && this.pinch) {
+      const a = points[0];
+      const b = points[1];
+      const nextDistance = Math.max(1, distance(a, b));
+      const nextMidpoint = midpoint(a, b);
+      const ratio = nextDistance / this.pinch.distance;
+
+      this.state = mapViewportSystem.normalize({
+        zoom: this.pinch.state.zoom * ratio,
+        offsetX:
+          this.pinch.state.offsetX +
+          (nextMidpoint.x - this.pinch.midpoint.x),
+        offsetY:
+          this.pinch.state.offsetY +
+          (nextMidpoint.y - this.pinch.midpoint.y)
+      });
+      this.apply();
+      return;
+    }
+
+    if (points.length === 1 && this.drag && event.pointerId === this.drag.pointerId) {
+      const dx = event.clientX - this.drag.x;
+      const dy = event.clientY - this.drag.y;
+      this.drag.x = event.clientX;
+      this.drag.y = event.clientY;
+      this.state = mapViewportSystem.pan(this.state, dx, dy);
+      this.apply();
+    }
   }
 
   handlePointerUp(event) {
-    if (!this.drag || event.pointerId !== this.drag.pointerId) return;
+    if (!this.pointers.has(event.pointerId)) return;
+
+    this.pointers.delete(event.pointerId);
     this.drag = null;
+    this.pinch = null;
+    this.startGesture();
     this.apply();
   }
 }
