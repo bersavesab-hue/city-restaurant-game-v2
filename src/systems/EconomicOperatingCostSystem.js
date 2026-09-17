@@ -29,6 +29,23 @@ class EconomicOperatingCostSystem {
 
   estimateDailyCost(restaurantId, day) {
     const restaurant = restaurantSystem.get(restaurantId);
+
+    if (!restaurant.locationId) {
+      return {
+        restaurantId,
+        day,
+        venueTypeId: null,
+        orders: 0,
+        openHours: 0,
+        seats: 0,
+        kitchenStations: 0,
+        usage: { electricityKwh: 0, waterTon: 0, gasCubicMeter: 0 },
+        breakdown: { electricity: 0, water: 0, gas: 0, waste: 0, internet: 0 },
+        total: 0,
+        reason: "no_operating_location"
+      };
+    }
+
     const schedule = operatingScheduleSystem.get(restaurantId);
     const renovation = renovationSystem.getSummary(restaurantId);
     const seats = renovation.modifiers?.seats ?? 0;
@@ -40,31 +57,33 @@ class EconomicOperatingCostSystem {
 
     let venue = null;
     let districtId = null;
-    if (restaurant.locationId) {
-      try {
-        const property = propertySystem.get(restaurant.locationId);
-        venue = venueTypeSystem.get(property.venueTypeId ?? "street_shop");
-        districtId = property.districtId;
-      } catch {
-        venue = null;
-      }
+
+    try {
+      const property = propertySystem.get(restaurant.locationId);
+      venue = venueTypeSystem.get(property.venueTypeId ?? "street_shop");
+      districtId = property.districtId;
+    } catch {
+      venue = null;
     }
 
     const baseline = economicBaselineSystem.getSnapshot();
     const economy = cityEconomySystem.getState(districtId);
     const maintenanceMultiplier = venue?.maintenanceMultiplier ?? 1;
+    const activeFactor = openHours > 0 || orders > 0 ? 1 : 0.22;
 
     const electricityKwh =
-      openHours * (1.6 + kitchenStations * 2.4 + seats * 0.045) + orders * 0.06;
+      (openHours * (1.6 + kitchenStations * 2.4 + seats * 0.045) + orders * 0.06) * activeFactor;
     const waterTon =
-      openHours * 0.045 + orders * 0.012 + seats * 0.002;
+      (openHours * 0.045 + orders * 0.012 + seats * 0.002) * activeFactor;
     const gasCubicMeter =
-      kitchenStations > 0 ? openHours * kitchenStations * 0.22 + orders * 0.035 : 0;
+      kitchenStations > 0
+        ? (openHours * kitchenStations * 0.22 + orders * 0.035) * activeFactor
+        : 0;
 
     const electricity = electricityKwh * baseline.utilitiesReference.electricityPerKwh * economy.energyIndex;
     const water = waterTon * baseline.utilitiesReference.waterPerTon;
     const gas = gasCubicMeter * baseline.utilitiesReference.gasPerCubicMeter * economy.energyIndex;
-    const waste = baseline.utilitiesReference.wasteDisposalMonthlyBase / 30 * maintenanceMultiplier;
+    const waste = baseline.utilitiesReference.wasteDisposalMonthlyBase / 30 * maintenanceMultiplier * activeFactor;
     const internet = baseline.utilitiesReference.internetMonthlyBase / 30;
 
     const total = Math.max(
@@ -101,28 +120,31 @@ class EconomicOperatingCostSystem {
     if (existing) return existing;
 
     const estimate = this.estimateDailyCost(restaurantId, day);
-    const balance = financeSystem.getBalance(restaurantId);
     let paid = 0;
     let unpaid = 0;
     let transactionId = null;
 
-    if (balance >= estimate.total) {
-      const result = financeSystem.expense(
-        restaurantId,
-        estimate.total,
-        FINANCE_CATEGORY.UTILITIES,
-        `第${day}日水电燃气及基础运营费用`
-      );
-      paid = estimate.total;
-      transactionId = result.transaction.id;
-    } else {
-      unpaid = estimate.total;
-      entitySystem.create("operating_cost_arrear", {
-        restaurantId,
-        day,
-        amount: estimate.total,
-        status: "unpaid"
-      });
+    if (estimate.total > 0) {
+      const balance = financeSystem.getBalance(restaurantId);
+
+      if (balance >= estimate.total) {
+        const result = financeSystem.expense(
+          restaurantId,
+          estimate.total,
+          FINANCE_CATEGORY.UTILITIES,
+          `第${day}日水电燃气及基础运营费用`
+        );
+        paid = estimate.total;
+        transactionId = result.transaction.id;
+      } else {
+        unpaid = estimate.total;
+        entitySystem.create("operating_cost_arrear", {
+          restaurantId,
+          day,
+          amount: estimate.total,
+          status: "unpaid"
+        });
+      }
     }
 
     return entitySystem.create("operating_cost_settlement", {
