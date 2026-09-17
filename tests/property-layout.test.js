@@ -6,14 +6,19 @@ import { app } from "../src/main.js";
 const {
   districtSystem,
   propertySystem,
-  propertyFloorplanSystem
+  propertyFloorplanSystem,
+  restaurantSystem,
+  financeSystem,
+  leaseSystem,
+  renovationSystem,
+  renovationMobilePageSystem
 } = app.systems;
 
 const {
   cityPropertyPageSystem
 } = app.ui;
 
-test("房源支持30到10000平米、多楼层、真实结构和自适应编辑模式", () => {
+test("房源支持30到10000平米、多楼层、真实结构和自适应装修", () => {
   districtSystem.load(
     [
       {
@@ -179,4 +184,77 @@ test("房源支持30到10000平米、多楼层、真实结构和自适应编辑�
       ),
     /outside the rented floorplan/
   );
+
+  const restaurant = restaurantSystem.create({
+    name: "大型多层装修测试店"
+  });
+
+  financeSystem.createAccount(
+    restaurant.id,
+    1500000
+  );
+
+  leaseSystem.sign({
+    restaurantId: restaurant.id,
+    propertyId: huge.id,
+    months: 12
+  });
+
+  const renovation = renovationSystem.initialize(
+    restaurant.id
+  );
+
+  assert.equal(renovation.floorCount, 3);
+  assert.equal(renovation.activeFloorId, "huge_1f");
+  assert.equal(renovation.width, 60);
+  assert.equal(renovation.height, 45);
+
+  const firstPage = renovationMobilePageSystem.open(
+    restaurant.id
+  );
+
+  assert.equal(firstPage.workspace.floorCount, 3);
+  assert.equal(firstPage.actions.canSwitchFloor, true);
+  assert.equal(firstPage.workspace.activeFloorId, "huge_1f");
+
+  const secondFloor = renovationMobilePageSystem.switchFloor(
+    restaurant.id,
+    "huge_2f"
+  );
+
+  assert.equal(secondFloor.workspace.width, 55);
+  assert.equal(secondFloor.workspace.height, 42);
+  assert.equal(secondFloor.workspace.activeFloorId, "huge_2f");
+
+  renovationMobilePageSystem.selectFurniture(
+    restaurant.id,
+    "table_2"
+  );
+
+  const preview = renovationMobilePageSystem.previewPlacement(
+    restaurant.id,
+    0,
+    0
+  );
+
+  assert.equal(preview.valid, true);
+  assert.equal(preview.placement.floorId, "huge_2f");
+
+  const afterPlace = renovationMobilePageSystem.placeSelected(
+    restaurant.id,
+    0,
+    0
+  );
+
+  assert.equal(afterPlace.workspace.placements.length, 1);
+  assert.equal(afterPlace.workspace.placements[0].floorId, "huge_2f");
+
+  const backToFirst = renovationMobilePageSystem.switchFloor(
+    restaurant.id,
+    "huge_1f"
+  );
+
+  assert.equal(backToFirst.workspace.placements.length, 0);
+
+  renovationMobilePageSystem.discard(restaurant.id);
 });
