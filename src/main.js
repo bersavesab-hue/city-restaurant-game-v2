@@ -51,6 +51,7 @@ import { layoutFlowSystem } from "./systems/LayoutFlowSystem.js";
 import { renovationPlanningSystem } from "./systems/RenovationPlanningSystem.js";
 import { renovationEditorSystem } from "./systems/RenovationEditorSystem.js";
 import { renovationMobilePageSystem } from "./ui/renovation/RenovationMobilePageSystem.js";
+import { restaurantHomePageSystem } from "./ui/pages/restaurant/RestaurantHomePageSystem.js";
 import { pageRegistry } from "./ui/registry/PageRegistry.js";
 import "./ui/registry/defaultPages.js";
 import { dailySettlementSystem } from "./systems/DailySettlementSystem.js";
@@ -138,7 +139,8 @@ function bootstrap() {
     },
 
     ui: {
-      pageRegistry
+      pageRegistry,
+      restaurantHomePageSystem
     }
   };
 }
