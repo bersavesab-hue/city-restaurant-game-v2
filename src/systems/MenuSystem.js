@@ -4,6 +4,7 @@ import { dishCatalogSystem } from "./DishCatalogSystem.js";
 import { recipeSystem } from "./RecipeSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
 import { dishGrowthSystem } from "./DishGrowthSystem.js";
+import { priceHistorySystem } from "./PriceHistorySystem.js";
 
 function requireRestaurant(id) {
   const restaurant = entitySystem.get("restaurant", id);
@@ -116,11 +117,33 @@ class MenuSystem {
       );
     }
 
-    return entitySystem.update(
+    const previous = requireMenuItem(id);
+
+    const updated = entitySystem.update(
       "menu_item",
       id,
       { price }
     );
+
+    if (previous.price !== price) {
+      priceHistorySystem.recordMenuPrice({
+        restaurantId: previous.restaurantId,
+        menuItemId: previous.id,
+        dishId: previous.dishId,
+        previousPrice: previous.price,
+        nextPrice: price
+      });
+
+      eventBus.emit("menu:priceChanged", {
+        restaurantId: previous.restaurantId,
+        menuItemId: previous.id,
+        dishId: previous.dishId,
+        previousPrice: previous.price,
+        nextPrice: price
+      });
+    }
+
+    return updated;
   }
 
   setActive(id, active) {
