@@ -55,12 +55,30 @@ class CityPropertyView {
     for (const district of model.districts) {
       const button = el("button", "cr-city-district-chip");
       button.type = "button";
-      button.innerHTML = `<strong>${district.name}</strong><span>客流 ${district.trafficIndex} · 消费 ${district.spendingPower} · 竞争 ${district.competition}</span>`;
+      button.innerHTML = `<strong>${district.name}</strong><span>客流 ${district.trafficIndex} · 消费 ${district.spendingPower} · 竞争 ${district.competition} · ${district.propertyCount}套</span>`;
       button.addEventListener("click", () => {
         this.renderMarketplace({ districtId: district.id });
       });
       districtRow.append(button);
     }
+
+    const marketInfo = el("div", "cr-property-market-info");
+    const summaries = model.market?.districts ?? [];
+    const available = summaries.reduce(
+      (sum, item) => sum + (item.availableGenerated ?? 0),
+      0
+    );
+    marketInfo.innerHTML = `
+      <div>
+        <strong>动态房源市场</strong>
+        <span>${available}套动态房源 · 每7天滚动更新</span>
+      </div>
+      <div class="cr-property-market-tags">
+        <span>30–10000㎡</span>
+        <span>真实户型</span>
+        <span>租金随商圈变化</span>
+      </div>
+    `;
 
     const list = el("section", "cr-property-list");
     if (model.properties.length === 0) {
@@ -70,15 +88,31 @@ class CityPropertyView {
     for (const property of model.properties) {
       const card = el("button", "cr-property-card");
       card.type = "button";
+      const marketBadges = property.source === "market"
+        ? `
+          <div class="cr-property-card__badges">
+            <span>动态房源</span>
+            ${property.qualityScore !== null ? `<span>房源评分 ${property.qualityScore}</span>` : ""}
+            ${property.listing.remainingDays !== null ? `<span>${property.listing.remainingDays}天后下架</span>` : ""}
+          </div>
+        `
+        : "";
       card.innerHTML = `
         <div class="cr-property-card__scene" aria-hidden="true"></div>
         <div class="cr-property-card__body">
+          ${marketBadges}
           <div class="cr-property-card__name">${property.name}</div>
           <div class="cr-property-card__district">${property.districtName}</div>
           <div class="cr-property-card__metrics">
-            <span>${property.area}㎡</span>
-            <span>参考座位 ${property.seats}</span>
+            <span>建筑 ${property.area}㎡</span>
+            <span>可用 ${property.usableArea}㎡</span>
+            <span>${property.floorCount}层</span>
             <span>${money(property.monthlyRent)}/月</span>
+          </div>
+          <div class="cr-property-card__features">
+            <span class="${property.foodServiceAllowed ? "is-good" : "is-bad"}">${property.foodServiceAllowed ? "可做餐饮" : "限制餐饮"}</span>
+            <span class="${property.exhaustAllowed ? "is-good" : "is-bad"}">${property.exhaustAllowed ? "可排烟" : "不可排烟"}</span>
+            ${property.parkingSpaces > 0 ? `<span>${property.parkingSpaces}车位</span>` : ""}
           </div>
           <div class="cr-property-card__footer">
             <span>签约首付 ${money(property.quote.upfront)}</span>
@@ -89,7 +123,7 @@ class CityPropertyView {
       list.append(card);
     }
 
-    this.root.append(header, districtRow, list);
+    this.root.append(header, districtRow, marketInfo, list);
     return model;
   }
 
@@ -112,19 +146,29 @@ class CityPropertyView {
     shell.innerHTML = `
       <div class="cr-property-detail__visual" aria-hidden="true"></div>
       <div class="cr-property-detail__content">
-        <div class="cr-property-detail__eyebrow">${property.districtName}</div>
+        <div class="cr-property-detail__eyebrow">${property.districtName}${property.source === "market" ? " · 动态房源" : ""}</div>
         <h2>${property.name}</h2>
         <div class="cr-property-detail__specs">
           <div><strong>${property.area}㎡</strong><span>建筑面积</span></div>
-          <div><strong>${property.seats}</strong><span>参考座位</span></div>
+          <div><strong>${property.usableArea}㎡</strong><span>可用面积</span></div>
+          <div><strong>${property.floorCount}层</strong><span>楼层</span></div>
           <div><strong>${money(property.monthlyRent)}</strong><span>月租</span></div>
-          <div><strong>${property.depositMonths}个月</strong><span>押金</span></div>
         </div>
         <div class="cr-property-detail__district">
           <span>客流 ${district?.trafficIndex ?? "-"}</span>
           <span>消费力 ${district?.spendingPower ?? "-"}</span>
           <span>竞争 ${district?.competition ?? "-"}</span>
+          ${property.frontageMeters !== null ? `<span>门面 ${property.frontageMeters}m</span>` : ""}
+          ${property.ceilingHeight !== null ? `<span>层高 ${property.ceilingHeight}m</span>` : ""}
+          <span>${property.foodServiceAllowed ? "可做餐饮" : "餐饮受限"}</span>
+          <span>${property.exhaustAllowed ? "可排烟" : "不可排烟"}</span>
         </div>
+        ${property.source === "market" ? `
+          <div class="cr-property-listing-meta">
+            <span>房源评分 ${property.qualityScore ?? "-"}</span>
+            <span>${property.listing.remainingDays ?? "-"}天后市场换新</span>
+          </div>
+        ` : ""}
         <div class="cr-property-detail__quote">
           <span>首月租金 ${money(quote.monthlyRent)}</span>
           <span>押金 ${money(quote.deposit)}</span>
@@ -138,9 +182,11 @@ class CityPropertyView {
       "cr-property-lease-button",
       leaseState.hasActiveLease
         ? "当前门店已有租约"
-        : quote.affordable === false
-          ? "资金不足"
-          : "签约租赁"
+        : !property.foodServiceAllowed
+          ? "该房源不允许餐饮"
+          : quote.affordable === false
+            ? "资金不足"
+            : "签约租赁"
     );
     leaseButton.type = "button";
     leaseButton.disabled = !leaseState.canSign || !this.restaurantId;
