@@ -1,6 +1,8 @@
 export const CUSTOMER_SEGMENTS = [
   {
     id: "office_worker",
+    averageDiningMinutes: 28,
+    queuePatienceMinutes: 8,
     name: "上班族",
 
     spendingPower: 65,
@@ -32,6 +34,8 @@ export const CUSTOMER_SEGMENTS = [
 
   {
     id: "resident",
+    averageDiningMinutes: 48,
+    queuePatienceMinutes: 18,
     name: "周边居民",
 
     spendingPower: 55,
@@ -64,6 +68,8 @@ export const CUSTOMER_SEGMENTS = [
 
   {
     id: "student",
+    averageDiningMinutes: 35,
+    queuePatienceMinutes: 12,
     name: "学生",
 
     spendingPower: 30,
@@ -95,6 +101,8 @@ export const CUSTOMER_SEGMENTS = [
 
   {
     id: "tourist",
+    averageDiningMinutes: 55,
+    queuePatienceMinutes: 20,
     name: "游客",
 
     spendingPower: 75,

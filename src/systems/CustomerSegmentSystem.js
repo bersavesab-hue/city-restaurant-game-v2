@@ -67,6 +67,28 @@ function validateSegment(item) {
   );
 
   if (
+    !Number.isInteger(
+      item.averageDiningMinutes
+    ) ||
+    item.averageDiningMinutes <= 0
+  ) {
+    throw new Error(
+      "averageDiningMinutes must be positive"
+    );
+  }
+
+  if (
+    !Number.isInteger(
+      item.queuePatienceMinutes
+    ) ||
+    item.queuePatienceMinutes < 0
+  ) {
+    throw new Error(
+      "queuePatienceMinutes must be non-negative"
+    );
+  }
+
+  if (
     item.categoryPreferences !==
     undefined
   ) {

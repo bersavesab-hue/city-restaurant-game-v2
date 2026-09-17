@@ -10,6 +10,7 @@ import { operatingScheduleSystem } from "./OperatingScheduleSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 import { trafficDemandSystem } from "./TrafficDemandSystem.js";
 import { customerChoiceSystem } from "./CustomerChoiceSystem.js";
+import { seatingSystem } from "./SeatingSystem.js";
 
 import { eventBus } from "../core/EventBus.js";
 
@@ -76,7 +77,7 @@ class TrafficSystem {
       schedule.closeHour -
       schedule.openHour;
 
-    const capacity =
+    const serviceCapacity =
       employeeWorkSystem
         .getServiceCapacity(
           restaurantId
@@ -90,6 +91,25 @@ class TrafficSystem {
           schedule.openHour,
           schedule.closeHour
         );
+
+    const seatingCapacity =
+      dailyDemand.hours.reduce(
+        (sum, demand) =>
+          sum +
+          seatingSystem
+            .getHourlyCapacity(
+              restaurantId,
+              demand
+            )
+            .capacity,
+        0
+      );
+
+    const capacity =
+      Math.min(
+        serviceCapacity,
+        seatingCapacity
+      );
 
     const expected =
       dailyDemand
@@ -309,18 +329,29 @@ class TrafficSystem {
           restaurantId
         );
 
+    const seating =
+      seatingSystem.getHourFlow(
+        restaurantId,
+        incomingVisitors,
+        demand
+      );
+
     const visitors =
       Math.min(
-        incomingVisitors,
+        seating.acceptedVisitors,
         serviceCapacity
       );
 
-    const rejectedVisitors =
+    const serviceRejectedVisitors =
       Math.max(
         0,
-        incomingVisitors -
+        seating.acceptedVisitors -
         visitors
       );
+
+    const rejectedVisitors =
+      seating.queueAbandoned +
+      serviceRejectedVisitors;
 
     let completedOrders = 0;
     let failedOrders = 0;
@@ -416,6 +447,21 @@ class TrafficSystem {
     const result = {
       visitors,
       rejectedVisitors,
+
+      queuedVisitors:
+        seating.queuedVisitors,
+
+      queueAbandoned:
+        seating.queueAbandoned,
+
+      serviceRejectedVisitors,
+
+      seats:
+        seating.seats,
+
+      turnoverRate:
+        seating.turnoverRate,
+
       completedOrders,
       failedOrders,
       revenue
