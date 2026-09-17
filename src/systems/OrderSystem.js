@@ -13,19 +13,26 @@ import { recipeSystem } from "./RecipeSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
 import { cookingSystem } from "./CookingSystem.js";
 import { customerSystem } from "./CustomerSystem.js";
+import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 
 class OrderSystem {
   place({
     restaurantId,
     customerId = null,
     items,
-    chefSkill = 50
+    chefId = null
   }) {
     if (!restaurantSystem.isOpen(restaurantId)) {
       throw new Error("Restaurant must be open");
     }
 
     financeSystem.getAccount(restaurantId);
+
+    const chef =
+      employeeWorkSystem.requireChef(
+        restaurantId,
+        chefId
+      );
 
     if (!Array.isArray(items) || items.length === 0) {
       throw new Error("Order requires items");
@@ -116,8 +123,18 @@ class OrderSystem {
         restaurantId,
         recipeId: line.recipe.id,
         portions: line.quantity,
-        chefSkill
+        chefSkill:
+          chef.effectiveSkill
       });
+
+      employeeWorkSystem.recordWork(
+        chef.employee.id,
+        Math.max(
+          5,
+          line.recipe.cookingMinutes *
+          line.quantity
+        )
+      );
 
       ingredientCost += cooking.ingredientCost;
       qualityTotal +=
@@ -159,6 +176,13 @@ class OrderSystem {
       {
         restaurantId,
         customerId,
+
+        chefEmployeeId:
+          chef.employee.id,
+
+        chefSkill:
+          chef.effectiveSkill,
+
         status: "completed",
         items: completedItems,
         totalRevenue,

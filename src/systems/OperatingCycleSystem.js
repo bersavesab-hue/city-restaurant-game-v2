@@ -1,8 +1,11 @@
 import { simulationSystem } from "../core/SimulationSystem.js";
 import { entitySystem } from "../core/EntitySystem.js";
+
+import { restaurantSystem } from "./RestaurantSystem.js";
 import { operatingScheduleSystem } from "./OperatingScheduleSystem.js";
 import { trafficSystem } from "./TrafficSystem.js";
 import { dailySettlementSystem } from "./DailySettlementSystem.js";
+import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 
 class OperatingCycleSystem {
   constructor() {
@@ -33,10 +36,21 @@ class OperatingCycleSystem {
                 current.hour
               );
 
-            trafficSystem
-              .simulateHour(
+            if (
+              restaurantSystem.isOpen(
                 restaurant.id
-              );
+              )
+            ) {
+              trafficSystem
+                .simulateHour(
+                  restaurant.id
+                );
+            } else {
+              employeeWorkSystem
+                .recoverHour(
+                  restaurant.id
+                );
+            }
           }
         },
 

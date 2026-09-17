@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { gameState } from "../src/core/GameState.js";
 import { restaurantSystem } from "../src/systems/RestaurantSystem.js";
 import { financeSystem } from "../src/systems/FinanceSystem.js";
+import { employeeSystem } from "../src/systems/EmployeeSystem.js";
 import { ingredientCatalogSystem } from "../src/systems/IngredientCatalogSystem.js";
 import { inventorySystem } from "../src/systems/InventorySystem.js";
 import { dishCatalogSystem } from "../src/systems/DishCatalogSystem.js";
@@ -59,6 +60,15 @@ test("营业完整链路", () => {
       name: "测试餐厅"
     });
 
+  employeeSystem.hire({
+    restaurantId:
+      restaurant.id,
+    name:
+      "测试厨师",
+    roleId:
+      "chef"
+  });
+
   financeSystem.createAccount(
     restaurant.id,
     100000
@@ -103,8 +113,7 @@ test("营业完整链路", () => {
           menuItemId: menuItem.id,
           quantity: 2
         }
-      ],
-      chefSkill: 70
+      ]
     });
 
   assert.equal(order.status, "completed");

@@ -10,6 +10,7 @@ import { schedulerSystem } from "./core/SchedulerSystem.js";
 import { restaurantSystem } from "./systems/RestaurantSystem.js";
 import { financeSystem } from "./systems/FinanceSystem.js";
 import { employeeSystem } from "./systems/EmployeeSystem.js";
+import { employeeWorkSystem } from "./systems/EmployeeWorkSystem.js";
 import { storeProgressSystem } from "./systems/StoreProgressSystem.js";
 
 import { ingredientCatalogSystem } from "./systems/IngredientCatalogSystem.js";
@@ -52,6 +53,7 @@ function bootstrap() {
       restaurantSystem,
       financeSystem,
       employeeSystem,
+      employeeWorkSystem,
       storeProgressSystem,
 
       ingredientCatalogSystem,

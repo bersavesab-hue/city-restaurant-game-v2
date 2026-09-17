@@ -1,8 +1,11 @@
 import { randomSystem } from "../core/RandomSystem.js";
+
 import { restaurantSystem } from "./RestaurantSystem.js";
 import { menuSystem } from "./MenuSystem.js";
 import { customerSystem } from "./CustomerSystem.js";
 import { orderSystem } from "./OrderSystem.js";
+import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
+
 import { eventBus } from "../core/EventBus.js";
 
 class TrafficSystem {
@@ -10,8 +13,7 @@ class TrafficSystem {
     restaurantId,
     {
       minVisitors = 1,
-      maxVisitors = 4,
-      chefSkill = 50
+      maxVisitors = 4
     } = {}
   ) {
     if (
@@ -21,6 +23,7 @@ class TrafficSystem {
     ) {
       return {
         visitors: 0,
+        rejectedVisitors: 0,
         completedOrders: 0,
         failedOrders: 0,
         revenue: 0
@@ -30,22 +33,73 @@ class TrafficSystem {
     const menu =
       menuSystem.listByRestaurant(
         restaurantId,
-        { activeOnly: true }
+        {
+          activeOnly: true
+        }
       );
 
     if (menu.length === 0) {
       return {
         visitors: 0,
+        rejectedVisitors: 0,
         completedOrders: 0,
         failedOrders: 0,
         revenue: 0
       };
     }
 
-    const visitors =
+    const incomingVisitors =
       randomSystem.int(
         minVisitors,
         maxVisitors
+      );
+
+    const chef =
+      employeeWorkSystem
+        .getBestChef(
+          restaurantId
+        );
+
+    if (!chef) {
+      const result = {
+        visitors: 0,
+        rejectedVisitors:
+          incomingVisitors,
+        completedOrders: 0,
+        failedOrders: 0,
+        revenue: 0,
+        reason:
+          "no_available_chef"
+      };
+
+      eventBus.emit(
+        "traffic:hourCompleted",
+        {
+          restaurantId,
+          ...result
+        }
+      );
+
+      return result;
+    }
+
+    const serviceCapacity =
+      employeeWorkSystem
+        .getServiceCapacity(
+          restaurantId
+        );
+
+    const visitors =
+      Math.min(
+        incomingVisitors,
+        serviceCapacity
+      );
+
+    const rejectedVisitors =
+      Math.max(
+        0,
+        incomingVisitors -
+        visitors
       );
 
     let completedOrders = 0;
@@ -58,19 +112,21 @@ class TrafficSystem {
       i += 1
     ) {
       const menuItem =
-        menu[
-          randomSystem.int(
-            0,
-            menu.length - 1
-          )
-        ];
+        randomSystem.pick(
+          menu
+        );
 
       const quantity =
-        randomSystem.int(1, 2);
+        randomSystem.int(
+          1,
+          2
+        );
 
       const budget =
         Math.max(
-          menuItem.price * quantity,
+          menuItem.price *
+            quantity,
+
           randomSystem.int(
             menuItem.price,
             menuItem.price * 4
@@ -80,13 +136,16 @@ class TrafficSystem {
       const customer =
         customerSystem.create({
           name:
-            `顾客${Date.now()}_${i}`,
+            `顾客_${restaurantId}_${Date.now()}_${i}`,
+
           budget,
+
           priceSensitivity:
             randomSystem.int(
               20,
               80
             ),
+
           patience:
             randomSystem.int(
               30,
@@ -98,6 +157,7 @@ class TrafficSystem {
         const order =
           orderSystem.place({
             restaurantId,
+
             customerId:
               customer.id,
 
@@ -107,21 +167,44 @@ class TrafficSystem {
                   menuItem.id,
                 quantity
               }
-            ],
-
-            chefSkill
+            ]
           });
 
         completedOrders += 1;
+
         revenue +=
           order.totalRevenue;
-      } catch {
+      } catch (error) {
         failedOrders += 1;
+
+        eventBus.emit(
+          "traffic:orderFailed",
+          {
+            restaurantId,
+            customerId:
+              customer.id,
+
+            error: {
+              name:
+                error?.name ??
+                "Error",
+
+              code:
+                error?.code ??
+                null,
+
+              message:
+                error?.message ??
+                "Unknown order error"
+            }
+          }
+        );
       }
     }
 
     const result = {
       visitors,
+      rejectedVisitors,
       completedOrders,
       failedOrders,
       revenue
