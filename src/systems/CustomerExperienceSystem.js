@@ -2,6 +2,7 @@ import { entitySystem } from "../core/EntitySystem.js";
 import { eventBus } from "../core/EventBus.js";
 import { restaurantSystem } from "./RestaurantSystem.js";
 import { reviewInsightSystem } from "./ReviewInsightSystem.js";
+import { layoutFlowSystem } from "./LayoutFlowSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -66,6 +67,49 @@ class CustomerExperienceSystem {
     const queued =
       result.queuedVisitors ?? 0;
 
+    const observedVisitors =
+      (result.visitors ?? 0) +
+      rejected +
+      failed;
+
+    const priceScore =
+      this.getPriceScore(
+        demand
+      );
+
+    const layout =
+      layoutFlowSystem
+        .getOperationalEffects(
+          restaurantId
+        );
+
+    const comfortScore =
+      layout.active
+        ? layout.comfortScore
+        : 80;
+
+    if (observedVisitors <= 0) {
+      return {
+        restaurantId,
+        satisfaction:
+          restaurant.customerSatisfaction ??
+          50,
+        qualityScore: 60,
+        priceScore:
+          Math.round(priceScore),
+        serviceScore: 100,
+        comfortScore,
+        layoutFlowScore:
+          layout.flowScore,
+        repeatRate:
+          restaurant.repeatRate ?? 0,
+        reviewScore:
+          restaurant.reviewScore ?? 3,
+        reputation:
+          restaurant.reputation ?? 0
+      };
+    }
+
     const totalVisitors =
       Math.max(
         1,
@@ -74,16 +118,13 @@ class CustomerExperienceSystem {
       );
 
     const qualityScore =
-      clamp(
-        result.averageQuality ?? 60,
-        0,
-        100
-      );
-
-    const priceScore =
-      this.getPriceScore(
-        demand
-      );
+      served > 0
+        ? clamp(
+            result.averageQuality ?? 60,
+            0,
+            100
+          )
+        : 60;
 
     const queueRate =
       queued / totalVisitors;
@@ -106,9 +147,10 @@ class CustomerExperienceSystem {
 
     const satisfaction =
       Math.round(
-        qualityScore * 0.55 +
-        priceScore * 0.2 +
-        serviceScore * 0.25
+        qualityScore * 0.5 +
+        priceScore * 0.18 +
+        serviceScore * 0.22 +
+        comfortScore * 0.1
       );
 
     const repeatRate =
@@ -251,6 +293,9 @@ class CustomerExperienceSystem {
         Math.round(priceScore),
       serviceScore:
         Math.round(serviceScore),
+      comfortScore,
+      layoutFlowScore:
+        layout.flowScore,
       repeatRate,
       reviewScore:
         updated.reviewScore,
