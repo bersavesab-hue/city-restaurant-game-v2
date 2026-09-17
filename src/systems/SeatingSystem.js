@@ -1,11 +1,30 @@
 import { restaurantSystem } from "./RestaurantSystem.js";
 import { propertySystem } from "./PropertySystem.js";
 import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
+import { renovationSystem } from "./RenovationSystem.js";
 
 class SeatingSystem {
   getSeatCount(
     restaurantId
   ) {
+    const renovation =
+      renovationSystem
+        .getOperationalModifiers(
+          restaurantId
+        );
+
+    if (
+      renovation.active &&
+      Number.isInteger(
+        renovation.seats
+      )
+    ) {
+      return Math.max(
+        0,
+        renovation.seats
+      );
+    }
+
     const restaurant =
       restaurantSystem.get(
         restaurantId
@@ -101,6 +120,17 @@ class SeatingSystem {
         demand
       );
 
+    const renovation =
+      renovationSystem
+        .getOperationalModifiers(
+          restaurantId
+        );
+
+    const queueEfficiency =
+      renovation.active
+        ? renovation.queueEfficiency
+        : 1;
+
     const turnsPerHour =
       Math.max(
         1,
@@ -128,7 +158,8 @@ class SeatingSystem {
             behavior
               .averageDiningMinutes
           ) *
-          turnsPerHour
+          turnsPerHour *
+          queueEfficiency
         )
       );
 
@@ -150,6 +181,8 @@ class SeatingSystem {
 
       queuePatienceMinutes:
         behavior.queuePatienceMinutes,
+
+      queueEfficiency,
 
       turnsPerHour,
 
