@@ -6,6 +6,7 @@ import { menuSystem } from "./MenuSystem.js";
 import { dishCatalogSystem } from "./DishCatalogSystem.js";
 import { marketCompetitionSystem } from "./MarketCompetitionSystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
+import { districtEventSystem } from "./DistrictEventSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -325,6 +326,13 @@ class TrafficDemandSystem {
           1.35
         );
 
+      const environment =
+        districtEventSystem
+          .getModifiers(
+            district.id,
+            segment.id
+          );
+
       const playerAppeal =
         clamp(
           priceFactor *
@@ -333,7 +341,9 @@ class TrafficDemandSystem {
           repeatFactor *
           levelFactor *
           actionModifiers
-            .marketAppealMultiplier,
+            .marketAppealMultiplier *
+          environment
+            .playerAppealMultiplier,
           0.2,
           4
         );
@@ -369,6 +379,10 @@ class TrafficDemandSystem {
         trafficFactor *
         competitionFactor *
         districtSpendFactor *
+        environment
+          .spendingMultiplier *
+        environment
+          .demandMultiplier *
         priceFactor *
         reputationFactor *
         reviewFactor *
@@ -394,6 +408,12 @@ class TrafficDemandSystem {
           market.marketShare,
 
         competitionFactor,
+
+        environmentFactor:
+          environment
+            .demandMultiplier *
+          environment
+            .spendingMultiplier,
 
         expectedVisitors:
           demand

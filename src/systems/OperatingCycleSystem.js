@@ -14,6 +14,7 @@ import { procurementSystem } from "./ProcurementSystem.js";
 import { autoProcurementSystem } from "./AutoProcurementSystem.js";
 import { competitorDynamicsSystem } from "./CompetitorDynamicsSystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
+import { districtEventSystem } from "./DistrictEventSystem.js";
 import { marketInsightSystem } from "./MarketInsightSystem.js";
 
 class OperatingCycleSystem {
@@ -128,6 +129,11 @@ class OperatingCycleSystem {
           }
 
           marketActionSystem
+            .processDay(
+              current.day
+            );
+
+          districtEventSystem
             .processDay(
               current.day
             );
