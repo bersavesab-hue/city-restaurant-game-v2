@@ -1,0 +1,212 @@
+import { entitySystem } from "../core/EntitySystem.js";
+import { gameState } from "../core/GameState.js";
+import { eventBus } from "../core/EventBus.js";
+
+import { restaurantSystem } from "./RestaurantSystem.js";
+import {
+  financeSystem,
+  FINANCE_CATEGORY
+} from "./FinanceSystem.js";
+
+import { menuSystem } from "./MenuSystem.js";
+import { recipeSystem } from "./RecipeSystem.js";
+import { inventorySystem } from "./InventorySystem.js";
+import { cookingSystem } from "./CookingSystem.js";
+import { customerSystem } from "./CustomerSystem.js";
+
+class OrderSystem {
+  place({
+    restaurantId,
+    customerId = null,
+    items,
+    chefSkill = 50
+  }) {
+    if (!restaurantSystem.isOpen(restaurantId)) {
+      throw new Error("Restaurant must be open");
+    }
+
+    financeSystem.getAccount(restaurantId);
+
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new Error("Order requires items");
+    }
+
+    const lines = [];
+    const requirements = new Map();
+    let totalRevenue = 0;
+
+    for (const item of items) {
+      if (
+        !item ||
+        !Number.isInteger(item.quantity) ||
+        item.quantity <= 0
+      ) {
+        throw new Error("Invalid order item");
+      }
+
+      const menuItem = menuSystem.get(item.menuItemId);
+
+      if (
+        menuItem.restaurantId !== restaurantId ||
+        !menuItem.active
+      ) {
+        throw new Error("Invalid menu item");
+      }
+
+      const recipe = recipeSystem.get(menuItem.recipeId);
+
+      if (!recipe) {
+        throw new Error("Recipe does not exist");
+      }
+
+      for (const ingredient of recipe.ingredients) {
+        const amount =
+          ingredient.quantity * item.quantity;
+
+        requirements.set(
+          ingredient.ingredientId,
+          (requirements.get(ingredient.ingredientId) ?? 0) + amount
+        );
+      }
+
+      const revenue =
+        menuItem.price * item.quantity;
+
+      totalRevenue += revenue;
+
+      lines.push({
+        menuItem,
+        recipe,
+        quantity: item.quantity,
+        revenue
+      });
+    }
+
+    for (const [ingredientId, quantity] of requirements) {
+      const available =
+        inventorySystem.getAvailableQuantity(
+          restaurantId,
+          ingredientId
+        );
+
+      if (available < quantity) {
+        throw new Error(
+          `Insufficient inventory for "${ingredientId}"`
+        );
+      }
+    }
+
+    let customer = null;
+
+    if (customerId !== null) {
+      customer = customerSystem.get(customerId);
+
+      if (totalRevenue > customer.budget) {
+        throw new Error("Customer budget insufficient");
+      }
+    }
+
+    const completedItems = [];
+    let ingredientCost = 0;
+    let qualityTotal = 0;
+    let portionTotal = 0;
+
+    for (const line of lines) {
+      const cooking = cookingSystem.cook({
+        restaurantId,
+        recipeId: line.recipe.id,
+        portions: line.quantity,
+        chefSkill
+      });
+
+      ingredientCost += cooking.ingredientCost;
+      qualityTotal +=
+        cooking.qualityScore * line.quantity;
+      portionTotal += line.quantity;
+
+      completedItems.push({
+        menuItemId: line.menuItem.id,
+        dishId: line.menuItem.dishId,
+        quantity: line.quantity,
+        unitPrice: line.menuItem.price,
+        revenue: line.revenue,
+        cookingRecordId: cooking.id,
+        qualityScore: cooking.qualityScore
+      });
+
+      menuSystem.recordSale(
+        line.menuItem.id,
+        line.quantity,
+        line.revenue
+      );
+    }
+
+    const averageQuality = Math.round(
+      qualityTotal / portionTotal
+    );
+
+    const payment = financeSystem.income(
+      restaurantId,
+      totalRevenue,
+      FINANCE_CATEGORY.SALES,
+      "餐厅营业收入"
+    );
+
+    const time = gameState.getSection("time");
+
+    const order = entitySystem.create(
+      "customer_order",
+      {
+        restaurantId,
+        customerId,
+        status: "completed",
+        items: completedItems,
+        totalRevenue,
+        ingredientCost,
+        grossProfit:
+          totalRevenue - ingredientCost,
+        averageQuality,
+        transactionId: payment.transaction.id,
+        createdAt: time.totalMinutes,
+        day: time.day
+      }
+    );
+
+    if (customer) {
+      customerSystem.recordVisit({
+        customerId,
+        restaurantId,
+        orderId: order.id,
+        spend: totalRevenue,
+        satisfaction: averageQuality
+      });
+    }
+
+    eventBus.emit("order:completed", {
+      order: structuredClone(order)
+    });
+
+    return order;
+  }
+
+  get(id) {
+    const order = entitySystem.get("customer_order", id);
+
+    if (!order) {
+      throw new Error(`Order "${id}" does not exist`);
+    }
+
+    return order;
+  }
+
+  listByRestaurant(restaurantId) {
+    return entitySystem
+      .list("customer_order")
+      .filter(
+        (order) => order.restaurantId === restaurantId
+      );
+  }
+}
+
+export const orderSystem = new OrderSystem();
+export { OrderSystem };
