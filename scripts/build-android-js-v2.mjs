@@ -35,7 +35,7 @@ fs.mkdirSync(
 
 await build({
   entryPoints: [
-    "src/ui/runtime/AndroidPlaytestEntry.js"
+    "src/ui/runtime/AndroidPlaytestEntryV2.js"
   ],
 
   outfile:
