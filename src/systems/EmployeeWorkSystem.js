@@ -4,6 +4,7 @@ import {
   employeeSystem,
   EMPLOYEE_STATUS
 } from "./EmployeeSystem.js";
+import { renovationSystem } from "./RenovationSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -148,29 +149,47 @@ class EmployeeWorkSystem {
         "server"
       );
 
-    // 没有服务员时，默认店主本人
-    // 只能勉强接待 1 人/小时。
+    let baseCapacity;
+
     if (servers.length === 0) {
-      return 1;
+      baseCapacity = 1;
+    } else {
+      baseCapacity = servers.reduce(
+        (capacity, employee) => {
+          const skill =
+            this.getEffectiveSkill(
+              employee,
+              "service"
+            );
+
+          return (
+            capacity +
+            2 +
+            Math.floor(
+              skill / 25
+            )
+          );
+        },
+        0
+      );
     }
 
-    return servers.reduce(
-      (capacity, employee) => {
-        const skill =
-          this.getEffectiveSkill(
-            employee,
-            "service"
-          );
-
-        return (
-          capacity +
-          2 +
-          Math.floor(
-            skill / 25
-          )
+    const renovation =
+      renovationSystem
+        .getOperationalModifiers(
+          restaurantId
         );
-      },
-      0
+
+    const multiplier =
+      renovation.active
+        ? renovation.serviceEfficiency
+        : 1;
+
+    return Math.max(
+      1,
+      Math.floor(
+        baseCapacity * multiplier
+      )
     );
   }
 
