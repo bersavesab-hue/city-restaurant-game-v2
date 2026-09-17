@@ -7,3 +7,9 @@ export {
   renovationMobilePageSystem,
   RenovationMobilePageSystem
 } from "./renovation/index.js";
+export {
+  restaurantHomePageSystem,
+  RestaurantHomePageSystem,
+  restaurantHomeView,
+  RestaurantHomeView
+} from "./pages/restaurant/index.js";
