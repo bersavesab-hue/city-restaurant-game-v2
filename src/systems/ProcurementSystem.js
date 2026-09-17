@@ -2,6 +2,7 @@ import { entitySystem } from "../core/EntitySystem.js";
 import { gameState } from "../core/GameState.js";
 import { eventBus } from "../core/EventBus.js";
 import { schedulerSystem } from "../core/SchedulerSystem.js";
+import { randomSystem } from "../core/RandomSystem.js";
 import {
   financeSystem,
   FINANCE_CATEGORY
@@ -48,17 +49,100 @@ class ProcurementSystem {
     );
   }
 
+  getOrderedQuantityForDay(supplierId, ingredientId, day) {
+    return entitySystem
+      .list("procurement_order")
+      .filter((order) =>
+        order.supplierId === supplierId &&
+        order.ingredientId === ingredientId &&
+        order.status !== ORDER_STATUS.CANCELLED &&
+        order.orderDay === day
+      )
+      .reduce((sum, order) => sum + order.quantity, 0);
+  }
+
+  getRemainingDailyCapacity(supplierId, ingredientId, day = null) {
+    const offer = supplierSystem.getOffer(supplierId, ingredientId);
+    if (!offer) return 0;
+
+    const currentDay =
+      day ?? gameState.getSection("time").day;
+
+    return Math.max(
+      0,
+      offer.capacityPerDay -
+      this.getOrderedQuantityForDay(
+        supplierId,
+        ingredientId,
+        currentDay
+      )
+    );
+  }
+
+  calculateDeliveryMinutes(baseMinutes, reliability) {
+    if (reliability >= 100) {
+      return {
+        delayed: false,
+        delayMinutes: 0,
+        deliveryMinutes: baseMinutes
+      };
+    }
+
+    const onTime =
+      randomSystem.int(1, 100) <= reliability;
+
+    if (onTime) {
+      return {
+        delayed: false,
+        delayMinutes: 0,
+        deliveryMinutes: baseMinutes
+      };
+    }
+
+    const delayMinutes =
+      randomSystem.int(60, 360);
+
+    return {
+      delayed: true,
+      delayMinutes,
+      deliveryMinutes:
+        baseMinutes + delayMinutes
+    };
+  }
+
   purchase({
     restaurantId,
     supplierId,
     ingredientId,
     quantity
   }) {
+    const time =
+      gameState.getSection("time");
+
+    const remainingCapacity =
+      this.getRemainingDailyCapacity(
+        supplierId,
+        ingredientId,
+        time.day
+      );
+
+    if (quantity > remainingCapacity) {
+      throw new Error(
+        `Remaining daily supply capacity is ${remainingCapacity}`
+      );
+    }
+
     const quote =
       supplierSystem.getQuote(
         supplierId,
         ingredientId,
         quantity
+      );
+
+    const delivery =
+      this.calculateDeliveryMinutes(
+        quote.deliveryMinutes,
+        quote.reliability
       );
 
     const balance =
@@ -74,9 +158,6 @@ class ProcurementSystem {
         `Insufficient funds: balance ${balance}, required ${quote.totalPrice}`
       );
     }
-
-    const time =
-      gameState.getSection("time");
 
     const payment =
       financeSystem.expense(
@@ -112,8 +193,20 @@ class ProcurementSystem {
           reliability:
             quote.reliability,
 
+          baseDeliveryMinutes:
+            delivery.deliveryMinutes,
+
           deliveryMinutes:
-            quote.deliveryMinutes,
+            delivery.deliveryMinutes,
+
+          delayed:
+            delivery.delayed,
+
+          delayMinutes:
+            delivery.delayMinutes,
+
+          orderDay:
+            time.day,
 
           status:
             ORDER_STATUS.PENDING,
@@ -270,13 +363,30 @@ class ProcurementSystem {
       );
     }
 
+    const refund =
+      financeSystem.refundExpense(
+        order.restaurantId,
+        order.totalPrice,
+        FINANCE_CATEGORY.REFUND,
+        `取消采购退款 ${order.ingredientId}`
+      );
+
+    const time =
+      gameState.getSection("time");
+
     const updated =
       entitySystem.update(
         "procurement_order",
         order.id,
         {
           status:
-            ORDER_STATUS.CANCELLED
+            ORDER_STATUS.CANCELLED,
+
+          cancelledAt:
+            time.totalMinutes,
+
+          refundTransactionId:
+            refund.transaction.id
         }
       );
 
@@ -288,6 +398,27 @@ class ProcurementSystem {
     );
 
     return updated;
+  }
+
+  getPendingQuantity(
+    restaurantId,
+    ingredientId
+  ) {
+    return this
+      .listByRestaurant(
+        restaurantId,
+        ORDER_STATUS.PENDING
+      )
+      .filter(
+        (order) =>
+          order.ingredientId ===
+          ingredientId
+      )
+      .reduce(
+        (total, order) =>
+          total + order.quantity,
+        0
+      );
   }
 
   get(orderId) {

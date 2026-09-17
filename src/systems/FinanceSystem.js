@@ -8,7 +8,8 @@ const TRANSACTION_TYPE = Object.freeze({
   EXPENSE: "expense",
   HOLD: "hold",
   RELEASE: "release",
-  APPLY_HOLD: "apply_hold"
+  APPLY_HOLD: "apply_hold",
+  REVERSAL: "reversal"
 });
 
 const CATEGORY = Object.freeze({
@@ -236,6 +237,80 @@ class FinanceSystem {
         balanceAfter,
         description
       });
+
+    return {
+      account: updated,
+      transaction
+    };
+  }
+
+  refundExpense(
+    restaurantId,
+    amount,
+    category = CATEGORY.REFUND,
+    description = "费用退款"
+  ) {
+    requirePositiveAmount(amount);
+
+    const account =
+      this.requireAccount(
+        restaurantId
+      );
+
+    const lifetimeExpense =
+      account.lifetimeExpense ?? 0;
+
+    if (lifetimeExpense < amount) {
+      throw new Error(
+        "Refund exceeds recorded expense"
+      );
+    }
+
+    const balanceAfter =
+      account.balance + amount;
+
+    const updated =
+      entitySystem.update(
+        "finance_account",
+        account.id,
+        {
+          balance:
+            balanceAfter,
+
+          lifetimeExpense:
+            lifetimeExpense -
+            amount
+        }
+      );
+
+    const transaction =
+      this.createTransaction({
+        restaurantId,
+        accountId:
+          account.id,
+
+        type:
+          TRANSACTION_TYPE.REVERSAL,
+
+        category,
+
+        amount,
+
+        balanceAfter,
+
+        description
+      });
+
+    eventBus.emit(
+      "finance:expenseRefunded",
+      {
+        restaurantId,
+        amount,
+        category,
+        transactionId:
+          transaction.id
+      }
+    );
 
     return {
       account: updated,
