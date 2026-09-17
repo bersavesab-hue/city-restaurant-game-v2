@@ -3,6 +3,7 @@ import { eventBus } from "../core/EventBus.js";
 import { dishCatalogSystem } from "./DishCatalogSystem.js";
 import { recipeSystem } from "./RecipeSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
+import { dishGrowthSystem } from "./DishGrowthSystem.js";
 
 function requireRestaurant(id) {
   const restaurant = entitySystem.get("restaurant", id);
@@ -133,16 +134,26 @@ class MenuSystem {
   recordSale(id, quantity, revenue) {
     const item = requireMenuItem(id);
 
-    return entitySystem.update(
-      "menu_item",
-      id,
-      {
-        soldCount:
-          item.soldCount + quantity,
-        totalRevenue:
-          item.totalRevenue + revenue
-      }
-    );
+    const updated =
+      entitySystem.update(
+        "menu_item",
+        id,
+        {
+          soldCount:
+            item.soldCount + quantity,
+
+          totalRevenue:
+            item.totalRevenue + revenue
+        }
+      );
+
+    dishGrowthSystem.recordSale({
+      menuItemId: id,
+      quantity,
+      revenue
+    });
+
+    return updated;
   }
 }
 

@@ -23,6 +23,19 @@ class TrafficSystem {
 
     let maximum = Infinity;
 
+    const ingredientEfficiency =
+      Number.isFinite(
+        recipe.ingredientEfficiency
+      )
+        ? Math.max(
+            0.85,
+            Math.min(
+              1,
+              recipe.ingredientEfficiency
+            )
+          )
+        : 1;
+
     for (const ingredient of recipe.ingredients) {
       const available =
         inventorySystem.getAvailableQuantity(
@@ -34,7 +47,10 @@ class TrafficSystem {
         maximum,
         Math.floor(
           available /
-          ingredient.quantity
+          (
+            ingredient.quantity *
+            ingredientEfficiency
+          )
         )
       );
     }

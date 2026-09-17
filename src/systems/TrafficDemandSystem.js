@@ -9,6 +9,7 @@ import { marketActionSystem } from "./MarketActionSystem.js";
 import { districtEventSystem } from "./DistrictEventSystem.js";
 import { businessCalendarSystem } from "./BusinessCalendarSystem.js";
 import { restaurantPositioningSystem } from "./RestaurantPositioningSystem.js";
+import { dishGrowthSystem } from "./DishGrowthSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -184,6 +185,12 @@ class TrafficDemandSystem {
     const positioningContext =
       restaurantPositioningSystem
         .getContext(
+          restaurantId
+        );
+
+    const dishPrestigeFactor =
+      dishGrowthSystem
+        .getRestaurantAppealMultiplier(
           restaurantId
         );
 
@@ -366,7 +373,8 @@ class TrafficDemandSystem {
             .marketAppealMultiplier *
           environment
             .playerAppealMultiplier *
-          positioningFactor,
+          positioningFactor *
+          dishPrestigeFactor,
           0.2,
           4
         );
@@ -408,6 +416,7 @@ class TrafficDemandSystem {
           .demandMultiplier *
         calendarFactor *
         positioningFactor *
+        dishPrestigeFactor *
         priceFactor *
         reputationFactor *
         reviewFactor *
@@ -497,6 +506,8 @@ class TrafficDemandSystem {
           positioningContext
             .priceFit
       },
+
+      dishPrestigeFactor,
 
       reputationFactor,
       reviewFactor,

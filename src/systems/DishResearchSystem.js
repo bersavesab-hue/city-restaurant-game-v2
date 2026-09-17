@@ -525,7 +525,22 @@ class DishResearchSystem {
           createdDay:
             time.day,
 
-          recipeId: null
+          recipeId: null,
+
+          masteryXp: 0,
+          masteryLevel: 1,
+          masteryQualityBonus: 0,
+
+          prestigeTitle:
+            "新研发",
+
+          lifetimeSold: 0,
+          lifetimeRevenue: 0,
+
+          improvementAttempts: 0,
+          successfulImprovements: 0,
+
+          improvementHistory: []
         }
       );
 
@@ -557,6 +572,9 @@ class DishResearchSystem {
           researchQuality:
             analysis
               .qualityScore,
+
+          ingredientEfficiency: 1,
+          improvementAttempts: 0,
 
           createdDay:
             time.day

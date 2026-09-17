@@ -74,9 +74,24 @@ class OrderSystem {
         throw new Error("Recipe does not exist");
       }
 
+      const ingredientEfficiency =
+        Number.isFinite(
+          recipe.ingredientEfficiency
+        )
+          ? Math.max(
+              0.85,
+              Math.min(
+                1,
+                recipe.ingredientEfficiency
+              )
+            )
+          : 1;
+
       for (const ingredient of recipe.ingredients) {
         const amount =
-          ingredient.quantity * item.quantity;
+          ingredient.quantity *
+          item.quantity *
+          ingredientEfficiency;
 
         requirements.set(
           ingredient.ingredientId,

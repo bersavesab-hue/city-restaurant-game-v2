@@ -114,12 +114,26 @@ class CookingSystem {
       );
     }
 
+    const ingredientEfficiency =
+      clamp(
+        Number.isFinite(
+          recipe.ingredientEfficiency
+        )
+          ? recipe.ingredientEfficiency
+          : 1,
+        0.85,
+        1
+      );
+
     const requirements =
       recipe.ingredients.map(
         (item) => ({
           ...item,
+
           requiredQuantity:
-            item.quantity * portions
+            item.quantity *
+            portions *
+            ingredientEfficiency
         })
       );
 
@@ -240,11 +254,40 @@ class CookingSystem {
         )
         .qualityBonus;
 
+    const researchQualityBonus =
+      dish.custom
+        ? clamp(
+            (
+              (
+                dish.qualityScore ??
+                60
+              ) -
+              60
+            ) *
+            0.2,
+            -5,
+            8
+          )
+        : 0;
+
+    const masteryQualityBonus =
+      dish.custom
+        ? clamp(
+            dish
+              .masteryQualityBonus ??
+            0,
+            0,
+            6
+          )
+        : 0;
+
     const qualityScore =
       Math.round(
         clamp(
           baseQualityScore +
-          qualityBonus,
+          qualityBonus +
+          researchQualityBonus +
+          masteryQualityBonus,
           0,
           100
         )

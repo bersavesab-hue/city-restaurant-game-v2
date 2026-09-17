@@ -23,6 +23,7 @@ import { dishCatalogSystem } from "./systems/DishCatalogSystem.js";
 import { recipeSystem } from "./systems/RecipeSystem.js";
 import { cookingSystem } from "./systems/CookingSystem.js";
 import { dishResearchSystem } from "./systems/DishResearchSystem.js";
+import { dishGrowthSystem } from "./systems/DishGrowthSystem.js";
 
 import { menuSystem } from "./systems/MenuSystem.js";
 import { customerSystem } from "./systems/CustomerSystem.js";
@@ -91,6 +92,7 @@ function bootstrap() {
       recipeSystem,
       cookingSystem,
       dishResearchSystem,
+      dishGrowthSystem,
 
       menuSystem,
       customerSystem,
