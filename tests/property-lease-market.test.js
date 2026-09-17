@@ -35,7 +35,7 @@ test("房源租赁支持房东议价免租物业费续租和NPC抢租", () => {
     { overwrite: true }
   );
 
-  const property = propertySystem.create({
+  const propertyBase = propertySystem.create({
     districtId: "lease_market_test_area",
     name: "云栖大道旗舰餐饮铺",
     area: 2000,
@@ -47,6 +47,20 @@ test("房源租赁支持房东议价免租物业费续租和NPC抢租", () => {
     foodServiceAllowed: true,
     exhaustAllowed: true
   });
+
+  const property = entitySystem.update(
+    "property",
+    propertyBase.id,
+    {
+      source: "market",
+      listedDay: 1,
+      marketMeta: {
+        seed: 654321,
+        qualityScore: 88,
+        listingLife: 40
+      }
+    }
+  );
 
   const enriched = propertyLeaseMarketSystem.ensureTerms(property.id);
 
