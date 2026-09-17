@@ -7,6 +7,7 @@ import { trafficSystem } from "./TrafficSystem.js";
 import { dailySettlementSystem } from "./DailySettlementSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 import { leaseSystem } from "./LeaseSystem.js";
+import { propertyMarketSystem } from "./PropertyMarketSystem.js";
 import { historyArchiveSystem } from "./HistoryArchiveSystem.js";
 import { periodArchiveSystem } from "./PeriodArchiveSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
@@ -149,6 +150,10 @@ class OperatingCycleSystem {
             );
 
           leaseSystem.processDay(
+            current.day
+          );
+
+          propertyMarketSystem.processDay(
             current.day
           );
 
