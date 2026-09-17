@@ -2,7 +2,6 @@ import { randomSystem } from "../core/RandomSystem.js";
 
 import { restaurantSystem } from "./RestaurantSystem.js";
 import { menuSystem } from "./MenuSystem.js";
-import { customerSystem } from "./CustomerSystem.js";
 import { orderSystem } from "./OrderSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 
@@ -122,44 +121,12 @@ class TrafficSystem {
           2
         );
 
-      const budget =
-        Math.max(
-          menuItem.price *
-            quantity,
-
-          randomSystem.int(
-            menuItem.price,
-            menuItem.price * 4
-          )
-        );
-
-      const customer =
-        customerSystem.create({
-          name:
-            `顾客_${restaurantId}_${Date.now()}_${i}`,
-
-          budget,
-
-          priceSensitivity:
-            randomSystem.int(
-              20,
-              80
-            ),
-
-          patience:
-            randomSystem.int(
-              30,
-              90
-            )
-        });
-
       try {
         const order =
           orderSystem.place({
             restaurantId,
 
-            customerId:
-              customer.id,
+            customerId: null,
 
             items: [
               {
@@ -181,8 +148,7 @@ class TrafficSystem {
           "traffic:orderFailed",
           {
             restaurantId,
-            customerId:
-              customer.id,
+            customerId: null,
 
             error: {
               name:

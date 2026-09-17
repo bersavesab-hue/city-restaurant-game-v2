@@ -95,8 +95,13 @@ class OperatingScheduleSystem {
       );
     }
 
+    const closingHour =
+      schedule.closeHour === 24
+        ? 0
+        : schedule.closeHour;
+
     if (
-      hour === schedule.closeHour &&
+      hour === closingHour &&
       restaurantSystem.isOpen(
         restaurantId
       )
