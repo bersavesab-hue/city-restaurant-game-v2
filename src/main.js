@@ -25,6 +25,8 @@ import { cookingSystem } from "./systems/CookingSystem.js";
 
 import { menuSystem } from "./systems/MenuSystem.js";
 import { customerSystem } from "./systems/CustomerSystem.js";
+import { customerSegmentSystem } from "./systems/CustomerSegmentSystem.js";
+import { CUSTOMER_SEGMENTS } from "./data/customerSegments.js";
 import { orderSystem } from "./systems/OrderSystem.js";
 
 import { operatingScheduleSystem } from "./systems/OperatingScheduleSystem.js";
@@ -37,6 +39,11 @@ import { propertySystem } from "./systems/PropertySystem.js";
 import { leaseSystem } from "./systems/LeaseSystem.js";
 
 function bootstrap() {
+  customerSegmentSystem.load(
+    CUSTOMER_SEGMENTS,
+    { overwrite: true }
+  );
+
   operatingCycleSystem.register();
 
   return {
@@ -70,6 +77,7 @@ function bootstrap() {
 
       menuSystem,
       customerSystem,
+      customerSegmentSystem,
       orderSystem,
 
       operatingScheduleSystem,

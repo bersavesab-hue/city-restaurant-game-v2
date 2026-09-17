@@ -46,6 +46,50 @@ function validateDistrict(item) {
     throw new Error("competition must be 0-100");
   }
 
+  if (
+    item.customerMix !== undefined
+  ) {
+    if (
+      !item.customerMix ||
+      typeof item.customerMix !== "object" ||
+      Array.isArray(item.customerMix)
+    ) {
+      throw new Error(
+        "customerMix must be an object"
+      );
+    }
+
+    let totalWeight = 0;
+
+    for (
+      const [
+        segmentId,
+        weight
+      ]
+      of Object.entries(
+        item.customerMix
+      )
+    ) {
+      if (
+        !segmentId ||
+        !Number.isFinite(weight) ||
+        weight < 0
+      ) {
+        throw new Error(
+          "Invalid customerMix"
+        );
+      }
+
+      totalWeight += weight;
+    }
+
+    if (totalWeight <= 0) {
+      throw new Error(
+        "customerMix must contain positive weight"
+      );
+    }
+  }
+
   return true;
 }
 
