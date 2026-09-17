@@ -1,6 +1,7 @@
 import { gameState } from "../../../core/GameState.js";
 import { districtSystem } from "../../../systems/DistrictSystem.js";
 import { propertySystem } from "../../../systems/PropertySystem.js";
+import { propertyMarketSystem } from "../../../systems/PropertyMarketSystem.js";
 import { financeSystem } from "../../../systems/FinanceSystem.js";
 import { leaseSystem } from "../../../systems/LeaseSystem.js";
 import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
@@ -61,6 +62,7 @@ class CityPropertyPageSystem {
   buildPropertyCard(property, restaurantId = null) {
     const district = getDistrict(property);
     const quote = this.getLeaseQuote(property, restaurantId);
+    const day = gameState.getSection("time")?.day ?? 1;
 
     return {
       id: property.id,
@@ -82,6 +84,17 @@ class CityPropertyPageSystem {
       exhaustAllowed: property.exhaustAllowed !== false,
       tags: [...(property.tags ?? [])],
       floors: buildFloorSummary(property),
+      source: property.source ?? "manual",
+      propertyType: property.propertyType ?? null,
+      qualityScore: property.marketMeta?.qualityScore ?? null,
+      listing: {
+        listedDay: property.listedDay ?? null,
+        expiresDay: property.expiresDay ?? null,
+        remainingDays:
+          Number.isInteger(property.expiresDay)
+            ? Math.max(0, property.expiresDay - day)
+            : null
+      },
       quote,
       district: district
         ? {
@@ -100,19 +113,62 @@ class CityPropertyPageSystem {
     minArea = null,
     maxArea = null,
     maxRent = null,
-    availableOnly = true
+    availableOnly = true,
+    foodServiceOnly = false,
+    exhaustRequired = false,
+    generateListings = true,
+    marketTarget = 18
   } = {}) {
     const districts = districtSystem.getAll();
+
+    if (generateListings) {
+      if (districtId !== null) {
+        propertyMarketSystem.ensureDistrictStock(
+          districtId,
+          { target: marketTarget }
+        );
+      } else {
+        for (const district of districts) {
+          propertyMarketSystem.ensureDistrictStock(
+            district.id,
+            { target: marketTarget }
+          );
+        }
+      }
+    }
+
     const properties = propertySystem
       .list({ districtId, availableOnly })
       .filter(item => minArea === null || item.area >= minArea)
       .filter(item => maxArea === null || item.area <= maxArea)
       .filter(item => maxRent === null || item.monthlyRent <= maxRent)
-      .map(item => this.buildPropertyCard(item, restaurantId));
+      .filter(
+        item =>
+          !foodServiceOnly || item.foodServiceAllowed !== false
+      )
+      .filter(
+        item =>
+          !exhaustRequired || item.exhaustAllowed !== false
+      )
+      .map(item => this.buildPropertyCard(item, restaurantId))
+      .sort((a, b) => {
+        const qualityA = a.qualityScore ?? 50;
+        const qualityB = b.qualityScore ?? 50;
+
+        if (qualityA !== qualityB) {
+          return qualityB - qualityA;
+        }
+
+        return a.monthlyRent - b.monthlyRent;
+      });
 
     const activeLease = restaurantId
       ? leaseSystem.getByRestaurant(restaurantId) ?? null
       : null;
+
+    const marketDistricts = districtId === null
+      ? districts
+      : districts.filter(item => item.id === districtId);
 
     return {
       pageId: "properties",
@@ -134,7 +190,16 @@ class CityPropertyPageSystem {
         minArea,
         maxArea,
         maxRent,
-        availableOnly
+        availableOnly,
+        foodServiceOnly,
+        exhaustRequired
+      },
+      market: {
+        dynamicListings: generateListings,
+        targetPerDistrict: marketTarget,
+        districts: marketDistricts.map(item =>
+          propertyMarketSystem.getSummary(item.id)
+        )
       },
       activeLease,
       balance: safeBalance(restaurantId),
