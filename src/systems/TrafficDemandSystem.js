@@ -10,6 +10,7 @@ import { districtEventSystem } from "./DistrictEventSystem.js";
 import { businessCalendarSystem } from "./BusinessCalendarSystem.js";
 import { restaurantPositioningSystem } from "./RestaurantPositioningSystem.js";
 import { dishGrowthSystem } from "./DishGrowthSystem.js";
+import { renovationSystem } from "./RenovationSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -194,6 +195,21 @@ class TrafficDemandSystem {
           restaurantId
         );
 
+    const renovation =
+      renovationSystem
+        .getOperationalModifiers(
+          restaurantId
+        );
+
+    const renovationAppealFactor =
+      renovation.active
+        ? clamp(
+            renovation.appealMultiplier ?? 1,
+            1,
+            1.15
+          )
+        : 1;
+
     const priceIndex =
       this.getMenuPriceIndex(
         restaurantId
@@ -374,7 +390,8 @@ class TrafficDemandSystem {
           environment
             .playerAppealMultiplier *
           positioningFactor *
-          dishPrestigeFactor,
+          dishPrestigeFactor *
+          renovationAppealFactor,
           0.2,
           4
         );
@@ -417,6 +434,7 @@ class TrafficDemandSystem {
         calendarFactor *
         positioningFactor *
         dishPrestigeFactor *
+        renovationAppealFactor *
         priceFactor *
         reputationFactor *
         reviewFactor *
@@ -452,6 +470,8 @@ class TrafficDemandSystem {
         calendarFactor,
 
         positioningFactor,
+
+        renovationAppealFactor,
 
         expectedVisitors:
           demand
@@ -508,6 +528,7 @@ class TrafficDemandSystem {
       },
 
       dishPrestigeFactor,
+      renovationAppealFactor,
 
       reputationFactor,
       reviewFactor,
