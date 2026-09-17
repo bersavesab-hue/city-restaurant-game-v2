@@ -216,15 +216,21 @@ test("房源支持30到10000平米、多楼层、真实结构和自适应装修"
   assert.equal(firstPage.workspace.floorCount, 3);
   assert.equal(firstPage.actions.canSwitchFloor, true);
   assert.equal(firstPage.workspace.activeFloorId, "huge_1f");
+  assert.equal(firstPage.workspace.floorWidth, 60);
+  assert.equal(firstPage.workspace.floorHeight, 45);
+  assert.equal(firstPage.workspace.mode, "zone");
 
   const secondFloor = renovationMobilePageSystem.switchFloor(
     restaurant.id,
     "huge_2f"
   );
 
-  assert.equal(secondFloor.workspace.width, 55);
-  assert.equal(secondFloor.workspace.height, 42);
+  assert.equal(secondFloor.workspace.floorWidth, 55);
+  assert.equal(secondFloor.workspace.floorHeight, 42);
   assert.equal(secondFloor.workspace.activeFloorId, "huge_2f");
+  assert.equal(secondFloor.workspace.mode, "zone");
+  assert.ok(secondFloor.workspace.width <= secondFloor.workspace.floorWidth);
+  assert.ok(secondFloor.workspace.height <= secondFloor.workspace.floorHeight);
 
   renovationMobilePageSystem.selectFurniture(
     restaurant.id,
