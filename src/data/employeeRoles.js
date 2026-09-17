@@ -2,7 +2,7 @@ export const EMPLOYEE_ROLES = Object.freeze({
   chef: {
     id: "chef",
     name: "厨师",
-    baseSalary: 4500,
+    baseSalary: 6500,
     primarySkill: "cooking",
     skillProfile: [
       "cooking",
@@ -17,7 +17,7 @@ export const EMPLOYEE_ROLES = Object.freeze({
   server: {
     id: "server",
     name: "服务员",
-    baseSalary: 3200,
+    baseSalary: 4200,
     primarySkill: "service",
     skillProfile: [
       "service",
@@ -31,7 +31,7 @@ export const EMPLOYEE_ROLES = Object.freeze({
   cashier: {
     id: "cashier",
     name: "收银员",
-    baseSalary: 3400,
+    baseSalary: 4300,
     primarySkill: "checkout",
     skillProfile: [
       "checkout",
@@ -45,7 +45,7 @@ export const EMPLOYEE_ROLES = Object.freeze({
   kitchen_assistant: {
     id: "kitchen_assistant",
     name: "后厨帮工",
-    baseSalary: 3100,
+    baseSalary: 4500,
     primarySkill: "prep",
     skillProfile: [
       "prep",
@@ -59,7 +59,7 @@ export const EMPLOYEE_ROLES = Object.freeze({
   cleaner: {
     id: "cleaner",
     name: "保洁员",
-    baseSalary: 3000,
+    baseSalary: 3600,
     primarySkill: "cleaning",
     skillProfile: [
       "cleaning",
@@ -72,7 +72,7 @@ export const EMPLOYEE_ROLES = Object.freeze({
   delivery: {
     id: "delivery",
     name: "配送员",
-    baseSalary: 3600,
+    baseSalary: 5200,
     primarySkill: "delivery",
     skillProfile: [
       "delivery",
@@ -86,7 +86,7 @@ export const EMPLOYEE_ROLES = Object.freeze({
   manager: {
     id: "manager",
     name: "店长",
-    baseSalary: 6500,
+    baseSalary: 8500,
     primarySkill: "management",
     skillProfile: [
       "management",
