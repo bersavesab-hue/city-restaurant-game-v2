@@ -12,431 +12,230 @@ const EMPLOYEE_STATUS = Object.freeze({
 });
 
 function requireRestaurant(restaurantId) {
-  const restaurant =
-    entitySystem.get("restaurant", restaurantId);
+  const restaurant = entitySystem.get("restaurant", restaurantId);
 
   if (!restaurant) {
-    throw new Error(
-      `Restaurant "${restaurantId}" does not exist`
-    );
+    throw new Error(`Restaurant "${restaurantId}" does not exist`);
   }
 
   return restaurant;
 }
 
 function requireEmployee(employeeId) {
-  const employee =
-    entitySystem.get("employee", employeeId);
+  const employee = entitySystem.get("employee", employeeId);
 
   if (!employee) {
-    throw new Error(
-      `Employee "${employeeId}" does not exist`
-    );
+    throw new Error(`Employee "${employeeId}" does not exist`);
   }
 
   return employee;
 }
 
 function requireRole(roleId) {
-  const role =
-    EMPLOYEE_ROLES[roleId];
+  const role = EMPLOYEE_ROLES[roleId];
 
   if (!role) {
-    throw new Error(
-      `Unknown employee role "${roleId}"`
-    );
+    throw new Error(`Unknown employee role "${roleId}"`);
   }
 
   return role;
 }
 
 function clamp(value, min, max) {
-  return Math.max(
-    min,
-    Math.min(max, value)
-  );
+  return Math.max(min, Math.min(max, value));
+}
+
+function buildInitialSkills(role) {
+  const skills = {};
+  const profile = role.skillProfile ?? [role.primarySkill];
+
+  for (const skill of profile) {
+    skills[skill] = skill === role.primarySkill
+      ? randomSystem.int(20, 40)
+      : randomSystem.int(10, 28);
+  }
+
+  return skills;
 }
 
 class EmployeeSystem {
-  listByRestaurant(
-    restaurantId,
-    {
-      includeFired = false
-    } = {}
-  ) {
+  listByRestaurant(restaurantId, { includeFired = false } = {}) {
     requireRestaurant(restaurantId);
 
     return entitySystem
       .list("employee")
+      .filter(employee => employee.restaurantId === restaurantId)
       .filter(
-        (employee) =>
-          employee.restaurantId ===
-          restaurantId
-      )
-      .filter(
-        (employee) =>
-          includeFired ||
-          employee.status !==
-            EMPLOYEE_STATUS.FIRED
+        employee =>
+          includeFired || employee.status !== EMPLOYEE_STATUS.FIRED
       );
   }
 
   countByRestaurant(restaurantId) {
-    return this.listByRestaurant(
-      restaurantId
-    ).length;
+    return this.listByRestaurant(restaurantId).length;
   }
 
-  hire({
-    restaurantId,
-    name,
-    roleId,
-    salary = null
-  }) {
+  hire({ restaurantId, name, roleId, salary = null }) {
     requireRestaurant(restaurantId);
 
-    if (
-      typeof name !== "string" ||
-      name.trim() === ""
-    ) {
-      throw new TypeError(
-        "Employee name must be a non-empty string"
-      );
+    if (typeof name !== "string" || name.trim() === "") {
+      throw new TypeError("Employee name must be a non-empty string");
     }
 
-    const role =
-      requireRole(roleId);
+    const role = requireRole(roleId);
+    const limits = storeProgressSystem.getLimits(restaurantId);
+    const currentCount = this.countByRestaurant(restaurantId);
 
-    const limits =
-      storeProgressSystem.getLimits(
-        restaurantId
-      );
-
-    const currentCount =
-      this.countByRestaurant(
-        restaurantId
-      );
-
-    if (
-      currentCount >=
-      limits.employees
-    ) {
-      throw new Error(
-        `Employee limit reached: ${limits.employees}`
-      );
+    if (currentCount >= limits.employees) {
+      throw new Error(`Employee limit reached: ${limits.employees}`);
     }
 
-    const finalSalary =
-      salary ?? role.baseSalary;
+    const finalSalary = salary ?? role.baseSalary;
 
-    if (
-      !Number.isInteger(finalSalary) ||
-      finalSalary <= 0
-    ) {
-      throw new RangeError(
-        "Salary must be a positive integer"
-      );
+    if (!Number.isInteger(finalSalary) || finalSalary <= 0) {
+      throw new RangeError("Salary must be a positive integer");
     }
 
-    const primarySkill =
-      randomSystem.int(20, 40);
+    const employee = entitySystem.create("employee", {
+      restaurantId,
+      name: name.trim(),
+      roleId: role.id,
+      status: EMPLOYEE_STATUS.ACTIVE,
+      level: 1,
+      experience: 0,
+      careerRankId: "apprentice",
+      careerRankOrder: 0,
+      promotionCount: 0,
+      trainingCount: 0,
+      salary: finalSalary,
+      fatigue: 0,
+      mood: 70,
+      loyalty: 50,
+      skills: buildInitialSkills(role),
+      totalWorkMinutes: 0,
+      hiredAt: Date.now(),
+      firedAt: null
+    });
 
-    const employee =
-      entitySystem.create(
-        "employee",
-        {
-          restaurantId,
-
-          name:
-            name.trim(),
-
-          roleId:
-            role.id,
-
-          status:
-            EMPLOYEE_STATUS.ACTIVE,
-
-          level: 1,
-
-          experience: 0,
-
-          salary:
-            finalSalary,
-
-          fatigue: 0,
-
-          mood: 70,
-
-          loyalty: 50,
-
-          skills: {
-            [role.primarySkill]:
-              primarySkill
-          },
-
-          totalWorkMinutes: 0,
-
-          hiredAt: Date.now(),
-
-          firedAt: null
-        }
-      );
-
-    eventBus.emit(
-      "employee:hired",
-      {
-        restaurantId,
-        employee:
-          structuredClone(
-            employee
-          )
-      }
-    );
+    eventBus.emit("employee:hired", {
+      restaurantId,
+      employee: structuredClone(employee)
+    });
 
     return employee;
   }
 
   get(employeeId) {
-    return requireEmployee(
-      employeeId
-    );
+    return requireEmployee(employeeId);
   }
 
   fire(employeeId) {
-    const employee =
-      requireEmployee(
-        employeeId
-      );
+    const employee = requireEmployee(employeeId);
 
-    if (
-      employee.status ===
-      EMPLOYEE_STATUS.FIRED
-    ) {
+    if (employee.status === EMPLOYEE_STATUS.FIRED) {
       return employee;
     }
 
-    const updated =
-      entitySystem.update(
-        "employee",
-        employeeId,
-        {
-          status:
-            EMPLOYEE_STATUS.FIRED,
+    const updated = entitySystem.update("employee", employeeId, {
+      status: EMPLOYEE_STATUS.FIRED,
+      firedAt: Date.now()
+    });
 
-          firedAt:
-            Date.now()
-        }
-      );
-
-    eventBus.emit(
-      "employee:fired",
-      {
-        restaurantId:
-          employee.restaurantId,
-
-        employeeId
-      }
-    );
+    eventBus.emit("employee:fired", {
+      restaurantId: employee.restaurantId,
+      employeeId
+    });
 
     return updated;
   }
 
-  setSalary(
-    employeeId,
-    salary
-  ) {
-    if (
-      !Number.isInteger(salary) ||
-      salary <= 0
-    ) {
-      throw new RangeError(
-        "Salary must be a positive integer"
-      );
+  setSalary(employeeId, salary) {
+    if (!Number.isInteger(salary) || salary <= 0) {
+      throw new RangeError("Salary must be a positive integer");
     }
 
-    return entitySystem.update(
-      "employee",
-      employeeId,
-      {
-        salary
-      }
-    );
+    return entitySystem.update("employee", employeeId, { salary });
   }
 
-  addExperience(
-    employeeId,
-    amount
-  ) {
-    if (
-      !Number.isInteger(amount) ||
-      amount <= 0
-    ) {
-      throw new RangeError(
-        "Experience must be a positive integer"
-      );
+  addExperience(employeeId, amount) {
+    if (!Number.isInteger(amount) || amount <= 0) {
+      throw new RangeError("Experience must be a positive integer");
     }
 
-    const employee =
-      requireEmployee(
-        employeeId
-      );
+    const employee = requireEmployee(employeeId);
+    const experience = employee.experience + amount;
+    const level = Math.floor(experience / 1000) + 1;
 
-    const experience =
-      employee.experience +
-      amount;
-
-    const level =
-      Math.floor(
-        experience / 1000
-      ) + 1;
-
-    const updated =
-      entitySystem.update(
-        "employee",
-        employeeId,
-        {
-          experience,
-          level
-        }
-      );
+    const updated = entitySystem.update("employee", employeeId, {
+      experience,
+      level
+    });
 
     if (level > employee.level) {
-      eventBus.emit(
-        "employee:levelUp",
-        {
-          employeeId,
-          oldLevel:
-            employee.level,
-          newLevel:
-            level
-        }
-      );
+      eventBus.emit("employee:levelUp", {
+        employeeId,
+        oldLevel: employee.level,
+        newLevel: level
+      });
     }
 
     return updated;
   }
 
-  changeFatigue(
-    employeeId,
-    amount
-  ) {
-    const employee =
-      requireEmployee(
-        employeeId
-      );
+  changeFatigue(employeeId, amount) {
+    const employee = requireEmployee(employeeId);
 
-    return entitySystem.update(
-      "employee",
-      employeeId,
-      {
-        fatigue:
-          clamp(
-            employee.fatigue +
-            amount,
-            0,
-            100
-          )
-      }
-    );
+    return entitySystem.update("employee", employeeId, {
+      fatigue: clamp(employee.fatigue + amount, 0, 100)
+    });
   }
 
-  changeMood(
-    employeeId,
-    amount
-  ) {
-    const employee =
-      requireEmployee(
-        employeeId
-      );
+  changeMood(employeeId, amount) {
+    const employee = requireEmployee(employeeId);
 
-    return entitySystem.update(
-      "employee",
-      employeeId,
-      {
-        mood:
-          clamp(
-            employee.mood +
-            amount,
-            0,
-            100
-          )
-      }
-    );
+    return entitySystem.update("employee", employeeId, {
+      mood: clamp(employee.mood + amount, 0, 100)
+    });
   }
 
-  changeSkill(
-    employeeId,
-    skill,
-    amount
-  ) {
-    if (
-      typeof skill !== "string" ||
-      skill.trim() === ""
-    ) {
-      throw new TypeError(
-        "Skill must be a non-empty string"
-      );
+  changeLoyalty(employeeId, amount) {
+    const employee = requireEmployee(employeeId);
+
+    return entitySystem.update("employee", employeeId, {
+      loyalty: clamp((employee.loyalty ?? 50) + amount, 0, 100)
+    });
+  }
+
+  changeSkill(employeeId, skill, amount) {
+    if (typeof skill !== "string" || skill.trim() === "") {
+      throw new TypeError("Skill must be a non-empty string");
     }
 
-    const employee =
-      requireEmployee(
-        employeeId
-      );
+    const employee = requireEmployee(employeeId);
+    const skills = { ...employee.skills };
 
-    const skills = {
-      ...employee.skills
-    };
+    skills[skill] = clamp((skills[skill] ?? 0) + amount, 0, 100);
 
-    skills[skill] =
-      clamp(
-        (skills[skill] ?? 0) +
-        amount,
-        0,
-        100
-      );
-
-    return entitySystem.update(
-      "employee",
-      employeeId,
-      {
-        skills
-      }
-    );
+    return entitySystem.update("employee", employeeId, { skills });
   }
 
-  getPayroll(
-    restaurantId
-  ) {
-    return this
-      .listByRestaurant(
-        restaurantId
-      )
-      .reduce(
-        (total, employee) =>
-          total +
-          employee.salary,
-        0
-      );
+  getPayroll(restaurantId) {
+    return this.listByRestaurant(restaurantId).reduce(
+      (total, employee) => total + employee.salary,
+      0
+    );
   }
 
   getRole(roleId) {
-    return structuredClone(
-      requireRole(roleId)
-    );
+    return structuredClone(requireRole(roleId));
   }
 
   getRoles() {
-    return Object.values(
-      EMPLOYEE_ROLES
-    ).map(
-      (role) =>
-        structuredClone(role)
-    );
+    return Object.values(EMPLOYEE_ROLES).map(role => structuredClone(role));
   }
 }
 
-export const employeeSystem =
-  new EmployeeSystem();
+export const employeeSystem = new EmployeeSystem();
 
 export {
   EmployeeSystem,
