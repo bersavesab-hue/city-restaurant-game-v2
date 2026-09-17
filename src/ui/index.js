@@ -13,3 +13,9 @@ export {
   restaurantHomeView,
   RestaurantHomeView
 } from "./pages/restaurant/index.js";
+export {
+  cityPropertyPageSystem,
+  CityPropertyPageSystem,
+  cityPropertyView,
+  CityPropertyView
+} from "./pages/city/index.js";
