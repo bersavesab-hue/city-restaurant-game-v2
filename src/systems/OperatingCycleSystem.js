@@ -13,6 +13,7 @@ import { inventorySystem } from "./InventorySystem.js";
 import { procurementSystem } from "./ProcurementSystem.js";
 import { autoProcurementSystem } from "./AutoProcurementSystem.js";
 import { competitorDynamicsSystem } from "./CompetitorDynamicsSystem.js";
+import { marketInsightSystem } from "./MarketInsightSystem.js";
 
 class OperatingCycleSystem {
   constructor() {
@@ -126,6 +127,11 @@ class OperatingCycleSystem {
           }
 
           competitorDynamicsSystem
+            .processDay(
+              current.day
+            );
+
+          marketInsightSystem
             .processDay(
               current.day
             );

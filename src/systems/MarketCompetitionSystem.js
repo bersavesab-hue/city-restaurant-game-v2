@@ -167,16 +167,25 @@ class MarketCompetitionSystem {
         }
       );
 
+    const active =
+      existing.filter(
+        item => item.active
+      );
+
     const target =
       this.getTargetCount(
         district
       );
 
     if (
-      existing.length >= target
+      active.length >= target
     ) {
-      return existing;
+      return active;
     }
+
+    const missing =
+      target -
+      active.length;
 
     const segmentIds =
       Object.keys(
@@ -184,10 +193,13 @@ class MarketCompetitionSystem {
       );
 
     for (
-      let index = existing.length;
-      index < target;
-      index += 1
+      let offset = 0;
+      offset < missing;
+      offset += 1
     ) {
+      const index =
+        existing.length +
+        offset;
       const focus =
         segmentIds.length > 0
           ? segmentIds[
