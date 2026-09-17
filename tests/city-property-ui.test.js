@@ -51,7 +51,8 @@ test("城市房源页面支持筛选详情签约并进入装修流程", () => {
 
   const marketplace = cityPropertyPageSystem.getMarketplace({
     restaurantId: restaurant.id,
-    districtId: "city_property_ui_area"
+    districtId: "city_property_ui_area",
+    generateListings: false
   });
 
   assert.equal(marketplace.properties.length, 1);
