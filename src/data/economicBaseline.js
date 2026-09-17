@@ -1,5 +1,5 @@
 export const ECONOMIC_BASELINE = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   snapshotId: "cn_reference_2026q3_seed",
   currency: "CNY",
   regionModel: "virtual_city_cn_reference",
@@ -7,11 +7,14 @@ export const ECONOMIC_BASELINE = {
   sourcePolicy: {
     mode: "snapshot",
     description: "现实数据只作为基准锚点；游戏价格由基准值与城市、季节、供需、品质、事件、合同等系数组合计算。",
+    refreshStrategy: "版本化快照，可由后续公开统计/批发市场/行业数据导入器覆盖，不允许业务页面写死价格。",
     supportedSourceKinds: [
       "official_statistics",
       "wholesale_market",
       "industry_report",
       "platform_index",
+      "utility_tariff",
+      "commercial_listing_sample",
       "manual_reference"
     ]
   },
@@ -48,6 +51,20 @@ export const ECONOMIC_BASELINE = {
     manager: { monthlySalary: 8500, scarcity: 0.25 }
   },
 
+  commercialRentReference: {
+    unit: "sqm_month",
+    old_town: 85,
+    cbd: 210,
+    university: 75,
+    premium_residential: 130,
+    residential: 60,
+    transport_hub: 160,
+    industrial_park: 45,
+    nightlife: 120,
+    tourist_scenic: 95,
+    suburban_resort: 38
+  },
+
   utilitiesReference: {
     electricityPerKwh: 0.92,
     waterPerTon: 5.2,
@@ -69,6 +86,18 @@ export const ECONOMIC_BASELINE = {
     premiumPerSquareMeter: 2600,
     privateDiningPerSquareMeter: 3200,
     resortOutdoorPerSquareMeter: 780
+  },
+
+  furnitureReference: {
+    table_2: 1200,
+    table_4: 2200,
+    booth_4: 4200,
+    kitchen_station: 12000,
+    prep_counter: 3800,
+    cashier_counter: 3200,
+    waiting_bench: 1800,
+    decor_plant: 600,
+    decor_feature: 6200
   },
 
   equipmentReference: {
