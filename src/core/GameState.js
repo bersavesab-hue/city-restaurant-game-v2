@@ -3,11 +3,13 @@ import { eventBus } from "./EventBus.js";
 const clone = (value) => structuredClone(value);
 
 function createInitialState() {
+  const now = Date.now();
+
   return {
     meta: {
       schemaVersion: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
+      createdAt: now,
+      updatedAt: now
     },
 
     time: {
@@ -43,28 +45,60 @@ class GameState {
     return clone(this.state[section]);
   }
 
-  setSection(section, value, reason = "setSection") {
-    this.state[section] = clone(value);
-    this.touch();
+  selectSection(section, selector) {
+    if (typeof selector !== "function") {
+      throw new TypeError(
+        "Section selector must be a function"
+      );
+    }
 
+    if (!(section in this.state)) {
+      return undefined;
+    }
+
+    return clone(
+      selector(this.state[section])
+    );
+  }
+
+  emitChange(section, reason) {
     eventBus.emit("state:changed", {
       section,
       reason,
-      state: this.snapshot()
+      updatedAt:
+        this.state.meta?.updatedAt ?? null
     });
-
-    return this.getSection(section);
   }
 
-  patchSection(section, changes, reason = "patchSection") {
-    const current = this.state[section];
+  setSection(
+    section,
+    value,
+    reason = "setSection"
+  ) {
+    this.state[section] = clone(value);
+
+    this.touch();
+    this.emitChange(section, reason);
+
+    return clone(this.state[section]);
+  }
+
+  patchSection(
+    section,
+    changes,
+    reason = "patchSection"
+  ) {
+    const current =
+      this.state[section];
 
     if (
       current === null ||
       typeof current !== "object" ||
       Array.isArray(current)
     ) {
-      throw new TypeError(`State section "${section}" is not patchable`);
+      throw new TypeError(
+        `State section "${section}" is not patchable`
+      );
     }
 
     this.state[section] = {
@@ -73,38 +107,84 @@ class GameState {
     };
 
     this.touch();
+    this.emitChange(section, reason);
 
-    eventBus.emit("state:changed", {
-      section,
-      reason,
-      state: this.snapshot()
-    });
-
-    return this.getSection(section);
+    return clone(this.state[section]);
   }
 
-  replace(nextState, reason = "replace") {
-    if (!nextState || typeof nextState !== "object") {
-      throw new TypeError("Game state must be an object");
+  mutateSection(
+    section,
+    mutator,
+    reason = "mutateSection"
+  ) {
+    if (typeof mutator !== "function") {
+      throw new TypeError(
+        "Section mutator must be a function"
+      );
+    }
+
+    const current =
+      this.state[section];
+
+    if (
+      current === null ||
+      typeof current !== "object" ||
+      Array.isArray(current)
+    ) {
+      throw new TypeError(
+        `State section "${section}" is not mutable`
+      );
+    }
+
+    const result =
+      mutator(current);
+
+    this.touch();
+    this.emitChange(section, reason);
+
+    return result === undefined
+      ? undefined
+      : clone(result);
+  }
+
+  replace(
+    nextState,
+    reason = "replace"
+  ) {
+    if (
+      !nextState ||
+      typeof nextState !== "object" ||
+      Array.isArray(nextState)
+    ) {
+      throw new TypeError(
+        "Game state must be an object"
+      );
     }
 
     this.state = clone(nextState);
     this.touch();
 
-    eventBus.emit("state:replaced", {
-      reason,
-      state: this.snapshot()
-    });
+    eventBus.emit(
+      "state:replaced",
+      {
+        reason,
+        state: this.snapshot()
+      }
+    );
 
     return this.snapshot();
   }
 
   reset() {
-    this.state = createInitialState();
+    this.state =
+      createInitialState();
 
-    eventBus.emit("state:reset", {
-      state: this.snapshot()
-    });
+    eventBus.emit(
+      "state:reset",
+      {
+        state: this.snapshot()
+      }
+    );
 
     return this.snapshot();
   }
@@ -114,9 +194,15 @@ class GameState {
       this.state.meta = {};
     }
 
-    this.state.meta.updatedAt = Date.now();
+    this.state.meta.updatedAt =
+      Date.now();
   }
 }
 
-export const gameState = new GameState();
-export { GameState, createInitialState };
+export const gameState =
+  new GameState();
+
+export {
+  GameState,
+  createInitialState
+};
