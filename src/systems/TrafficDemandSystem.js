@@ -8,6 +8,7 @@ import { marketCompetitionSystem } from "./MarketCompetitionSystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
 import { districtEventSystem } from "./DistrictEventSystem.js";
 import { businessCalendarSystem } from "./BusinessCalendarSystem.js";
+import { restaurantPositioningSystem } from "./RestaurantPositioningSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -180,6 +181,12 @@ class TrafficDemandSystem {
           restaurantId
         );
 
+    const positioningContext =
+      restaurantPositioningSystem
+        .getContext(
+          restaurantId
+        );
+
     const priceIndex =
       this.getMenuPriceIndex(
         restaurantId
@@ -341,6 +348,13 @@ class TrafficDemandSystem {
             hour
           );
 
+      const positioningFactor =
+        restaurantPositioningSystem
+          .getSegmentDemandMultiplier(
+            positioningContext,
+            segment.id
+          );
+
       const playerAppeal =
         clamp(
           priceFactor *
@@ -351,7 +365,8 @@ class TrafficDemandSystem {
           actionModifiers
             .marketAppealMultiplier *
           environment
-            .playerAppealMultiplier,
+            .playerAppealMultiplier *
+          positioningFactor,
           0.2,
           4
         );
@@ -392,6 +407,7 @@ class TrafficDemandSystem {
         environment
           .demandMultiplier *
         calendarFactor *
+        positioningFactor *
         priceFactor *
         reputationFactor *
         reviewFactor *
@@ -425,6 +441,8 @@ class TrafficDemandSystem {
             .spendingMultiplier,
 
         calendarFactor,
+
+        positioningFactor,
 
         expectedVisitors:
           demand
@@ -465,6 +483,20 @@ class TrafficDemandSystem {
       calendar:
         businessCalendarSystem
           .getCalendar(),
+
+      positioningId:
+        positioningContext
+          .positioningId,
+
+      positioningFit: {
+        category:
+          positioningContext
+            .categoryFit,
+
+        price:
+          positioningContext
+            .priceFit
+      },
 
       reputationFactor,
       reviewFactor,
