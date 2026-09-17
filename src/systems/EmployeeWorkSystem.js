@@ -164,7 +164,7 @@ class EmployeeWorkSystem {
 
         return (
           capacity +
-          1 +
+          2 +
           Math.floor(
             skill / 25
           )

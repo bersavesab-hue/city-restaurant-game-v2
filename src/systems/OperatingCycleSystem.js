@@ -9,6 +9,7 @@ import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 import { leaseSystem } from "./LeaseSystem.js";
 import { historyArchiveSystem } from "./HistoryArchiveSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
+import { procurementSystem } from "./ProcurementSystem.js";
 import { autoProcurementSystem } from "./AutoProcurementSystem.js";
 
 class OperatingCycleSystem {
@@ -86,6 +87,16 @@ class OperatingCycleSystem {
           ) {
             inventorySystem
               .discardSpoiled(
+                restaurant.id
+              );
+
+            inventorySystem
+              .pruneInactive(
+                restaurant.id
+              );
+
+            procurementSystem
+              .pruneHistory(
                 restaurant.id
               );
           }

@@ -51,14 +51,19 @@ class ProcurementSystem {
 
   getOrderedQuantityForDay(supplierId, ingredientId, day) {
     return entitySystem
-      .list("procurement_order")
-      .filter((order) =>
-        order.supplierId === supplierId &&
-        order.ingredientId === ingredientId &&
-        order.status !== ORDER_STATUS.CANCELLED &&
-        order.orderDay === day
+      .filter(
+        "procurement_order",
+        (order) =>
+          order.supplierId === supplierId &&
+          order.ingredientId === ingredientId &&
+          order.status !== ORDER_STATUS.CANCELLED &&
+          order.orderDay === day
       )
-      .reduce((sum, order) => sum + order.quantity, 0);
+      .reduce(
+        (sum, order) =>
+          sum + order.quantity,
+        0
+      );
   }
 
   getRemainingDailyCapacity(supplierId, ingredientId, day = null) {
@@ -302,7 +307,10 @@ class ProcurementSystem {
           "procurement",
 
         sourceId:
-          order.id
+          order.id,
+
+        unitCost:
+          order.unitPrice
       });
 
     const time =
@@ -421,6 +429,60 @@ class ProcurementSystem {
       );
   }
 
+  pruneHistory(
+    restaurantId,
+    retentionDays = 30
+  ) {
+    const cutoff =
+      gameState
+        .getSection("time")
+        .totalMinutes -
+      retentionDays * 1440;
+
+    const removable =
+      entitySystem.filter(
+        "procurement_order",
+        (order) => {
+          if (
+            order.restaurantId !==
+            restaurantId ||
+            order.status ===
+            ORDER_STATUS.PENDING
+          ) {
+            return false;
+          }
+
+          const finishedAt =
+            order.deliveredAt ??
+            order.cancelledAt ??
+            order.orderedAt;
+
+          if (finishedAt > cutoff) {
+            return false;
+          }
+
+          if (
+            order.inventoryBatchId &&
+            entitySystem.get(
+              "inventory_batch",
+              order.inventoryBatchId
+            )
+          ) {
+            return false;
+          }
+
+          return true;
+        }
+      );
+
+    return entitySystem.removeMany(
+      "procurement_order",
+      removable.map(
+        order => order.id
+      )
+    );
+  }
+
   get(orderId) {
     return requireOrder(orderId);
   }
@@ -429,20 +491,16 @@ class ProcurementSystem {
     restaurantId,
     status = null
   ) {
-    return entitySystem
-      .list(
-        "procurement_order"
-      )
-      .filter(
-        (order) =>
-          order.restaurantId ===
-          restaurantId
-      )
-      .filter(
-        (order) =>
+    return entitySystem.filter(
+      "procurement_order",
+      (order) =>
+        order.restaurantId ===
+          restaurantId &&
+        (
           status === null ||
           order.status === status
-      );
+        )
+    );
   }
 }
 

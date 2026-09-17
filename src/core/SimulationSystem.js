@@ -1,6 +1,7 @@
 import { eventBus } from "./EventBus.js";
 import { gameState } from "./GameState.js";
 import { timeSystem } from "./TimeSystem.js";
+import { schedulerSystem } from "./SchedulerSystem.js";
 
 function normalizeName(name) {
   if (typeof name !== "string" || name.trim() === "") {
@@ -285,6 +286,185 @@ class SimulationSystem {
       "simulation:minuteProcessed",
       {
         time: structuredClone(current)
+      }
+    );
+
+    return current;
+  }
+
+  hasEnabledMinuteHooks() {
+    return this
+      .getOrderedSystems()
+      .some(
+        (system) =>
+          typeof system.hooks.onMinute ===
+          "function"
+      );
+  }
+
+  getNextScheduledMinute() {
+    const now =
+      timeSystem.getTime()
+        .totalMinutes;
+
+    const task =
+      schedulerSystem
+        .list()
+        .filter(
+          (item) =>
+            item.dueAt > now
+        )
+        .sort(
+          (a, b) =>
+            a.dueAt - b.dueAt
+        )[0];
+
+    return task?.dueAt ?? null;
+  }
+
+  advanceFast(minutes = 1) {
+    if (
+      !Number.isInteger(minutes) ||
+      minutes <= 0
+    ) {
+      throw new RangeError(
+        "Simulation minutes must be a positive integer"
+      );
+    }
+
+    if (
+      this.hasEnabledMinuteHooks()
+    ) {
+      return this.advance(
+        minutes
+      );
+    }
+
+    let remaining = minutes;
+    let current =
+      timeSystem.getTime();
+
+    while (remaining > 0) {
+      schedulerSystem
+        .processDueTasks();
+
+      const previous =
+        timeSystem.getTime();
+
+      const toHour =
+        previous.minute === 0
+          ? 60
+          : 60 -
+            previous.minute;
+
+      const nextTask =
+        this.getNextScheduledMinute();
+
+      const toTask =
+        nextTask === null
+          ? Infinity
+          : Math.max(
+              1,
+              nextTask -
+              previous.totalMinutes
+            );
+
+      const step =
+        Math.min(
+          remaining,
+          toHour,
+          toTask
+        );
+
+      current =
+        timeSystem.advance(
+          step
+        );
+
+      const context = {
+        previous,
+        current,
+        deltaMinutes: step
+      };
+
+      const simulation =
+        this.ensureState();
+
+      simulation.processedMinutes +=
+        step;
+
+      if (current.minute === 0) {
+        this.runHook(
+          "onHour",
+          context
+        );
+
+        simulation.processedHours +=
+          1;
+
+        eventBus.emit(
+          "simulation:hourProcessed",
+          {
+            time:
+              structuredClone(
+                current
+              )
+          }
+        );
+      }
+
+      if (
+        current.hour === 0 &&
+        current.minute === 0
+      ) {
+        this.runHook(
+          "onDay",
+          context
+        );
+
+        simulation.processedDays +=
+          1;
+
+        eventBus.emit(
+          "simulation:dayProcessed",
+          {
+            time:
+              structuredClone(
+                current
+              )
+          }
+        );
+      }
+
+      gameState.setSection(
+        "simulation",
+        simulation,
+        "simulation:fastStep"
+      );
+
+      remaining -= step;
+    }
+
+    const simulation =
+      this.ensureState();
+
+    simulation.ticks += 1;
+
+    gameState.setSection(
+      "simulation",
+      simulation,
+      "simulation:fastAdvance"
+    );
+
+    eventBus.emit(
+      "simulation:advanced",
+      {
+        minutes,
+        fast: true,
+        time:
+          structuredClone(
+            current
+          )
       }
     );
 

@@ -105,6 +105,7 @@ class InventorySystem {
     shelfLifeDays = null,
     sourceType = "manual",
     sourceId = null,
+    unitCost = null,
     storageType = null
   }) {
     requireRestaurant(restaurantId);
@@ -141,6 +142,20 @@ class InventorySystem {
       );
     }
 
+    const finalUnitCost =
+      unitCost ??
+      ingredient.basePurchasePrice;
+
+    if (
+      typeof finalUnitCost !== "number" ||
+      !Number.isFinite(finalUnitCost) ||
+      finalUnitCost < 0
+    ) {
+      throw new RangeError(
+        "Unit cost must be non-negative"
+      );
+    }
+
     const receivedAt =
       this.getCurrentMinute();
 
@@ -174,6 +189,9 @@ class InventorySystem {
 
           sourceType,
           sourceId,
+
+          unitCost:
+            finalUnitCost,
 
           status:
             BATCH_STATUS.ACTIVE
@@ -219,35 +237,30 @@ class InventorySystem {
   ) {
     requireRestaurant(restaurantId);
 
-    let batches =
-      entitySystem
-        .list("inventory_batch")
-        .filter(
-          (batch) =>
-            batch.restaurantId ===
-            restaurantId
-        );
-
     if (ingredientId !== null) {
       requireIngredient(ingredientId);
+    }
 
-      batches =
-        batches.filter(
-          (batch) =>
+    const batches =
+      entitySystem.filter(
+        "inventory_batch",
+        (batch) =>
+          batch.restaurantId ===
+            restaurantId &&
+          (
+            ingredientId === null ||
             batch.ingredientId ===
-            ingredientId
-        );
-    }
-
-    if (activeOnly) {
-      batches =
-        batches.filter(
-          (batch) =>
-            batch.status ===
-              BATCH_STATUS.ACTIVE &&
-            batch.quantity > 0
-        );
-    }
+              ingredientId
+          ) &&
+          (
+            !activeOnly ||
+            (
+              batch.status ===
+                BATCH_STATUS.ACTIVE &&
+              batch.quantity > 0
+            )
+          )
+      );
 
     let result =
       batches.map(
@@ -354,7 +367,12 @@ class InventorySystem {
           status:
             newQuantity <= 0
               ? BATCH_STATUS.DEPLETED
-              : BATCH_STATUS.ACTIVE
+              : BATCH_STATUS.ACTIVE,
+
+          depletedAt:
+            newQuantity <= 0
+              ? this.getCurrentMinute()
+              : null
         }
       );
 
@@ -481,6 +499,49 @@ class InventorySystem {
       totalBatches,
       totalQuantity
     };
+  }
+
+  pruneInactive(
+    restaurantId,
+    retentionDays = 30
+  ) {
+    requireRestaurant(
+      restaurantId
+    );
+
+    const cutoff =
+      this.getCurrentMinute() -
+      retentionDays * 1440;
+
+    const removable =
+      entitySystem.filter(
+        "inventory_batch",
+        (batch) => {
+          if (
+            batch.restaurantId !==
+            restaurantId ||
+            batch.status ===
+            BATCH_STATUS.ACTIVE
+          ) {
+            return false;
+          }
+
+          const inactiveAt =
+            batch.discardedAt ??
+            batch.depletedAt ??
+            batch.expiresAt ??
+            batch.receivedAt;
+
+          return inactiveAt <= cutoff;
+        }
+      );
+
+    return entitySystem.removeMany(
+      "inventory_batch",
+      removable.map(
+        batch => batch.id
+      )
+    );
   }
 
   getSummary(

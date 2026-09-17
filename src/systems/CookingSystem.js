@@ -32,6 +32,14 @@ function getUnitCost(batchId, ingredientId) {
     );
 
   if (
+    Number.isFinite(
+      batch?.unitCost
+    )
+  ) {
+    return batch.unitCost;
+  }
+
+  if (
     batch?.sourceType === "procurement" &&
     batch.sourceId
   ) {

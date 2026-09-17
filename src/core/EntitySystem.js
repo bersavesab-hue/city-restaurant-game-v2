@@ -340,6 +340,42 @@ class EntitySystem {
     return removed;
   }
 
+  filter(type, predicate) {
+    const entityType =
+      normalizeType(type);
+
+    if (typeof predicate !== "function") {
+      throw new TypeError(
+        "Entity predicate must be a function"
+      );
+    }
+
+    return (
+      gameState.selectSection(
+        "data",
+        (data) => {
+          const collection =
+            data?.entities?.[
+              entityType
+            ] ?? {};
+
+          const matches = [];
+
+          for (
+            const entity
+            of Object.values(collection)
+          ) {
+            if (predicate(entity)) {
+              matches.push(entity);
+            }
+          }
+
+          return matches;
+        }
+      ) ?? []
+    );
+  }
+
   list(type) {
     const entityType =
       normalizeType(type);
