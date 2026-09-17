@@ -8,6 +8,7 @@ import {
 } from "./FinanceSystem.js";
 import { restaurantSystem } from "./RestaurantSystem.js";
 import { propertySystem } from "./PropertySystem.js";
+import { propertyFloorplanSystem } from "./PropertyFloorplanSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
 
 const FURNITURE = Object.freeze({
@@ -170,6 +171,58 @@ class RenovationSystem {
     return { width, height };
   }
 
+  getLayoutFloors(layout) {
+    if (Array.isArray(layout.floors) && layout.floors.length > 0) {
+      return layout.floors;
+    }
+
+    return [
+      {
+        id: "floor_1",
+        label: "1F",
+        floorNumber: 1,
+        area: layout.width * layout.height,
+        usableArea: layout.width * layout.height,
+        width: layout.width,
+        height: layout.height,
+        shape: "rectangle",
+        polygon: [
+          { x: 0, y: 0 },
+          { x: layout.width, y: 0 },
+          { x: layout.width, y: layout.height },
+          { x: 0, y: layout.height }
+        ],
+        entrances: [],
+        windows: [],
+        columns: [],
+        fixedStructures: [],
+        utilityPoints: []
+      }
+    ];
+  }
+
+  getFloor(layout, floorId = null) {
+    const floors = this.getLayoutFloors(layout);
+    const resolvedId =
+      floorId ?? layout.activeFloorId ?? floors[0]?.id ?? null;
+    const floor = floors.find((item) => item.id === resolvedId);
+
+    if (!floor) {
+      throw new Error(`Renovation floor "${resolvedId}" does not exist`);
+    }
+
+    return floor;
+  }
+
+  getPlacementFloorId(layout, placement) {
+    return (
+      placement.floorId ??
+      layout.activeFloorId ??
+      this.getLayoutFloors(layout)[0]?.id ??
+      "floor_1"
+    );
+  }
+
   initialize(restaurantId) {
     const restaurant = restaurantSystem.get(restaurantId);
 
@@ -182,14 +235,45 @@ class RenovationSystem {
     }
 
     const property = propertySystem.get(restaurant.locationId);
-    const grid = this.getGridSize(property.area);
+    const propertyLayout = propertySystem.getLayout(property.id);
+    const fallbackGrid = this.getGridSize(property.usableArea ?? property.area);
+    const floors = propertyLayout.floors?.length
+      ? structuredClone(propertyLayout.floors)
+      : [
+          {
+            id: "floor_1",
+            label: "1F",
+            floorNumber: 1,
+            area: property.area,
+            usableArea: property.usableArea ?? property.area,
+            width: fallbackGrid.width,
+            height: fallbackGrid.height,
+            shape: "rectangle",
+            polygon: [
+              { x: 0, y: 0 },
+              { x: fallbackGrid.width, y: 0 },
+              { x: fallbackGrid.width, y: fallbackGrid.height },
+              { x: 0, y: fallbackGrid.height }
+            ],
+            entrances: [],
+            windows: [],
+            columns: [],
+            fixedStructures: [],
+            utilityPoints: []
+          }
+        ];
+    const defaultFloor = floors[0];
     const time = gameState.getSection("time");
 
     const layout = entitySystem.create("renovation_layout", {
       restaurantId,
       propertyId: property.id,
-      width: grid.width,
-      height: grid.height,
+      propertyLayoutVersion: propertyLayout.layoutVersion ?? 1,
+      floorCount: floors.length,
+      floors,
+      activeFloorId: defaultFloor.id,
+      width: defaultFloor.width,
+      height: defaultFloor.height,
       active: false,
       revision: 1,
       placements: [],
@@ -202,7 +286,10 @@ class RenovationSystem {
 
     eventBus.emit("renovation:initialized", {
       restaurantId,
-      layoutId: layout.id
+      layoutId: layout.id,
+      propertyId: property.id,
+      floorCount: floors.length,
+      activeFloorId: defaultFloor.id
     });
 
     return layout;
@@ -210,6 +297,23 @@ class RenovationSystem {
 
   requireLayout(restaurantId) {
     return this.findLayout(restaurantId) ?? this.initialize(restaurantId);
+  }
+
+  setActiveFloor(restaurantId, floorId) {
+    const layout = this.requireLayout(restaurantId);
+    const floor = this.getFloor(layout, floorId);
+
+    return entitySystem.update(
+      "renovation_layout",
+      layout.id,
+      {
+        activeFloorId: floor.id,
+        width: floor.width,
+        height: floor.height,
+        revision: (layout.revision ?? 0) + 1,
+        updatedDay: gameState.getSection("time").day
+      }
+    );
   }
 
   getSize(definition, rotation) {
@@ -234,19 +338,14 @@ class RenovationSystem {
   validatePlacement(layout, placement, ignorePlacementId = null) {
     const definition = this.getFurnitureDefinition(placement.furnitureId);
     const size = this.getSize(definition, placement.rotation ?? 0);
+    const floorId = this.getPlacementFloorId(layout, placement);
+    const floor = this.getFloor(layout, floorId);
 
     requireInteger(placement.x, "x");
     requireInteger(placement.y, "y");
 
     if (placement.x < 0 || placement.y < 0) {
       throw new RangeError("Furniture position cannot be negative");
-    }
-
-    if (
-      placement.x + size.width > layout.width ||
-      placement.y + size.height > layout.height
-    ) {
-      throw new Error("Furniture is outside renovation bounds");
     }
 
     const rectangle = {
@@ -256,8 +355,25 @@ class RenovationSystem {
       height: size.height
     };
 
+    if (layout.propertyId && Array.isArray(layout.floors)) {
+      propertyFloorplanSystem.validatePlacement(
+        layout.propertyId,
+        floor.id,
+        rectangle
+      );
+    } else if (
+      placement.x + size.width > floor.width ||
+      placement.y + size.height > floor.height
+    ) {
+      throw new Error("Furniture is outside renovation bounds");
+    }
+
     for (const current of layout.placements ?? []) {
       if (current.id === ignorePlacementId) {
+        continue;
+      }
+
+      if (this.getPlacementFloorId(layout, current) !== floor.id) {
         continue;
       }
 
@@ -331,7 +447,8 @@ class RenovationSystem {
     furnitureId,
     x,
     y,
-    rotation = 0
+    rotation = 0,
+    floorId = null
   }) {
     const layout = this.requireLayout(restaurantId);
     const definition = this.getFurnitureDefinition(furnitureId);
@@ -351,6 +468,7 @@ class RenovationSystem {
     const placement = {
       id: `placement_${layout.nextPlacementNumber ?? 1}`,
       furnitureId,
+      floorId: floorId ?? layout.activeFloorId ?? this.getLayoutFloors(layout)[0].id,
       x,
       y,
       rotation
@@ -394,7 +512,8 @@ class RenovationSystem {
     placementId,
     x,
     y,
-    rotation = null
+    rotation = null,
+    floorId = null
   }) {
     const layout = this.requireLayout(restaurantId);
     const current = (layout.placements ?? []).find(
@@ -407,6 +526,11 @@ class RenovationSystem {
 
     const moved = {
       ...current,
+      floorId:
+        floorId ??
+        current.floorId ??
+        layout.activeFloorId ??
+        this.getLayoutFloors(layout)[0].id,
       x,
       y,
       rotation: rotation ?? current.rotation ?? 0
@@ -587,16 +711,33 @@ class RenovationSystem {
       };
     }
 
+    let editingMode = null;
+
+    if (layout.propertyId) {
+      try {
+        editingMode = propertyFloorplanSystem.getEditingMode(layout.propertyId);
+      } catch {
+        editingMode = null;
+      }
+    }
+
     return {
       restaurantId,
       initialized: true,
       active: layout.active,
       layoutId: layout.id,
+      propertyId: layout.propertyId ?? null,
+      propertyLayoutVersion: layout.propertyLayoutVersion ?? 1,
+      floorCount: layout.floorCount ?? this.getLayoutFloors(layout).length,
+      activeFloorId:
+        layout.activeFloorId ?? this.getLayoutFloors(layout)[0]?.id ?? null,
+      floors: structuredClone(this.getLayoutFloors(layout)),
       width: layout.width,
       height: layout.height,
       placements: layout.placements.length,
       totalSpent: layout.totalSpent ?? 0,
       revision: layout.revision ?? 1,
+      editingMode,
       modifiers: layout.active
         ? this.getOperationalModifiers(restaurantId)
         : {
