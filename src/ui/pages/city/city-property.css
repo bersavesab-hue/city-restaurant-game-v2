@@ -1,0 +1,270 @@
+.cr-city-property-page {
+  min-height: 100%;
+  padding: 14px 14px 88px;
+  color: var(--ui-text-primary, #173744);
+  background:
+    linear-gradient(180deg, rgba(18, 74, 83, .96), rgba(31, 92, 96, .92) 150px, #f5efe2 360px);
+  box-sizing: border-box;
+}
+
+.cr-city-property-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: #fff8e8;
+}
+
+.cr-city-property-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
+.cr-city-property-balance {
+  font-size: 13px;
+  opacity: .9;
+}
+
+.cr-city-district-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 0 12px;
+  scrollbar-width: none;
+}
+
+.cr-city-district-row::-webkit-scrollbar { display: none; }
+
+.cr-city-district-chip {
+  flex: 0 0 auto;
+  min-width: 180px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 14px;
+  background: rgba(255,255,255,.10);
+  color: #fff;
+  text-align: left;
+  backdrop-filter: blur(8px);
+}
+
+.cr-city-district-chip strong,
+.cr-city-district-chip span {
+  display: block;
+}
+
+.cr-city-district-chip span {
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: .78;
+}
+
+.cr-property-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.cr-property-card {
+  padding: 0;
+  border: 1px solid #d9d0bd;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fffaf0;
+  color: inherit;
+  text-align: left;
+  box-shadow: 0 8px 24px rgba(37, 50, 47, .10);
+}
+
+.cr-property-card__scene,
+.cr-property-detail__visual {
+  min-height: 132px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.08)),
+    linear-gradient(135deg, #b96f40, #e9c38a 58%, #547e75);
+  position: relative;
+}
+
+.cr-property-card__scene::after,
+.cr-property-detail__visual::after {
+  content: "房源门面预览";
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(20, 50, 54, .76);
+  color: #fff7e7;
+  font-size: 11px;
+}
+
+.cr-property-card__body {
+  padding: 12px;
+}
+
+.cr-property-card__name {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.cr-property-card__district {
+  margin-top: 3px;
+  color: #6d786f;
+  font-size: 12px;
+}
+
+.cr-property-card__metrics,
+.cr-property-card__footer,
+.cr-property-detail__district,
+.cr-property-detail__quote {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cr-property-card__metrics {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #46615f;
+}
+
+.cr-property-card__metrics span,
+.cr-property-detail__district span {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #edf1e9;
+}
+
+.cr-property-card__footer {
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #ece3d2;
+  font-size: 12px;
+}
+
+.cr-property-card__footer strong {
+  color: #a85e32;
+}
+
+.cr-property-empty {
+  padding: 28px;
+  border-radius: 16px;
+  background: #fffaf0;
+  color: #6e766d;
+  text-align: center;
+}
+
+.cr-property-back {
+  margin-bottom: 10px;
+  border: 0;
+  background: transparent;
+  color: #fff8e8;
+  font-weight: 700;
+}
+
+.cr-property-detail {
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fffaf0;
+  box-shadow: 0 10px 28px rgba(37, 50, 47, .12);
+}
+
+.cr-property-detail__visual {
+  min-height: 220px;
+}
+
+.cr-property-detail__content {
+  padding: 16px;
+}
+
+.cr-property-detail__eyebrow {
+  color: #a76d45;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cr-property-detail h2 {
+  margin: 4px 0 14px;
+  font-size: 22px;
+}
+
+.cr-property-detail__specs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cr-property-detail__specs > div {
+  padding: 10px;
+  border-radius: 12px;
+  background: #f1eadb;
+}
+
+.cr-property-detail__specs strong,
+.cr-property-detail__specs span {
+  display: block;
+}
+
+.cr-property-detail__specs span {
+  margin-top: 3px;
+  font-size: 11px;
+  color: #68746e;
+}
+
+.cr-property-detail__district,
+.cr-property-detail__quote {
+  margin-top: 12px;
+}
+
+.cr-property-detail__quote {
+  padding: 12px;
+  border-radius: 12px;
+  background: #173f46;
+  color: #fff6e5;
+  justify-content: space-between;
+}
+
+.cr-property-detail__quote strong {
+  color: #f1c483;
+}
+
+.cr-property-detail__actions {
+  position: sticky;
+  bottom: 12px;
+  margin-top: 12px;
+}
+
+.cr-property-lease-button {
+  width: 100%;
+  min-height: 50px;
+  border: 0;
+  border-radius: 15px;
+  background: #c8783e;
+  color: white;
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(124, 70, 33, .22);
+}
+
+.cr-property-lease-button:disabled {
+  background: #a9aba3;
+  box-shadow: none;
+}
+
+@media (min-width: 720px) {
+  .cr-city-property-page {
+    padding-inline: 22px;
+  }
+
+  .cr-property-detail {
+    display: grid;
+    grid-template-columns: minmax(320px, 1.1fr) minmax(320px, .9fr);
+  }
+
+  .cr-property-detail__visual {
+    min-height: 460px;
+  }
+}
