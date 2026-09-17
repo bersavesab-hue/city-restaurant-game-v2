@@ -20,6 +20,11 @@ class LayoutFlowSystem {
     return {
       placement,
       definition,
+      floorId:
+        renovationSystem.getPlacementFloorId(
+          layout,
+          placement
+        ),
       width: size.width,
       height: size.height,
       centerX:
@@ -46,6 +51,10 @@ class LayoutFlowSystem {
   }
 
   getDistance(a, b) {
+    if (a.floorId !== b.floorId) {
+      return Infinity;
+    }
+
     return (
       Math.abs(
         a.centerX - b.centerX
@@ -68,6 +77,7 @@ class LayoutFlowSystem {
     }
 
     let total = 0;
+    let matched = 0;
 
     for (const source of sources) {
       let nearest = Infinity;
@@ -82,11 +92,48 @@ class LayoutFlowSystem {
         );
       }
 
-      total += nearest;
+      if (Number.isFinite(nearest)) {
+        total += nearest;
+        matched += 1;
+      }
     }
 
-    return total /
-      sources.length;
+    return matched > 0
+      ? total / matched
+      : null;
+  }
+
+  getTotalCells(layout) {
+    const floors =
+      renovationSystem.getLayoutFloors(
+        layout
+      );
+
+    return Math.max(
+      1,
+      floors.reduce(
+        (sum, floor) =>
+          sum +
+          floor.width * floor.height,
+        0
+      )
+    );
+  }
+
+  getDistanceNormalizer(layout) {
+    const floors =
+      renovationSystem.getLayoutFloors(
+        layout
+      );
+
+    return Math.max(
+      1,
+      ...floors.map(
+        floor =>
+          floor.width +
+          floor.height
+      )
+    );
   }
 
   calculate(layout) {
@@ -136,11 +183,7 @@ class LayoutFlowSystem {
       );
 
     const totalCells =
-      Math.max(
-        1,
-        layout.width *
-        layout.height
-      );
+      this.getTotalCells(layout);
 
     const occupiedCells =
       geometries.reduce(
@@ -158,10 +201,8 @@ class LayoutFlowSystem {
       );
 
     const normalizer =
-      Math.max(
-        1,
-        layout.width +
-        layout.height
+      this.getDistanceNormalizer(
+        layout
       );
 
     const kitchenTargets =
@@ -380,6 +421,10 @@ class LayoutFlowSystem {
     return {
       width: layout.width,
       height: layout.height,
+      floorCount:
+        renovationSystem
+          .getLayoutFloors(layout)
+          .length,
       occupiedCells,
       totalCells,
       density:
