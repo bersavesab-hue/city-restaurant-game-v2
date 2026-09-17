@@ -135,7 +135,7 @@ test(
     assert.equal(invalid.valid, false);
     assert.match(
       invalid.reason,
-      /outside renovation bounds/
+      /outside the rented floorplan/
     );
 
     renovationMobilePageSystem.discard(
