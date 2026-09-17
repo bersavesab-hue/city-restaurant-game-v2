@@ -47,6 +47,7 @@ import { restaurantPositioningSystem } from "./systems/RestaurantPositioningSyst
 import { competitorDynamicsSystem } from "./systems/CompetitorDynamicsSystem.js";
 import { seatingSystem } from "./systems/SeatingSystem.js";
 import { renovationSystem } from "./systems/RenovationSystem.js";
+import { layoutFlowSystem } from "./systems/LayoutFlowSystem.js";
 import { dailySettlementSystem } from "./systems/DailySettlementSystem.js";
 import { operatingAnalyticsSystem } from "./systems/OperatingAnalyticsSystem.js";
 import { operatingReportSystem } from "./systems/OperatingReportSystem.js";
@@ -116,6 +117,7 @@ function bootstrap() {
       competitorDynamicsSystem,
       seatingSystem,
       renovationSystem,
+      layoutFlowSystem,
       dailySettlementSystem,
       operatingAnalyticsSystem,
       operatingReportSystem,
