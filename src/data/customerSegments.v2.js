@@ -1,0 +1,122 @@
+export const CUSTOMER_SEGMENTS_V2 = [
+  {
+    id: "office_worker",
+    name: "上班族",
+    spendingPower: 65,
+    priceSensitivity: 58,
+    qualitySensitivity: 60,
+    speedSensitivity: 88,
+    averageDiningMinutes: 28,
+    queuePatienceMinutes: 8,
+    categoryPreferences: { rice: 1.25, noodle: 1.2, fast_food: 1.3, stir_fry: 0.85, hotpot: 0.55, dessert: 0.55, default: 0.8 },
+    hourWeights: { 7: 25, 8: 40, 11: 75, 12: 100, 13: 78, 17: 42, 18: 72, 19: 58 }
+  },
+  {
+    id: "resident",
+    name: "家庭居民",
+    spendingPower: 58,
+    priceSensitivity: 65,
+    qualitySensitivity: 72,
+    speedSensitivity: 38,
+    averageDiningMinutes: 52,
+    queuePatienceMinutes: 18,
+    categoryPreferences: { rice: 1, noodle: 0.9, fast_food: 0.6, stir_fry: 1.35, hotpot: 1.15, dessert: 0.75, default: 0.9 },
+    hourWeights: { 7: 30, 8: 25, 11: 35, 12: 58, 13: 42, 17: 48, 18: 82, 19: 100, 20: 75 }
+  },
+  {
+    id: "student",
+    name: "学生",
+    spendingPower: 30,
+    priceSensitivity: 92,
+    qualitySensitivity: 45,
+    speedSensitivity: 58,
+    averageDiningMinutes: 36,
+    queuePatienceMinutes: 13,
+    categoryPreferences: { rice: 1.25, noodle: 1.3, fast_food: 1.4, stir_fry: 0.72, hotpot: 0.8, dessert: 1.15, default: 0.82 },
+    hourWeights: { 7: 20, 11: 42, 12: 85, 13: 72, 17: 65, 18: 100, 19: 88, 20: 68, 21: 45 }
+  },
+  {
+    id: "blue_collar",
+    name: "产业工人",
+    spendingPower: 42,
+    priceSensitivity: 82,
+    qualitySensitivity: 52,
+    speedSensitivity: 72,
+    averageDiningMinutes: 32,
+    queuePatienceMinutes: 10,
+    categoryPreferences: { rice: 1.4, noodle: 1.25, fast_food: 1.2, stir_fry: 1, hotpot: 0.7, dessert: 0.35, default: 0.85 },
+    hourWeights: { 6: 28, 7: 55, 11: 72, 12: 100, 13: 58, 17: 55, 18: 88, 19: 58 }
+  },
+  {
+    id: "senior",
+    name: "中老年居民",
+    spendingPower: 46,
+    priceSensitivity: 78,
+    qualitySensitivity: 75,
+    speedSensitivity: 28,
+    averageDiningMinutes: 55,
+    queuePatienceMinutes: 22,
+    categoryPreferences: { rice: 1, noodle: 1, fast_food: 0.42, stir_fry: 1.2, hotpot: 0.72, dessert: 0.55, default: 0.85 },
+    hourWeights: { 6: 35, 7: 68, 8: 52, 10: 25, 11: 62, 12: 82, 13: 48, 17: 50, 18: 72 }
+  },
+  {
+    id: "tourist",
+    name: "游客",
+    spendingPower: 74,
+    priceSensitivity: 38,
+    qualitySensitivity: 82,
+    speedSensitivity: 30,
+    averageDiningMinutes: 58,
+    queuePatienceMinutes: 21,
+    categoryPreferences: { rice: 0.9, noodle: 0.95, fast_food: 0.55, stir_fry: 1.25, hotpot: 1.35, dessert: 1.05, default: 1 },
+    hourWeights: { 10: 32, 11: 52, 12: 72, 13: 78, 14: 65, 17: 52, 18: 78, 19: 92, 20: 78 }
+  },
+  {
+    id: "high_income",
+    name: "高收入客群",
+    spendingPower: 92,
+    priceSensitivity: 18,
+    qualitySensitivity: 94,
+    speedSensitivity: 32,
+    averageDiningMinutes: 72,
+    queuePatienceMinutes: 18,
+    categoryPreferences: { rice: 0.72, noodle: 0.62, fast_food: 0.35, stir_fry: 1.28, hotpot: 1.22, dessert: 1.1, default: 1.05 },
+    hourWeights: { 11: 25, 12: 48, 13: 38, 17: 40, 18: 72, 19: 100, 20: 92, 21: 62 }
+  },
+  {
+    id: "business_guest",
+    name: "商务宴请",
+    spendingPower: 96,
+    priceSensitivity: 12,
+    qualitySensitivity: 96,
+    speedSensitivity: 22,
+    averageDiningMinutes: 95,
+    queuePatienceMinutes: 12,
+    categoryPreferences: { rice: 0.65, noodle: 0.45, fast_food: 0.2, stir_fry: 1.35, hotpot: 1.05, dessert: 0.9, default: 1.05 },
+    hourWeights: { 11: 22, 12: 45, 13: 35, 17: 35, 18: 72, 19: 100, 20: 90, 21: 55 }
+  },
+  {
+    id: "foodie",
+    name: "美食爱好者",
+    spendingPower: 78,
+    priceSensitivity: 32,
+    qualitySensitivity: 100,
+    speedSensitivity: 24,
+    averageDiningMinutes: 68,
+    queuePatienceMinutes: 25,
+    categoryPreferences: { rice: 0.82, noodle: 0.85, fast_food: 0.48, stir_fry: 1.35, hotpot: 1.25, dessert: 1.12, default: 1 },
+    hourWeights: { 10: 18, 11: 40, 12: 68, 13: 58, 17: 42, 18: 78, 19: 100, 20: 88, 21: 55 }
+  },
+  {
+    id: "nightlife",
+    name: "夜生活客群",
+    spendingPower: 62,
+    priceSensitivity: 48,
+    qualitySensitivity: 62,
+    speedSensitivity: 35,
+    averageDiningMinutes: 70,
+    queuePatienceMinutes: 22,
+    categoryPreferences: { rice: 0.75, noodle: 1, fast_food: 0.9, stir_fry: 1.15, hotpot: 1.35, dessert: 0.72, default: 1 },
+    hourWeights: { 18: 32, 19: 52, 20: 72, 21: 92, 22: 100, 23: 82 }
+  }
+];
