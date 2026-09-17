@@ -1,5 +1,15 @@
 import { renovationEditorSystem } from "../../systems/RenovationEditorSystem.js";
 import { renovationSystem } from "../../systems/RenovationSystem.js";
+import {
+  RENOVATION_WORKSPACE_MODE_LABELS,
+  getWorkspaceMode,
+  getZoomConfig,
+  normalizeZoom,
+  buildWorkspaceZones,
+  getViewBounds,
+  placementIntersectsBounds,
+  buildMinimapModel
+} from "./RenovationWorkspaceModel.js";
 
 const DEFAULT_CATEGORY = "dining";
 
@@ -18,7 +28,10 @@ class RenovationMobilePageSystem {
       pendingRotation: 0,
       issuesExpanded: false,
       templatesExpanded: false,
-      drawerExpanded: true
+      drawerExpanded: true,
+      minimapExpanded: false,
+      zoom: 1,
+      activeZoneByFloor: {}
     });
 
     return this.getPage(restaurantId, editor);
@@ -86,6 +99,49 @@ class RenovationMobilePageSystem {
       ? this.findCatalogItem(editor, ui.selectedFurnitureId)
       : null;
 
+    const activeFloor = editor.layout.activeFloor ?? {
+      id: editor.layout.activeFloorId ?? "floor_1",
+      label: "1F",
+      width: editor.layout.width,
+      height: editor.layout.height,
+      area: editor.layout.width * editor.layout.height,
+      usableArea: editor.layout.width * editor.layout.height,
+      polygon: []
+    };
+    const mode = getWorkspaceMode(activeFloor);
+    const zoomConfig = getZoomConfig(mode);
+    ui.zoom = normalizeZoom(ui.zoom, mode);
+    const zones = buildWorkspaceZones(activeFloor);
+
+    if (
+      mode === "zone" &&
+      !ui.activeZoneByFloor[activeFloor.id]
+    ) {
+      ui.activeZoneByFloor[activeFloor.id] = zones[0]?.id ?? null;
+    }
+
+    const activeZoneId =
+      mode === "zone"
+        ? ui.activeZoneByFloor[activeFloor.id] ?? zones[0]?.id ?? null
+        : null;
+    const viewBounds = getViewBounds(
+      activeFloor,
+      mode,
+      zones,
+      activeZoneId
+    );
+    const floorPlacements = editor.layout.placements.map(
+      item => this.getPlacementView(item)
+    );
+    const visiblePlacements = floorPlacements.filter(
+      item => placementIntersectsBounds(item, viewBounds)
+    );
+    const minimap = buildMinimapModel({
+      floor: activeFloor,
+      placements: floorPlacements,
+      viewBounds
+    });
+
     return {
       restaurantId,
       header: {
@@ -97,19 +153,36 @@ class RenovationMobilePageSystem {
         grade: editor.analysis.grade
       },
       workspace: {
-        width: editor.layout.width,
-        height: editor.layout.height,
+        width: viewBounds.width,
+        height: viewBounds.height,
+        floorWidth: activeFloor.width,
+        floorHeight: activeFloor.height,
         floorCount: editor.layout.floorCount ?? 1,
         floors: structuredClone(editor.layout.floors ?? []),
         activeFloorId: editor.layout.activeFloorId ?? null,
-        activeFloor: editor.layout.activeFloor
-          ? structuredClone(editor.layout.activeFloor)
-          : null,
+        activeFloor: structuredClone(activeFloor),
         totalPlacements: editor.layout.totalPlacements ?? editor.layout.placements.length,
-        placements: editor.layout.placements.map(
-          item => this.getPlacementView(item)
-        ),
-        selectedPlacementId: ui.selectedPlacementId
+        floorPlacementCount: floorPlacements.length,
+        placements: visiblePlacements,
+        floorPlacements,
+        selectedPlacementId: ui.selectedPlacementId,
+        mode,
+        modeLabel: RENOVATION_WORKSPACE_MODE_LABELS[mode] ?? mode,
+        zoom: ui.zoom,
+        zoomMin: zoomConfig.min,
+        zoomMax: zoomConfig.max,
+        zoomStep: zoomConfig.step,
+        canZoom: zoomConfig.max > zoomConfig.min,
+        viewBounds,
+        zones,
+        activeZoneId,
+        minimap: {
+          ...minimap,
+          enabled:
+            mode !== "direct" ||
+            (editor.layout.floorCount ?? 1) > 1,
+          expanded: ui.minimapExpanded
+        }
       },
       drawer: {
         expanded: ui.drawerExpanded,
@@ -163,8 +236,67 @@ class RenovationMobilePageSystem {
     ui.selectedPlacementId = null;
     ui.selectedFurnitureId = null;
     ui.pendingRotation = 0;
+    ui.zoom = 1;
 
     return this.getPage(restaurantId, editor);
+  }
+
+  selectZone(restaurantId, zoneId) {
+    const ui = this.requireUiState(restaurantId);
+    const editor = renovationEditorSystem.getPageState(restaurantId);
+    const floor = editor.layout.activeFloor;
+    const mode = getWorkspaceMode(floor);
+    const zones = buildWorkspaceZones(floor);
+
+    if (mode !== "zone") {
+      throw new Error("Active floor does not require zone navigation");
+    }
+
+    if (!zones.some(item => item.id === zoneId)) {
+      throw new Error(`Unknown renovation zone "${zoneId}"`);
+    }
+
+    ui.activeZoneByFloor[floor.id] = zoneId;
+    ui.selectedPlacementId = null;
+    ui.selectedFurnitureId = null;
+    ui.pendingRotation = 0;
+    ui.zoom = 1;
+
+    return this.getPage(restaurantId, editor);
+  }
+
+  setZoom(restaurantId, value) {
+    const ui = this.requireUiState(restaurantId);
+    const editor = renovationEditorSystem.getPageState(restaurantId);
+    const mode = getWorkspaceMode(editor.layout.activeFloor);
+    ui.zoom = normalizeZoom(value, mode);
+    return this.getPage(restaurantId, editor);
+  }
+
+  zoomIn(restaurantId) {
+    const page = this.getPage(restaurantId);
+    return this.setZoom(
+      restaurantId,
+      page.workspace.zoom + page.workspace.zoomStep
+    );
+  }
+
+  zoomOut(restaurantId) {
+    const page = this.getPage(restaurantId);
+    return this.setZoom(
+      restaurantId,
+      page.workspace.zoom - page.workspace.zoomStep
+    );
+  }
+
+  resetZoom(restaurantId) {
+    return this.setZoom(restaurantId, 1);
+  }
+
+  toggleMinimap(restaurantId) {
+    const ui = this.requireUiState(restaurantId);
+    ui.minimapExpanded = !ui.minimapExpanded;
+    return this.getPage(restaurantId);
   }
 
   selectCategory(restaurantId, categoryId) {
