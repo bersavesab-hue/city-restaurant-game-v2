@@ -50,6 +50,7 @@ import { renovationSystem } from "./systems/RenovationSystem.js";
 import { layoutFlowSystem } from "./systems/LayoutFlowSystem.js";
 import { renovationPlanningSystem } from "./systems/RenovationPlanningSystem.js";
 import { renovationEditorSystem } from "./systems/RenovationEditorSystem.js";
+import { renovationMobilePageSystem } from "./ui/renovation/RenovationMobilePageSystem.js";
 import { dailySettlementSystem } from "./systems/DailySettlementSystem.js";
 import { operatingAnalyticsSystem } from "./systems/OperatingAnalyticsSystem.js";
 import { operatingReportSystem } from "./systems/OperatingReportSystem.js";
@@ -122,6 +123,7 @@ function bootstrap() {
       layoutFlowSystem,
       renovationPlanningSystem,
       renovationEditorSystem,
+      renovationMobilePageSystem,
       dailySettlementSystem,
       operatingAnalyticsSystem,
       operatingReportSystem,
