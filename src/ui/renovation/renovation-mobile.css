@@ -1,0 +1,229 @@
+.renovation-page {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+  background: #f4f1ea;
+  color: #1f2328;
+  overflow: hidden;
+}
+
+.renovation-topbar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 8px 10px;
+  background: #fffdf8;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 3;
+}
+
+.renovation-stat {
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.035);
+}
+
+.renovation-stat-label {
+  display: block;
+  font-size: 11px;
+  opacity: 0.62;
+}
+
+.renovation-stat-value {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.renovation-workspace {
+  position: relative;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 12px;
+}
+
+.renovation-canvas-wrap {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.renovation-canvas {
+  position: relative;
+  width: min(100%, 560px);
+  aspect-ratio: var(--layout-width) / var(--layout-height);
+  background-color: #fff;
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+  background-size:
+    calc(100% / var(--layout-width)) calc(100% / var(--layout-height)),
+    calc(100% / var(--layout-width)) calc(100% / var(--layout-height));
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  touch-action: none;
+}
+
+.renovation-item {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: 8px;
+  background: #f7ead7;
+  font-size: 11px;
+  user-select: none;
+  touch-action: none;
+}
+
+.renovation-item.is-selected {
+  outline: 3px solid rgba(33, 120, 88, 0.32);
+  outline-offset: 2px;
+}
+
+.renovation-floating-tools {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  padding: 7px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  z-index: 4;
+}
+
+.renovation-tool-button,
+.renovation-primary-button,
+.renovation-secondary-button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 11px;
+  padding: 0 14px;
+  font: inherit;
+}
+
+.renovation-primary-button {
+  background: #1f6f55;
+  color: #fff;
+}
+
+.renovation-secondary-button,
+.renovation-tool-button {
+  background: #ece8df;
+  color: #20242a;
+}
+
+.renovation-bottom-sheet {
+  background: #fffdf8;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 5;
+}
+
+.renovation-sheet-handle {
+  width: 44px;
+  height: 4px;
+  margin: 7px auto 5px;
+  border-radius: 99px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.renovation-category-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 6px 10px 8px;
+  scrollbar-width: none;
+}
+
+.renovation-category-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.renovation-category-tab {
+  flex: 0 0 auto;
+  min-height: 36px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 13px;
+  background: #efebe2;
+}
+
+.renovation-category-tab.is-active {
+  background: #1f6f55;
+  color: #fff;
+}
+
+.renovation-furniture-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 10px 10px;
+}
+
+.renovation-furniture-card {
+  flex: 0 0 104px;
+  min-height: 84px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 8px;
+  background: #fff;
+}
+
+.renovation-furniture-card.is-locked,
+.renovation-furniture-card.is-unaffordable {
+  opacity: 0.45;
+}
+
+.renovation-sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 8px;
+  padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
+}
+
+.renovation-collapsible-panel {
+  position: absolute;
+  top: 64px;
+  right: 10px;
+  width: min(84vw, 320px);
+  max-height: 45vh;
+  overflow: auto;
+  border-radius: 14px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  z-index: 6;
+}
+
+@media (min-width: 700px) {
+  .renovation-page {
+    grid-template-columns: 1fr 320px;
+    grid-template-rows: auto 1fr;
+  }
+
+  .renovation-topbar {
+    grid-column: 1 / -1;
+  }
+
+  .renovation-bottom-sheet {
+    grid-column: 2;
+    grid-row: 2;
+    border-radius: 0;
+    border-left: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 0;
+  }
+}
