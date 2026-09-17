@@ -57,12 +57,31 @@ class CityPropertyView {
     for (const district of model.districts) {
       const button = el("button", "cr-city-district-chip");
       button.type = "button";
-      button.innerHTML = `<strong>${district.name}</strong><span>客流 ${district.trafficIndex} · 消费 ${district.spendingPower} · 竞争 ${district.competition}</span>`;
+      button.innerHTML = `<strong>${district.name}</strong><span>客流 ${district.trafficIndex} · 消费 ${district.spendingPower} · 竞争 ${district.competition} · ${district.propertyCount}套</span>`;
       button.addEventListener("click", () => {
         this.renderMarketplace({ districtId: district.id });
       });
       districtRow.append(button);
     }
+
+    const marketInfo = el("div", "cr-property-market-info");
+    const summaries = model.market?.districts ?? [];
+    const available = summaries.reduce(
+      (sum, item) => sum + (item.availableGenerated ?? 0),
+      0
+    );
+    marketInfo.innerHTML = `
+      <div>
+        <strong>动态房源市场</strong>
+        <span>${available}套动态房源 · 每7天滚动更新</span>
+      </div>
+      <div class="cr-property-market-tags">
+        <span>30–10000㎡</span>
+        <span>真实户型</span>
+        <span>可议价房源</span>
+        <span>NPC会抢租</span>
+      </div>
+    `;
 
     const list = el("section", "cr-property-list");
     if (model.properties.length === 0) {
@@ -72,19 +91,33 @@ class CityPropertyView {
     for (const property of model.properties) {
       const card = el("button", "cr-property-card");
       card.type = "button";
-      const competitionText = property.competition?.daysUntilPossibleClaim === null
-        ? "竞争一般"
-        : `可能被抢租 · ${property.competition.daysUntilPossibleClaim}天`;
+      const marketBadges = property.source === "market"
+        ? `
+          <div class="cr-property-card__badges">
+            <span>动态房源</span>
+            ${property.qualityScore !== null ? `<span>房源评分 ${property.qualityScore}</span>` : ""}
+            ${property.listing.remainingDays !== null ? `<span>${property.listing.remainingDays}天后下架</span>` : ""}
+            ${property.competition?.daysUntilPossibleClaim !== null ? `<span>${property.competition.daysUntilPossibleClaim}天内可能被抢租</span>` : ""}
+          </div>
+        `
+        : "";
       card.innerHTML = `
         <div class="cr-property-card__scene" aria-hidden="true"></div>
         <div class="cr-property-card__body">
+          ${marketBadges}
           <div class="cr-property-card__name">${property.name}</div>
           <div class="cr-property-card__district">${property.districtName} · 房东 ${property.landlord?.name ?? "业主"}</div>
           <div class="cr-property-card__metrics">
-            <span>${property.area}㎡</span>
-            <span>参考座位 ${property.seats}</span>
+            <span>建筑 ${property.area}㎡</span>
+            <span>可用 ${property.usableArea}㎡</span>
+            <span>${property.floorCount}层</span>
             <span>${money(property.monthlyRent)}/月</span>
-            <span>${competitionText}</span>
+          </div>
+          <div class="cr-property-card__features">
+            <span class="${property.foodServiceAllowed ? "is-good" : "is-bad"}">${property.foodServiceAllowed ? "可做餐饮" : "限制餐饮"}</span>
+            <span class="${property.exhaustAllowed ? "is-good" : "is-bad"}">${property.exhaustAllowed ? "可排烟" : "不可排烟"}</span>
+            ${property.leaseTerms?.negotiable ? `<span class="is-good">可议价</span>` : ""}
+            ${property.parkingSpaces > 0 ? `<span>${property.parkingSpaces}车位</span>` : ""}
           </div>
           <div class="cr-property-card__footer">
             <span>签约首付 ${money(property.quote.upfront)}</span>
@@ -95,7 +128,7 @@ class CityPropertyView {
       list.append(card);
     }
 
-    this.root.append(header, districtRow, list);
+    this.root.append(header, districtRow, marketInfo, list);
     return model;
   }
 
@@ -122,7 +155,6 @@ class CityPropertyView {
       leaseTerms,
       activeOffer
     } = model;
-
     this.root.innerHTML = "";
 
     const back = el("button", "cr-property-back", "← 返回房源列表");
@@ -133,7 +165,7 @@ class CityPropertyView {
     shell.innerHTML = `
       <div class="cr-property-detail__visual" aria-hidden="true"></div>
       <div class="cr-property-detail__content">
-        <div class="cr-property-detail__eyebrow">${property.districtName}</div>
+        <div class="cr-property-detail__eyebrow">${property.districtName}${property.source === "market" ? " · 动态房源" : ""}</div>
         <h2>${property.name}</h2>
         <div class="cr-property-detail__landlord">
           <strong>房东 ${landlord?.name ?? "业主"}</strong>
@@ -142,21 +174,31 @@ class CityPropertyView {
         <div class="cr-property-detail__specs">
           <div><strong>${property.area}㎡</strong><span>建筑面积</span></div>
           <div><strong>${property.usableArea}㎡</strong><span>可用面积</span></div>
+          <div><strong>${property.floorCount}层</strong><span>楼层</span></div>
           <div><strong>${money(property.monthlyRent)}</strong><span>挂牌月租</span></div>
-          <div><strong>${property.depositMonths}个月</strong><span>押金</span></div>
         </div>
         <div class="cr-property-detail__district">
           <span>客流 ${district?.trafficIndex ?? "-"}</span>
           <span>消费力 ${district?.spendingPower ?? "-"}</span>
           <span>竞争 ${district?.competition ?? "-"}</span>
+          ${property.frontageMeters !== null ? `<span>门面 ${property.frontageMeters}m</span>` : ""}
+          ${property.ceilingHeight !== null ? `<span>层高 ${property.ceilingHeight}m</span>` : ""}
+          <span>${property.foodServiceAllowed ? "可做餐饮" : "餐饮受限"}</span>
+          <span>${property.exhaustAllowed ? "可排烟" : "不可排烟"}</span>
         </div>
+        ${property.source === "market" ? `
+          <div class="cr-property-listing-meta">
+            <span>房源评分 ${property.qualityScore ?? "-"}</span>
+            <span>${property.listing.remainingDays ?? "-"}天后市场换新</span>
+            <span>抢租热度 ${leaseTerms.competitorDemand}</span>
+          </div>
+        ` : ""}
         <div class="cr-property-detail__terms">
           <span>租期 ${leaseTerms.minMonths}-${leaseTerms.maxMonths}个月</span>
           <span>物业费 ${money(leaseTerms.propertyFeeMonthly)}/月</span>
           <span>转让费 ${money(leaseTerms.transferFee)}</span>
           <span>最高免租 ${leaseTerms.rentFreeMaxDays}天</span>
           <span>续租涨幅约 ${Math.round((leaseTerms.renewalIncreaseRate ?? 0) * 100)}%</span>
-          <span>抢租热度 ${leaseTerms.competitorDemand}</span>
         </div>
         ${activeOffer ? `
           <div class="cr-property-offer ${activeOffer.status}">
@@ -166,6 +208,7 @@ class CityPropertyView {
         ` : ""}
         <div class="cr-property-detail__quote">
           <span>月租 ${money(quote.monthlyRent)}</span>
+          <span>押金 ${money(quote.deposit)}</span>
           <span>物业费 ${money(quote.propertyFeeMonthly)}</span>
           <span>转让费 ${money(quote.transferFee)}</span>
           <span>免租 ${quote.rentFreeDays}天</span>
@@ -206,11 +249,13 @@ class CityPropertyView {
       "cr-property-lease-button",
       leaseState.hasActiveLease
         ? "当前门店已有租约"
-        : quote.affordable === false
-          ? "资金不足"
-          : activeOffer?.status === "accepted"
-            ? "按谈妥条件签约"
-            : "按挂牌条件签约"
+        : !property.foodServiceAllowed
+          ? "该房源不允许餐饮"
+          : quote.affordable === false
+            ? "资金不足"
+            : activeOffer?.status === "accepted"
+              ? "按谈妥条件签约"
+              : "按挂牌条件签约"
     );
     leaseButton.type = "button";
     leaseButton.disabled =
@@ -258,15 +303,15 @@ class CityPropertyView {
       throw new Error("Restaurant and property must be selected before lease signing");
     }
 
-    const activeOffer = this.pageSystem.getPropertyDetail(
+    const detail = this.pageSystem.getPropertyDetail(
       this.selectedPropertyId,
       this.restaurantId,
       this.months,
       this.offerId
-    ).activeOffer;
+    );
     const offerId =
-      activeOffer?.status === "accepted"
-        ? activeOffer.id
+      detail.activeOffer?.status === "accepted"
+        ? detail.activeOffer.id
         : null;
 
     const result = this.pageSystem.signLease({
