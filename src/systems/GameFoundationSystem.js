@@ -5,6 +5,7 @@ import { venueTypeSystem } from "./VenueTypeSystem.js";
 import { expandedPropertyBootstrapSystem } from "./ExpandedPropertyBootstrapSystem.js";
 import { trafficDemandIntegrationSystem } from "./TrafficDemandIntegrationSystem.js";
 import { supplierPriceIntegrationSystem } from "./SupplierPriceIntegrationSystem.js";
+import { economicOperatingCostSystem } from "./EconomicOperatingCostSystem.js";
 import { operatingCycleSystem } from "./OperatingCycleSystem.js";
 
 class GameFoundationSystem {
@@ -29,6 +30,7 @@ class GameFoundationSystem {
 
     trafficDemandIntegrationSystem.register();
     supplierPriceIntegrationSystem.register();
+    economicOperatingCostSystem.register();
     operatingCycleSystem.register();
 
     return {
