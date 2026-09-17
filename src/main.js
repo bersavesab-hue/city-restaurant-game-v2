@@ -40,6 +40,7 @@ import { marketInsightSystem } from "./systems/MarketInsightSystem.js";
 import { marketRankingSystem } from "./systems/MarketRankingSystem.js";
 import { marketActionSystem } from "./systems/MarketActionSystem.js";
 import { districtEventSystem } from "./systems/DistrictEventSystem.js";
+import { businessCalendarSystem } from "./systems/BusinessCalendarSystem.js";
 import { competitorDynamicsSystem } from "./systems/CompetitorDynamicsSystem.js";
 import { seatingSystem } from "./systems/SeatingSystem.js";
 import { dailySettlementSystem } from "./systems/DailySettlementSystem.js";
@@ -104,6 +105,7 @@ function bootstrap() {
       marketRankingSystem,
       marketActionSystem,
       districtEventSystem,
+      businessCalendarSystem,
       competitorDynamicsSystem,
       seatingSystem,
       dailySettlementSystem,

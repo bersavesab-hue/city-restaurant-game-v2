@@ -7,6 +7,7 @@ import { dishCatalogSystem } from "./DishCatalogSystem.js";
 import { marketCompetitionSystem } from "./MarketCompetitionSystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
 import { districtEventSystem } from "./DistrictEventSystem.js";
+import { businessCalendarSystem } from "./BusinessCalendarSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -333,6 +334,13 @@ class TrafficDemandSystem {
             segment.id
           );
 
+      const calendarFactor =
+        businessCalendarSystem
+          .getDemandMultiplier(
+            segment.id,
+            hour
+          );
+
       const playerAppeal =
         clamp(
           priceFactor *
@@ -383,6 +391,7 @@ class TrafficDemandSystem {
           .spendingMultiplier *
         environment
           .demandMultiplier *
+        calendarFactor *
         priceFactor *
         reputationFactor *
         reviewFactor *
@@ -414,6 +423,8 @@ class TrafficDemandSystem {
             .demandMultiplier *
           environment
             .spendingMultiplier,
+
+        calendarFactor,
 
         expectedVisitors:
           demand
@@ -450,6 +461,11 @@ class TrafficDemandSystem {
           : 1,
 
       districtSpendFactor,
+
+      calendar:
+        businessCalendarSystem
+          .getCalendar(),
+
       reputationFactor,
       reviewFactor,
       repeatFactor,
