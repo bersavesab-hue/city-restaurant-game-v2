@@ -64,6 +64,7 @@ import { districtSystem } from "./systems/DistrictSystem.js";
 import { propertySystem } from "./systems/PropertySystem.js";
 import { propertyFloorplanSystem } from "./systems/PropertyFloorplanSystem.js";
 import { propertyMarketSystem } from "./systems/PropertyMarketSystem.js";
+import { propertyLeaseMarketSystem } from "./systems/PropertyLeaseMarketSystem.js";
 import { leaseSystem } from "./systems/LeaseSystem.js";
 
 function bootstrap() {
@@ -140,6 +141,7 @@ function bootstrap() {
       propertySystem,
       propertyFloorplanSystem,
       propertyMarketSystem,
+      propertyLeaseMarketSystem,
       leaseSystem
     },
 
