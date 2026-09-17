@@ -1,6 +1,7 @@
 import { entitySystem } from "../core/EntitySystem.js";
 import { eventBus } from "../core/EventBus.js";
 import { restaurantSystem } from "./RestaurantSystem.js";
+import { reviewInsightSystem } from "./ReviewInsightSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -256,6 +257,12 @@ class CustomerExperienceSystem {
       reputation:
         updated.reputation
     };
+
+    reviewInsightSystem.record({
+      restaurantId,
+      experience,
+      result
+    });
 
     eventBus.emit(
       "customer:experienceUpdated",
