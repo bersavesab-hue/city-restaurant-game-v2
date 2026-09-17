@@ -63,6 +63,7 @@ import { operatingCycleSystem } from "./systems/OperatingCycleSystem.js";
 import { districtSystem } from "./systems/DistrictSystem.js";
 import { propertySystem } from "./systems/PropertySystem.js";
 import { propertyFloorplanSystem } from "./systems/PropertyFloorplanSystem.js";
+import { propertyMarketSystem } from "./systems/PropertyMarketSystem.js";
 import { leaseSystem } from "./systems/LeaseSystem.js";
 
 function bootstrap() {
@@ -138,6 +139,7 @@ function bootstrap() {
       districtSystem,
       propertySystem,
       propertyFloorplanSystem,
+      propertyMarketSystem,
       leaseSystem
     },
 
