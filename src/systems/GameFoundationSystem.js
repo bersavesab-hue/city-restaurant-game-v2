@@ -3,8 +3,11 @@ import { districtBootstrapSystem } from "./DistrictBootstrapSystem.js";
 import { cityExpansionMigrationSystem } from "./CityExpansionMigrationSystem.js";
 import { venueTypeSystem } from "./VenueTypeSystem.js";
 import { expandedPropertyBootstrapSystem } from "./ExpandedPropertyBootstrapSystem.js";
+import { propertyRentIntegrationSystem } from "./PropertyRentIntegrationSystem.js";
 import { trafficDemandIntegrationSystem } from "./TrafficDemandIntegrationSystem.js";
 import { supplierPriceIntegrationSystem } from "./SupplierPriceIntegrationSystem.js";
+import { dishResearchCostIntegrationSystem } from "./DishResearchCostIntegrationSystem.js";
+import { renovationPriceIntegrationSystem } from "./RenovationPriceIntegrationSystem.js";
 import { economicOperatingCostSystem } from "./EconomicOperatingCostSystem.js";
 import { operatingCycleSystem } from "./OperatingCycleSystem.js";
 
@@ -24,20 +27,25 @@ class GameFoundationSystem {
       overwrite: overwriteReferenceData
     });
 
-    if (seedProperties) {
-      expandedPropertyBootstrapSystem.ensureLoaded();
-    }
-
+    renovationPriceIntegrationSystem.register();
+    dishResearchCostIntegrationSystem.register();
     trafficDemandIntegrationSystem.register();
     supplierPriceIntegrationSystem.register();
     economicOperatingCostSystem.register();
     operatingCycleSystem.register();
 
+    if (seedProperties) {
+      expandedPropertyBootstrapSystem.ensureLoaded();
+    }
+
+    const rebasedProperties = propertyRentIntegrationSystem.rebaseAvailableProperties();
+
     return {
       customerSegments: customerSegmentBootstrapSystem.ensureLoaded(),
       districts: districtBootstrapSystem.ensureLoaded(),
       venueTypes: venueTypeSystem.getAll(),
-      seedProperties
+      seedProperties,
+      rebasedProperties
     };
   }
 }
