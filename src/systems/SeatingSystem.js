@@ -2,6 +2,7 @@ import { restaurantSystem } from "./RestaurantSystem.js";
 import { propertySystem } from "./PropertySystem.js";
 import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
 import { renovationSystem } from "./RenovationSystem.js";
+import { layoutFlowSystem } from "./LayoutFlowSystem.js";
 
 class SeatingSystem {
   getSeatCount(
@@ -126,10 +127,28 @@ class SeatingSystem {
           restaurantId
         );
 
+    const flow =
+      layoutFlowSystem
+        .getOperationalEffects(
+          restaurantId
+        );
+
     const queueEfficiency =
       renovation.active
         ? renovation.queueEfficiency
         : 1;
+
+    const queuePatienceMultiplier =
+      flow.active
+        ? flow.queuePatienceMultiplier
+        : 1;
+
+    const effectiveQueuePatience =
+      Math.max(
+        0,
+        behavior.queuePatienceMinutes *
+        queuePatienceMultiplier
+      );
 
     const turnsPerHour =
       Math.max(
@@ -153,10 +172,8 @@ class SeatingSystem {
         Math.floor(
           seats *
           (
-            behavior
-              .queuePatienceMinutes /
-            behavior
-              .averageDiningMinutes
+            effectiveQueuePatience /
+            behavior.averageDiningMinutes
           ) *
           turnsPerHour *
           queueEfficiency
@@ -179,8 +196,13 @@ class SeatingSystem {
       averageDiningMinutes:
         behavior.averageDiningMinutes,
 
-      queuePatienceMinutes:
+      baseQueuePatienceMinutes:
         behavior.queuePatienceMinutes,
+
+      queuePatienceMinutes:
+        effectiveQueuePatience,
+
+      queuePatienceMultiplier,
 
       queueEfficiency,
 
