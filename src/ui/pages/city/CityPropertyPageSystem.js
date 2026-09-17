@@ -22,6 +22,24 @@ function getDistrict(property) {
   return districtSystem.get(property.districtId) ?? null;
 }
 
+function buildFloorSummary(property) {
+  return (property.floors ?? []).map((floor) => ({
+    id: floor.id,
+    label: floor.label,
+    floorNumber: floor.floorNumber,
+    area: floor.area,
+    usableArea: floor.usableArea,
+    width: floor.width,
+    height: floor.height,
+    shape: floor.shape,
+    entranceCount: floor.entrances?.length ?? 0,
+    windowCount: floor.windows?.length ?? 0,
+    columnCount: floor.columns?.length ?? 0,
+    fixedStructureCount: floor.fixedStructures?.length ?? 0,
+    utilityPointCount: floor.utilityPoints?.length ?? 0
+  }));
+}
+
 class CityPropertyPageSystem {
   getLeaseQuote(property, restaurantId = null, months = 12) {
     const deposit = property.monthlyRent * property.depositMonths;
@@ -50,11 +68,20 @@ class CityPropertyPageSystem {
       districtId: property.districtId,
       districtName: district?.name ?? property.districtId,
       area: property.area,
+      usableArea: property.usableArea ?? property.area,
+      floorCount: property.floorCount ?? property.floors?.length ?? 1,
       seats: property.seats,
       monthlyRent: property.monthlyRent,
       depositMonths: property.depositMonths,
       status: property.status,
       available: property.status === "available",
+      frontageMeters: property.frontageMeters ?? null,
+      ceilingHeight: property.ceilingHeight ?? null,
+      parkingSpaces: property.parkingSpaces ?? 0,
+      foodServiceAllowed: property.foodServiceAllowed !== false,
+      exhaustAllowed: property.exhaustAllowed !== false,
+      tags: [...(property.tags ?? [])],
+      floors: buildFloorSummary(property),
       quote,
       district: district
         ? {
@@ -125,18 +152,30 @@ class CityPropertyPageSystem {
     const activeLease = restaurantId
       ? leaseSystem.getByRestaurant(restaurantId) ?? null
       : null;
+    const layout = propertySystem.getLayout(propertyId);
 
     return {
       pageId: "property_detail",
       property: this.buildPropertyCard(property, restaurantId),
       district,
+      layout,
+      suitability: {
+        foodServiceAllowed: property.foodServiceAllowed !== false,
+        exhaustAllowed: property.exhaustAllowed !== false,
+        frontageMeters: property.frontageMeters ?? null,
+        ceilingHeight: property.ceilingHeight ?? null,
+        parkingSpaces: property.parkingSpaces ?? 0,
+        renovationRules: structuredClone(property.renovationRules ?? {}),
+        tags: [...(property.tags ?? [])]
+      },
       quote,
       leaseState: {
         hasActiveLease: Boolean(activeLease),
         canSign:
           property.status === "available" &&
           !activeLease &&
-          quote.affordable !== false,
+          quote.affordable !== false &&
+          property.foodServiceAllowed !== false,
         activeLease
       },
       nextAfterLease: "renovation"
@@ -145,6 +184,12 @@ class CityPropertyPageSystem {
 
   signLease({ restaurantId, propertyId, months = 12 }) {
     restaurantSystem.get(restaurantId);
+    const property = propertySystem.get(propertyId);
+
+    if (property.foodServiceAllowed === false) {
+      throw new Error("Property does not allow food service");
+    }
+
     const lease = leaseSystem.sign({
       restaurantId,
       propertyId,
@@ -155,6 +200,7 @@ class CityPropertyPageSystem {
       lease,
       restaurant: restaurantSystem.get(restaurantId),
       property: propertySystem.get(propertyId),
+      propertyLayout: propertySystem.getLayout(propertyId),
       nextPage: "renovation",
       signedAtDay: gameState.getSection("time").day
     };
