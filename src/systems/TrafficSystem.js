@@ -12,9 +12,11 @@ import { trafficDemandSystem } from "./TrafficDemandSystem.js";
 import { customerChoiceSystem } from "./CustomerChoiceSystem.js";
 import { seatingSystem } from "./SeatingSystem.js";
 import { customerExperienceSystem } from "./CustomerExperienceSystem.js";
+import { serviceCapacitySystem } from "./ServiceCapacitySystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
 
 import { eventBus } from "../core/EventBus.js";
+import { restaurantEquipmentSystem } from "./RestaurantEquipmentSystem.js";
 
 class TrafficSystem {
   getMaxPortions(restaurantId, recipeId) {
@@ -371,22 +373,63 @@ class TrafficSystem {
         demand
       );
 
-    const visitors =
+    const configuredCapacity =
+      serviceCapacitySystem
+        .getHourlyCapacity(
+          restaurantId,
+          {
+            durationMinutes: 60
+          }
+        );
+
+    const frontAcceptedVisitors =
       Math.min(
         seating.acceptedVisitors,
-        serviceCapacity
+        serviceCapacity,
+        configuredCapacity
+          .serviceGuests
       );
 
     const serviceRejectedVisitors =
       Math.max(
         0,
         seating.acceptedVisitors -
+        frontAcceptedVisitors
+      );
+
+    const kitchenAcceptedVisitors =
+      Math.min(
+        frontAcceptedVisitors,
+        configuredCapacity
+          .kitchenGuests
+      );
+
+    const kitchenRejectedVisitors =
+      Math.max(
+        0,
+        frontAcceptedVisitors -
+        kitchenAcceptedVisitors
+      );
+
+    const visitors =
+      Math.min(
+        kitchenAcceptedVisitors,
+        configuredCapacity
+          .checkoutGuests
+      );
+
+    const checkoutRejectedVisitors =
+      Math.max(
+        0,
+        kitchenAcceptedVisitors -
         visitors
       );
 
     const rejectedVisitors =
       seating.queueAbandoned +
-      serviceRejectedVisitors;
+      serviceRejectedVisitors +
+      kitchenRejectedVisitors +
+      checkoutRejectedVisitors;
 
     let completedOrders = 0;
     let failedOrders = 0;
@@ -499,6 +542,28 @@ class TrafficSystem {
 
       serviceRejectedVisitors,
 
+      kitchenRejectedVisitors,
+
+      checkoutRejectedVisitors,
+
+      kitchenCapacity:
+        configuredCapacity
+          .kitchenGuests,
+
+      checkoutCapacity:
+        configuredCapacity
+          .checkoutGuests,
+
+      workforce:
+        configuredCapacity
+          .workforce,
+
+      serviceCapacity,
+
+      configuredSeatingCapacity:
+        configuredCapacity
+          .seatingGuests,
+
       seats:
         seating.seats,
 
@@ -524,6 +589,59 @@ class TrafficSystem {
           restaurantId,
           demand,
           result
+        });
+
+    const averageSpend =
+      completedOrders > 0
+        ? Math.round(
+            revenue /
+            completedOrders
+          )
+        : 0;
+
+    result.equipmentWear =
+      restaurantEquipmentSystem
+        .recordOperatingHour({
+          restaurantId,
+
+          servedGuests:
+            visitors,
+
+          completedOrders
+        });
+
+    result.capacityRecord =
+      serviceCapacitySystem
+        .recordActualHour({
+          restaurantId,
+
+          arrivals:
+            incomingVisitors,
+
+          servedGuests:
+            visitors,
+
+          waitingGuests:
+            seating.queuedVisitors,
+
+          abandonedGuests:
+            rejectedVisitors,
+
+          averageSpend,
+
+          seatingCapacity:
+            configuredCapacity
+              .seatingGuests,
+
+          serviceCapacity,
+
+          kitchenCapacity:
+            configuredCapacity
+              .kitchenGuests,
+
+          checkoutCapacity:
+            configuredCapacity
+              .checkoutGuests
         });
 
     eventBus.emit(

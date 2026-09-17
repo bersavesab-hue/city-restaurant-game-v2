@@ -1,5 +1,6 @@
 import { renovationEditorSystem } from "../../systems/RenovationEditorSystem.js";
 import { renovationSystem } from "../../systems/RenovationSystem.js";
+import { renovationConstructionSystem } from "../../systems/RenovationConstructionSystem.js";
 import {
   RENOVATION_WORKSPACE_MODE_LABELS,
   getWorkspaceMode,
@@ -535,11 +536,20 @@ class RenovationMobilePageSystem {
 
   save(restaurantId, { activate = false } = {}) {
     this.requireUiState(restaurantId);
-    const result = renovationEditorSystem.save(
-      restaurantId,
-      { activate }
+
+    const result = activate
+      ? renovationConstructionSystem.startFromEditor(
+          restaurantId
+        )
+      : renovationEditorSystem.save(
+          restaurantId,
+          { activate: false }
+        );
+
+    this.uiState.delete(
+      restaurantId
     );
-    this.uiState.delete(restaurantId);
+
     return result;
   }
 

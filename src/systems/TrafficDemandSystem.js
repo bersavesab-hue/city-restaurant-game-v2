@@ -11,6 +11,7 @@ import { businessCalendarSystem } from "./BusinessCalendarSystem.js";
 import { restaurantPositioningSystem } from "./RestaurantPositioningSystem.js";
 import { dishGrowthSystem } from "./DishGrowthSystem.js";
 import { renovationSystem } from "./RenovationSystem.js";
+import { wordOfMouthSystem } from "./WordOfMouthSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -293,6 +294,12 @@ class TrafficDemandSystem {
         1.3
       );
 
+    const wordOfMouthFactor =
+      wordOfMouthSystem
+        .getDemandMultiplier(
+          restaurantId
+        );
+
     const segments = [];
 
     let expectedVisitors = 0;
@@ -385,6 +392,7 @@ class TrafficDemandSystem {
           reviewFactor *
           repeatFactor *
           levelFactor *
+          wordOfMouthFactor *
           actionModifiers
             .marketAppealMultiplier *
           environment
@@ -440,6 +448,7 @@ class TrafficDemandSystem {
         reviewFactor *
         repeatFactor *
         levelFactor *
+        wordOfMouthFactor *
         actionModifiers
           .demandMultiplier;
 
@@ -534,6 +543,7 @@ class TrafficDemandSystem {
       reviewFactor,
       repeatFactor,
       levelFactor,
+      wordOfMouthFactor,
 
       segments
     };

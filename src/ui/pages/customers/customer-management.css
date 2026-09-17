@@ -1,0 +1,96 @@
+.customer-management {
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 14px 14px 90px;
+  color: #193c40;
+  background:
+    linear-gradient(
+      180deg,
+      #173f46 0,
+      #28575a 180px,
+      #f3eddf 420px
+    );
+}
+
+.customer-management > header {
+  color: #fff8e8;
+}
+
+.customer-management h1 {
+  margin: 3px 0;
+}
+
+.customer-kpis {
+  display: grid;
+  grid-template-columns:
+    repeat(4, 1fr);
+  gap: 7px;
+  margin: 14px 0;
+}
+
+.customer-kpis article {
+  padding: 11px;
+  border-radius: 13px;
+  color: #fff8e8;
+  background:
+    rgba(255,255,255,.1);
+}
+
+.customer-kpis span,
+.customer-kpis strong {
+  display: block;
+}
+
+.customer-kpis span {
+  font-size: 9px;
+  opacity: .75;
+}
+
+.customer-kpis strong {
+  margin-top: 4px;
+}
+
+.customer-management nav {
+  display: grid;
+  grid-template-columns:
+    repeat(4,1fr);
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.customer-management nav span {
+  padding: 9px;
+  border-radius: 9px;
+  text-align: center;
+  background: #fff8e8;
+}
+
+.customer-management > section:not(.customer-kpis) {
+  margin-top: 9px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #fffaf0;
+}
+
+.customer-management article {
+  padding: 8px 0;
+}
+
+.customer-management article + article {
+  border-top:
+    1px solid #eee5d5;
+}
+
+.customer-management article span,
+.customer-management article small {
+  margin-left: 8px;
+  color: #6f7972;
+  font-size: 9px;
+}
+
+@media (max-width: 600px) {
+  .customer-kpis {
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+}

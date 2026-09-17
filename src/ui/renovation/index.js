@@ -10,10 +10,17 @@ export {
 } from "./RenovationMobileView.js";
 
 export {
-  RenovationFloorplanMobileView as RenovationMobileView,
-  mountRenovationFloorplanMobilePage as mountRenovationMobilePage,
+  RenovationFloorplanMobileView,
+  mountRenovationFloorplanMobilePage,
   renderFloorplanLayer
 } from "./RenovationFloorplanMobileView.js";
+
+export {
+  RenovationGameView,
+  RenovationGameView as RenovationMobileView,
+  mountRenovationGamePage,
+  mountRenovationGamePage as mountRenovationMobilePage
+} from "./RenovationGameView.js";
 
 export {
   RENOVATION_UTILITY_META,
@@ -38,3 +45,13 @@ export {
   placementIntersectsBounds,
   buildMinimapModel
 } from "./RenovationWorkspaceModel.js";
+
+export {
+  renovationConstructionPageSystem,
+  RenovationConstructionPageSystem
+} from "./RenovationConstructionPageSystem.js";
+
+export {
+  renovationConstructionView,
+  RenovationConstructionView
+} from "./RenovationConstructionView.js";

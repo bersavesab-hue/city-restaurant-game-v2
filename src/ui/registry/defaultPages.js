@@ -11,6 +11,8 @@ const CORE_PAGES = [
   { id: "property_detail", title: "房源详情", parent: "city", order: 120, layout: "management" },
   { id: "lease", title: "租约管理", parent: "restaurant", order: 210, layout: "management" },
   { id: "renovation", title: "装修布局", parent: "restaurant", order: 220, layout: "workspace" },
+  { id: "renovation_construction", title: "装修施工", parent: "restaurant", order: 225, layout: "management" },
+  { id: "opening-setup", title: "开店准备", parent: "restaurant", order: 230, layout: "management" },
 
   { id: "dishes", title: "菜品中心", parent: "operations", order: 310, layout: "management" },
   { id: "supply", title: "供应链", parent: "operations", order: 320, layout: "management" },

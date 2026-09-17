@@ -1,0 +1,290 @@
+import { financeSystem } from "../../../systems/FinanceSystem.js";
+import { supplierTradingSystem } from "../../../systems/SupplierTradingSystem.js";
+import { procurementSystem } from "../../../systems/ProcurementSystem.js";
+import { ingredientCatalogSystem } from "../../../systems/IngredientCatalogSystem.js";
+import { supplierSystem } from "../../../systems/SupplierSystem.js";
+
+function safeBalance(
+  restaurantId
+) {
+  try {
+    return financeSystem
+      .getBalance(
+        restaurantId
+      );
+  } catch {
+    return null;
+  }
+}
+
+class SupplyManagementPageSystem {
+  getPage(
+    restaurantId
+  ) {
+    const suppliers =
+      supplierTradingSystem
+        .listProfiles();
+
+    const inventory =
+      supplierTradingSystem
+        .getInventoryDashboard(
+          restaurantId
+        );
+
+    const orders =
+      procurementSystem
+        .listByRestaurant(
+          restaurantId
+        )
+        .slice()
+        .sort(
+          (a, b) =>
+            b.orderedAt -
+            a.orderedAt
+        );
+
+    const payables =
+      supplierTradingSystem
+        .getPayables(
+          restaurantId
+        );
+
+    const policies =
+      supplierTradingSystem
+        .getPolicies(
+          restaurantId
+        );
+
+    return {
+      pageId:
+        "supply",
+
+      title:
+        "供应链",
+
+      balance:
+        safeBalance(
+          restaurantId
+        ),
+
+      summary: {
+        supplierCount:
+          suppliers.length,
+
+        shortageCount:
+          inventory.filter(
+            item =>
+              [
+                "critical",
+                "high"
+              ].includes(
+                item.level
+              )
+          ).length,
+
+        pendingOrders:
+          orders.filter(
+            item =>
+              item.status ===
+              "pending"
+          ).length,
+
+        payableAmount:
+          payables
+            .filter(
+              item =>
+                [
+                  "open",
+                  "overdue"
+                ].includes(
+                  item.status
+                )
+            )
+            .reduce(
+              (sum, item) =>
+                sum +
+                item.amount,
+              0
+            ),
+
+        overdueAmount:
+          payables
+            .filter(
+              item =>
+                item.status ===
+                "overdue"
+            )
+            .reduce(
+              (sum, item) =>
+                sum +
+                item.amount,
+              0
+            )
+      },
+
+      suppliers,
+      inventory,
+      orders,
+      payables,
+      policies
+    };
+  }
+
+  getSupplierDetail(
+    supplierId
+  ) {
+    const profile =
+      supplierTradingSystem
+        .getProfile(
+          supplierId
+        );
+
+    return {
+      ...profile,
+
+      offers:
+        profile.offers.map(
+          offer => ({
+            ...offer,
+
+            sampleQuote:
+              supplierTradingSystem
+                .getDailyQuote(
+                  supplierId,
+                  offer.ingredientId,
+                  offer.minimumOrder
+                )
+          })
+        )
+    };
+  }
+
+  getQuote({
+    supplierId,
+    ingredientId,
+    quantity
+  }) {
+    return (
+      supplierTradingSystem
+        .getDailyQuote(
+          supplierId,
+          ingredientId,
+          quantity
+        )
+    );
+  }
+
+  purchase({
+    restaurantId,
+    supplierId,
+    ingredientId,
+    quantity,
+    useCredit = false
+  }) {
+    return (
+      supplierTradingSystem
+        .purchase({
+          restaurantId,
+          supplierId,
+          ingredientId,
+          quantity,
+          useCredit
+        })
+    );
+  }
+
+  cancelOrder(
+    orderId
+  ) {
+    return procurementSystem
+      .cancel(
+        orderId
+      );
+  }
+
+  setAutoPolicy({
+    restaurantId,
+    ingredientId,
+    supplierId,
+    minimumQuantity,
+    targetQuantity,
+    enabled = true
+  }) {
+    return (
+      supplierTradingSystem
+        .setAutoPolicy({
+          restaurantId,
+          ingredientId,
+          supplierId,
+          minimumQuantity,
+          targetQuantity,
+          enabled
+        })
+    );
+  }
+
+  getAutoPolicyOptions() {
+    const suppliers =
+      supplierTradingSystem
+        .listProfiles();
+
+    return {
+      suppliers:
+        suppliers.map(
+          supplier => ({
+            id:
+              supplier.id,
+
+            name:
+              supplier.name,
+
+            offers:
+              supplier.offers.map(
+                offer => ({
+                  ingredientId:
+                    offer
+                      .ingredientId,
+
+                  ingredientName:
+                    offer
+                      .ingredient
+                      ?.name ??
+                    offer
+                      .ingredientId
+                })
+              )
+          })
+        ),
+
+      ingredients:
+        ingredientCatalogSystem
+          .getAll()
+          .map(
+            item => ({
+              id:
+                item.id,
+              name:
+                item.name,
+              unit:
+                item.unit
+            })
+          )
+    };
+  }
+
+  getRelationship(
+    supplierId
+  ) {
+    return supplierSystem
+      .get(
+        supplierId
+      ).relationship;
+  }
+}
+
+export const supplyManagementPageSystem =
+  new SupplyManagementPageSystem();
+
+export {
+  SupplyManagementPageSystem
+};

@@ -15,13 +15,20 @@ import { cookingSystem } from "./CookingSystem.js";
 import { customerSystem } from "./CustomerSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
+import { customerLoyaltySystem } from "./CustomerLoyaltySystem.js";
+import { memberBenefitSystem } from "./MemberBenefitSystem.js";
+import { salesChannelSystem } from "./SalesChannelSystem.js";
+import { dishLifecycleSystem } from "./DishLifecycleSystem.js";
 
 class OrderSystem {
   place({
     restaurantId,
     customerId = null,
     items,
-    chefId = null
+    chefId = null,
+    couponId = null,
+    redeemPoints = 0,
+    channelId = "dine_in"
   }) {
     if (!restaurantSystem.isOpen(restaurantId)) {
       throw new Error("Restaurant must be open");
@@ -137,14 +144,66 @@ class OrderSystem {
     }
 
     let customer = null;
+    let memberCheckout = null;
+    let paidAmount = totalRevenue;
 
     if (customerId !== null) {
-      customer = customerSystem.get(customerId);
+      customer =
+        customerSystem.get(customerId);
 
-      if (totalRevenue > customer.budget) {
-        throw new Error("Customer budget insufficient");
+      const member =
+        customerLoyaltySystem.findMember(
+          restaurantId,
+          customerId
+        );
+
+      if (member) {
+        memberCheckout =
+          memberBenefitSystem.previewCheckout({
+            restaurantId,
+            customerId,
+            subtotal: totalRevenue,
+            couponId,
+            redeemPoints
+          });
+
+        paidAmount =
+          memberCheckout.finalAmount;
+      } else if (
+        couponId !== null ||
+        redeemPoints > 0
+      ) {
+        throw new Error(
+          "Member benefits require membership"
+        );
+      }
+
+      if (paidAmount > customer.budget) {
+        throw new Error(
+          "Customer budget insufficient"
+        );
       }
     }
+
+    salesChannelSystem
+      .ensureRestaurantChannels(
+        restaurantId
+      );
+
+    salesChannelSystem
+      .ensureRestaurantChannels(
+        restaurantId
+      );
+
+    const channelSettlement =
+      salesChannelSystem
+        .calculateSettlement({
+          restaurantId,
+          channelId,
+          grossRevenue:
+            paidAmount,
+          orderCount: 1
+        });
 
     const completedItems = [];
     let ingredientCost = 0;
@@ -196,26 +255,77 @@ class OrderSystem {
         line.quantity,
         line.revenue
       );
+
+      if (
+        entitySystem.get(
+          "custom_dish",
+          line.menuItem.dishId
+        )
+      ) {
+        dishLifecycleSystem.recordService({
+          dishId: line.menuItem.dishId,
+          quantity: line.quantity,
+          revenue: line.revenue,
+          ingredientCost:
+            cooking.ingredientCost,
+          outputQualityScore:
+            cooking.qualityScore
+        });
+      }
     }
 
     const averageQuality = Math.round(
       qualityTotal / portionTotal
     );
 
-    const payment = financeSystem.income(
-      restaurantId,
-      totalRevenue,
-      FINANCE_CATEGORY.SALES,
-      "餐厅营业收入"
-    );
+    const payment =
+      paidAmount > 0
+        ? financeSystem.income(
+            restaurantId,
+            paidAmount,
+            FINANCE_CATEGORY.SALES,
+            "餐厅营业收入"
+          )
+        : null;
+
+    let channelCommissionPayment = null;
+    let channelPackagingPayment = null;
+
+    if (
+      channelSettlement.commission >
+      0
+    ) {
+      channelCommissionPayment =
+        financeSystem.expense(
+          restaurantId,
+          channelSettlement.commission,
+          FINANCE_CATEGORY.OTHER,
+          `渠道佣金：${channelId}`
+        );
+    }
+
+    if (
+      channelSettlement.packagingCost >
+      0
+    ) {
+      channelPackagingPayment =
+        financeSystem.expense(
+          restaurantId,
+          channelSettlement.packagingCost,
+          FINANCE_CATEGORY.OTHER,
+          `渠道包装费：${channelId}`
+        );
+    }
 
     const time = gameState.getSection("time");
 
-    const order = entitySystem.create(
+    let order = entitySystem.create(
       "customer_order",
       {
         restaurantId,
         customerId,
+
+        channelId,
 
         chefEmployeeId:
           chef.employee.id,
@@ -225,23 +335,161 @@ class OrderSystem {
 
         status: "completed",
         items: completedItems,
-        totalRevenue,
+        grossRevenue:
+          totalRevenue,
+
+        totalRevenue:
+          paidAmount,
+
+        paidAmount,
+
+        memberDiscount:
+          memberCheckout?.levelDiscount ?? 0,
+
+        couponDiscount:
+          memberCheckout?.couponDiscount ?? 0,
+
+        pointDiscount:
+          memberCheckout?.pointDiscount ?? 0,
+
+        totalDiscount:
+          memberCheckout?.totalDiscount ?? 0,
+
+        couponId:
+          memberCheckout?.couponId ?? null,
+
+        pointsUsed:
+          memberCheckout?.pointsUsed ?? 0,
+
+        memberLevelId:
+          memberCheckout?.memberLevelId ?? null,
+
+        benefitRecordId: null,
+
+        paidAmount:
+          paidAmount,
+
+        channelGrossRevenue:
+          channelSettlement.grossRevenue,
+
+        channelCommission:
+          channelSettlement.commission,
+
+        channelPackagingCost:
+          channelSettlement.packagingCost,
+
+        channelFees:
+          channelSettlement.fees,
+
+        channelNetRevenue:
+          channelSettlement.netRevenue,
+
+        channelCommissionTransactionId:
+          channelCommissionPayment
+            ?.transaction?.id ??
+          null,
+
+        channelPackagingTransactionId:
+          channelPackagingPayment
+            ?.transaction?.id ??
+          null,
+
         ingredientCost,
+
         grossProfit:
-          totalRevenue - ingredientCost,
+          channelSettlement.netRevenue -
+          ingredientCost,
+
         averageQuality,
-        transactionId: payment.transaction.id,
+
+        transactionId:
+          payment?.transaction?.id ?? null,
         createdAt: time.totalMinutes,
         day: time.day
       }
     );
+
+    salesChannelSystem
+      .recordSettlement(
+        channelSettlement
+      );
+
+    if (memberCheckout) {
+      const committed =
+        memberBenefitSystem.commitCheckout({
+          restaurantId,
+          customerId,
+          subtotal: totalRevenue,
+          couponId,
+          redeemPoints,
+          orderId: order.id
+        });
+
+      order =
+        entitySystem.update(
+          "customer_order",
+          order.id,
+          {
+            memberDiscount:
+              committed.levelDiscount,
+
+            couponDiscount:
+              committed.couponDiscount,
+
+            pointDiscount:
+              committed.pointDiscount,
+
+            totalDiscount:
+              committed.totalDiscount,
+
+            paidAmount:
+              committed.finalAmount,
+
+            totalRevenue:
+              committed.finalAmount,
+
+            pointsUsed:
+              committed.pointsUsed,
+
+            couponId:
+              committed.couponId,
+
+            benefitRecordId:
+              committed.recordId
+          }
+        );
+
+      if (committed.couponId) {
+        const usedCoupon =
+          entitySystem.get(
+            "member_coupon",
+            committed.couponId
+          );
+
+        if (usedCoupon?.campaignId) {
+          memberBenefitSystem
+            .recordCampaignConversion({
+              campaignId:
+                usedCoupon.campaignId,
+
+              customerId,
+
+              orderId:
+                order.id,
+
+              revenue:
+                committed.finalAmount
+            });
+        }
+      }
+    }
 
     if (customer) {
       customerSystem.recordVisit({
         customerId,
         restaurantId,
         orderId: order.id,
-        spend: totalRevenue,
+        spend: paidAmount,
         satisfaction: averageQuality
       });
     }
@@ -258,7 +506,8 @@ class OrderSystem {
     menuItemId,
     portions,
     orderCount,
-    chefId = null
+    chefId = null,
+    channelId = "dine_in"
   }) {
     financeSystem.getAccount(
       restaurantId
@@ -334,6 +583,68 @@ class OrderSystem {
       totalRevenue
     );
 
+    if (
+      entitySystem.get(
+        "custom_dish",
+        menuItem.dishId
+      )
+    ) {
+      dishLifecycleSystem.recordService({
+        dishId: menuItem.dishId,
+        quantity: portions,
+        revenue: totalRevenue,
+        ingredientCost:
+          cooking.ingredientCost,
+        outputQualityScore:
+          cooking.qualityScore
+      });
+    }
+
+    salesChannelSystem
+      .ensureRestaurantChannels(
+        restaurantId
+      );
+
+    const channelSettlement =
+      salesChannelSystem
+        .calculateSettlement({
+          restaurantId,
+          channelId,
+          grossRevenue:
+            totalRevenue,
+
+          paidAmount:
+            totalRevenue,
+
+          channelId,
+
+          channelGrossRevenue:
+            channelSettlement.grossRevenue,
+
+          channelCommission:
+            channelSettlement.commission,
+
+          channelPackagingCost:
+            channelSettlement.packagingCost,
+
+          channelFees:
+            channelSettlement.fees,
+
+          channelNetRevenue:
+            channelSettlement.netRevenue,
+
+          channelCommissionTransactionId:
+            channelCommissionPayment
+              ?.transaction?.id ??
+            null,
+
+          channelPackagingTransactionId:
+            channelPackagingPayment
+              ?.transaction?.id ??
+            null,
+          orderCount
+        });
+
     const payment =
       financeSystem.income(
         restaurantId,
@@ -341,6 +652,35 @@ class OrderSystem {
         FINANCE_CATEGORY.SALES,
         "长期模拟营业收入"
       );
+
+    let channelCommissionPayment = null;
+    let channelPackagingPayment = null;
+
+    if (
+      channelSettlement.commission >
+      0
+    ) {
+      channelCommissionPayment =
+        financeSystem.expense(
+          restaurantId,
+          channelSettlement.commission,
+          FINANCE_CATEGORY.OTHER,
+          `渠道佣金：${channelId}`
+        );
+    }
+
+    if (
+      channelSettlement.packagingCost >
+      0
+    ) {
+      channelPackagingPayment =
+        financeSystem.expense(
+          restaurantId,
+          channelSettlement.packagingCost,
+          FINANCE_CATEGORY.OTHER,
+          `渠道包装费：${channelId}`
+        );
+    }
 
     const time =
       gameState.getSection("time");
@@ -387,7 +727,7 @@ class OrderSystem {
             cooking.ingredientCost,
 
           grossProfit:
-            totalRevenue -
+            channelSettlement.netRevenue -
             cooking.ingredientCost,
 
           averageQuality:
@@ -402,6 +742,11 @@ class OrderSystem {
           day:
             time.day
         }
+      );
+
+    salesChannelSystem
+      .recordSettlement(
+        channelSettlement
       );
 
     eventBus.emit(

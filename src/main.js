@@ -1,3 +1,5 @@
+import "./systems/WordOfMouthSystem.js";
+import "./systems/CustomerLoyaltyIntegrationSystem.js";
 import { eventBus } from "./core/EventBus.js";
 import { gameState } from "./core/GameState.js";
 import { timeSystem } from "./core/TimeSystem.js";
@@ -8,15 +10,22 @@ import { simulationSystem } from "./core/SimulationSystem.js";
 import { schedulerSystem } from "./core/SchedulerSystem.js";
 
 import { restaurantSystem } from "./systems/RestaurantSystem.js";
+import { openingFlowSystem } from "./systems/OpeningFlowSystem.js";
+import { openingInventorySystem } from "./systems/OpeningInventorySystem.js";
+import { openingPermitSystem } from "./systems/OpeningPermitSystem.js";
 import { financeSystem } from "./systems/FinanceSystem.js";
 import { employeeSystem } from "./systems/EmployeeSystem.js";
 import { employeeWorkSystem } from "./systems/EmployeeWorkSystem.js";
+import { employeeStaffingSystem } from "./systems/EmployeeStaffingSystem.js";
 import { employeeCareerSystem } from "./systems/EmployeeCareerSystem.js";
+import { employeeDynamicsSystem } from "./systems/EmployeeDynamicsSystem.js";
+import { staffingRecommendationSystem } from "./systems/StaffingRecommendationSystem.js";
 import { storeProgressSystem } from "./systems/StoreProgressSystem.js";
 
 import { ingredientCatalogSystem } from "./systems/IngredientCatalogSystem.js";
 import { inventorySystem } from "./systems/InventorySystem.js";
 import { supplierSystem } from "./systems/SupplierSystem.js";
+import { supplierTradingSystem } from "./systems/SupplierTradingSystem.js";
 import { procurementSystem } from "./systems/ProcurementSystem.js";
 import { autoProcurementSystem } from "./systems/AutoProcurementSystem.js";
 
@@ -24,7 +33,9 @@ import { dishCatalogSystem } from "./systems/DishCatalogSystem.js";
 import { recipeSystem } from "./systems/RecipeSystem.js";
 import { cookingSystem } from "./systems/CookingSystem.js";
 import { dishResearchSystem } from "./systems/DishResearchSystem.js";
+import { dishResearchPreviewSystem } from "./systems/DishResearchPreviewSystem.js";
 import { dishGrowthSystem } from "./systems/DishGrowthSystem.js";
+import { dishLifecycleSystem } from "./systems/DishLifecycleSystem.js";
 
 import { menuSystem } from "./systems/MenuSystem.js";
 import { customerSystem } from "./systems/CustomerSystem.js";
@@ -48,12 +59,19 @@ import { restaurantPositioningSystem } from "./systems/RestaurantPositioningSyst
 import { competitorDynamicsSystem } from "./systems/CompetitorDynamicsSystem.js";
 import { seatingSystem } from "./systems/SeatingSystem.js";
 import { renovationSystem } from "./systems/RenovationSystem.js";
+import { renovationConstructionSystem } from "./systems/RenovationConstructionSystem.js";
 import { layoutFlowSystem } from "./systems/LayoutFlowSystem.js";
 import { renovationPlanningSystem } from "./systems/RenovationPlanningSystem.js";
 import { renovationEditorSystem } from "./systems/RenovationEditorSystem.js";
 import { renovationMobilePageSystem } from "./ui/renovation/RenovationMobilePageSystem.js";
 import { restaurantHomePageSystem } from "./ui/pages/restaurant/RestaurantHomePageSystem.js";
+import { openingSetupPageSystem } from "./ui/pages/opening/OpeningSetupPageSystem.js";
 import { cityPropertyPageSystem } from "./ui/pages/city/CityPropertyPageSystem.js";
+import { dishCenterPageSystem } from "./ui/pages/dishes/DishCenterPageSystem.js";
+import { businessAnalyticsPageSystem } from "./ui/pages/analytics/BusinessAnalyticsPageSystem.js";
+import { supplyManagementPageSystem } from "./ui/pages/supply/SupplyManagementPageSystem.js";
+import { dishManagementPageSystem } from "./ui/pages/dishes/DishManagementPageSystem.js";
+import { employeeManagementPageSystem } from "./ui/pages/employees/EmployeeManagementPageSystem.js";
 import { pageRegistry } from "./ui/registry/PageRegistry.js";
 import "./ui/registry/defaultPages.js";
 import { dailySettlementSystem } from "./systems/DailySettlementSystem.js";
@@ -90,15 +108,22 @@ function bootstrap() {
 
     systems: {
       restaurantSystem,
+      openingFlowSystem,
+      openingPermitSystem,
+      openingInventorySystem,
       financeSystem,
       employeeSystem,
       employeeWorkSystem,
+      employeeStaffingSystem,
       employeeCareerSystem,
+      employeeDynamicsSystem,
+      staffingRecommendationSystem,
       storeProgressSystem,
 
       ingredientCatalogSystem,
       inventorySystem,
       supplierSystem,
+      supplierTradingSystem,
       procurementSystem,
       autoProcurementSystem,
 
@@ -106,7 +131,9 @@ function bootstrap() {
       recipeSystem,
       cookingSystem,
       dishResearchSystem,
+      dishResearchPreviewSystem,
       dishGrowthSystem,
+      dishLifecycleSystem,
 
       menuSystem,
       customerSystem,
@@ -129,6 +156,7 @@ function bootstrap() {
       competitorDynamicsSystem,
       seatingSystem,
       renovationSystem,
+      renovationConstructionSystem,
       layoutFlowSystem,
       renovationPlanningSystem,
       renovationEditorSystem,
@@ -150,7 +178,12 @@ function bootstrap() {
     ui: {
       pageRegistry,
       restaurantHomePageSystem,
-      cityPropertyPageSystem
+      openingSetupPageSystem,
+      cityPropertyPageSystem,
+      employeeManagementPageSystem,
+      dishManagementPageSystem,
+      supplyManagementPageSystem,
+      businessAnalyticsPageSystem
     }
   };
 }

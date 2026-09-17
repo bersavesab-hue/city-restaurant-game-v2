@@ -119,7 +119,9 @@ class ProcurementSystem {
     restaurantId,
     supplierId,
     ingredientId,
-    quantity
+    quantity,
+    quoteOverride = null,
+    paymentTerms = null
   }) {
     const time =
       gameState.getSection("time");
@@ -138,11 +140,22 @@ class ProcurementSystem {
     }
 
     const quote =
+      quoteOverride ??
       supplierSystem.getQuote(
         supplierId,
         ingredientId,
         quantity
       );
+
+    if (
+      quote.supplierId !== supplierId ||
+      quote.ingredientId !== ingredientId ||
+      quote.quantity !== quantity
+    ) {
+      throw new Error(
+        "Procurement quote does not match order"
+      );
+    }
 
     const delivery =
       this.calculateDeliveryMinutes(
@@ -150,27 +163,67 @@ class ProcurementSystem {
         quote.reliability
       );
 
-    const balance =
-      financeSystem.getBalance(
-        restaurantId
-      );
+    const creditDays =
+      paymentTerms?.creditDays ?? 0;
 
     if (
-      balance <
-      quote.totalPrice
+      !Number.isInteger(creditDays) ||
+      creditDays < 0
     ) {
-      throw new Error(
-        `Insufficient funds: balance ${balance}, required ${quote.totalPrice}`
+      throw new RangeError(
+        "creditDays must be a non-negative integer"
       );
     }
 
-    const payment =
-      financeSystem.expense(
-        restaurantId,
-        quote.totalPrice,
-        FINANCE_CATEGORY.INGREDIENT,
-        `采购 ${ingredientId} × ${quantity}`
-      );
+    let payment = null;
+    let payable = null;
+
+    if (creditDays === 0) {
+      const balance =
+        financeSystem.getBalance(
+          restaurantId
+        );
+
+      if (
+        balance <
+        quote.totalPrice
+      ) {
+        throw new Error(
+          `Insufficient funds: balance ${balance}, required ${quote.totalPrice}`
+        );
+      }
+
+      payment =
+        financeSystem.expense(
+          restaurantId,
+          quote.totalPrice,
+          FINANCE_CATEGORY.INGREDIENT,
+          `采购 ${ingredientId} × ${quantity}`
+        );
+    } else {
+      payable =
+        entitySystem.create(
+          "supplier_payable",
+          {
+            restaurantId,
+            supplierId,
+            ingredientId,
+            amount:
+              quote.totalPrice,
+            status:
+              "open",
+            createdDay:
+              time.day,
+            dueDay:
+              time.day +
+              creditDays,
+            paidDay: null,
+            transactionId: null,
+            orderId: null,
+            lastPenaltyDay: null
+          }
+        );
+    }
 
     const order =
       entitySystem.create(
@@ -226,7 +279,19 @@ class ProcurementSystem {
           deliveredAt: null,
 
           transactionId:
-            payment.transaction.id,
+            payment?.transaction?.id ??
+            null,
+
+          payableId:
+            payable?.id ??
+            null,
+
+          paymentMode:
+            creditDays > 0
+              ? "credit"
+              : "cash",
+
+          creditDays,
 
           inventoryBatchId:
             null,
@@ -245,6 +310,17 @@ class ProcurementSystem {
             order.id
         }
       );
+
+    if (payable) {
+      entitySystem.update(
+        "supplier_payable",
+        payable.id,
+        {
+          orderId:
+            order.id
+        }
+      );
+    }
 
     const updated =
       entitySystem.update(
@@ -371,13 +447,50 @@ class ProcurementSystem {
       );
     }
 
-    const refund =
-      financeSystem.refundExpense(
-        order.restaurantId,
-        order.totalPrice,
-        FINANCE_CATEGORY.REFUND,
-        `取消采购退款 ${order.ingredientId}`
-      );
+    let refundTransactionId =
+      null;
+
+    if (order.payableId) {
+      const payable =
+        entitySystem.get(
+          "supplier_payable",
+          order.payableId
+        );
+
+      if (
+        payable &&
+        [
+          "open",
+          "overdue"
+        ].includes(
+          payable.status
+        )
+      ) {
+        entitySystem.update(
+          "supplier_payable",
+          payable.id,
+          {
+            status:
+              "cancelled",
+            cancelledDay:
+              gameState
+                .getSection("time")
+                .day
+          }
+        );
+      }
+    } else {
+      const refund =
+        financeSystem.refundExpense(
+          order.restaurantId,
+          order.totalPrice,
+          FINANCE_CATEGORY.REFUND,
+          `取消采购退款 ${order.ingredientId}`
+        );
+
+      refundTransactionId =
+        refund.transaction.id;
+    }
 
     const time =
       gameState.getSection("time");
@@ -393,8 +506,7 @@ class ProcurementSystem {
           cancelledAt:
             time.totalMinutes,
 
-          refundTransactionId:
-            refund.transaction.id
+          refundTransactionId
         }
       );
 
@@ -481,6 +593,143 @@ class ProcurementSystem {
         order => order.id
       )
     );
+  }
+
+  listPayables(
+    restaurantId,
+    status = null
+  ) {
+    return entitySystem
+      .list(
+        "supplier_payable"
+      )
+      .filter(
+        payable =>
+          payable.restaurantId ===
+            restaurantId &&
+          (
+            status === null ||
+            payable.status ===
+              status
+          )
+      )
+      .sort(
+        (a, b) =>
+          a.dueDay -
+          b.dueDay
+      );
+  }
+
+  settlePayables(
+    restaurantId,
+    day =
+      gameState
+        .getSection("time")
+        .day
+  ) {
+    const result = {
+      paid: 0,
+      overdue: 0,
+      paidAmount: 0,
+      overdueAmount: 0
+    };
+
+    const payables =
+      this.listPayables(
+        restaurantId
+      ).filter(
+        payable =>
+          [
+            "open",
+            "overdue"
+          ].includes(
+            payable.status
+          ) &&
+          payable.dueDay <= day
+      );
+
+    for (
+      const payable
+      of payables
+    ) {
+      const balance =
+        financeSystem
+          .getBalance(
+            restaurantId
+          );
+
+      if (
+        balance >=
+        payable.amount
+      ) {
+        const payment =
+          financeSystem.expense(
+            restaurantId,
+            payable.amount,
+            FINANCE_CATEGORY.INGREDIENT,
+            `供应商账期付款 ${payable.ingredientId}`
+          );
+
+        entitySystem.update(
+          "supplier_payable",
+          payable.id,
+          {
+            status:
+              "paid",
+            paidDay:
+              day,
+            transactionId:
+              payment
+                .transaction
+                .id
+          }
+        );
+
+        supplierSystem
+          .changeRelationship(
+            payable.supplierId,
+            1
+          );
+
+        result.paid += 1;
+        result.paidAmount +=
+          payable.amount;
+      } else {
+        const shouldPenalty =
+          payable.lastPenaltyDay !==
+          day;
+
+        entitySystem.update(
+          "supplier_payable",
+          payable.id,
+          {
+            status:
+              "overdue",
+            lastPenaltyDay:
+              shouldPenalty
+                ? day
+                : payable
+                    .lastPenaltyDay
+          }
+        );
+
+        if (
+          shouldPenalty
+        ) {
+          supplierSystem
+            .changeRelationship(
+              payable.supplierId,
+              -2
+            );
+        }
+
+        result.overdue += 1;
+        result.overdueAmount +=
+          payable.amount;
+      }
+    }
+
+    return result;
   }
 
   get(orderId) {

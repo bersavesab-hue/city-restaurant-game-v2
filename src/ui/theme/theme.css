@@ -1,3 +1,15 @@
+@import url("../renovation/renovation-construction.css");
+@import url("../pages/city/property-detail.css");
+@import url("../pages/city/city-map.css");
+@import url("../pages/dishes/dish-center.css");
+@import url("../pages/opening/opening-setup.css");
+@import url("../pages/city/city-property-game.css");
+@import url("./restaurant-game-ui.css");
+@import url("../pages/employees/employee-management.css");
+@import url("../pages/employee-promotion/employee-promotion.css");
+@import url("../renovation/renovation-game.css");
+@import url("./game-chrome.css");
+
 :root {
   --ui-brand-900: #073b5a;
   --ui-brand-800: #0b4e72;
@@ -123,5 +135,75 @@
   .ui-screen {
     max-width: 760px;
     margin: 0 auto;
+  }
+}
+
+
+/* ===== Unified game shell final override ===== */
+
+.rg-screen,
+.restaurant-home-game,
+.city-map-game,
+.property-detail-game,
+.construction-page,
+.employee-management-page,
+.opening-setup-page,
+.dish-center-page {
+  width: 100% !important;
+  max-width: var(--rg-shell-max, 760px) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+
+.store-bottom-nav,
+.city-bottom-nav,
+.rg-bottom-nav {
+  width: min(100%, var(--rg-shell-max, 760px)) !important;
+}
+
+
+.store-bottom-nav,
+.city-bottom-nav {
+  display: none !important;
+}
+
+
+.restaurant-home-game,
+.city-map-game {
+  padding-bottom:
+    calc(
+      78px +
+      env(safe-area-inset-bottom)
+    ) !important;
+}
+
+
+.property-detail-game,
+.construction-page {
+  font-size: 11px;
+}
+
+
+button,
+input,
+select {
+  touch-action: manipulation;
+}
+
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+@media (min-width: 520px) {
+  .restaurant-home-game,
+  .city-map-game,
+  .property-detail-game,
+  .construction-page,
+  .rg-screen {
+    border-left: 1px solid rgba(61,157,205,.18);
+    border-right: 1px solid rgba(61,157,205,.18);
   }
 }

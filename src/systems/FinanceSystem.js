@@ -500,7 +500,7 @@ class FinanceSystem {
       {
         restaurantId,
         accountId,
-        type,
+        transactionType: type,
         category,
         amount,
         balanceAfter,
@@ -544,7 +544,7 @@ class FinanceSystem {
       .filter(
         (item) =>
           type === null ||
-          item.type === type
+          item.transactionType === type
       )
       .filter(
         (item) =>

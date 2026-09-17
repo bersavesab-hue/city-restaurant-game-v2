@@ -6,6 +6,7 @@ import { operatingScheduleSystem } from "./OperatingScheduleSystem.js";
 import { trafficSystem } from "./TrafficSystem.js";
 import { dailySettlementSystem } from "./DailySettlementSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
+import { employeeDynamicsSystem } from "./EmployeeDynamicsSystem.js";
 import { leaseSystem } from "./LeaseSystem.js";
 import { propertyMarketSystem } from "./PropertyMarketSystem.js";
 import { propertyLeaseMarketSystem } from "./PropertyLeaseMarketSystem.js";
@@ -18,6 +19,8 @@ import { competitorDynamicsSystem } from "./CompetitorDynamicsSystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
 import { districtEventSystem } from "./DistrictEventSystem.js";
 import { marketInsightSystem } from "./MarketInsightSystem.js";
+import { renovationConstructionSystem } from "./RenovationConstructionSystem.js";
+import { equipmentMaintenanceSystem } from "./EquipmentMaintenanceSystem.js";
 
 class OperatingCycleSystem {
   constructor() {
@@ -114,6 +117,16 @@ class OperatingCycleSystem {
             const restaurant
             of restaurants
           ) {
+            employeeDynamicsSystem
+              .refreshRestaurant(
+                restaurant.id
+              );
+          }
+
+          for (
+            const restaurant
+            of restaurants
+          ) {
             inventorySystem
               .discardSpoiled(
                 restaurant.id
@@ -122,6 +135,12 @@ class OperatingCycleSystem {
             inventorySystem
               .pruneInactive(
                 restaurant.id
+              );
+
+            procurementSystem
+              .settlePayables(
+                restaurant.id,
+                current.day
               );
 
             procurementSystem
@@ -146,6 +165,16 @@ class OperatingCycleSystem {
             );
 
           marketInsightSystem
+            .processDay(
+              current.day
+            );
+
+          equipmentMaintenanceSystem
+            .processDay(
+              current.day
+            );
+
+          renovationConstructionSystem
             .processDay(
               current.day
             );

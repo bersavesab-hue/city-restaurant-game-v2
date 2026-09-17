@@ -504,8 +504,8 @@ class RenovationMobileView {
           </div>
 
           <div class="renovation-sheet-actions">
-            <button type="button" class="renovation-secondary-button" data-action="save" ${page.actions.canSave ? "" : "disabled"}>保存</button>
-            <button type="button" class="renovation-primary-button" data-action="activate" ${page.actions.canActivate ? "" : "disabled"}>保存并启用</button>
+            <button type="button" class="renovation-secondary-button" data-action="save" ${page.actions.canSave ? "" : "disabled"}>保存草稿</button>
+            <button type="button" class="renovation-primary-button" data-action="activate" ${page.actions.canActivate ? "" : "disabled"}>确认预算并施工</button>
           </div>
         </section>
 
@@ -771,15 +771,35 @@ class RenovationMobileView {
       { activate }
     );
 
+    const constructionStarted =
+      Boolean(
+        result?.constructionStarted
+      );
+
     this.destroy();
+
     this.root.innerHTML = `
       <div class="renovation-finished">
-        ${activate ? "装修已保存并启用" : "装修草稿已保存"}
+        ${
+          constructionStarted
+            ? "装修方案已确认，施工已经开始"
+            : "装修草稿已保存"
+        }
       </div>
     `;
 
-    this.onSaved?.(result);
-    this.onClose?.({ saved: true, activate });
+    this.onSaved?.(
+      result
+    );
+
+    this.onClose?.({
+      saved: true,
+      activate,
+      constructionStarted,
+      nextPage:
+        result?.nextPage ??
+        null
+    });
   }
 }
 
