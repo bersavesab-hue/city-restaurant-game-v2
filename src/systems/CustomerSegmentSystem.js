@@ -67,6 +67,40 @@ function validateSegment(item) {
   );
 
   if (
+    item.categoryPreferences !==
+    undefined
+  ) {
+    if (
+      !item.categoryPreferences ||
+      typeof item.categoryPreferences !==
+        "object" ||
+      Array.isArray(
+        item.categoryPreferences
+      )
+    ) {
+      throw new Error(
+        "categoryPreferences must be an object"
+      );
+    }
+
+    for (
+      const weight
+      of Object.values(
+        item.categoryPreferences
+      )
+    ) {
+      if (
+        !Number.isFinite(weight) ||
+        weight < 0
+      ) {
+        throw new Error(
+          "Invalid category preference"
+        );
+      }
+    }
+  }
+
+  if (
     !item.hourWeights ||
     typeof item.hourWeights !==
       "object" ||

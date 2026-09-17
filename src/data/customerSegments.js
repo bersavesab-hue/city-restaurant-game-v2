@@ -8,6 +8,16 @@ export const CUSTOMER_SEGMENTS = [
     qualitySensitivity: 60,
     speedSensitivity: 85,
 
+    categoryPreferences: {
+      rice: 1.25,
+      noodle: 1.15,
+      fast_food: 1.2,
+      stir_fry: 0.85,
+      hotpot: 0.55,
+      dessert: 0.45,
+      default: 0.8
+    },
+
     hourWeights: {
       7: 20,
       8: 35,
@@ -28,6 +38,16 @@ export const CUSTOMER_SEGMENTS = [
     priceSensitivity: 65,
     qualitySensitivity: 70,
     speedSensitivity: 40,
+
+    categoryPreferences: {
+      rice: 1,
+      noodle: 0.9,
+      fast_food: 0.65,
+      stir_fry: 1.3,
+      hotpot: 1.15,
+      dessert: 0.7,
+      default: 0.9
+    },
 
     hourWeights: {
       7: 30,
@@ -51,6 +71,16 @@ export const CUSTOMER_SEGMENTS = [
     qualitySensitivity: 45,
     speedSensitivity: 55,
 
+    categoryPreferences: {
+      rice: 1.2,
+      noodle: 1.25,
+      fast_food: 1.35,
+      stir_fry: 0.7,
+      hotpot: 0.75,
+      dessert: 1.05,
+      default: 0.8
+    },
+
     hourWeights: {
       7: 20,
       11: 40,
@@ -71,6 +101,16 @@ export const CUSTOMER_SEGMENTS = [
     priceSensitivity: 35,
     qualitySensitivity: 80,
     speedSensitivity: 30,
+
+    categoryPreferences: {
+      rice: 0.9,
+      noodle: 0.9,
+      fast_food: 0.55,
+      stir_fry: 1.2,
+      hotpot: 1.35,
+      dessert: 1,
+      default: 1
+    },
 
     hourWeights: {
       10: 30,

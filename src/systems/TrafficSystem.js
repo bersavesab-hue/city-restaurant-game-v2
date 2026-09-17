@@ -9,6 +9,7 @@ import { inventorySystem } from "./InventorySystem.js";
 import { operatingScheduleSystem } from "./OperatingScheduleSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 import { trafficDemandSystem } from "./TrafficDemandSystem.js";
+import { customerChoiceSystem } from "./CustomerChoiceSystem.js";
 
 import { eventBus } from "../core/EventBus.js";
 
@@ -330,10 +331,34 @@ class TrafficSystem {
       i < visitors;
       i += 1
     ) {
-      const menuItem =
-        randomSystem.pick(
-          menu
+      const segmentId =
+        randomSystem.weightedPick(
+          demand.segments
+            .filter(
+              item =>
+                item.expectedVisitors > 0
+            )
+            .map(
+              item => ({
+                value:
+                  item.segmentId,
+                weight:
+                  item.expectedVisitors
+              })
+            )
         );
+
+      const menuItem =
+        customerChoiceSystem
+          .chooseMenuItem(
+            restaurantId,
+            segmentId
+          );
+
+      if (!menuItem) {
+        failedOrders += 1;
+        continue;
+      }
 
       const quantity =
         randomSystem.int(
