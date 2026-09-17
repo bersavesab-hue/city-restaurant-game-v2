@@ -1,5 +1,6 @@
 import { entitySystem } from "../core/EntitySystem.js";
 import { eventBus } from "../core/EventBus.js";
+import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
 
 function requireCustomer(id) {
   const customer = entitySystem.get("customer", id);
@@ -13,8 +14,9 @@ class CustomerSystem {
   create({
     name = "散客",
     budget = 10000,
-    priceSensitivity = 50,
-    patience = 50
+    priceSensitivity = null,
+    patience = null,
+    segmentId = null
   } = {}) {
     if (typeof name !== "string" || !name.trim()) {
       throw new TypeError("Customer name is required");
@@ -24,11 +26,31 @@ class CustomerSystem {
       throw new RangeError("Customer budget must be positive");
     }
 
+    const segment = segmentId ? customerSegmentSystem.get(segmentId) : null;
+
+    if (segmentId && !segment) {
+      throw new Error(`Customer segment "${segmentId}" does not exist`);
+    }
+
+    const resolvedPriceSensitivity =
+      priceSensitivity ?? segment?.priceSensitivity ?? 50;
+
+    const resolvedPatience =
+      patience ??
+      (segment
+        ? Math.max(0, Math.min(100, Math.round(segment.queuePatienceMinutes * 4)))
+        : 50);
+
     const customer = entitySystem.create("customer", {
       name: name.trim(),
+      segmentId: segment?.id ?? null,
+      segmentName: segment?.name ?? null,
       budget,
-      priceSensitivity: Math.max(0, Math.min(100, priceSensitivity)),
-      patience: Math.max(0, Math.min(100, patience)),
+      priceSensitivity: Math.max(0, Math.min(100, resolvedPriceSensitivity)),
+      patience: Math.max(0, Math.min(100, resolvedPatience)),
+      spendingPower: segment?.spendingPower ?? null,
+      qualitySensitivity: segment?.qualitySensitivity ?? null,
+      speedSensitivity: segment?.speedSensitivity ?? null,
       visits: 0,
       totalSpend: 0,
       averageSatisfaction: 0,
