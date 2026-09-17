@@ -27,6 +27,7 @@ import { menuSystem } from "./systems/MenuSystem.js";
 import { customerSystem } from "./systems/CustomerSystem.js";
 import { customerSegmentSystem } from "./systems/CustomerSegmentSystem.js";
 import { customerChoiceSystem } from "./systems/CustomerChoiceSystem.js";
+import { customerExperienceSystem } from "./systems/CustomerExperienceSystem.js";
 import { CUSTOMER_SEGMENTS } from "./data/customerSegments.js";
 import { orderSystem } from "./systems/OrderSystem.js";
 
@@ -82,6 +83,7 @@ function bootstrap() {
       customerSystem,
       customerSegmentSystem,
       customerChoiceSystem,
+      customerExperienceSystem,
       orderSystem,
 
       operatingScheduleSystem,

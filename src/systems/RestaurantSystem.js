@@ -52,6 +52,13 @@ class RestaurantSystem {
 
           reputation: 0,
 
+          customerSatisfaction: 50,
+          repeatRate: 0,
+          reviewScore: 3,
+          totalReviews: 0,
+          totalServedGuests: 0,
+          totalRejectedGuests: 0,
+
           experience: 0,
 
           totalOperatingMinutes: 0,

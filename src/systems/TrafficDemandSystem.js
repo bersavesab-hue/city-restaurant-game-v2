@@ -213,6 +213,40 @@ class TrafficDemandSystem {
         1.5
       );
 
+    const reviewScore =
+      clamp(
+        Number.isFinite(
+          restaurant.reviewScore
+        )
+          ? restaurant.reviewScore
+          : 3,
+        1,
+        5
+      );
+
+    const reviewFactor =
+      clamp(
+        0.8 +
+        (reviewScore - 1) *
+          0.1,
+        0.8,
+        1.2
+      );
+
+    const repeatFactor =
+      clamp(
+        1 +
+        clamp(
+          restaurant.repeatRate ?? 0,
+          0,
+          100
+        ) /
+          100 *
+          0.15,
+        1,
+        1.15
+      );
+
     const levelFactor =
       clamp(
         1 +
@@ -295,6 +329,8 @@ class TrafficDemandSystem {
         districtSpendFactor *
         priceFactor *
         reputationFactor *
+        reviewFactor *
+        repeatFactor *
         levelFactor;
 
       expectedVisitors += demand;
@@ -334,6 +370,8 @@ class TrafficDemandSystem {
       competitionFactor,
       districtSpendFactor,
       reputationFactor,
+      reviewFactor,
+      repeatFactor,
       levelFactor,
 
       segments

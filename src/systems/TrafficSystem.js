@@ -11,6 +11,7 @@ import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 import { trafficDemandSystem } from "./TrafficDemandSystem.js";
 import { customerChoiceSystem } from "./CustomerChoiceSystem.js";
 import { seatingSystem } from "./SeatingSystem.js";
+import { customerExperienceSystem } from "./CustomerExperienceSystem.js";
 
 import { eventBus } from "../core/EventBus.js";
 
@@ -357,6 +358,9 @@ class TrafficSystem {
     let failedOrders = 0;
     let revenue = 0;
 
+    let qualityTotal = 0;
+    let qualityCount = 0;
+
     for (
       let i = 0;
       i < visitors;
@@ -415,6 +419,11 @@ class TrafficSystem {
 
         completedOrders += 1;
 
+        qualityTotal +=
+          order.averageQuality;
+
+        qualityCount += 1;
+
         revenue +=
           order.totalRevenue;
       } catch (error) {
@@ -464,8 +473,24 @@ class TrafficSystem {
 
       completedOrders,
       failedOrders,
-      revenue
+      revenue,
+
+      averageQuality:
+        qualityCount > 0
+          ? Math.round(
+              qualityTotal /
+              qualityCount
+            )
+          : 0
     };
+
+    result.experience =
+      customerExperienceSystem
+        .recordHour({
+          restaurantId,
+          demand,
+          result
+        });
 
     eventBus.emit(
       "traffic:hourCompleted",
