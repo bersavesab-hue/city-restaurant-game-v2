@@ -29,6 +29,9 @@ import { operatingScheduleSystem } from "./systems/OperatingScheduleSystem.js";
 import { trafficSystem } from "./systems/TrafficSystem.js";
 import { dailySettlementSystem } from "./systems/DailySettlementSystem.js";
 import { operatingCycleSystem } from "./systems/OperatingCycleSystem.js";
+import { districtSystem } from "./systems/DistrictSystem.js";
+import { propertySystem } from "./systems/PropertySystem.js";
+import { leaseSystem } from "./systems/LeaseSystem.js";
 
 function bootstrap() {
   operatingCycleSystem.register();
@@ -67,7 +70,11 @@ function bootstrap() {
       operatingScheduleSystem,
       trafficSystem,
       dailySettlementSystem,
-      operatingCycleSystem
+      operatingCycleSystem,
+
+      districtSystem,
+      propertySystem,
+      leaseSystem
     }
   };
 }
