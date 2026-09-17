@@ -263,6 +263,13 @@ class LayoutFlowSystem {
           )
         : 0;
 
+    const crowdingPenalty =
+      Math.max(
+        0,
+        density - 0.5
+      ) *
+      0.5;
+
     const comfortMultiplier =
       clamp(
         1.02 +
@@ -270,13 +277,41 @@ class LayoutFlowSystem {
           0.06,
           decor.length * 0.01
         ) -
-        Math.max(
-          0,
-          density - 0.5
-        ) *
-        0.5,
+        crowdingPenalty,
         0.85,
         1.08
+      );
+
+    const waitingSupport =
+      waiting.length > 0
+        ? clamp(
+            1 +
+            Math.min(
+              0.15,
+              waiting.length * 0.06
+            ),
+            1,
+            1.15
+          )
+        : 0.88;
+
+    const queuePatienceMultiplier =
+      clamp(
+        waitingSupport *
+        comfortMultiplier,
+        0.75,
+        1.2
+      );
+
+    const comfortScore =
+      Math.round(
+        clamp(
+          80 +
+          (comfortMultiplier - 1) *
+            250,
+          45,
+          100
+        )
       );
 
     const issues = [];
@@ -297,8 +332,16 @@ class LayoutFlowSystem {
       issues.push("no_waiting_area");
     }
 
+    if (decor.length === 0) {
+      issues.push("plain_environment");
+    }
+
     if (density > 0.58) {
       issues.push("layout_too_crowded");
+    }
+
+    if (comfortMultiplier < 0.95) {
+      issues.push("low_comfort");
     }
 
     if (
@@ -419,6 +462,13 @@ class LayoutFlowSystem {
           comfortMultiplier.toFixed(3)
         ),
 
+      queuePatienceMultiplier:
+        Number(
+          queuePatienceMultiplier
+            .toFixed(3)
+        ),
+
+      comfortScore,
       flowScore,
       issues
     };
@@ -435,6 +485,7 @@ class LayoutFlowSystem {
         restaurantId,
         initialized: false,
         active: false,
+        comfortScore: 80,
         flowScore: 100,
         issues: []
       };
@@ -463,6 +514,8 @@ class LayoutFlowSystem {
         kitchenMultiplier: 1,
         serviceMultiplier: 1,
         comfortMultiplier: 1,
+        queuePatienceMultiplier: 1,
+        comfortScore: 80,
         kitchenCapacityPerHour:
           Infinity,
         flowScore: 100,
@@ -490,6 +543,12 @@ class LayoutFlowSystem {
 
       comfortMultiplier:
         analysis.comfortMultiplier,
+
+      queuePatienceMultiplier:
+        analysis.queuePatienceMultiplier,
+
+      comfortScore:
+        analysis.comfortScore,
 
       kitchenCapacityPerHour:
         Math.max(
