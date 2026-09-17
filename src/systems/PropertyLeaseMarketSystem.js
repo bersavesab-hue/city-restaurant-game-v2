@@ -130,21 +130,15 @@ class PropertyLeaseMarketSystem {
     };
   }
 
-  ensureTerms(propertyId) {
-    const property = propertySystem.get(propertyId);
-
-    if (property.landlord && property.leaseTerms) {
-      return property;
-    }
-
-    const generated = this.buildGeneratedTerms(property);
-
-    return entitySystem.update("property", property.id, {
-      landlord:
-        property.landlord ?? generated.landlord,
+  buildManualTerms(property) {
+    return {
+      landlord: {
+        type: "individual",
+        name: "业主"
+      },
       leaseTerms: {
-        minMonths: 6,
-        maxMonths: 36,
+        minMonths: 1,
+        maxMonths: 60,
         propertyFeeMonthly: 0,
         transferFee: 0,
         rentFreeMaxDays: 0,
@@ -152,7 +146,27 @@ class PropertyLeaseMarketSystem {
         renewalIncreaseRate: 0.05,
         negotiable: false,
         competitorDemand: 0,
-        competitorClaimDay: null,
+        competitorClaimDay: null
+      }
+    };
+  }
+
+  ensureTerms(propertyId) {
+    const property = propertySystem.get(propertyId);
+
+    if (property.landlord && property.leaseTerms) {
+      return property;
+    }
+
+    const generated =
+      property.source === "market"
+        ? this.buildGeneratedTerms(property)
+        : this.buildManualTerms(property);
+
+    return entitySystem.update("property", property.id, {
+      landlord:
+        property.landlord ?? generated.landlord,
+      leaseTerms: {
         ...generated.leaseTerms,
         ...(property.leaseTerms ?? {})
       }
