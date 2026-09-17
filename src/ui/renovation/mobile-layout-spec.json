@@ -1,0 +1,34 @@
+{
+  "screen": "renovation",
+  "orientation": "portrait-first",
+  "regions": [
+    {
+      "id": "topbar",
+      "priority": 2,
+      "items": ["balance", "currentCost", "remaining", "score"]
+    },
+    {
+      "id": "workspace",
+      "priority": 1,
+      "items": ["grid", "placements", "selectionTools"]
+    },
+    {
+      "id": "bottomSheet",
+      "priority": 3,
+      "items": ["categories", "furniture", "save", "activate"]
+    },
+    {
+      "id": "overlayPanels",
+      "priority": 4,
+      "items": ["issues", "templates"]
+    }
+  ],
+  "rules": {
+    "workspaceMustRemainLargestRegion": true,
+    "issuesCollapsedByDefault": true,
+    "templatesCollapsedByDefault": true,
+    "selectionToolsOnlyWhenSelected": true,
+    "previewNeverCharges": true,
+    "saveChargesOnce": true
+  }
+}
