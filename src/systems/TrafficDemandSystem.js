@@ -4,6 +4,7 @@ import { districtSystem } from "./DistrictSystem.js";
 import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
 import { menuSystem } from "./MenuSystem.js";
 import { dishCatalogSystem } from "./DishCatalogSystem.js";
+import { marketCompetitionSystem } from "./MarketCompetitionSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -183,15 +184,6 @@ class TrafficDemandSystem {
         2.5
       );
 
-    const competitionFactor =
-      clamp(
-        1 -
-        district.competition *
-          0.006,
-        0.35,
-        1
-      );
-
     const districtSpendFactor =
       clamp(
         0.7 +
@@ -264,6 +256,10 @@ class TrafficDemandSystem {
 
     let expectedVisitors = 0;
 
+    let weightedMarketShare = 0;
+    let weightedCompetitionFactor = 0;
+    let competitionWeight = 0;
+
     for (const item of mix) {
       const segment =
         customerSegmentSystem.get(
@@ -320,6 +316,41 @@ class TrafficDemandSystem {
           1.35
         );
 
+      const playerAppeal =
+        clamp(
+          priceFactor *
+          reputationFactor *
+          reviewFactor *
+          repeatFactor *
+          levelFactor,
+          0.2,
+          4
+        );
+
+      const market =
+        marketCompetitionSystem
+          .getMarketSnapshot({
+            restaurantId,
+            district,
+            segmentId:
+              segment.id,
+            playerAppeal
+          });
+
+      const competitionFactor =
+        market.competitionFactor;
+
+      weightedMarketShare +=
+        market.marketShare *
+        item.share;
+
+      weightedCompetitionFactor +=
+        competitionFactor *
+        item.share;
+
+      competitionWeight +=
+        item.share;
+
       const demand =
         4 *
         item.share *
@@ -346,6 +377,11 @@ class TrafficDemandSystem {
 
         priceFactor,
 
+        marketShare:
+          market.marketShare,
+
+        competitionFactor,
+
         expectedVisitors:
           demand
       });
@@ -367,7 +403,19 @@ class TrafficDemandSystem {
       priceIndex,
 
       trafficFactor,
-      competitionFactor,
+
+      marketShare:
+        competitionWeight > 0
+          ? weightedMarketShare /
+            competitionWeight
+          : 1,
+
+      competitionFactor:
+        competitionWeight > 0
+          ? weightedCompetitionFactor /
+            competitionWeight
+          : 1,
+
       districtSpendFactor,
       reputationFactor,
       reviewFactor,
