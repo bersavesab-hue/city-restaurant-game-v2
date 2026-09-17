@@ -2,6 +2,7 @@ import { gameState } from "../../../core/GameState.js";
 import { districtSystem } from "../../../systems/DistrictSystem.js";
 import { propertySystem } from "../../../systems/PropertySystem.js";
 import { propertyMarketSystem } from "../../../systems/PropertyMarketSystem.js";
+import { propertyLeaseMarketSystem } from "../../../systems/PropertyLeaseMarketSystem.js";
 import { financeSystem } from "../../../systems/FinanceSystem.js";
 import { leaseSystem } from "../../../systems/LeaseSystem.js";
 import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
@@ -42,57 +43,79 @@ function buildFloorSummary(property) {
 }
 
 class CityPropertyPageSystem {
-  getLeaseQuote(property, restaurantId = null, months = 12) {
-    const deposit = property.monthlyRent * property.depositMonths;
-    const upfront = deposit + property.monthlyRent;
-    const balance = safeBalance(restaurantId);
-
-    return {
+  getLeaseQuote(
+    property,
+    restaurantId = null,
+    months = 12,
+    offerId = null
+  ) {
+    return propertyLeaseMarketSystem.getQuote({
+      propertyId: property.id,
+      restaurantId,
       months,
-      monthlyRent: property.monthlyRent,
-      depositMonths: property.depositMonths,
-      deposit,
-      upfront,
-      totalContractRent: property.monthlyRent * months,
-      balance,
-      affordable: balance === null ? null : balance >= upfront
-    };
+      offerId
+    });
   }
 
   buildPropertyCard(property, restaurantId = null) {
-    const district = getDistrict(property);
-    const quote = this.getLeaseQuote(property, restaurantId);
+    const enriched = propertyLeaseMarketSystem.ensureTerms(property.id);
+    const district = getDistrict(enriched);
+    const defaultMonths = Math.max(
+      12,
+      enriched.leaseTerms?.minMonths ?? 12
+    );
+    const quote = this.getLeaseQuote(
+      enriched,
+      restaurantId,
+      Math.min(
+        defaultMonths,
+        enriched.leaseTerms?.maxMonths ?? defaultMonths
+      )
+    );
     const day = gameState.getSection("time")?.day ?? 1;
 
     return {
-      id: property.id,
-      name: property.name,
-      districtId: property.districtId,
-      districtName: district?.name ?? property.districtId,
-      area: property.area,
-      usableArea: property.usableArea ?? property.area,
-      floorCount: property.floorCount ?? property.floors?.length ?? 1,
-      seats: property.seats,
-      monthlyRent: property.monthlyRent,
-      depositMonths: property.depositMonths,
-      status: property.status,
-      available: property.status === "available",
-      frontageMeters: property.frontageMeters ?? null,
-      ceilingHeight: property.ceilingHeight ?? null,
-      parkingSpaces: property.parkingSpaces ?? 0,
-      foodServiceAllowed: property.foodServiceAllowed !== false,
-      exhaustAllowed: property.exhaustAllowed !== false,
-      tags: [...(property.tags ?? [])],
-      floors: buildFloorSummary(property),
-      source: property.source ?? "manual",
-      propertyType: property.propertyType ?? null,
-      qualityScore: property.marketMeta?.qualityScore ?? null,
+      id: enriched.id,
+      name: enriched.name,
+      districtId: enriched.districtId,
+      districtName: district?.name ?? enriched.districtId,
+      area: enriched.area,
+      usableArea: enriched.usableArea ?? enriched.area,
+      floorCount: enriched.floorCount ?? enriched.floors?.length ?? 1,
+      seats: enriched.seats,
+      monthlyRent: enriched.monthlyRent,
+      depositMonths: enriched.depositMonths,
+      status: enriched.status,
+      available: enriched.status === "available",
+      frontageMeters: enriched.frontageMeters ?? null,
+      ceilingHeight: enriched.ceilingHeight ?? null,
+      parkingSpaces: enriched.parkingSpaces ?? 0,
+      foodServiceAllowed: enriched.foodServiceAllowed !== false,
+      exhaustAllowed: enriched.exhaustAllowed !== false,
+      tags: [...(enriched.tags ?? [])],
+      floors: buildFloorSummary(enriched),
+      source: enriched.source ?? "manual",
+      propertyType: enriched.propertyType ?? null,
+      qualityScore: enriched.marketMeta?.qualityScore ?? null,
+      landlord: structuredClone(enriched.landlord ?? null),
+      leaseTerms: structuredClone(enriched.leaseTerms ?? null),
+      competition: {
+        demandScore: enriched.leaseTerms?.competitorDemand ?? 0,
+        claimDay: enriched.leaseTerms?.competitorClaimDay ?? null,
+        daysUntilPossibleClaim:
+          Number.isInteger(enriched.leaseTerms?.competitorClaimDay)
+            ? Math.max(
+                0,
+                enriched.leaseTerms.competitorClaimDay - day
+              )
+            : null
+      },
       listing: {
-        listedDay: property.listedDay ?? null,
-        expiresDay: property.expiresDay ?? null,
+        listedDay: enriched.listedDay ?? null,
+        expiresDay: enriched.expiresDay ?? null,
         remainingDays:
-          Number.isInteger(property.expiresDay)
-            ? Math.max(0, property.expiresDay - day)
+          Number.isInteger(enriched.expiresDay)
+            ? Math.max(0, enriched.expiresDay - day)
             : null
       },
       quote,
@@ -210,12 +233,35 @@ class CityPropertyPageSystem {
     };
   }
 
-  getPropertyDetail(propertyId, restaurantId = null, months = 12) {
-    const property = propertySystem.get(propertyId);
+  getPropertyDetail(
+    propertyId,
+    restaurantId = null,
+    months = 12,
+    offerId = null
+  ) {
+    const property = propertyLeaseMarketSystem.ensureTerms(propertyId);
     const district = getDistrict(property);
-    const quote = this.getLeaseQuote(property, restaurantId, months);
+    const normalizedMonths = Math.min(
+      Math.max(
+        months,
+        property.leaseTerms.minMonths
+      ),
+      property.leaseTerms.maxMonths
+    );
+    const quote = this.getLeaseQuote(
+      property,
+      restaurantId,
+      normalizedMonths,
+      offerId
+    );
     const activeLease = restaurantId
       ? leaseSystem.getByRestaurant(restaurantId) ?? null
+      : null;
+    const activeOffer = restaurantId
+      ? propertyLeaseMarketSystem.getActiveOffer(
+          restaurantId,
+          propertyId
+        )
       : null;
     const layout = propertySystem.getLayout(propertyId);
 
@@ -224,6 +270,9 @@ class CityPropertyPageSystem {
       property: this.buildPropertyCard(property, restaurantId),
       district,
       layout,
+      landlord: structuredClone(property.landlord),
+      leaseTerms: structuredClone(property.leaseTerms),
+      activeOffer,
       suitability: {
         foodServiceAllowed: property.foodServiceAllowed !== false,
         exhaustAllowed: property.exhaustAllowed !== false,
@@ -236,18 +285,62 @@ class CityPropertyPageSystem {
       quote,
       leaseState: {
         hasActiveLease: Boolean(activeLease),
+        canNegotiate:
+          property.status === "available" &&
+          !activeLease &&
+          property.leaseTerms.negotiable === true,
         canSign:
           property.status === "available" &&
           !activeLease &&
           quote.affordable !== false &&
-          property.foodServiceAllowed !== false,
+          property.foodServiceAllowed !== false &&
+          (!offerId || activeOffer?.status === "accepted"),
         activeLease
       },
       nextAfterLease: "renovation"
     };
   }
 
-  signLease({ restaurantId, propertyId, months = 12 }) {
+  negotiateLease({
+    restaurantId,
+    propertyId,
+    months = 12,
+    requestedRent = null,
+    requestedRentFreeDays = 0
+  }) {
+    restaurantSystem.get(restaurantId);
+
+    const offer = propertyLeaseMarketSystem.negotiate({
+      restaurantId,
+      propertyId,
+      months,
+      requestedRent,
+      requestedRentFreeDays
+    });
+
+    return {
+      offer,
+      detail: this.getPropertyDetail(
+        propertyId,
+        restaurantId,
+        months,
+        offer.status === "accepted"
+          ? offer.id
+          : null
+      )
+    };
+  }
+
+  acceptCounter(offerId) {
+    return propertyLeaseMarketSystem.acceptCounter(offerId);
+  }
+
+  signLease({
+    restaurantId,
+    propertyId,
+    months = 12,
+    offerId = null
+  }) {
     restaurantSystem.get(restaurantId);
     const property = propertySystem.get(propertyId);
 
@@ -255,10 +348,11 @@ class CityPropertyPageSystem {
       throw new Error("Property does not allow food service");
     }
 
-    const lease = leaseSystem.sign({
+    const lease = propertyLeaseMarketSystem.signLease({
       restaurantId,
       propertyId,
-      months
+      months,
+      offerId
     });
 
     return {
@@ -269,6 +363,32 @@ class CityPropertyPageSystem {
       nextPage: "renovation",
       signedAtDay: gameState.getSection("time").day
     };
+  }
+
+  getRenewalQuote(restaurantId, months = 12) {
+    const lease = leaseSystem.getByRestaurant(restaurantId);
+
+    if (!lease) {
+      return null;
+    }
+
+    return propertyLeaseMarketSystem.getRenewalQuote(
+      lease.id,
+      months
+    );
+  }
+
+  renewLease(restaurantId, months = 12) {
+    const lease = leaseSystem.getByRestaurant(restaurantId);
+
+    if (!lease) {
+      throw new Error("Restaurant does not have an active lease");
+    }
+
+    return propertyLeaseMarketSystem.renewLease({
+      leaseId: lease.id,
+      months
+    });
   }
 }
 
