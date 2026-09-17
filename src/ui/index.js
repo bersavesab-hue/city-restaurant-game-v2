@@ -5,7 +5,12 @@ export { PageRegistry, pageRegistry } from "./registry/PageRegistry.js";
 export { CORE_PAGES, registerDefaultPages } from "./registry/defaultPages.js";
 export {
   renovationMobilePageSystem,
-  RenovationMobilePageSystem
+  RenovationMobilePageSystem,
+  RenovationMobileView,
+  BaseRenovationMobileView,
+  mountRenovationMobilePage,
+  renderFloorplanLayer,
+  buildFloorplanVisualModel
 } from "./renovation/index.js";
 export {
   restaurantHomePageSystem,
