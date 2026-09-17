@@ -13,10 +13,16 @@ function formatMoney(value) {
   return Number(value ?? 0).toLocaleString("zh-CN");
 }
 
-function placementStyle(placement, layoutWidth, layoutHeight) {
+function placementStyle(
+  placement,
+  layoutWidth,
+  layoutHeight,
+  offsetX = 0,
+  offsetY = 0
+) {
   return [
-    `left:${placement.x / layoutWidth * 100}%`,
-    `top:${placement.y / layoutHeight * 100}%`,
+    `left:${(placement.x - offsetX) / layoutWidth * 100}%`,
+    `top:${(placement.y - offsetY) / layoutHeight * 100}%`,
     `width:${placement.width / layoutWidth * 100}%`,
     `height:${placement.height / layoutHeight * 100}%`
   ].join(";");
@@ -27,7 +33,9 @@ function gridPointFromClient(
   layoutWidth,
   layoutHeight,
   clientX,
-  clientY
+  clientY,
+  offsetX = 0,
+  offsetY = 0
 ) {
   if (
     clientX < rect.left ||
@@ -42,15 +50,28 @@ function gridPointFromClient(
   const cellHeight = rect.height / layoutHeight;
 
   return {
-    x: Math.min(
-      layoutWidth - 1,
-      Math.max(0, Math.floor((clientX - rect.left) / cellWidth))
-    ),
-    y: Math.min(
-      layoutHeight - 1,
-      Math.max(0, Math.floor((clientY - rect.top) / cellHeight))
-    )
+    x:
+      offsetX +
+      Math.min(
+        layoutWidth - 1,
+        Math.max(0, Math.floor((clientX - rect.left) / cellWidth))
+      ),
+    y:
+      offsetY +
+      Math.min(
+        layoutHeight - 1,
+        Math.max(0, Math.floor((clientY - rect.top) / cellHeight))
+      )
   };
+}
+
+function normalizedRectStyle(rect, width, height) {
+  return [
+    `left:${rect.x / width * 100}%`,
+    `top:${rect.y / height * 100}%`,
+    `width:${rect.width / width * 100}%`,
+    `height:${rect.height / height * 100}%`
+  ].join(";");
 }
 
 class RenovationMobileView {
@@ -126,9 +147,19 @@ class RenovationMobileView {
     return this.page;
   }
 
+  getViewport() {
+    return this.page.workspace.viewBounds ?? {
+      x: 0,
+      y: 0,
+      width: this.page.workspace.width,
+      height: this.page.workspace.height
+    };
+  }
+
   renderPlacement(item, extraClass = "") {
     const selected =
       item.id === this.page.workspace.selectedPlacementId;
+    const viewport = this.getViewport();
 
     return `
       <button
@@ -138,8 +169,10 @@ class RenovationMobileView {
         } ${extraClass}"
         style="${placementStyle(
           item,
-          this.page.workspace.width,
-          this.page.workspace.height
+          viewport.width,
+          viewport.height,
+          viewport.x,
+          viewport.y
         )}"
         data-placement-id="${escapeHtml(item.id)}"
         aria-label="${escapeHtml(item.name)}"
@@ -149,19 +182,184 @@ class RenovationMobileView {
     `;
   }
 
+  isVisibleInViewport(item) {
+    const viewport = this.getViewport();
+    const floorId = item.floorId ?? this.page.workspace.activeFloorId;
+
+    if (floorId !== this.page.workspace.activeFloorId) {
+      return false;
+    }
+
+    return !(
+      item.x + item.width <= viewport.x ||
+      item.y + item.height <= viewport.y ||
+      item.x >= viewport.x + viewport.width ||
+      item.y >= viewport.y + viewport.height
+    );
+  }
+
   renderTemplatePreview() {
     if (!this.templatePreview) {
       return "";
     }
 
     return this.templatePreview.placements
-      .map(item =>
-        this.renderPlacement(
-          this.pageSystem.getPlacementView(item),
-          "is-template-preview"
-        )
-      )
+      .map(item => this.pageSystem.getPlacementView(item))
+      .filter(item => this.isVisibleInViewport(item))
+      .map(item => this.renderPlacement(item, "is-template-preview"))
       .join("");
+  }
+
+  renderStructureMarkers() {
+    const floor = this.page.workspace.activeFloor;
+    const viewport = this.getViewport();
+    const structures = [];
+
+    for (const column of floor?.columns ?? []) {
+      const item = {
+        x: column.x ?? 0,
+        y: column.y ?? 0,
+        width: column.width ?? 1,
+        height: column.height ?? 1
+      };
+
+      if (
+        item.x + item.width <= viewport.x ||
+        item.y + item.height <= viewport.y ||
+        item.x >= viewport.x + viewport.width ||
+        item.y >= viewport.y + viewport.height
+      ) {
+        continue;
+      }
+
+      structures.push(`
+        <div
+          class="renovation-structure renovation-column"
+          style="${placementStyle(
+            item,
+            viewport.width,
+            viewport.height,
+            viewport.x,
+            viewport.y
+          )}"
+          title="固定柱体"
+        ></div>
+      `);
+    }
+
+    for (const entrance of floor?.entrances ?? []) {
+      const x = entrance.x ?? 0;
+      const y = entrance.y ?? 0;
+
+      if (
+        x < viewport.x ||
+        y < viewport.y ||
+        x > viewport.x + viewport.width ||
+        y > viewport.y + viewport.height
+      ) {
+        continue;
+      }
+
+      structures.push(`
+        <div
+          class="renovation-entrance"
+          style="left:${(x - viewport.x) / viewport.width * 100}%;top:${(y - viewport.y) / viewport.height * 100}%"
+          title="入口"
+        >门</div>
+      `);
+    }
+
+    return structures.join("");
+  }
+
+  renderWorkspaceToolbar() {
+    const workspace = this.page.workspace;
+    const floorTabs = workspace.floors.length > 1
+      ? `
+        <nav class="renovation-floor-tabs" aria-label="楼层选择">
+          ${workspace.floors.map(floor => `
+            <button
+              type="button"
+              class="renovation-floor-tab ${floor.id === workspace.activeFloorId ? "is-active" : ""}"
+              data-action="floor"
+              data-floor-id="${escapeHtml(floor.id)}"
+            >
+              <b>${escapeHtml(floor.label)}</b>
+              <span>${escapeHtml(floor.usableArea ?? floor.area ?? "-")}㎡</span>
+            </button>
+          `).join("")}
+        </nav>
+      `
+      : "";
+
+    const zoneTabs = workspace.mode === "zone"
+      ? `
+        <nav class="renovation-zone-tabs" aria-label="分区选择">
+          ${workspace.zones.map(zone => `
+            <button
+              type="button"
+              class="renovation-zone-tab ${zone.id === workspace.activeZoneId ? "is-active" : ""}"
+              data-action="zone"
+              data-zone-id="${escapeHtml(zone.id)}"
+            >${escapeHtml(zone.label)}</button>
+          `).join("")}
+        </nav>
+      `
+      : "";
+
+    return `
+      <div class="renovation-workspace-toolbar">
+        <div class="renovation-workspace-toolbar-main">
+          <div class="renovation-mode-badge">
+            <b>${escapeHtml(workspace.modeLabel)}</b>
+            <span>${escapeHtml(workspace.activeFloor?.label ?? "1F")} · ${escapeHtml(workspace.activeFloor?.usableArea ?? workspace.activeFloor?.area ?? "-")}㎡</span>
+          </div>
+
+          <div class="renovation-zoom-controls">
+            <button type="button" data-action="zoom-out" ${workspace.canZoom && workspace.zoom > workspace.zoomMin ? "" : "disabled"}>－</button>
+            <button type="button" data-action="zoom-reset" ${workspace.canZoom ? "" : "disabled"}>${Math.round(workspace.zoom * 100)}%</button>
+            <button type="button" data-action="zoom-in" ${workspace.canZoom && workspace.zoom < workspace.zoomMax ? "" : "disabled"}>＋</button>
+            ${workspace.minimap.enabled ? `<button type="button" data-action="toggle-minimap">小地图</button>` : ""}
+          </div>
+        </div>
+        ${floorTabs}
+        ${zoneTabs}
+      </div>
+    `;
+  }
+
+  renderMinimap() {
+    const workspace = this.page.workspace;
+    const minimap = workspace.minimap;
+
+    if (!minimap.enabled || !minimap.expanded) {
+      return "";
+    }
+
+    const viewportStyle = [
+      `left:${minimap.viewport.x * 100}%`,
+      `top:${minimap.viewport.y * 100}%`,
+      `width:${minimap.viewport.width * 100}%`,
+      `height:${minimap.viewport.height * 100}%`
+    ].join(";");
+
+    return `
+      <aside class="renovation-minimap">
+        <div class="renovation-minimap-header">
+          <b>${escapeHtml(workspace.activeFloor?.label ?? "楼层")}</b>
+          <span>${workspace.floorPlacementCount}件</span>
+        </div>
+        <div class="renovation-minimap-canvas">
+          ${minimap.placements.map(item => `
+            <span
+              class="renovation-minimap-item"
+              style="${normalizedRectStyle(item, minimap.width, minimap.height)}"
+            ></span>
+          `).join("")}
+          <span class="renovation-minimap-viewport" style="${viewportStyle}"></span>
+        </div>
+      </aside>
+    `;
   }
 
   render() {
@@ -174,17 +372,11 @@ class RenovationMobileView {
     const selectionTools = page.selection.canRotate
       ? `
         <div class="renovation-floating-tools">
-          <button type="button" class="renovation-tool-button" data-action="rotate">
-            旋转
-          </button>
-          ${
-            page.selection.canDelete
-              ? `<button type="button" class="renovation-tool-button danger" data-action="delete">删除</button>`
-              : ""
-          }
-          <button type="button" class="renovation-tool-button" data-action="clear-selection">
-            取消选择
-          </button>
+          <button type="button" class="renovation-tool-button" data-action="rotate">旋转</button>
+          ${page.selection.canDelete
+            ? `<button type="button" class="renovation-tool-button danger" data-action="delete">删除</button>`
+            : ""}
+          <button type="button" class="renovation-tool-button" data-action="clear-selection">取消选择</button>
         </div>
       `
       : "";
@@ -201,13 +393,11 @@ class RenovationMobileView {
               .join("")}
           </div>
           <div class="renovation-issue-list">
-            ${
-              page.analysis.issues.length > 0
-                ? page.analysis.issues
-                    .map(issue => `<div>${escapeHtml(issue.label ?? issue.id ?? issue)}</div>`)
-                    .join("")
-                : "<div>当前没有明显布局问题</div>"
-            }
+            ${page.analysis.issues.length > 0
+              ? page.analysis.issues
+                  .map(issue => `<div>${escapeHtml(issue.label ?? issue.id ?? issue)}</div>`)
+                  .join("")
+              : "<div>当前没有明显布局问题</div>"}
           </div>
         </section>
       `
@@ -228,14 +418,16 @@ class RenovationMobileView {
               </div>
             `)
             .join("")}
-          ${
-            this.templatePreview
-              ? `<div class="renovation-template-summary">预览：${escapeHtml(this.templatePreview.template.name)} · ¥${formatMoney(this.templatePreview.budget.purchaseCost)} · ${this.templatePreview.placements.length}件</div>`
-              : ""
-          }
+          ${this.templatePreview
+            ? `<div class="renovation-template-summary">预览：${escapeHtml(this.templatePreview.template.name)} · ¥${formatMoney(this.templatePreview.budget.purchaseCost)} · ${this.templatePreview.placements.length}件</div>`
+            : ""}
         </section>
       `
       : "";
+
+    const viewport = this.getViewport();
+    const zoomPercent = Math.round(page.workspace.zoom * 100);
+    const zoomMax = Math.round(560 * page.workspace.zoom);
 
     this.root.innerHTML = `
       <main class="renovation-page">
@@ -250,17 +442,22 @@ class RenovationMobileView {
         </header>
 
         <section class="renovation-workspace">
-          <div class="renovation-canvas-wrap">
-            <div
-              class="renovation-canvas"
-              data-renovation-canvas
-              style="--layout-width:${page.workspace.width};--layout-height:${page.workspace.height};"
-            >
-              ${page.workspace.placements.map(item => this.renderPlacement(item)).join("")}
-              ${this.renderTemplatePreview()}
+          ${this.renderWorkspaceToolbar()}
+          <div class="renovation-canvas-scroll">
+            <div class="renovation-canvas-wrap">
+              <div
+                class="renovation-canvas"
+                data-renovation-canvas
+                style="--layout-width:${viewport.width};--layout-height:${viewport.height};--zoom-width:${zoomPercent}%;--zoom-max:${zoomMax}px;"
+              >
+                ${this.renderStructureMarkers()}
+                ${page.workspace.placements.map(item => this.renderPlacement(item)).join("")}
+                ${this.renderTemplatePreview()}
+              </div>
             </div>
           </div>
           ${selectionTools}
+          ${this.renderMinimap()}
           <div class="renovation-workspace-actions">
             <button type="button" data-action="toggle-templates">模板</button>
             <button type="button" data-action="toggle-issues">诊断</button>
@@ -328,7 +525,31 @@ class RenovationMobileView {
     const action = target.dataset.action;
 
     try {
-      if (action === "category") {
+      if (action === "floor") {
+        this.templatePreview = null;
+        this.refresh(
+          this.pageSystem.switchFloor(
+            this.restaurantId,
+            target.dataset.floorId
+          )
+        );
+      } else if (action === "zone") {
+        this.templatePreview = null;
+        this.refresh(
+          this.pageSystem.selectZone(
+            this.restaurantId,
+            target.dataset.zoneId
+          )
+        );
+      } else if (action === "zoom-in") {
+        this.refresh(this.pageSystem.zoomIn(this.restaurantId));
+      } else if (action === "zoom-out") {
+        this.refresh(this.pageSystem.zoomOut(this.restaurantId));
+      } else if (action === "zoom-reset") {
+        this.refresh(this.pageSystem.resetZoom(this.restaurantId));
+      } else if (action === "toggle-minimap") {
+        this.refresh(this.pageSystem.toggleMinimap(this.restaurantId));
+      } else if (action === "category") {
         this.templatePreview = null;
         this.refresh(
           this.pageSystem.selectCategory(
@@ -445,12 +666,15 @@ class RenovationMobileView {
       return;
     }
 
+    const viewport = this.getViewport();
     const point = gridPointFromClient(
       canvas.getBoundingClientRect(),
-      this.page.workspace.width,
-      this.page.workspace.height,
+      viewport.width,
+      viewport.height,
       event.clientX,
-      event.clientY
+      event.clientY,
+      viewport.x,
+      viewport.y
     );
 
     if (!point) {
@@ -525,14 +749,17 @@ class RenovationMobileView {
       return;
     }
 
+    const viewport = this.getViewport();
     const node = document.createElement("div");
     node.className = `renovation-drop-preview ${
       this.preview.valid ? "is-valid" : "is-invalid"
     }`;
     node.style.cssText = placementStyle(
       this.preview.placement,
-      this.page.workspace.width,
-      this.page.workspace.height
+      viewport.width,
+      viewport.height,
+      viewport.x,
+      viewport.y
     );
     node.textContent = this.preview.placement.name;
     canvas.appendChild(node);
