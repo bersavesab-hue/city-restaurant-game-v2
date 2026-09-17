@@ -8,6 +8,7 @@ import { dailySettlementSystem } from "./DailySettlementSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 import { leaseSystem } from "./LeaseSystem.js";
 import { historyArchiveSystem } from "./HistoryArchiveSystem.js";
+import { periodArchiveSystem } from "./PeriodArchiveSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
 import { procurementSystem } from "./ProcurementSystem.js";
 import { autoProcurementSystem } from "./AutoProcurementSystem.js";
@@ -109,6 +110,17 @@ class OperatingCycleSystem {
             .processAll(
               current.day
             );
+
+          for (
+            const restaurant
+            of restaurants
+          ) {
+            periodArchiveSystem
+              .archiveRestaurant(
+                restaurant.id,
+                current.day
+              );
+          }
         }
       },
       {
