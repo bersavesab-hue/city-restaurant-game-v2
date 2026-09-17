@@ -1,4 +1,5 @@
 import { renovationEditorSystem } from "../../systems/RenovationEditorSystem.js";
+import { renovationSystem } from "../../systems/RenovationSystem.js";
 
 const DEFAULT_CATEGORY = "dining";
 
@@ -14,6 +15,7 @@ class RenovationMobilePageSystem {
       activeCategory: DEFAULT_CATEGORY,
       selectedFurnitureId: null,
       selectedPlacementId: null,
+      pendingRotation: 0,
       issuesExpanded: false,
       templatesExpanded: false,
       drawerExpanded: true
@@ -32,9 +34,42 @@ class RenovationMobilePageSystem {
     return state;
   }
 
+  getPlacementView(placement) {
+    const definition = renovationSystem.getFurnitureDefinition(
+      placement.furnitureId
+    );
+    const rotation = placement.rotation ?? 0;
+    const size = renovationSystem.getSize(definition, rotation);
+
+    return {
+      ...structuredClone(placement),
+      name: definition.name,
+      type: definition.type,
+      width: size.width,
+      height: size.height,
+      seats: definition.seats ?? 0,
+      cost: definition.cost
+    };
+  }
+
+  findCatalogItem(editor, furnitureId) {
+    for (const group of editor.catalog) {
+      const item = group.items.find(
+        candidate => candidate.id === furnitureId
+      );
+
+      if (item) {
+        return item;
+      }
+    }
+
+    return null;
+  }
+
   getPage(restaurantId, editorState = null) {
     const ui = this.requireUiState(restaurantId);
-    const editor = editorState ?? renovationEditorSystem.getPageState(restaurantId);
+    const editor =
+      editorState ?? renovationEditorSystem.getPageState(restaurantId);
 
     const category =
       editor.catalog.find(item => item.id === ui.activeCategory) ??
@@ -42,11 +77,13 @@ class RenovationMobilePageSystem {
       null;
 
     const selectedPlacement = ui.selectedPlacementId
-      ? editor.layout.placements.find(item => item.id === ui.selectedPlacementId) ?? null
+      ? editor.layout.placements.find(
+          item => item.id === ui.selectedPlacementId
+        ) ?? null
       : null;
 
-    const selectedFurniture = ui.selectedFurnitureId && category
-      ? category.items.find(item => item.id === ui.selectedFurnitureId) ?? null
+    const selectedFurniture = ui.selectedFurnitureId
+      ? this.findCatalogItem(editor, ui.selectedFurnitureId)
       : null;
 
     return {
@@ -62,7 +99,9 @@ class RenovationMobilePageSystem {
       workspace: {
         width: editor.layout.width,
         height: editor.layout.height,
-        placements: editor.layout.placements,
+        placements: editor.layout.placements.map(
+          item => this.getPlacementView(item)
+        ),
         selectedPlacementId: ui.selectedPlacementId
       },
       drawer: {
@@ -74,12 +113,16 @@ class RenovationMobilePageSystem {
           count: item.items.length
         })),
         items: category?.items ?? [],
-        selectedFurnitureId: ui.selectedFurnitureId
+        selectedFurnitureId: ui.selectedFurnitureId,
+        pendingRotation: ui.pendingRotation
       },
       selection: {
-        placement: selectedPlacement,
+        placement: selectedPlacement
+          ? this.getPlacementView(selectedPlacement)
+          : null,
         furniture: selectedFurniture,
-        canRotate: Boolean(selectedPlacement),
+        pendingRotation: ui.pendingRotation,
+        canRotate: Boolean(selectedPlacement || selectedFurniture),
         canDelete: Boolean(selectedPlacement)
       },
       analysis: {
@@ -95,7 +138,8 @@ class RenovationMobilePageSystem {
       },
       actions: {
         canSave: editor.actions.canSave && editor.budget.affordable,
-        canActivate: editor.actions.canActivate && editor.budget.affordable
+        canActivate:
+          editor.actions.canActivate && editor.budget.affordable
       }
     };
   }
@@ -110,6 +154,7 @@ class RenovationMobilePageSystem {
 
     ui.activeCategory = categoryId;
     ui.selectedFurnitureId = null;
+    ui.pendingRotation = 0;
     return this.getPage(restaurantId, editor);
   }
 
@@ -126,6 +171,7 @@ class RenovationMobilePageSystem {
 
     ui.selectedFurnitureId = furnitureId;
     ui.selectedPlacementId = null;
+    ui.pendingRotation = 0;
     return this.getPage(restaurantId, editor);
   }
 
@@ -139,10 +185,85 @@ class RenovationMobilePageSystem {
 
     ui.selectedPlacementId = placementId;
     ui.selectedFurnitureId = null;
+    ui.pendingRotation = 0;
     return this.getPage(restaurantId, editor);
   }
 
-  placeSelected(restaurantId, x, y, rotation = 0) {
+  clearSelection(restaurantId) {
+    const ui = this.requireUiState(restaurantId);
+    ui.selectedPlacementId = null;
+    ui.selectedFurnitureId = null;
+    ui.pendingRotation = 0;
+    return this.getPage(restaurantId);
+  }
+
+  previewPlacement(restaurantId, x, y, rotation = null) {
+    const ui = this.requireUiState(restaurantId);
+    const editor = renovationEditorSystem.getPageState(restaurantId);
+
+    let candidate = null;
+    let placements = editor.layout.placements;
+    let mode = null;
+
+    if (ui.selectedFurnitureId) {
+      mode = "place";
+      candidate = {
+        id: "preview_new",
+        furnitureId: ui.selectedFurnitureId,
+        x,
+        y,
+        rotation: rotation ?? ui.pendingRotation,
+        draftNew: true
+      };
+      placements = [...placements, candidate];
+    } else if (ui.selectedPlacementId) {
+      mode = "move";
+      const current = placements.find(
+        item => item.id === ui.selectedPlacementId
+      );
+
+      if (!current) {
+        throw new Error(
+          `Placement "${ui.selectedPlacementId}" does not exist`
+        );
+      }
+
+      candidate = {
+        ...current,
+        x,
+        y,
+        rotation: rotation ?? current.rotation ?? 0
+      };
+      placements = placements.map(item =>
+        item.id === current.id ? candidate : item
+      );
+    } else {
+      throw new Error("No furniture or placement selected");
+    }
+
+    try {
+      renovationEditorSystem.validateDraft(
+        restaurantId,
+        placements
+      );
+
+      return {
+        valid: true,
+        mode,
+        placement: this.getPlacementView(candidate),
+        reason: null
+      };
+    } catch (error) {
+      return {
+        valid: false,
+        mode,
+        placement: this.getPlacementView(candidate),
+        reason: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+
+  placeSelected(restaurantId, x, y, rotation = null) {
     const ui = this.requireUiState(restaurantId);
 
     if (!ui.selectedFurnitureId) {
@@ -152,12 +273,17 @@ class RenovationMobilePageSystem {
     const editor = renovationEditorSystem.addItem(
       restaurantId,
       ui.selectedFurnitureId,
-      { x, y, rotation }
+      {
+        x,
+        y,
+        rotation: rotation ?? ui.pendingRotation
+      }
     );
 
     const created = editor.layout.placements.at(-1);
     ui.selectedPlacementId = created?.id ?? null;
     ui.selectedFurnitureId = null;
+    ui.pendingRotation = 0;
     return this.getPage(restaurantId, editor);
   }
 
@@ -181,16 +307,21 @@ class RenovationMobilePageSystem {
   rotateSelected(restaurantId) {
     const ui = this.requireUiState(restaurantId);
 
-    if (!ui.selectedPlacementId) {
-      throw new Error("No placement selected");
+    if (ui.selectedPlacementId) {
+      const editor = renovationEditorSystem.rotateItem(
+        restaurantId,
+        ui.selectedPlacementId
+      );
+
+      return this.getPage(restaurantId, editor);
     }
 
-    const editor = renovationEditorSystem.rotateItem(
-      restaurantId,
-      ui.selectedPlacementId
-    );
+    if (ui.selectedFurnitureId) {
+      ui.pendingRotation = ui.pendingRotation === 0 ? 90 : 0;
+      return this.getPage(restaurantId);
+    }
 
-    return this.getPage(restaurantId, editor);
+    throw new Error("No furniture or placement selected");
   }
 
   deleteSelected(restaurantId) {
@@ -216,9 +347,13 @@ class RenovationMobilePageSystem {
 
   applyTemplate(restaurantId, templateId) {
     const ui = this.requireUiState(restaurantId);
-    const editor = renovationEditorSystem.applyTemplate(restaurantId, templateId);
+    const editor = renovationEditorSystem.applyTemplate(
+      restaurantId,
+      templateId
+    );
     ui.selectedPlacementId = null;
     ui.selectedFurnitureId = null;
+    ui.pendingRotation = 0;
     ui.templatesExpanded = false;
     return this.getPage(restaurantId, editor);
   }
@@ -243,7 +378,10 @@ class RenovationMobilePageSystem {
 
   save(restaurantId, { activate = false } = {}) {
     this.requireUiState(restaurantId);
-    const result = renovationEditorSystem.save(restaurantId, { activate });
+    const result = renovationEditorSystem.save(
+      restaurantId,
+      { activate }
+    );
     this.uiState.delete(restaurantId);
     return result;
   }
@@ -255,5 +393,6 @@ class RenovationMobilePageSystem {
   }
 }
 
-export const renovationMobilePageSystem = new RenovationMobilePageSystem();
+export const renovationMobilePageSystem =
+  new RenovationMobilePageSystem();
 export { RenovationMobilePageSystem };
