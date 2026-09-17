@@ -1,14 +1,16 @@
 import { dataRegistry } from "../core/DataRegistry.js";
 import { VENUE_TYPES } from "../data/venueTypes.js";
+import { ADDITIONAL_VENUE_TYPES } from "../data/venueTypes.additional.js";
 
 const COLLECTION = "venue_types";
+const ALL_VENUE_TYPES = [...VENUE_TYPES, ...ADDITIONAL_VENUE_TYPES];
 
 class VenueTypeSystem {
-  ensureLoaded() {
+  ensureLoaded({ overwrite = false } = {}) {
     const existing = dataRegistry.getAll(COLLECTION);
 
-    if (existing.length === 0) {
-      dataRegistry.register(COLLECTION, VENUE_TYPES, { overwrite: true });
+    if (existing.length === 0 || overwrite) {
+      dataRegistry.register(COLLECTION, ALL_VENUE_TYPES, { overwrite: true });
     }
 
     return dataRegistry.getAll(COLLECTION);
@@ -26,18 +28,12 @@ class VenueTypeSystem {
 
   getSegmentMultiplier(venueTypeId, segmentId) {
     const venue = this.get(venueTypeId);
-    if (!venue) {
-      return 1;
-    }
-
+    if (!venue) return 1;
     return venue.targetSegments?.[segmentId] ?? 1;
   }
 
   getDistrictAffinity(venueTypeId, district) {
-    if (!district || !venueTypeId) {
-      return 1;
-    }
-
+    if (!district || !venueTypeId) return 1;
     return district.venueAffinity?.[venueTypeId] ?? 1;
   }
 
@@ -53,4 +49,4 @@ class VenueTypeSystem {
 }
 
 export const venueTypeSystem = new VenueTypeSystem();
-export { VenueTypeSystem };
+export { VenueTypeSystem, ALL_VENUE_TYPES };
