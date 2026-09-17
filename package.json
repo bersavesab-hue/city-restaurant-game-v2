@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/main.js",
-    "test": "node --test"
+    "test": "node --test",
+    "stress": "node scripts/stress-longrun.mjs"
   }
 }
