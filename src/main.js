@@ -9,6 +9,16 @@ import { entitySystem } from "./core/EntitySystem.js";
 import { simulationSystem } from "./core/SimulationSystem.js";
 import { schedulerSystem } from "./core/SchedulerSystem.js";
 
+import { gameFoundationSystem } from "./systems/GameFoundationSystem.js";
+import { economicBaselineSystem } from "./systems/EconomicBaselineSystem.js";
+import { cityEconomySystem } from "./systems/CityEconomySystem.js";
+import { venueTypeSystem } from "./systems/VenueTypeSystem.js";
+import { propertyVenueSystem } from "./systems/PropertyVenueSystem.js";
+import { priceHistorySystem } from "./systems/PriceHistorySystem.js";
+import { trafficDemandIntegrationSystem } from "./systems/TrafficDemandIntegrationSystem.js";
+import { supplierPriceIntegrationSystem } from "./systems/SupplierPriceIntegrationSystem.js";
+import { mapViewportSystem } from "./systems/MapViewportSystem.js";
+
 import { restaurantSystem } from "./systems/RestaurantSystem.js";
 import { openingFlowSystem } from "./systems/OpeningFlowSystem.js";
 import { openingInventorySystem } from "./systems/OpeningInventorySystem.js";
@@ -43,7 +53,6 @@ import { customerSegmentSystem } from "./systems/CustomerSegmentSystem.js";
 import { customerChoiceSystem } from "./systems/CustomerChoiceSystem.js";
 import { customerExperienceSystem } from "./systems/CustomerExperienceSystem.js";
 import { reviewInsightSystem } from "./systems/ReviewInsightSystem.js";
-import { CUSTOMER_SEGMENTS } from "./data/customerSegments.js";
 import { orderSystem } from "./systems/OrderSystem.js";
 
 import { operatingScheduleSystem } from "./systems/OperatingScheduleSystem.js";
@@ -87,12 +96,10 @@ import { propertyLeaseMarketSystem } from "./systems/PropertyLeaseMarketSystem.j
 import { leaseSystem } from "./systems/LeaseSystem.js";
 
 function bootstrap() {
-  customerSegmentSystem.load(
-    CUSTOMER_SEGMENTS,
-    { overwrite: true }
-  );
-
-  operatingCycleSystem.register();
+  gameFoundationSystem.initialize({
+    seedProperties: false,
+    overwriteReferenceData: true
+  });
 
   return {
     core: {
@@ -107,6 +114,16 @@ function bootstrap() {
     },
 
     systems: {
+      gameFoundationSystem,
+      economicBaselineSystem,
+      cityEconomySystem,
+      venueTypeSystem,
+      propertyVenueSystem,
+      priceHistorySystem,
+      trafficDemandIntegrationSystem,
+      supplierPriceIntegrationSystem,
+      mapViewportSystem,
+
       restaurantSystem,
       openingFlowSystem,
       openingPermitSystem,
