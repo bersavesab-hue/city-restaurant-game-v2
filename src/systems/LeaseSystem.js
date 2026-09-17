@@ -38,11 +38,18 @@ function requireLease(id) {
   return lease;
 }
 
+function requireNonNegativeInteger(value, name) {
+  if (!Number.isInteger(value) || value < 0) {
+    throw new RangeError(`${name} must be non-negative`);
+  }
+}
+
 class LeaseSystem {
   sign({
     restaurantId,
     propertyId,
-    months = 12
+    months = 12,
+    commercialTerms = null
   }) {
     requireRestaurant(restaurantId);
 
@@ -77,13 +84,56 @@ class LeaseSystem {
       );
     }
 
+    const monthlyRent =
+      commercialTerms?.monthlyRent ??
+      property.monthlyRent;
+    const propertyFeeMonthly =
+      commercialTerms?.propertyFeeMonthly ??
+      0;
+    const transferFee =
+      commercialTerms?.transferFee ??
+      0;
+    const rentFreeDays =
+      commercialTerms?.rentFreeDays ??
+      0;
+
+    if (!Number.isInteger(monthlyRent) || monthlyRent <= 0) {
+      throw new RangeError("Monthly rent must be positive");
+    }
+
+    requireNonNegativeInteger(
+      propertyFeeMonthly,
+      "Property fee"
+    );
+    requireNonNegativeInteger(
+      transferFee,
+      "Transfer fee"
+    );
+    requireNonNegativeInteger(
+      rentFreeDays,
+      "Rent-free days"
+    );
+
+    if (rentFreeDays >= months * 30) {
+      throw new RangeError(
+        "Rent-free period must be shorter than lease term"
+      );
+    }
+
     const deposit =
-      property.monthlyRent *
+      monthlyRent *
       property.depositMonths;
+
+    const initialRent =
+      rentFreeDays > 0
+        ? 0
+        : monthlyRent;
 
     const upfront =
       deposit +
-      property.monthlyRent;
+      initialRent +
+      propertyFeeMonthly +
+      transferFee;
 
     if (
       financeSystem.getBalance(
@@ -101,12 +151,32 @@ class LeaseSystem {
       `铺位押金 ${property.name}`
     );
 
-    financeSystem.expense(
-      restaurantId,
-      property.monthlyRent,
-      FINANCE_CATEGORY.RENT,
-      `首月租金 ${property.name}`
-    );
+    if (transferFee > 0) {
+      financeSystem.expense(
+        restaurantId,
+        transferFee,
+        FINANCE_CATEGORY.OTHER,
+        `铺位转让费 ${property.name}`
+      );
+    }
+
+    if (propertyFeeMonthly > 0) {
+      financeSystem.expense(
+        restaurantId,
+        propertyFeeMonthly,
+        FINANCE_CATEGORY.UTILITIES,
+        `首月物业费 ${property.name}`
+      );
+    }
+
+    if (initialRent > 0) {
+      financeSystem.expense(
+        restaurantId,
+        monthlyRent,
+        FINANCE_CATEGORY.RENT,
+        `首月租金 ${property.name}`
+      );
+    }
 
     const time =
       gameState.getSection("time");
@@ -121,8 +191,13 @@ class LeaseSystem {
           restaurantId,
           propertyId,
 
-          monthlyRent:
-            property.monthlyRent,
+          monthlyRent,
+          propertyFeeMonthly,
+          transferFee,
+          rentFreeDays,
+          offerId:
+            commercialTerms?.offerId ??
+            null,
 
           deposit,
 
@@ -133,21 +208,47 @@ class LeaseSystem {
           startDay,
 
           nextRentDay:
-            startDay + 30,
+            startDay +
+            (rentFreeDays > 0
+              ? rentFreeDays
+              : 30),
+
+          nextPropertyFeeDay:
+            propertyFeeMonthly > 0
+              ? startDay + 30
+              : null,
 
           endDay:
             startDay +
             months * 30,
 
-          rentPayments: 1,
+          rentPayments:
+            initialRent > 0
+              ? 1
+              : 0,
+
+          propertyFeePayments:
+            propertyFeeMonthly > 0
+              ? 1
+              : 0,
 
           unpaidRent: 0,
+          unpaidPropertyFee: 0,
+
+          renewalCount: 0,
 
           startedAt:
             time.totalMinutes,
 
           lastRentDay:
-            startDay,
+            initialRent > 0
+              ? startDay
+              : null,
+
+          lastPropertyFeeDay:
+            propertyFeeMonthly > 0
+              ? startDay
+              : null,
 
           endedAt: null
         }
@@ -241,7 +342,7 @@ class LeaseSystem {
             nextRentDay,
 
             rentPayments:
-              lease.rentPayments + 1
+              (lease.rentPayments ?? 0) + 1
           }
         );
 
@@ -262,7 +363,7 @@ class LeaseSystem {
           nextRentDay,
 
           unpaidRent:
-            lease.unpaidRent +
+            (lease.unpaidRent ?? 0) +
             lease.monthlyRent
         }
       );
@@ -284,6 +385,159 @@ class LeaseSystem {
       paid: false,
       lease: updated
     };
+  }
+
+  chargePropertyFee(leaseId) {
+    const lease = requireLease(leaseId);
+
+    if (lease.status !== "active") {
+      throw new Error("Lease is not active");
+    }
+
+    if ((lease.propertyFeeMonthly ?? 0) <= 0) {
+      return {
+        paid: true,
+        lease
+      };
+    }
+
+    const dueDay = lease.nextPropertyFeeDay;
+
+    if (!Number.isInteger(dueDay)) {
+      return {
+        paid: true,
+        lease
+      };
+    }
+
+    const nextPropertyFeeDay = dueDay + 30;
+
+    if (
+      financeSystem.getBalance(lease.restaurantId) >=
+      lease.propertyFeeMonthly
+    ) {
+      financeSystem.expense(
+        lease.restaurantId,
+        lease.propertyFeeMonthly,
+        FINANCE_CATEGORY.UTILITIES,
+        `第${dueDay}日物业费`
+      );
+
+      return {
+        paid: true,
+        lease: entitySystem.update("lease", leaseId, {
+          lastPropertyFeeDay: dueDay,
+          nextPropertyFeeDay,
+          propertyFeePayments:
+            (lease.propertyFeePayments ?? 0) + 1
+        })
+      };
+    }
+
+    const updated = entitySystem.update("lease", leaseId, {
+      lastPropertyFeeDay: dueDay,
+      nextPropertyFeeDay,
+      unpaidPropertyFee:
+        (lease.unpaidPropertyFee ?? 0) +
+        lease.propertyFeeMonthly
+    });
+
+    eventBus.emit("lease:propertyFeeArrears", {
+      leaseId,
+      restaurantId: lease.restaurantId,
+      amount: lease.propertyFeeMonthly,
+      unpaidPropertyFee: updated.unpaidPropertyFee
+    });
+
+    return {
+      paid: false,
+      lease: updated
+    };
+  }
+
+  renew(
+    leaseId,
+    {
+      months = 12,
+      monthlyRent = null,
+      propertyFeeMonthly = null
+    } = {}
+  ) {
+    const lease = requireLease(leaseId);
+
+    if (lease.status !== "active") {
+      throw new Error("Lease is not active");
+    }
+
+    if (!Number.isInteger(months) || months <= 0) {
+      throw new RangeError("Renewal months must be positive");
+    }
+
+    const nextMonthlyRent =
+      monthlyRent ?? lease.monthlyRent;
+    const nextPropertyFee =
+      propertyFeeMonthly ??
+      lease.propertyFeeMonthly ??
+      0;
+
+    if (
+      !Number.isInteger(nextMonthlyRent) ||
+      nextMonthlyRent <= 0
+    ) {
+      throw new RangeError("Renewal monthly rent must be positive");
+    }
+
+    requireNonNegativeInteger(
+      nextPropertyFee,
+      "Renewal property fee"
+    );
+
+    const property = propertySystem.get(lease.propertyId);
+    const newDeposit =
+      nextMonthlyRent *
+      property.depositMonths;
+    const depositDifference =
+      newDeposit - lease.deposit;
+
+    if (depositDifference > 0) {
+      financeSystem.holdDeposit(
+        lease.restaurantId,
+        depositDifference,
+        "续租补足押金"
+      );
+    } else if (depositDifference < 0) {
+      financeSystem.releaseDeposit(
+        lease.restaurantId,
+        Math.abs(depositDifference),
+        "续租退还多余押金"
+      );
+    }
+
+    const updated = entitySystem.update(
+      "lease",
+      leaseId,
+      {
+        monthlyRent: nextMonthlyRent,
+        propertyFeeMonthly: nextPropertyFee,
+        deposit: newDeposit,
+        months: lease.months + months,
+        endDay: lease.endDay + months * 30,
+        renewalCount: (lease.renewalCount ?? 0) + 1,
+        lastRenewedDay:
+          gameState.getSection("time").day
+      }
+    );
+
+    eventBus.emit("lease:renewed", {
+      leaseId,
+      restaurantId: lease.restaurantId,
+      months,
+      monthlyRent: nextMonthlyRent,
+      propertyFeeMonthly: nextPropertyFee,
+      endDay: updated.endDay
+    });
+
+    return updated;
   }
 
   processDay(currentDay) {
@@ -313,6 +567,15 @@ class LeaseSystem {
           this.chargeMonthlyRent(
             lease.id
           ).lease;
+      }
+
+      while (
+        lease.status === "active" &&
+        Number.isInteger(lease.nextPropertyFeeDay) &&
+        lease.nextPropertyFeeDay < lease.endDay &&
+        currentDay >= lease.nextPropertyFeeDay
+      ) {
+        lease = this.chargePropertyFee(lease.id).lease;
       }
 
       if (
@@ -349,8 +612,13 @@ class LeaseSystem {
     let remainingDeposit =
       lease.deposit;
 
-    let remainingArrears =
+    let remainingRentArrears =
       lease.unpaidRent ?? 0;
+    let remainingPropertyFeeArrears =
+      lease.unpaidPropertyFee ?? 0;
+    let remainingArrears =
+      remainingRentArrears +
+      remainingPropertyFeeArrears;
 
     let depositApplied = 0;
 
@@ -368,14 +636,26 @@ class LeaseSystem {
         lease.restaurantId,
         depositApplied,
         FINANCE_CATEGORY.RENT,
-        "押金抵扣欠租"
+        "押金抵扣租赁欠款"
       );
 
       remainingDeposit -=
         depositApplied;
 
-      remainingArrears -=
-        depositApplied;
+      let remainingApplied = depositApplied;
+      const rentApplied = Math.min(
+        remainingRentArrears,
+        remainingApplied
+      );
+      remainingRentArrears -= rentApplied;
+      remainingApplied -= rentApplied;
+      remainingPropertyFeeArrears = Math.max(
+        0,
+        remainingPropertyFeeArrears - remainingApplied
+      );
+      remainingArrears =
+        remainingRentArrears +
+        remainingPropertyFeeArrears;
     }
 
     if (remainingDeposit > 0) {
@@ -409,6 +689,12 @@ class LeaseSystem {
             remainingDeposit,
 
           unpaidRent:
+            remainingRentArrears,
+
+          unpaidPropertyFee:
+            remainingPropertyFeeArrears,
+
+          unpaidLeaseCharges:
             remainingArrears
         }
       );
