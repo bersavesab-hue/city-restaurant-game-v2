@@ -1,5 +1,6 @@
 import { entitySystem } from "../core/EntitySystem.js";
 import { randomSystem } from "../core/RandomSystem.js";
+import { gameState } from "../core/GameState.js";
 import { districtSystem } from "./DistrictSystem.js";
 import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
 
@@ -57,6 +58,9 @@ class MarketCompetitionSystem {
       );
     }
 
+    const time =
+      gameState.getSection("time");
+
     const competitor =
       entitySystem.create(
         "competitor_store",
@@ -89,7 +93,24 @@ class MarketCompetitionSystem {
 
           segmentFocus,
 
-          active: true
+          active: true,
+
+          openedDay:
+            time.day,
+
+          closedDay: null,
+
+          ageDays: 0,
+
+          weakDays: 0,
+
+          strategy: "stable",
+
+          lastStrategyDay:
+            time.day,
+
+          lastProcessedDay:
+            null
         }
       );
 

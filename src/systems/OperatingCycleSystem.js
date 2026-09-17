@@ -12,6 +12,7 @@ import { periodArchiveSystem } from "./PeriodArchiveSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
 import { procurementSystem } from "./ProcurementSystem.js";
 import { autoProcurementSystem } from "./AutoProcurementSystem.js";
+import { competitorDynamicsSystem } from "./CompetitorDynamicsSystem.js";
 
 class OperatingCycleSystem {
   constructor() {
@@ -123,6 +124,11 @@ class OperatingCycleSystem {
                 restaurant.id
               );
           }
+
+          competitorDynamicsSystem
+            .processDay(
+              current.day
+            );
 
           leaseSystem.processDay(
             current.day
