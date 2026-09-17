@@ -213,6 +213,151 @@ class OrderSystem {
     return order;
   }
 
+  placeBulk({
+    restaurantId,
+    menuItemId,
+    portions,
+    orderCount,
+    chefId = null
+  }) {
+    financeSystem.getAccount(
+      restaurantId
+    );
+
+    if (
+      !Number.isInteger(portions) ||
+      portions <= 0 ||
+      !Number.isInteger(orderCount) ||
+      orderCount <= 0
+    ) {
+      throw new Error(
+        "Invalid bulk order"
+      );
+    }
+
+    const chef =
+      employeeWorkSystem.requireChef(
+        restaurantId,
+        chefId
+      );
+
+    const menuItem =
+      menuSystem.get(menuItemId);
+
+    if (
+      menuItem.restaurantId !==
+        restaurantId ||
+      !menuItem.active
+    ) {
+      throw new Error(
+        "Invalid menu item"
+      );
+    }
+
+    const recipe =
+      recipeSystem.get(
+        menuItem.recipeId
+      );
+
+    const cooking =
+      cookingSystem.cook({
+        restaurantId,
+        recipeId: recipe.id,
+        portions,
+        chefSkill:
+          chef.effectiveSkill
+      });
+
+    const totalRevenue =
+      menuItem.price * portions;
+
+    menuSystem.recordSale(
+      menuItem.id,
+      portions,
+      totalRevenue
+    );
+
+    const payment =
+      financeSystem.income(
+        restaurantId,
+        totalRevenue,
+        FINANCE_CATEGORY.SALES,
+        "长期模拟营业收入"
+      );
+
+    const time =
+      gameState.getSection("time");
+
+    const order =
+      entitySystem.create(
+        "customer_order",
+        {
+          restaurantId,
+          customerId: null,
+
+          aggregate: true,
+          orderCount,
+          status: "completed",
+
+          chefEmployeeId:
+            chef.employee.id,
+
+          chefSkill:
+            chef.effectiveSkill,
+
+          items: [
+            {
+              menuItemId:
+                menuItem.id,
+              dishId:
+                menuItem.dishId,
+              quantity:
+                portions,
+              unitPrice:
+                menuItem.price,
+              revenue:
+                totalRevenue,
+              cookingRecordId:
+                cooking.id,
+              qualityScore:
+                cooking.qualityScore
+            }
+          ],
+
+          totalRevenue,
+
+          ingredientCost:
+            cooking.ingredientCost,
+
+          grossProfit:
+            totalRevenue -
+            cooking.ingredientCost,
+
+          averageQuality:
+            cooking.qualityScore,
+
+          transactionId:
+            payment.transaction.id,
+
+          createdAt:
+            time.totalMinutes,
+
+          day:
+            time.day
+        }
+      );
+
+    eventBus.emit(
+      "order:completed",
+      {
+        order:
+          structuredClone(order)
+      }
+    );
+
+    return order;
+  }
+
   get(id) {
     const order = entitySystem.get("customer_order", id);
 

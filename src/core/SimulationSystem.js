@@ -55,7 +55,8 @@ class SimulationSystem {
     const allowedHooks = [
       "onMinute",
       "onHour",
-      "onDay"
+      "onDay",
+      "onLongDay"
     ];
 
     const hasHook = allowedHooks.some(
@@ -102,7 +103,9 @@ class SimulationSystem {
       hooks: {
         onMinute: hooks.onMinute,
         onHour: hooks.onHour,
-        onDay: hooks.onDay
+        onDay: hooks.onDay,
+        onLongDay:
+          hooks.onLongDay
       },
       priority,
       enabled: options.enabled ?? true
@@ -320,6 +323,96 @@ class SimulationSystem {
         )[0];
 
     return task?.dueAt ?? null;
+  }
+
+  advanceLongTerm(days = 1) {
+    if (
+      !Number.isInteger(days) ||
+      days <= 0
+    ) {
+      throw new RangeError(
+        "Long term days must be a positive integer"
+      );
+    }
+
+    let current =
+      timeSystem.getTime();
+
+    for (
+      let i = 0;
+      i < days;
+      i += 1
+    ) {
+      const previous =
+        timeSystem.getTime();
+
+      this.runHook(
+        "onLongDay",
+        {
+          previous,
+          current: previous,
+          deltaMinutes: 1440,
+          longTerm: true
+        }
+      );
+
+      current =
+        timeSystem.advance(
+          1440
+        );
+
+      const context = {
+        previous,
+        current,
+        deltaMinutes: 1440,
+        longTerm: true
+      };
+
+      this.runHook(
+        "onDay",
+        context
+      );
+
+      const simulation =
+        this.ensureState();
+
+      simulation.processedMinutes +=
+        1440;
+
+      simulation.processedHours +=
+        24;
+
+      simulation.processedDays +=
+        1;
+
+      gameState.setSection(
+        "simulation",
+        simulation,
+        "simulation:longDay"
+      );
+
+      eventBus.emit(
+        "simulation:dayProcessed",
+        {
+          time:
+            structuredClone(current),
+          longTerm: true
+        }
+      );
+    }
+
+    const simulation =
+      this.ensureState();
+
+    simulation.ticks += 1;
+
+    gameState.setSection(
+      "simulation",
+      simulation,
+      "simulation:longAdvance"
+    );
+
+    return current;
   }
 
   advanceFast(minutes = 1) {

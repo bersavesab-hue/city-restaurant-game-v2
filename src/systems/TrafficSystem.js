@@ -3,11 +3,175 @@ import { randomSystem } from "../core/RandomSystem.js";
 import { restaurantSystem } from "./RestaurantSystem.js";
 import { menuSystem } from "./MenuSystem.js";
 import { orderSystem } from "./OrderSystem.js";
+import { recipeSystem } from "./RecipeSystem.js";
+import { inventorySystem } from "./InventorySystem.js";
+import { operatingScheduleSystem } from "./OperatingScheduleSystem.js";
 import { employeeWorkSystem } from "./EmployeeWorkSystem.js";
 
 import { eventBus } from "../core/EventBus.js";
 
 class TrafficSystem {
+  getMaxPortions(restaurantId, recipeId) {
+    const recipe =
+      recipeSystem.get(recipeId);
+
+    let maximum = Infinity;
+
+    for (const ingredient of recipe.ingredients) {
+      const available =
+        inventorySystem.getAvailableQuantity(
+          restaurantId,
+          ingredient.ingredientId
+        );
+
+      maximum = Math.min(
+        maximum,
+        Math.floor(
+          available /
+          ingredient.quantity
+        )
+      );
+    }
+
+    return Number.isFinite(maximum)
+      ? Math.max(0, maximum)
+      : 0;
+  }
+
+  simulateDayAggregate(restaurantId) {
+    const schedule =
+      operatingScheduleSystem.get(
+        restaurantId
+      );
+
+    const menu =
+      menuSystem.listByRestaurant(
+        restaurantId,
+        { activeOnly: true }
+      );
+
+    const chef =
+      employeeWorkSystem.getBestChef(
+        restaurantId
+      );
+
+    if (
+      !schedule ||
+      !schedule.enabled ||
+      menu.length === 0 ||
+      !chef
+    ) {
+      return {
+        visitors: 0,
+        completedOrders: 0,
+        failedOrders: 0,
+        revenue: 0
+      };
+    }
+
+    const openHours =
+      schedule.closeHour -
+      schedule.openHour;
+
+    const capacity =
+      employeeWorkSystem
+        .getServiceCapacity(
+          restaurantId
+        ) *
+      openHours;
+
+    const visitors =
+      Math.min(
+        randomSystem.int(
+          openHours,
+          openHours * 4
+        ),
+        capacity
+      );
+
+    let completedOrders = 0;
+    let failedOrders = 0;
+    let revenue = 0;
+
+    const base =
+      Math.floor(
+        visitors / menu.length
+      );
+
+    let remainder =
+      visitors % menu.length;
+
+    for (const menuItem of menu) {
+      const orders =
+        base +
+        (remainder > 0 ? 1 : 0);
+
+      if (remainder > 0) {
+        remainder -= 1;
+      }
+
+      if (orders <= 0) {
+        continue;
+      }
+
+      const targetPortions =
+        randomSystem.int(
+          orders,
+          orders * 2
+        );
+
+      const portions =
+        Math.min(
+          targetPortions,
+          this.getMaxPortions(
+            restaurantId,
+            menuItem.recipeId
+          )
+        );
+
+      const successful =
+        Math.min(
+          orders,
+          portions
+        );
+
+      if (successful <= 0) {
+        failedOrders += orders;
+        continue;
+      }
+
+      try {
+        const order =
+          orderSystem.placeBulk({
+            restaurantId,
+            menuItemId:
+              menuItem.id,
+            portions,
+            orderCount:
+              successful
+          });
+
+        completedOrders +=
+          successful;
+
+        failedOrders +=
+          orders - successful;
+
+        revenue +=
+          order.totalRevenue;
+      } catch {
+        failedOrders += orders;
+      }
+    }
+
+    return {
+      visitors,
+      completedOrders,
+      failedOrders,
+      revenue
+    };
+  }
+
   simulateHour(
     restaurantId,
     {

@@ -66,6 +66,14 @@ class DailySettlementSystem {
               targetDay
         );
 
+    const orderCount =
+      orders.reduce(
+        (sum, order) =>
+          sum +
+          (order.orderCount ?? 1),
+        0
+      );
+
     const revenue =
       orders.reduce(
         (sum, order) =>
@@ -147,9 +155,9 @@ class DailySettlementSystem {
 
     let experience = 0;
 
-    if (orders.length > 0) {
+    if (orderCount > 0) {
       experience =
-        orders.length * 10 +
+        orderCount * 10 +
         Math.floor(
           revenue / 1000
         );
@@ -177,7 +185,7 @@ class DailySettlementSystem {
             employee.id,
             Math.max(
               1,
-              orders.length * 2
+              orderCount * 2
             )
           );
       }
@@ -210,7 +218,7 @@ class DailySettlementSystem {
             targetDay,
 
           orders:
-            orders.length,
+            orderCount,
 
           revenue,
 

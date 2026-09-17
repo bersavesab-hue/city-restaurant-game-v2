@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node src/main.js",
     "test": "node --test",
-    "stress": "node scripts/stress-longrun.mjs"
+    "stress": "node scripts/stress-longrun.mjs",
+    "stress20": "node scripts/stress-20year.mjs",
+    "aging": "node scripts/aging-performance.mjs"
   }
 }

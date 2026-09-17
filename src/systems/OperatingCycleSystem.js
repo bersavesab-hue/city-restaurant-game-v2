@@ -26,6 +26,28 @@ class OperatingCycleSystem {
     simulationSystem.register(
       "restaurant_operations",
       {
+        onLongDay: () => {
+          const restaurants =
+            entitySystem.list(
+              "restaurant"
+            );
+
+          for (
+            const restaurant
+            of restaurants
+          ) {
+            trafficSystem
+              .simulateDayAggregate(
+                restaurant.id
+              );
+
+            autoProcurementSystem
+              .processRestaurant(
+                restaurant.id
+              );
+          }
+        },
+
         onHour: ({ current }) => {
           const restaurants =
             entitySystem.list(
