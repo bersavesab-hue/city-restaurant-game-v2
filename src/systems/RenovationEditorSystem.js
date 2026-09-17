@@ -72,6 +72,17 @@ class RenovationEditorSystem {
     return "decor";
   }
 
+  getSessionFloor(session, floorId = null) {
+    const id = floorId ?? session.activeFloorId;
+    const floor = session.floors.find(item => item.id === id);
+
+    if (!floor) {
+      throw new Error(`Renovation floor "${id}" does not exist`);
+    }
+
+    return floor;
+  }
+
   open(restaurantId) {
     restaurantSystem.get(restaurantId);
 
@@ -79,16 +90,27 @@ class RenovationEditorSystem {
       renovationSystem.requireLayout(
         restaurantId
       );
+    const floors = clone(
+      renovationSystem.getLayoutFloors(layout)
+    );
+    const activeFloorId =
+      layout.activeFloorId ?? floors[0].id;
+    const activeFloor = floors.find(
+      item => item.id === activeFloorId
+    ) ?? floors[0];
 
     const session = {
       restaurantId,
       layoutId: layout.id,
+      propertyId: layout.propertyId ?? null,
       baselineRevision:
         layout.revision ?? 1,
       originalActive:
         Boolean(layout.active),
-      width: layout.width,
-      height: layout.height,
+      floors,
+      activeFloorId: activeFloor.id,
+      width: activeFloor.width,
+      height: activeFloor.height,
       placements:
         clone(layout.placements ?? []),
       nextDraftNumber: 1,
@@ -128,6 +150,17 @@ class RenovationEditorSystem {
     return session;
   }
 
+  setActiveFloor(restaurantId, floorId) {
+    const session = this.requireSession(restaurantId);
+    const floor = this.getSessionFloor(session, floorId);
+
+    session.activeFloorId = floor.id;
+    session.width = floor.width;
+    session.height = floor.height;
+
+    return this.getPageState(restaurantId);
+  }
+
   getDraftLayout(restaurantId) {
     const session =
       this.requireSession(
@@ -137,6 +170,10 @@ class RenovationEditorSystem {
     return {
       id: session.layoutId,
       restaurantId,
+      propertyId: session.propertyId,
+      floors: clone(session.floors),
+      floorCount: session.floors.length,
+      activeFloorId: session.activeFloorId,
       width: session.width,
       height: session.height,
       active: false,
@@ -202,6 +239,10 @@ class RenovationEditorSystem {
       );
 
     const temporary = {
+      propertyId: session.propertyId,
+      floors: clone(session.floors),
+      floorCount: session.floors.length,
+      activeFloorId: session.activeFloorId,
       width: session.width,
       height: session.height,
       placements: []
@@ -291,18 +332,24 @@ class RenovationEditorSystem {
     {
       x,
       y,
-      rotation = 0
+      rotation = 0,
+      floorId = null
     }
   ) {
     const session =
       this.requireSession(
         restaurantId
       );
+    const targetFloor = this.getSessionFloor(
+      session,
+      floorId ?? session.activeFloorId
+    );
 
     const placement = {
       id:
         `draft_${session.nextDraftNumber}`,
       furnitureId,
+      floorId: targetFloor.id,
       x,
       y,
       rotation,
@@ -373,6 +420,40 @@ class RenovationEditorSystem {
     return this.getPageState(
       restaurantId
     );
+  }
+
+  moveItemToFloor(
+    restaurantId,
+    placementId,
+    floorId,
+    x,
+    y
+  ) {
+    const session = this.requireSession(restaurantId);
+    const floor = this.getSessionFloor(session, floorId);
+    let found = false;
+
+    const next = session.placements.map(item => {
+      if (item.id !== placementId) {
+        return item;
+      }
+
+      found = true;
+      return {
+        ...item,
+        floorId: floor.id,
+        x,
+        y
+      };
+    });
+
+    if (!found) {
+      throw new Error(`Placement "${placementId}" does not exist`);
+    }
+
+    this.validateDraft(restaurantId, next);
+    session.placements = next;
+    return this.getPageState(restaurantId);
   }
 
   rotateItem(
@@ -472,6 +553,20 @@ class RenovationEditorSystem {
       );
     }
 
+    const floors = clone(
+      renovationSystem.getLayoutFloors(layout)
+    );
+    const activeFloorId =
+      layout.activeFloorId ?? floors[0].id;
+    const activeFloor = floors.find(
+      item => item.id === activeFloorId
+    ) ?? floors[0];
+
+    session.propertyId = layout.propertyId ?? null;
+    session.floors = floors;
+    session.activeFloorId = activeFloor.id;
+    session.width = activeFloor.width;
+    session.height = activeFloor.height;
     session.baselineRevision =
       layout.revision ?? 1;
     session.originalActive =
@@ -508,10 +603,18 @@ class RenovationEditorSystem {
           ])
       );
 
+    const offFloor = session.placements.filter(
+      item =>
+        (item.floorId ?? session.floors[0].id) !==
+        session.activeFloorId
+    );
     const planned = [];
     let draftNumber = 1;
 
     const workingLayout = {
+      propertyId: session.propertyId,
+      floors: clone(session.floors),
+      activeFloorId: session.activeFloorId,
       width: session.width,
       height: session.height,
       placements: []
@@ -531,42 +634,51 @@ class RenovationEditorSystem {
         continue;
       }
 
-      const candidate =
+      const candidates =
         renovationPlanningSystem
           .getCandidateCoordinates(
             workingLayout,
             furnitureId
-          )
-          .find(
-            item =>
-              !renovationPlanningSystem
-                .overlaps(
-                  item,
-                  planned
-                )
           );
 
-      if (!candidate) {
+      let chosen = null;
+
+      for (const candidate of candidates) {
+        const placement = {
+          id: `draft_${draftNumber}`,
+          ...candidate,
+          floorId: session.activeFloorId,
+          draftNew: true
+        };
+
+        try {
+          this.validateDraft(
+            restaurantId,
+            [...offFloor, ...planned, placement]
+          );
+          chosen = placement;
+          break;
+        } catch {
+          chosen = null;
+        }
+      }
+
+      if (!chosen) {
         continue;
       }
 
-      planned.push({
-        id: `draft_${draftNumber}`,
-        ...candidate,
-        draftNew: true
-      });
-
-      workingLayout.placements =
-        planned;
+      planned.push(chosen);
+      workingLayout.placements = planned;
       draftNumber += 1;
     }
 
+    const combined = [...offFloor, ...planned];
     this.validateDraft(
       restaurantId,
-      planned
+      combined
     );
 
-    return planned;
+    return combined;
   }
 
   previewTemplate(
@@ -687,6 +799,10 @@ class RenovationEditorSystem {
     const layout = {
       id: session.layoutId,
       restaurantId,
+      propertyId: session.propertyId,
+      floors: clone(session.floors),
+      floorCount: session.floors.length,
+      activeFloorId: session.activeFloorId,
       width: session.width,
       height: session.height,
       active: false,
@@ -769,15 +885,31 @@ class RenovationEditorSystem {
       this.requireSession(
         restaurantId
       );
+    const activeFloor =
+      this.getSessionFloor(session);
+    const activePlacements =
+      session.placements.filter(
+        item =>
+          (item.floorId ?? session.floors[0].id) ===
+          session.activeFloorId
+      );
+    const analysis = this.getAnalysis(restaurantId);
 
     return {
       restaurantId,
       layout: {
         id: session.layoutId,
+        propertyId: session.propertyId,
         width: session.width,
         height: session.height,
+        floorCount: session.floors.length,
+        activeFloorId: session.activeFloorId,
+        activeFloor: clone(activeFloor),
+        floors: clone(session.floors),
         placements:
-          clone(session.placements),
+          clone(activePlacements),
+        totalPlacements:
+          session.placements.length,
         baselineRevision:
           session.baselineRevision,
         originallyActive:
@@ -791,19 +923,16 @@ class RenovationEditorSystem {
         this.getBudget(
           restaurantId
         ),
-      analysis:
-        this.getAnalysis(
-          restaurantId
-        ),
+      analysis,
       templates:
         renovationPlanningSystem
           .getTemplates(),
       actions: {
         canSave: true,
+        canSwitchFloor:
+          session.floors.length > 1,
         canActivate:
-          this.getAnalysis(
-            restaurantId
-          ).scores
+          analysis.scores
             .completeness === 100
       }
     };
@@ -858,6 +987,10 @@ class RenovationEditorSystem {
 
     const previewLayout = {
       ...liveLayout,
+      floors: clone(session.floors),
+      activeFloorId: session.activeFloorId,
+      width: session.width,
+      height: session.height,
       placements:
         session.placements
     };
@@ -906,12 +1039,15 @@ class RenovationEditorSystem {
       liveLayout.nextPlacementNumber ??
       1;
 
+    const defaultFloorId = session.floors[0].id;
     const placements =
       session.placements.map(
         item => {
           const clean = {
             furnitureId:
               item.furnitureId,
+            floorId:
+              item.floorId ?? defaultFloorId,
             x: item.x,
             y: item.y,
             rotation:
@@ -933,11 +1069,17 @@ class RenovationEditorSystem {
     const time =
       gameState.getSection("time");
 
+    const activeFloor = this.getSessionFloor(session);
     const updated =
       entitySystem.update(
         "renovation_layout",
         liveLayout.id,
         {
+          floors: clone(session.floors),
+          floorCount: session.floors.length,
+          activeFloorId: session.activeFloorId,
+          width: activeFloor.width,
+          height: activeFloor.height,
           placements,
           nextPlacementNumber:
             nextNumber,
@@ -966,7 +1108,9 @@ class RenovationEditorSystem {
         activate:
           Boolean(activate),
         purchaseCost:
-          budget.purchaseCost
+          budget.purchaseCost,
+        floorCount:
+          session.floors.length
       }
     );
 
