@@ -14,6 +14,7 @@ on:
       - "scripts/build-android-js.mjs"
       - "scripts/phase2-gate.mjs"
       - "scripts/phase3-balance-gate.mjs"
+      - "scripts/phase3-longrun-gate.mjs"
       - "tests/**"
       - "package.json"
       - "package-lock.json"
@@ -43,7 +44,7 @@ jobs:
       - name: Run playable-flow gate
         run: npm run test:phase2
 
-      - name: Run phase3 balance gate
+      - name: Run phase3 90-day balance gate
         run: npm run test:phase3:balance
 
       - name: Build Android web bundle
