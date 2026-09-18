@@ -1029,7 +1029,6 @@ class TrafficDemandSystem {
             .playerAppealMultiplier *
           positioningFactor *
           segmentRetentionFactor *
-          memberRetentionFactor *
           dishPrestigeFactor *
           renovationAppealFactor,
           0.2,
