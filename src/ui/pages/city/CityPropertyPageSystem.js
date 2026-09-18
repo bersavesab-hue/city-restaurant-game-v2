@@ -228,6 +228,17 @@ class CityPropertyPageSystem {
         enriched.venueTypeId ??
         null,
 
+      venueTypeName:
+        enriched.venueTypeId
+          ? (
+              venueTypeSystem
+                .get(
+                  enriched.venueTypeId
+                )?.name ??
+              enriched.venueTypeId
+            )
+          : null,
+
       recommendedVenueTypes:
         structuredClone(
           recommendedVenueTypes
