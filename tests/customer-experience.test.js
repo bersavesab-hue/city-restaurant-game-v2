@@ -130,3 +130,41 @@ test(
     );
   }
 );
+
+
+test(
+  "门店声望公共接口始终限制在0到100",
+  () => {
+    const restaurant =
+      restaurantSystem.create({
+        name:
+          "声望边界测试店"
+      });
+
+    restaurantSystem
+      .changeReputation(
+        restaurant.id,
+        250
+      );
+
+    assert.equal(
+      restaurantSystem.get(
+        restaurant.id
+      ).reputation,
+      100
+    );
+
+    restaurantSystem
+      .changeReputation(
+        restaurant.id,
+        -500
+      );
+
+    assert.equal(
+      restaurantSystem.get(
+        restaurant.id
+      ).reputation,
+      0
+    );
+  }
+);
