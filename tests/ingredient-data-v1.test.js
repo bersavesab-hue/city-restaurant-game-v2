@@ -8,7 +8,8 @@ import {
 
 import {
   INGREDIENT_CATEGORY,
-  INGREDIENT_QUALITY_LABELS
+  INGREDIENT_QUALITY_LABELS,
+  DEFAULT_INGREDIENT_BATCH_QUALITY
 } from "../src/data/ingredientRules.js";
 
 import {
@@ -127,10 +128,26 @@ test(
 
 
     assert.equal(
+      INGREDIENT_DATASET_META
+        .schemaVersion,
+      2
+    );
+
+
+    assert.equal(
+      DEFAULT_INGREDIENT_BATCH_QUALITY,
+      3
+    );
+
+
+    assert.equal(
       INGREDIENTS_V1.every(
         item =>
-          item.baseQuality ===
-          3
+          !Object.prototype
+            .hasOwnProperty.call(
+              item,
+              "baseQuality"
+            )
       ),
       true
     );
@@ -147,6 +164,16 @@ test(
             "string"
       ),
       true
+    );
+
+
+    assert.throws(
+      () =>
+        validateIngredient({
+          ...INGREDIENTS_V1[0],
+          baseQuality: 3
+        }),
+      /quality belongs to inventory batches/
     );
   }
 );
