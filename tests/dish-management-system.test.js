@@ -110,7 +110,7 @@ test(
 
     assert.equal(
       detail.lifecycle
-        .tier.name,
+        .rank.name,
       "家常"
     );
 
