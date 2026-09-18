@@ -121,7 +121,7 @@ function createReadyRestaurant(
     y: 0
   });
 
-  renovationSystem.activate(
+  renovationSystem.activateLayout(
     restaurant.id
   );
 
