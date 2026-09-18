@@ -274,6 +274,48 @@ class RecipeSystem {
         dishId
     );
   }
+
+  getOperationalRequirements(
+    recipeId
+  ) {
+    const recipe =
+      this.get(
+        recipeId
+      );
+
+    if (!recipe) {
+      throw new Error(
+        `Recipe "${recipeId}" does not exist`
+      );
+    }
+
+    const method =
+      COOKING_METHOD_MAP[
+        recipe.method
+      ];
+
+    if (!method) {
+      throw new Error(
+        `Recipe "${recipeId}" has unknown cooking method`
+      );
+    }
+
+    return {
+      recipeId:
+        recipe.id,
+
+      methodId:
+        method.id,
+
+      requiresExhaust:
+        method.requiresExhaust,
+
+      equipmentCapabilities: [
+        ...method
+          .equipmentCapabilities
+      ]
+    };
+  }
 }
 
 export const recipeSystem =
