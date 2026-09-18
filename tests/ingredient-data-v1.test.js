@@ -239,9 +239,6 @@ test(
           unit:
             "g",
 
-          baseQuality:
-            3,
-
           storageType:
             "chilled",
 
