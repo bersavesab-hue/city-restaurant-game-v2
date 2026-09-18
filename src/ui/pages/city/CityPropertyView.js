@@ -31,6 +31,7 @@ export class CityPropertyView {
     this.selectedPropertyId = null;
     this.months = 12;
     this.offerId = null;
+    this.currentFilters = {};
   }
 
   mount(
@@ -59,6 +60,10 @@ export class CityPropertyView {
 
   renderMarketplace(filters = {}) {
     this.offerId = null;
+    this.currentFilters = {
+      ...filters
+    };
+
     const model = this.pageSystem.getMarketplace({
       restaurantId: this.restaurantId,
       ...filters
@@ -120,12 +125,54 @@ export class CityPropertyView {
       </div>
     `;
 
-    const list = el("section", "cr-property-list");
-    if (model.properties.length === 0) {
-      list.append(el("div", "cr-property-empty", "当前筛选条件下没有可租房源"));
+    const list =
+      el(
+        "section",
+        "cr-property-list"
+      );
+
+    const visibleProperties =
+      filters.districtId
+        ? model.properties
+        : model.properties.slice(
+            0,
+            30
+          );
+
+    if (
+      model.properties.length ===
+      0
+    ) {
+      list.append(
+        el(
+          "div",
+          "cr-property-empty",
+          "当前筛选条件下没有可租房源"
+        )
+      );
     }
 
-    for (const property of model.properties) {
+    if (
+      !filters.districtId &&
+      model.properties.length >
+        visibleProperties.length
+    ) {
+      const notice =
+        el(
+          "div",
+          "cr-property-list-notice",
+          `当前显示推荐前${visibleProperties.length}套，共${model.properties.length}套；选择上方商圈可查看该商圈全部房源。`
+        );
+
+      list.append(
+        notice
+      );
+    }
+
+    for (
+      const property
+      of visibleProperties
+    ) {
       const card = el("button", "cr-property-card");
       card.type = "button";
       const marketBadges = property.source === "market"
@@ -225,7 +272,13 @@ export class CityPropertyView {
 
     const back = el("button", "cr-property-back", "← 返回房源列表");
     back.type = "button";
-    back.addEventListener("click", () => this.renderMarketplace());
+    back.addEventListener(
+      "click",
+      () =>
+        this.renderMarketplace(
+          this.currentFilters
+        )
+    );
 
     const shell = el("section", "cr-property-detail");
     shell.innerHTML = `
