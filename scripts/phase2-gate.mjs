@@ -48,6 +48,7 @@ const tests = [
   "tests/dish-growth.test.js",
   "tests/dish-lifecycle.test.js",
   "tests/dish-research-preview.test.js",
+  "tests/formal-supplier-data.test.js",
   "tests/supply-management.test.js",
   "tests/employee-management-ui.test.js",
   "tests/existing-page-entry-points.test.js",
