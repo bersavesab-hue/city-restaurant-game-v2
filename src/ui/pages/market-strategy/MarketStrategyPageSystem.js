@@ -109,6 +109,68 @@ class MarketStrategyPageSystem {
   getPositioningOptions(
     restaurantId
   ) {
+    if (
+      typeof this.positioning
+        .getOptions ===
+      "function"
+    ) {
+      return this.positioning
+        .getOptions(
+          restaurantId
+        )
+        .map(
+          item => ({
+            id:
+              item.positioningId,
+            name:
+              item.positioningName,
+            description:
+              item.description ?? "",
+            targetSegments:
+              structuredClone(
+                item.targetSegments ??
+                {}
+              ),
+            priceRange:
+              [
+                ...(
+                  item.priceRange ??
+                  [1, 1]
+                )
+              ],
+            categoryFit:
+              item.categoryFit ?? 1,
+            priceFit:
+              item.priceFit ?? 1,
+            districtFit:
+              item.districtFit ?? 1,
+            venueFit:
+              item.venueFit ?? 1,
+            renovationFit:
+              item.renovationFit ?? 1,
+            marketingFit:
+              item.marketingFit ?? 1,
+            competitionFit:
+              item.competitionFit ?? 1,
+            fitScore:
+              item.fitScore ?? 100,
+            minRestaurantLevel:
+              item.minRestaurantLevel ?? 1,
+            canSelect:
+              item.availability
+                ?.canSelect !== false,
+            lockedReasons:
+              [
+                ...(
+                  item.availability
+                    ?.reasons ??
+                  []
+                )
+              ]
+          })
+        );
+    }
+
     return this.positioning
       .getAvailable()
       .map(
@@ -153,42 +215,46 @@ class MarketStrategyPageSystem {
               )
             );
 
-
           return {
             id:
               definition.id,
-
             name:
               definition.name,
-
+            description:
+              definition.description ?? "",
             targetSegments:
               structuredClone(
                 definition
                   .targetSegments
               ),
-
             priceRange:
               [
                 ...definition
                   .priceRange
               ],
-
             categoryFit:
               round1(
                 categoryFit
               ),
-
             priceFit:
               round1(
                 priceFit
               ),
-
             districtFit:
               round1(
                 districtFit
               ),
-
-            fitScore
+            venueFit: 1,
+            renovationFit: 1,
+            marketingFit: 1,
+            competitionFit: 1,
+            fitScore,
+            minRestaurantLevel:
+              definition
+                .minRestaurantLevel ??
+              1,
+            canSelect: true,
+            lockedReasons: []
           };
         }
       )
