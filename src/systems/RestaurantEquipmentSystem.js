@@ -23,6 +23,7 @@ import {
 
 import {
   EQUIPMENT_CAPABILITIES,
+  getEquipmentTier,
   validateEquipmentDefinition
 } from "../data/equipmentRules.js";
 
@@ -75,15 +76,38 @@ class RestaurantEquipmentSystem {
   }
 
 
-  getDefinitions() {
-    return EQUIPMENT_V1.map(
-      item => ({
-        ...item,
-        capabilities: [
-          ...item.capabilities
-        ]
-      })
-    );
+  getDefinitions({
+    storeLevel = null,
+    equipmentKind = null
+  } = {}) {
+    return EQUIPMENT_V1
+      .filter(
+        item =>
+          (
+            storeLevel === null ||
+            item.unlockLevel <=
+              storeLevel
+          ) &&
+          (
+            equipmentKind === null ||
+            item.equipmentKind ===
+              equipmentKind
+          )
+      )
+      .map(
+        item => ({
+          ...item,
+
+          tier:
+            getEquipmentTier(
+              item.capabilityTier
+            ),
+
+          capabilities: [
+            ...item.capabilities
+          ]
+        })
+      );
   }
 
 
@@ -991,6 +1015,11 @@ class RestaurantEquipmentSystem {
 
       capacity:
         limits,
+
+      capabilityCoverage:
+        this.getCapabilityCoverage(
+          restaurantId
+        ),
 
       equipment:
         rows
