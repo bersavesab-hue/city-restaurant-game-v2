@@ -174,7 +174,7 @@ test(
         ingredientCost:
           2000,
 
-        qualityScore:
+        outputQualityScore:
           85
       });
 
@@ -225,22 +225,22 @@ test(
 
     assert.equal(
       order.channelPackagingCost,
-      180
+      4
     );
 
     assert.equal(
       order.channelFees,
-      1980
+      1804
     );
 
     assert.equal(
       order.channelNetRevenue,
-      8020
+      8196
     );
 
     assert.equal(
       order.grossProfit,
-      6020
+      6196
     );
 
     assert.equal(
@@ -248,7 +248,7 @@ test(
         restaurant.id
       ),
       balanceBefore +
-      8020
+      8196
     );
 
     const commission =
@@ -277,7 +277,7 @@ test(
 
     assert.equal(
       packaging.amount,
-      180
+      4
     );
 
     const dashboard =
@@ -305,7 +305,7 @@ test(
 
     assert.equal(
       delivery.lifetimeNetRevenue,
-      8020
+      8196
     );
 
     assert.equal(
@@ -321,7 +321,7 @@ test(
 
     assert.equal(
       delivery.performance.profit,
-      6020
+      6196
     );
   }
 );
