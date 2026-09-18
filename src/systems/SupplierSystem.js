@@ -3,6 +3,13 @@ import { eventBus } from "../core/EventBus.js";
 import { randomSystem } from "../core/RandomSystem.js";
 import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 
+import {
+  SUPPLIER_CAPABILITY_TIER,
+  SUPPLIER_TYPE,
+  SUPPLIER_PROCUREMENT_GROUPS,
+  validateSupplierTemplate
+} from "../data/supplierRules.js";
+
 const SUPPLIER_STATUS = Object.freeze({
   ACTIVE: "active",
   SUSPENDED: "suspended"
@@ -27,7 +34,17 @@ function requireSupplier(id) {
 
 class SupplierSystem {
   create({
+    id = null,
+    templateId = null,
     name,
+    capabilityTier = "T1",
+    supplierType =
+      SUPPLIER_TYPE.COMPREHENSIVE,
+    supplyGroups = [
+      ...SUPPLIER_PROCUREMENT_GROUPS
+    ],
+    unlockLevel = 1,
+    maxCreditDays = 0,
     relationship = 50,
     reliability = 80
   }) {
@@ -60,17 +77,93 @@ class SupplierSystem {
       );
     }
 
+    if (
+      !SUPPLIER_CAPABILITY_TIER[
+        capabilityTier
+      ]
+    ) {
+      throw new Error(
+        "Invalid supplier capabilityTier"
+      );
+    }
+
+    if (
+      !Object.values(
+        SUPPLIER_TYPE
+      ).includes(
+        supplierType
+      )
+    ) {
+      throw new Error(
+        "Invalid supplierType"
+      );
+    }
+
+    if (
+      !Array.isArray(
+        supplyGroups
+      ) ||
+      supplyGroups.length === 0 ||
+      supplyGroups.some(
+        group =>
+          !SUPPLIER_PROCUREMENT_GROUPS.includes(
+            group
+          )
+      )
+    ) {
+      throw new Error(
+        "Invalid supplier supplyGroups"
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        unlockLevel
+      ) ||
+      unlockLevel < 1 ||
+      unlockLevel > 10
+    ) {
+      throw new RangeError(
+        "unlockLevel must be between 1 and 10"
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        maxCreditDays
+      ) ||
+      maxCreditDays < 0 ||
+      maxCreditDays > 60
+    ) {
+      throw new RangeError(
+        "maxCreditDays must be between 0 and 60"
+      );
+    }
+
     const supplier =
       entitySystem.create(
         "supplier",
         {
+          templateId,
           name: name.trim(),
           status:
             SUPPLIER_STATUS.ACTIVE,
+          capabilityTier,
+          supplierType,
+          supplyGroups: [
+            ...supplyGroups
+          ],
+          unlockLevel,
+          maxCreditDays,
           relationship,
           reliability,
           offers: {}
-        }
+        },
+        id
+          ? {
+              id
+            }
+          : undefined
       );
 
     eventBus.emit(
@@ -86,6 +179,98 @@ class SupplierSystem {
 
   get(id) {
     return requireSupplier(id);
+  }
+
+  upsertTemplate(
+    template,
+    {
+      offers = null
+    } = {}
+  ) {
+    validateSupplierTemplate(
+      template
+    );
+
+    const existing =
+      entitySystem.get(
+        "supplier",
+        template.id
+      );
+
+    const staticFields = {
+      templateId:
+        template.id,
+      name:
+        template.name,
+      capabilityTier:
+        template.capabilityTier,
+      supplierType:
+        template.supplierType,
+      supplyGroups: [
+        ...template.supplyGroups
+      ],
+      unlockLevel:
+        template.unlockLevel,
+      maxCreditDays:
+        template.maxCreditDays,
+      reliability:
+        template.reliability
+    };
+
+    if (offers) {
+      staticFields.offers =
+        structuredClone(
+          offers
+        );
+    }
+
+    if (existing) {
+      return entitySystem.update(
+        "supplier",
+        existing.id,
+        staticFields
+      );
+    }
+
+    const created =
+      this.create({
+        id:
+          template.id,
+        templateId:
+          template.id,
+        name:
+          template.name,
+        capabilityTier:
+          template.capabilityTier,
+        supplierType:
+          template.supplierType,
+        supplyGroups:
+          template.supplyGroups,
+        unlockLevel:
+          template.unlockLevel,
+        maxCreditDays:
+          template.maxCreditDays,
+        relationship:
+          template
+            .initialRelationship,
+        reliability:
+          template.reliability
+      });
+
+    if (!offers) {
+      return created;
+    }
+
+    return entitySystem.update(
+      "supplier",
+      created.id,
+      {
+        offers:
+          structuredClone(
+            offers
+          )
+      }
+    );
   }
 
   list({
