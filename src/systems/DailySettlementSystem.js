@@ -8,6 +8,9 @@ import {
 
 import { employeeSystem } from "./EmployeeSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
+import {
+  calculateStoreExperience
+} from "../data/storeProgressionRules.js";
 import { districtEventSystem } from "./DistrictEventSystem.js";
 import { eventBus } from "../core/EventBus.js";
 
@@ -187,15 +190,18 @@ class DailySettlementSystem {
       }
     }
 
-    let experience = 0;
+    const experienceBreakdown =
+      calculateStoreExperience({
+        orders:
+          orderCount,
+        revenue
+      });
+
+    const experience =
+      experienceBreakdown
+        .total;
 
     if (orderCount > 0) {
-      experience =
-        orderCount * 10 +
-        Math.floor(
-          revenue / 1000
-        );
-
       if (experience > 0) {
         storeProgressSystem
           .addExperience(
@@ -286,7 +292,12 @@ class DailySettlementSystem {
             payrollPaid,
 
           experienceGained:
-            experience
+            experience,
+
+          experienceBreakdown:
+            structuredClone(
+              experienceBreakdown
+            )
         }
       );
 
