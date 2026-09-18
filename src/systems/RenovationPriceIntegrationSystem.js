@@ -9,20 +9,55 @@ class RenovationPriceIntegrationSystem {
   }
 
   applyReference(item) {
-    const reference = economicBaselineSystem.getFurnitureReference(item.id);
-    if (!Number.isFinite(reference)) {
+    const reference =
+      economicBaselineSystem
+        .getFurnitureReferenceDetail(
+          item.id
+        );
+
+    if (
+      !reference ||
+      !Number.isFinite(
+        reference.price
+      )
+    ) {
       return item;
     }
 
-    const macro = economicBaselineSystem.getSnapshot().macro?.[
-      item.type === "decor" ? "renovationIndex" : "equipmentIndex"
-    ] ?? 1;
+    const macro =
+      economicBaselineSystem
+        .getSnapshot()
+        .macro?.[
+          item.type ===
+          "decor"
+            ? "renovationIndex"
+            : "equipmentIndex"
+        ] ??
+      1;
 
     return {
       ...item,
-      originalGameCost: item.cost,
-      cost: Math.max(1, Math.round(reference * macro)),
-      costModel: "reality_baseline_v1"
+
+      originalGameCost:
+        item.cost,
+
+      cost:
+        Math.max(
+          1,
+          Math.round(
+            reference.price *
+            macro
+          )
+        ),
+
+      costModel:
+        "reality_1_to_1_v2",
+
+      costCurrency:
+        "CNY",
+
+      costReference:
+        reference
     };
   }
 
