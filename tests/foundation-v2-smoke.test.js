@@ -22,7 +22,7 @@ test("V2 foundation loads expanded city, customer groups and venue types", () =>
     overwriteReferenceData: true
   });
 
-  assert.equal(districtSystem.getAll().length, 10);
+  assert.equal(districtSystem.getAll().length, 20);
   assert.ok(customerSegmentSystem.getAll().length >= 10);
   assert.ok(venueTypeSystem.getAll().length >= 15);
 
