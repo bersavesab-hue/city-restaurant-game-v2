@@ -49,6 +49,10 @@ import {
   marketActionSystem
 } from "../src/systems/MarketActionSystem.js";
 
+import {
+  dishLifecycleSystem
+} from "../src/systems/DishLifecycleSystem.js";
+
 test(
   "外卖订单自动扣除平台佣金和包装费并进入渠道经营统计与财务",
   () => {
@@ -115,6 +119,10 @@ test(
       () => ({
         priceMultiplier: 1
       });
+
+    dishLifecycleSystem
+      .recordService =
+      () => null;
 
     menuSystem.get =
       () => ({
