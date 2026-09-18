@@ -12,6 +12,8 @@ on:
       - "assets/**"
       - "android/**"
       - "scripts/build-android-js-v2.mjs"
+      - "scripts/phase2-gate.mjs"
+      - "tests/**"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/android-v2-playtest.yml"
@@ -35,6 +37,9 @@ jobs:
 
       - name: Run V2 foundation smoke tests
         run: node --test tests/foundation-v2-smoke.test.js tests/business-causality.test.js tests/pricing-decision-impact.test.js tests/reality-pricing.test.js tests/business-analytics-causality-ui.test.js
+
+      - name: Run Phase 2 playable-flow gate
+        run: npm run test:phase2
 
       - name: Build V2 game bundle
         run: npm run build:android-js
