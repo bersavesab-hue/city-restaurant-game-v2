@@ -255,3 +255,13 @@ export {
   marketStrategyView,
   MarketStrategyView
 } from "./pages/market-strategy/index.js";
+
+
+export {
+  storeProgressPageSystem,
+  StoreProgressPageSystem,
+  FEATURE_NAMES,
+  featureName,
+  storeProgressView,
+  StoreProgressView
+} from "./pages/progress/index.js";
