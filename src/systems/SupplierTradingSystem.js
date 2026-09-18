@@ -710,24 +710,14 @@ class SupplierTradingSystem {
     restaurantId
   ) {
     const involved =
-      new Set();
-
-    for (
-      const supplier
-      of supplierSystem.list()
-    ) {
-      for (
-        const offer
-        of supplierSystem
-          .listOffers(
-            supplier.id
+      new Set(
+        ingredientCatalogSystem
+          .getAll()
+          .map(
+            ingredient =>
+              ingredient.id
           )
-      ) {
-        involved.add(
-          offer.ingredientId
-        );
-      }
-    }
+      );
 
     for (
       const item
