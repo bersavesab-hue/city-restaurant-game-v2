@@ -166,7 +166,7 @@ export const VENUE_TYPES_V2 =
         student: 1.4,
         office_worker: 0.78,
         resident: 0.72,
-        value_hunter: 1
+        solo_diner: 1.08
       }
     }),
     venue({
@@ -370,7 +370,7 @@ export const VENUE_TYPES_V2 =
         foodie: 1.2,
         tourist: 1.08,
         young_couple: 1.3,
-        trend_seeker: 1
+        premium_foodie: 1.08
       }
     }),
     venue({
