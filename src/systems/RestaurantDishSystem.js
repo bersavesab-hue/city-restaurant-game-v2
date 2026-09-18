@@ -134,9 +134,9 @@ class RestaurantDishSystem {
           ? initialQualityScore
           : (
               Number.isFinite(
-                dish.qualityScore
+                dish.researchQualityScore
               )
-                ? dish.qualityScore
+                ? dish.researchQualityScore
                 : 60
             ),
         1,
