@@ -896,6 +896,31 @@ class EmployeeStaffingSystem {
         employee.salary
       );
 
+    const stability =
+      clamp(
+        employee.stability ??
+        60,
+        0,
+        100
+      );
+
+    const stressTolerance =
+      clamp(
+        employee
+          .stressTolerance ??
+        60,
+        0,
+        100
+      );
+
+    const fatigueRiskFactor =
+      0.12 +
+      (
+        100 -
+        stressTolerance
+      ) *
+      0.0008;
+
     const score =
       clamp(
         Math.round(
@@ -908,7 +933,13 @@ class EmployeeStaffingSystem {
             0.28 +
 
           (employee.fatigue ?? 0) *
-            0.18 +
+            fatigueRiskFactor +
+
+          (
+            100 -
+            stability
+          ) *
+            0.1 +
 
           (
             100 -
@@ -956,6 +987,10 @@ class EmployeeStaffingSystem {
 
         fatigue:
           employee.fatigue ?? 0,
+
+        stability,
+
+        stressTolerance,
 
         mood:
           employee.mood ?? 70,
