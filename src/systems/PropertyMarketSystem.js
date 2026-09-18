@@ -7,6 +7,7 @@ import {
   PROPERTY_STATUS,
   getDefaultGridSize
 } from "./PropertySystem.js";
+import { venueTypeSystem } from "./VenueTypeSystem.js";
 
 const DEFAULT_TARGET = 18;
 const REFRESH_DAYS = 7;
@@ -579,18 +580,50 @@ class PropertyMarketSystem {
       tags
     });
 
-    const property = entitySystem.update("property", created.id, {
-      source: "market",
-      propertyType: profileId,
-      listedDay: day,
-      expiresDay: day + listingLife,
-      marketMeta: {
-        profileId,
-        qualityScore,
-        seed,
-        listingLife
+    const recommendedVenueTypes =
+      venueTypeSystem
+        .recommendForProperty(
+          created,
+          district,
+          {
+            limit: 3
+          }
+        );
+
+    const property = entitySystem.update(
+      "property",
+      created.id,
+      {
+        source: "market",
+        propertyType: profileId,
+        listedDay: day,
+        expiresDay:
+          day +
+          listingLife,
+        marketMeta: {
+          profileId,
+          qualityScore,
+          seed,
+          listingLife,
+
+          recommendedVenueTypes:
+            recommendedVenueTypes
+              .map(
+                item => ({
+                  id:
+                    item.venueTypeId,
+                  name:
+                    item.venueName,
+                  score:
+                    item.score,
+                  districtAffinity:
+                    item
+                      .districtAffinity
+                })
+              )
+        }
       }
-    });
+    );
 
     eventBus.emit("propertyMarket:listed", {
       districtId,
