@@ -242,55 +242,189 @@ function buildFloor({
   floorCount,
   rng,
   foodServiceAllowed,
-  exhaustAllowed
+  exhaustAllowed,
+  preferredShape,
+  entranceCount,
+  naturalLightScore,
+  columnDensityPer1000,
+  kitchenProfile
 }) {
-  const grid = getDefaultGridSize(usableArea);
-  const width = grid.width;
-  const height = grid.height;
-  const geometry = buildPolygon(width, height, rng);
-  const floorId = `market_${propertySequence}_f${floorIndex + 1}`;
-  const entranceX = clamp(Math.floor(width * 0.25), 1, width - 2);
+  const grid =
+    getDefaultGridSize(
+      usableArea
+    );
+
+  const width =
+    grid.width;
+
+  const height =
+    grid.height;
+
+  const geometry =
+    buildPolygon(
+      width,
+      height,
+      rng,
+      preferredShape
+    );
+
+  const floorId =
+    `market_${propertySequence}_f${floorIndex + 1}`;
+
+  const windowTarget =
+    naturalLightScore >= 82
+      ? 3
+      : naturalLightScore >= 55
+        ? 2
+        : 1;
+
   const windows = [
     {
-      id: `${floorId}_window_1`,
-      x: clamp(Math.floor(width * 0.55), 1, width - 1),
+      id:
+        `${floorId}_window_1`,
+      x:
+        clamp(
+          Math.floor(
+            width *
+            0.55
+          ),
+          1,
+          width - 1
+        ),
       y: 0,
       side: "north",
-      length: Math.max(1, Math.min(3, Math.floor(width / 5)))
+      length:
+        Math.max(
+          1,
+          Math.min(
+            4,
+            Math.floor(
+              width /
+              5
+            )
+          )
+        )
     }
   ];
 
-  if (width >= 12) {
+  if (
+    windowTarget >= 2 &&
+    width >= 8
+  ) {
     windows.push({
-      id: `${floorId}_window_2`,
+      id:
+        `${floorId}_window_2`,
       x: 0,
-      y: clamp(Math.floor(height * 0.45), 1, height - 1),
+      y:
+        clamp(
+          Math.floor(
+            height *
+            0.45
+          ),
+          1,
+          height - 1
+        ),
       side: "west",
       length: 2
     });
   }
 
-  const columnCount = clamp(
-    Math.floor(usableArea / 650),
-    0,
-    8
-  );
+  if (
+    windowTarget >= 3 &&
+    height >= 8
+  ) {
+    windows.push({
+      id:
+        `${floorId}_window_3`,
+      x:
+        clamp(
+          Math.floor(
+            width *
+            0.35
+          ),
+          1,
+          width - 1
+        ),
+      y:
+        height,
+      side: "south",
+      length:
+        Math.max(
+          1,
+          Math.min(
+            3,
+            Math.floor(
+              width /
+              6
+            )
+          )
+        )
+    });
+  }
+
+  const columnCount =
+    clamp(
+      Math.round(
+        usableArea /
+        1000 *
+        columnDensityPer1000
+      ),
+      0,
+      12
+    );
+
   const columns = [];
 
-  for (let index = 0; index < columnCount; index += 1) {
-    const x = clamp(
-      2 + (index * 4) % Math.max(2, geometry.safeWidth - 3),
-      1,
-      Math.max(1, geometry.safeWidth - 2)
-    );
-    const y = clamp(
-      2 + Math.floor(index / Math.max(1, Math.floor(geometry.safeWidth / 4))) * 4,
-      1,
-      Math.max(1, geometry.safeHeight - 2)
-    );
+  for (
+    let index = 0;
+    index < columnCount;
+    index += 1
+  ) {
+    const x =
+      clamp(
+        2 +
+        (
+          index *
+          4
+        ) %
+        Math.max(
+          2,
+          geometry.safeWidth -
+          3
+        ),
+        1,
+        Math.max(
+          1,
+          geometry.safeWidth -
+          2
+        )
+      );
+
+    const y =
+      clamp(
+        2 +
+        Math.floor(
+          index /
+          Math.max(
+            1,
+            Math.floor(
+              geometry.safeWidth /
+              4
+            )
+          )
+        ) *
+        4,
+        1,
+        Math.max(
+          1,
+          geometry.safeHeight -
+          2
+        )
+      );
 
     columns.push({
-      id: `${floorId}_column_${index + 1}`,
+      id:
+        `${floorId}_column_${index + 1}`,
       type: "column",
       x,
       y,
@@ -301,23 +435,45 @@ function buildFloor({
 
   const fixedStructures = [];
 
-  if (floorCount > 1) {
+  if (
+    floorCount >
+    1
+  ) {
     fixedStructures.push({
-      id: `${floorId}_stair`,
+      id:
+        `${floorId}_stair`,
       type: "stair",
       x: 1,
-      y: clamp(height - 3, 1, height - 2),
+      y:
+        clamp(
+          height -
+          3,
+          1,
+          height -
+          2
+        ),
       width: 2,
       height: 2
     });
   }
 
-  if (floorCount >= 3 && width >= 10) {
+  if (
+    floorCount >= 3 &&
+    width >= 10
+  ) {
     fixedStructures.push({
-      id: `${floorId}_elevator`,
+      id:
+        `${floorId}_elevator`,
       type: "elevator",
       x: 4,
-      y: clamp(height - 3, 1, height - 2),
+      y:
+        clamp(
+          height -
+          3,
+          1,
+          height -
+          2
+        ),
       width: 2,
       height: 2
     });
@@ -325,72 +481,260 @@ function buildFloor({
 
   const utilityPoints = [
     {
-      id: `${floorId}_power`,
+      id:
+        `${floorId}_power`,
       type: "power",
       x: 1,
       y: 1
     }
   ];
 
-  if (foodServiceAllowed) {
+  if (
+    kitchenProfile
+      .powerCapacity >=
+      85 &&
+    width >= 8
+  ) {
+    utilityPoints.push({
+      id:
+        `${floorId}_power_2`,
+      type: "power",
+      x:
+        clamp(
+          width -
+          2,
+          1,
+          width -
+          1
+        ),
+      y:
+        clamp(
+          height -
+          2,
+          1,
+          height -
+          1
+        )
+    });
+  }
+
+  if (
+    foodServiceAllowed
+  ) {
     utilityPoints.push(
       {
-        id: `${floorId}_water`,
+        id:
+          `${floorId}_water`,
         type: "water",
-        x: clamp(width - 2, 1, width - 1),
+        x:
+          clamp(
+            width -
+            2,
+            1,
+            width -
+            1
+          ),
         y: 1
       },
       {
-        id: `${floorId}_drain`,
+        id:
+          `${floorId}_drain`,
         type: "drain",
-        x: clamp(width - 3, 1, width - 1),
+        x:
+          clamp(
+            width -
+            3,
+            1,
+            width -
+            1
+          ),
         y: 1
       }
     );
 
-    if (floorIndex === 0) {
+    if (
+      floorIndex === 0 &&
+      rng() *
+        100 <
+        kitchenProfile
+          .gasAvailability
+    ) {
       utilityPoints.push({
-        id: `${floorId}_gas`,
+        id:
+          `${floorId}_gas`,
         type: "gas",
-        x: clamp(width - 4, 1, width - 1),
+        x:
+          clamp(
+            width -
+            4,
+            1,
+            width -
+            1
+          ),
         y: 1
       });
     }
   }
 
-  if (exhaustAllowed) {
+  if (
+    exhaustAllowed
+  ) {
     utilityPoints.push({
-      id: `${floorId}_exhaust`,
+      id:
+        `${floorId}_exhaust`,
       type: "exhaust",
-      x: clamp(width - 2, 1, width - 1),
+      x:
+        clamp(
+          width -
+          2,
+          1,
+          width -
+          1
+        ),
       y: 2
+    });
+  }
+
+  const entrances = [];
+
+  const actualEntranceCount =
+    floorIndex === 0
+      ? Math.max(
+          1,
+          entranceCount
+        )
+      : 1;
+
+  const entranceSpecs = [
+    {
+      side: "north",
+      x:
+        clamp(
+          Math.floor(
+            width *
+            0.25
+          ),
+          1,
+          width - 2
+        ),
+      y: 0
+    },
+    {
+      side: "south",
+      x:
+        clamp(
+          Math.floor(
+            width *
+            0.7
+          ),
+          1,
+          width - 2
+        ),
+      y: height
+    },
+    {
+      side: "east",
+      x: width,
+      y:
+        clamp(
+          Math.floor(
+            height *
+            0.4
+          ),
+          1,
+          height - 2
+        )
+    },
+    {
+      side: "west",
+      x: 0,
+      y:
+        clamp(
+          Math.floor(
+            height *
+            0.65
+          ),
+          1,
+          height - 2
+        )
+    },
+    {
+      side: "north",
+      x:
+        clamp(
+          Math.floor(
+            width *
+            0.72
+          ),
+          1,
+          width - 2
+        ),
+      y: 0
+    }
+  ];
+
+  for (
+    let index = 0;
+    index <
+      actualEntranceCount;
+    index += 1
+  ) {
+    const spec =
+      entranceSpecs[
+        Math.min(
+          index,
+          entranceSpecs.length -
+          1
+        )
+      ];
+
+    entrances.push({
+      id:
+        `${floorId}_entrance_${index + 1}`,
+      type:
+        floorIndex === 0
+          ? (
+              index === 0
+                ? "main"
+                : "secondary"
+            )
+          : "stair_lobby",
+      x:
+        spec.x,
+      y:
+        spec.y,
+      side:
+        spec.side,
+      width:
+        index === 0
+          ? 2
+          : 1
     });
   }
 
   return {
     id: floorId,
-    label: `${floorIndex + 1}F`,
-    floorNumber: floorIndex + 1,
-    area: floorArea,
+    label:
+      `${floorIndex + 1}F`,
+    floorNumber:
+      floorIndex +
+      1,
+    area:
+      floorArea,
     usableArea,
     width,
     height,
-    shape: geometry.shape,
-    polygon: geometry.polygon,
-    entrances: [
-      {
-        id: `${floorId}_main`,
-        type: floorIndex === 0 ? "main" : "stair_lobby",
-        x: entranceX,
-        y: 0,
-        side: "north",
-        width: 2
-      }
-    ],
+    shape:
+      geometry.shape,
+    polygon:
+      geometry.polygon,
+    entrances,
     windows,
     columns,
     fixedStructures,
-    utilityPoints
+    utilityPoints,
+    notes:
+      `natural_light_${naturalLightScore}`
   };
 }
 
