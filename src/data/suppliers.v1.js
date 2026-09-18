@@ -346,13 +346,7 @@ function buildTemplates() {
         const qualityMin =
           clamp(
             tier.defaultQualityMin +
-              (
-                archetype.qualityAdjust >
-                  0 &&
-                tier.level >= 3
-                  ? 1
-                  : 0
-              ),
+              archetype.qualityAdjust,
             1,
             5
           );
