@@ -79,6 +79,8 @@ const tests = [
   "tests/random-event-integration.test.js",
   "tests/district-event.test.js",
   "tests/business-calendar.test.js",
+  "tests/formal-marketing-action-data.test.js",
+  "tests/marketing-action-integration.test.js",
   "tests/existing-page-entry-points.test.js",
   "tests/ranking-awards-catalog.test.js",
   "tests/award-cycle.test.js",
