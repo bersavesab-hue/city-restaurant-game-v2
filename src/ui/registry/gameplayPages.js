@@ -360,6 +360,24 @@ const GAMEPLAY_PAGES = [
     }
   },
 
+
+  {
+    id:
+      "market-strategy",
+
+    title:
+      "市场与竞争",
+
+    parent:
+      "operations",
+
+    order:
+      360,
+
+    layout:
+      "dashboard"
+  },
+
 ];
 
 

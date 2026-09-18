@@ -182,6 +182,15 @@ import {
 } from "../pages/more/MoreHubView.js";
 
 
+import {
+  marketStrategyPageSystem
+} from "../pages/market-strategy/MarketStrategyPageSystem.js";
+
+import {
+  marketStrategyView
+} from "../pages/market-strategy/MarketStrategyView.js";
+
+
 const FORMAL_PAGE_DEFINITIONS =
   Object.freeze({
     supply: {
@@ -385,6 +394,18 @@ const FORMAL_PAGE_DEFINITIONS =
 
       view:
         moreHubView,
+
+      mode:
+        "mount"
+    },
+
+
+    "market-strategy": {
+      pageSystem:
+        marketStrategyPageSystem,
+
+      view:
+        marketStrategyView,
 
       mode:
         "mount"
