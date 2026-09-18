@@ -7,12 +7,9 @@ const {
   ingredientCatalogSystem,
   restaurantSystem,
   financeSystem,
-  dishLifecycleSystem
+  dishLifecycleSystem,
+  restaurantDishSystem
 } = app.systems;
-
-const {
-  entitySystem
-} = app.core;
 
 test(
   "菜品支持随机研发等级品质熟练度销量成本利润口碑和招牌成长",
@@ -94,7 +91,7 @@ test(
 
     assert.equal(
       developed.lifecycle
-        .tier.name,
+        .rank.name,
       "家常"
     );
 
@@ -105,8 +102,8 @@ test(
     );
 
     const prepared =
-      entitySystem.update(
-        "custom_dish",
+      restaurantDishSystem.update(
+        restaurant.id,
         developed.dish.id,
         {
           qualityScore: 72,
@@ -123,6 +120,8 @@ test(
     const served =
       dishLifecycleSystem
         .recordService({
+          restaurantId:
+            restaurant.id,
           dishId:
             developed.dish.id,
           quantity: 400,
@@ -173,11 +172,12 @@ test(
     const status =
       dishLifecycleSystem
         .getStatus(
+          restaurant.id,
           developed.dish.id
         );
 
     assert.equal(
-      status.tier.name,
+      status.rank.name,
       "招牌"
     );
 
