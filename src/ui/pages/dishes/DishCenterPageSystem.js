@@ -194,9 +194,13 @@ class DishCenterPageSystem {
           progress
         ),
 
-      qualityScore:
+      recipeQualityScore:
         progress
-          ?.qualityScore ??
+          ?.recipeQualityScore ??
+        null,
+
+      researchScore:
+        dish.researchScore ??
         null,
 
       dishRankId:
