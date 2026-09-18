@@ -12,6 +12,12 @@ const PRIMARY_ENTRIES =
           title: "菜单优化",
           target:
             "menu-optimization"
+        },
+
+        {
+          title: "菜单工程",
+          target:
+            "menu-engineering"
         }
       ]
     },
@@ -38,6 +44,12 @@ const PRIMARY_ENTRIES =
           title: "顾客口碑",
           target:
             "reputation"
+        },
+
+        {
+          title: "顾客管理",
+          target:
+            "customers"
         }
       ]
     },

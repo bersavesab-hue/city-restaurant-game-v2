@@ -40,7 +40,8 @@ const tests = [
   "tests/dish-center-ui.test.js",
   "tests/dish-management-system.test.js",
   "tests/supply-management.test.js",
-  "tests/employee-management-ui.test.js"
+  "tests/employee-management-ui.test.js",
+  "tests/existing-page-entry-points.test.js"
 ];
 
 

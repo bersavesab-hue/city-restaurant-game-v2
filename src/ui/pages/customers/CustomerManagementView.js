@@ -29,6 +29,13 @@ class CustomerManagementView {
         <header>
           <span>顾客资产</span>
           <h1>顾客与会员</h1>
+
+          <button
+            type="button"
+            data-page-target="member-marketing"
+          >
+            会员营销 →
+          </button>
         </header>
 
         <section class="customer-kpis">

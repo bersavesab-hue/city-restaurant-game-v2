@@ -520,6 +520,13 @@ class EmployeeManagementView {
             </span>
           </div>
 
+          <button
+            type="button"
+            data-page-target="workforce-capacity"
+          >
+            员工产能
+          </button>
+
           <b
             class="${
               staffing.balanced

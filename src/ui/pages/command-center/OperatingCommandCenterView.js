@@ -282,6 +282,44 @@ class OperatingCommandCenterView {
             `
         }
 
+        <section class="command-center__management-shortcuts">
+
+          <h2>
+            门店设施
+          </h2>
+
+          <div class="command-center__grid">
+
+            <button
+              type="button"
+              data-page-target="equipment-management"
+            >
+              <strong>
+                设备管理
+              </strong>
+
+              <span>
+                后厨、冷藏、收银等设备配置
+              </span>
+            </button>
+
+            <button
+              type="button"
+              data-page-target="equipment-maintenance"
+            >
+              <strong>
+                设备维护
+              </strong>
+
+              <span>
+                查看耐久、故障风险与维修任务
+              </span>
+            </button>
+
+          </div>
+
+        </section>
+
         <section class="command-center__priority">
 
           <h2>
