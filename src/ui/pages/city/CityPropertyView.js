@@ -57,7 +57,19 @@ export class CityPropertyView {
     for (const district of model.districts) {
       const button = el("button", "cr-city-district-chip");
       button.type = "button";
-      button.innerHTML = `<strong>${district.name}</strong><span>客流 ${district.trafficIndex} · 消费 ${district.spendingPower} · 竞争 ${district.competition} · ${district.propertyCount}套</span>`;
+      button.innerHTML = `
+        <strong>${district.name}</strong>
+        <span>
+          机会 ${district.opportunityScore}
+          · 客流 ${district.trafficIndex}
+          · 消费 ${district.spendingPower}
+          · 竞争 ${district.competition}
+          · 交通 ${district.transitAccess}
+          · 停车 ${district.parkingConvenience}
+          · 外卖 ${district.deliveryDemand}
+          · ${district.propertyCount}套
+        </span>
+      `;
       button.addEventListener("click", () => {
         this.renderMarketplace({ districtId: district.id });
       });
@@ -96,6 +108,7 @@ export class CityPropertyView {
           <div class="cr-property-card__badges">
             <span>动态房源</span>
             ${property.qualityScore !== null ? `<span>房源评分 ${property.qualityScore}</span>` : ""}
+            <span>推荐 ${property.recommendation?.score ?? "-"}</span>
             ${property.listing.remainingDays !== null ? `<span>${property.listing.remainingDays}天后下架</span>` : ""}
             ${property.competition?.daysUntilPossibleClaim !== null ? `<span>${property.competition.daysUntilPossibleClaim}天内可能被抢租</span>` : ""}
           </div>
@@ -178,9 +191,14 @@ export class CityPropertyView {
           <div><strong>${money(property.monthlyRent)}</strong><span>挂牌月租</span></div>
         </div>
         <div class="cr-property-detail__district">
+          <span>推荐 ${property.recommendation?.score ?? "-"}</span>
+          <span>商圈机会 ${property.recommendation?.districtOpportunityScore ?? "-"}</span>
           <span>客流 ${district?.trafficIndex ?? "-"}</span>
           <span>消费力 ${district?.spendingPower ?? "-"}</span>
           <span>竞争 ${district?.competition ?? "-"}</span>
+          <span>交通 ${district?.transitAccess ?? "-"}</span>
+          <span>停车 ${district?.parkingConvenience ?? "-"}</span>
+          <span>外卖需求 ${district?.deliveryDemand ?? "-"}</span>
           ${property.frontageMeters !== null ? `<span>门面 ${property.frontageMeters}m</span>` : ""}
           ${property.ceilingHeight !== null ? `<span>层高 ${property.ceilingHeight}m</span>` : ""}
           <span>${property.foodServiceAllowed ? "可做餐饮" : "餐饮受限"}</span>
