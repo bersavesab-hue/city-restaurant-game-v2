@@ -18,7 +18,7 @@ test(
     assert.equal(
       STORE_PROGRESSION_DATASET_META
         .totalLevels,
-      10
+      3
     );
 
     assert.equal(
@@ -115,7 +115,7 @@ test(
 );
 
 test(
-  "门店经验公式保持订单10经验加每1000营业额1经验",
+  "门店经验公式按订单3经验加每1000营业额1经验",
   () => {
     assert.equal(
       STORE_EXPERIENCE_POLICY
@@ -138,10 +138,10 @@ test(
     assert.deepEqual(
       result,
       {
-        total: 382,
+        total: 123,
         orders: 37,
         revenue: 12890,
-        orderExperience: 370,
+        orderExperience: 111,
         revenueExperience: 12
       }
     );
