@@ -3,7 +3,6 @@ import {
 } from "../data/suppliers.v1.js";
 
 import {
-  getSupplierCapabilityTier,
   validateSupplierTemplate
 } from "../data/supplierRules.js";
 
@@ -12,131 +11,11 @@ import {
 } from "./IngredientBootstrapSystem.js";
 
 import {
-  ingredientCatalogSystem
-} from "./IngredientCatalogSystem.js";
-
-import {
   supplierSystem
 } from "./SupplierSystem.js";
 
 
-function scaledInteger(
-  value,
-  factor
-) {
-  return Math.max(
-    1,
-    Math.round(
-      value *
-      factor
-    )
-  );
-}
-
-
 class SupplierBootstrapSystem {
-  buildOffer(
-    template,
-    ingredient
-  ) {
-    const tier =
-      getSupplierCapabilityTier(
-        template.capabilityTier
-      );
-
-    if (!tier) {
-      throw new Error(
-        `Unknown capability tier "${template.capabilityTier}"`
-      );
-    }
-
-    const pieceBased =
-      ingredient.unit ===
-      "piece";
-
-    const minimumOrder =
-      scaledInteger(
-        pieceBased
-          ? tier.pieceMinimumOrder
-          : tier.gramMinimumOrder,
-        template.minimumOrderFactor
-      );
-
-    const capacityPerDay =
-      Math.max(
-        minimumOrder,
-        scaledInteger(
-          pieceBased
-            ? tier.pieceCapacityPerDay
-            : tier.gramCapacityPerDay,
-          template.capacityFactor
-        )
-      );
-
-    return {
-      ingredientId:
-        ingredient.id,
-
-      supplyGroup:
-        ingredient
-          .procurementGroup,
-
-      priceMultiplier:
-        template.priceIndex,
-
-      priceVolatility:
-        template.priceVolatility,
-
-      qualityMin:
-        template.qualityMin,
-
-      qualityMax:
-        template.qualityMax,
-
-      deliveryMinutes:
-        template.deliveryMinutes,
-
-      capacityPerDay,
-
-      minimumOrder
-    };
-  }
-
-  buildOffers(
-    template
-  ) {
-    validateSupplierTemplate(
-      template
-    );
-
-    const offers = {};
-
-    for (
-      const ingredient
-      of ingredientCatalogSystem
-        .getAll()
-    ) {
-      if (
-        !template.supplyGroups.includes(
-          ingredient
-            .procurementGroup
-        )
-      ) {
-        continue;
-      }
-
-      offers[
-        ingredient.id
-      ] =
-        this.buildOffer(
-          template,
-          ingredient
-        );
-    }
-
-    return offers;
-  }
-
   ensureLoaded() {
     ingredientBootstrapSystem
       .ensureLoaded({
@@ -147,15 +26,13 @@ class SupplierBootstrapSystem {
       const template
       of SUPPLIERS_V1
     ) {
+      validateSupplierTemplate(
+        template
+      );
+
       supplierSystem
         .upsertTemplate(
-          template,
-          {
-            offers:
-              this.buildOffers(
-                template
-              )
-          }
+          template
         );
     }
 
@@ -170,11 +47,10 @@ class SupplierBootstrapSystem {
             template
           ) =>
             sum +
-            Object.keys(
-              supplierSystem.get(
+            supplierSystem
+              .listOffers(
                 template.id
-              ).offers
-            ).length,
+              ).length,
           0
         )
     };
