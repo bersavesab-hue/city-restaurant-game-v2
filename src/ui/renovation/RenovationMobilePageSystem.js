@@ -147,9 +147,43 @@ class RenovationMobilePageSystem {
       restaurantId,
       header: {
         balance: editor.budget.balance,
-        currentCost: editor.budget.purchaseCost,
-        remaining: editor.budget.remaining,
-        affordable: editor.budget.affordable,
+        currentCost:
+          editor.budget
+            .totalProjectCost ??
+          editor.budget
+            .purchaseCost,
+
+        furnishingCost:
+          editor.budget
+            .furnishingCost ??
+          editor.budget
+            .purchaseCost,
+
+        baseConstructionCost:
+          editor.budget
+            .baseConstructionCost ??
+          0,
+
+        constructionRatePerSquareMeter:
+          editor.budget
+            .constructionRatePerSquareMeter ??
+          0,
+
+        constructionArea:
+          editor.budget
+            .constructionArea ??
+          0,
+
+        priceModel:
+          editor.budget
+            .priceModel ??
+          null,
+
+        remaining:
+          editor.budget.remaining,
+
+        affordable:
+          editor.budget.affordable,
         score: editor.analysis.score,
         grade: editor.analysis.grade
       },
