@@ -3,126 +3,40 @@ import { eventBus } from "../core/EventBus.js";
 import { randomSystem } from "../core/RandomSystem.js";
 
 import { districtSystem } from "./DistrictSystem.js";
+import { businessCalendarSystem } from "./BusinessCalendarSystem.js";
 
-const EVENTS = Object.freeze({
-  convention: {
-    id: "convention",
-    name: "附近展会",
-    weight: 12,
-    minDays: 2,
-    maxDays: 4,
+import {
+  RANDOM_EVENTS_V1
+} from "../data/randomEvents.v1.js";
 
-    modifiers: {
-      demandMultiplier: 1.18,
-      spendingMultiplier: 1.08,
+import {
+  RANDOM_EVENT_MULTIPLIER_FIELDS
+} from "../data/randomEventRules.js";
 
-      segmentMultipliers: {
-        office_worker: 1.15,
-        tourist: 1.4
-      }
-    }
-  },
+const EVENT_MAP = Object.freeze(
+  Object.fromEntries(
+    RANDOM_EVENTS_V1.map(
+      item => [
+        item.id,
+        item
+      ]
+    )
+  )
+);
 
-  road_construction: {
-    id: "road_construction",
-    name: "道路施工",
-    weight: 10,
-    minDays: 4,
-    maxDays: 8,
-
-    modifiers: {
-      demandMultiplier: 0.78,
-
-      segmentMultipliers: {
-        tourist: 0.8
-      }
-    }
-  },
-
-  severe_weather: {
-    id: "severe_weather",
-    name: "恶劣天气",
-    weight: 8,
-    minDays: 1,
-    maxDays: 2,
-
-    modifiers: {
-      demandMultiplier: 0.78,
-
-      segmentMultipliers: {
-        tourist: 0.65,
-        office_worker: 0.9,
-        student: 0.9
-      }
-    }
-  },
-
-  school_opening: {
-    id: "school_opening",
-    name: "学校开学",
-    weight: 8,
-    minDays: 2,
-    maxDays: 4,
-
-    modifiers: {
-      demandMultiplier: 1.06,
-
-      segmentMultipliers: {
-        student: 1.45,
-        resident: 1.05
-      }
-    }
-  },
-
-  office_holiday: {
-    id: "office_holiday",
-    name: "写字楼集中休假",
-    weight: 7,
-    minDays: 2,
-    maxDays: 5,
-
-    modifiers: {
-      demandMultiplier: 0.95,
-
-      segmentMultipliers: {
-        office_worker: 0.45,
-        resident: 1.08,
-        tourist: 1.1
-      }
-    }
-  },
-
-  neighborhood_festival: {
-    id: "neighborhood_festival",
-    name: "商圈节庆活动",
-    weight: 9,
-    minDays: 2,
-    maxDays: 3,
-
-    modifiers: {
-      demandMultiplier: 1.22,
-      spendingMultiplier: 1.1,
-
-      segmentMultipliers: {
-        resident: 1.2,
-        tourist: 1.35
-      }
-    }
-  },
-
-  competitor_promotion: {
-    id: "competitor_promotion",
-    name: "竞争店联合促销",
-    weight: 7,
-    minDays: 2,
-    maxDays: 4,
-
-    modifiers: {
-      demandMultiplier: 0.96,
-      playerAppealMultiplier: 0.9
-    }
-  }
-});
+function clamp(
+  value,
+  min,
+  max
+) {
+  return Math.max(
+    min,
+    Math.min(
+      max,
+      value
+    )
+  );
+}
 
 class DistrictEventSystem {
   ensureState() {
@@ -148,9 +62,13 @@ class DistrictEventSystem {
     return state;
   }
 
+  getAllDefinitions() {
+    return RANDOM_EVENTS_V1;
+  }
+
   getDefinition(type) {
     const event =
-      EVENTS[type];
+      EVENT_MAP[type];
 
     if (!event) {
       throw new Error(
@@ -184,15 +102,57 @@ class DistrictEventSystem {
       );
   }
 
+  getDistrictSensitivity(
+    district,
+    eventType
+  ) {
+    return clamp(
+      Number(
+        district
+          ?.eventSensitivity?.[
+            eventType
+          ] ??
+        1
+      ),
+      0.5,
+      1.7
+    );
+  }
+
+  scaleMultiplier(
+    multiplier,
+    sensitivity
+  ) {
+    return (
+      1 +
+      (
+        (
+          multiplier ??
+          1
+        ) -
+        1
+      ) *
+      sensitivity
+    );
+  }
+
   getModifiers(
     districtId,
     segmentId = null
   ) {
-    const result = {
-      demandMultiplier: 1,
-      spendingMultiplier: 1,
-      playerAppealMultiplier: 1
-    };
+    const result = Object.fromEntries(
+      RANDOM_EVENT_MULTIPLIER_FIELDS.map(
+        field => [
+          field,
+          1
+        ]
+      )
+    );
+
+    const district =
+      districtSystem.get(
+        districtId
+      );
 
     for (
       const event
@@ -201,7 +161,7 @@ class DistrictEventSystem {
       )
     ) {
       const definition =
-        EVENTS[event.type];
+        EVENT_MAP[event.type];
 
       if (!definition) {
         continue;
@@ -210,69 +170,176 @@ class DistrictEventSystem {
       const modifiers =
         definition.modifiers;
 
-      const district =
-        districtSystem.get(
-          districtId
-        );
-
       const sensitivity =
-        Math.max(
-          0.5,
-          Math.min(
-            1.7,
-            Number(
-              district
-                ?.eventSensitivity?.[
-                  event.type
-                ] ??
-              1
-            )
-          )
+        this.getDistrictSensitivity(
+          district,
+          event.type
         );
 
-      const scale =
-        multiplier =>
-          1 +
-          (
-            (
-              multiplier ??
-              1
-            ) -
-            1
-          ) *
-          sensitivity;
-
-      result.demandMultiplier *=
-        scale(
-          modifiers
-            .demandMultiplier
-        );
-
-      result.spendingMultiplier *=
-        scale(
-          modifiers
-            .spendingMultiplier
-        );
-
-      result
-        .playerAppealMultiplier *=
-        scale(
-          modifiers
-            .playerAppealMultiplier
-        );
+      for (
+        const field
+        of RANDOM_EVENT_MULTIPLIER_FIELDS
+      ) {
+        result[field] *=
+          this.scaleMultiplier(
+            modifiers[field],
+            sensitivity
+          );
+      }
 
       if (segmentId) {
         result.demandMultiplier *=
-          scale(
+          this.scaleMultiplier(
             modifiers
               .segmentMultipliers?.[
                 segmentId
-              ]
+              ],
+            sensitivity
           );
       }
     }
 
+    for (
+      const field
+      of RANDOM_EVENT_MULTIPLIER_FIELDS
+    ) {
+      result[field] =
+        Number(
+          clamp(
+            result[field],
+            0.35,
+            2.5
+          ).toFixed(4)
+        );
+    }
+
     return result;
+  }
+
+  getDefinitionWeight(
+    definition,
+    districtId,
+    day
+  ) {
+    const district =
+      districtSystem.get(
+        districtId
+      );
+
+    if (!district) {
+      return 0;
+    }
+
+    const calendar =
+      businessCalendarSystem
+        .getCalendar(
+          day
+        );
+
+    const districtWeight =
+      definition
+        .districtWeights?.[
+          districtId
+        ] ??
+      0.45;
+
+    const seasonWeight =
+      definition
+        .seasonWeights?.[
+          calendar.season
+        ] ??
+      1;
+
+    const sensitivity =
+      this.getDistrictSensitivity(
+        district,
+        definition.id
+      );
+
+    const recent =
+      this.ensureState()
+        .recent
+        .some(
+          item =>
+            item.districtId ===
+              districtId &&
+            item.type ===
+              definition.id &&
+            day -
+              (
+                item.endedDay ??
+                item.endDay
+              ) <=
+              30
+        );
+
+    const repeatFactor =
+      recent
+        ? 0.12
+        : 1;
+
+    return Math.max(
+      0,
+      definition.weight *
+        districtWeight *
+        seasonWeight *
+        sensitivity *
+        repeatFactor
+    );
+  }
+
+  pickRandomEvent(
+    districtId = null,
+    day = null
+  ) {
+    const currentDay =
+      day ??
+      gameState.getSection(
+        "time"
+      ).day;
+
+    const district =
+      districtId
+        ? districtSystem.get(
+            districtId
+          )
+        : null;
+
+    if (
+      districtId &&
+      !district
+    ) {
+      throw new Error(
+        `District "${districtId}" does not exist`
+      );
+    }
+
+    const weighted =
+      RANDOM_EVENTS_V1
+        .map(
+          item => ({
+            value:
+              item.id,
+            weight:
+              districtId
+                ? this.getDefinitionWeight(
+                    item,
+                    districtId,
+                    currentDay
+                  )
+                : item.weight
+          })
+        )
+        .filter(
+          item =>
+            item.weight >
+            0
+        );
+
+    return randomSystem
+      .weightedPick(
+        weighted
+      );
   }
 
   startEvent(
@@ -305,8 +372,10 @@ class DistrictEventSystem {
     const duration =
       durationDays ??
       randomSystem.int(
-        definition.minDays,
-        definition.maxDays
+        definition
+          .durationRange.min,
+        definition
+          .durationRange.max
       );
 
     const state =
@@ -333,6 +402,18 @@ class DistrictEventSystem {
 
       name:
         definition.name,
+
+      category:
+        definition.category,
+
+      polarity:
+        definition.polarity,
+
+      severity:
+        definition.severity,
+
+      description:
+        definition.description,
 
       startDay:
         currentDay,
@@ -362,7 +443,9 @@ class DistrictEventSystem {
     return event;
   }
 
-  expireEvents(currentDay) {
+  expireEvents(
+    currentDay
+  ) {
     const state =
       this.ensureState();
 
@@ -386,7 +469,10 @@ class DistrictEventSystem {
           item.endDay
       );
 
-    for (const event of expired) {
+    for (
+      const event
+      of expired
+    ) {
       state.recent.push({
         ...event,
         endedDay:
@@ -397,7 +483,9 @@ class DistrictEventSystem {
         "district:eventEnded",
         {
           event:
-            structuredClone(event),
+            structuredClone(
+              event
+            ),
           day:
             currentDay
         }
@@ -405,11 +493,13 @@ class DistrictEventSystem {
     }
 
     if (
-      state.recent.length > 20
+      state.recent.length >
+      120
     ) {
       state.recent.splice(
         0,
-        state.recent.length - 20
+        state.recent.length -
+        120
       );
     }
 
@@ -422,15 +512,27 @@ class DistrictEventSystem {
     return expired.length;
   }
 
-  pickRandomEvent() {
-    return randomSystem.weightedPick(
-      Object.values(EVENTS)
-        .map(
-          item => ({
-            value: item.id,
-            weight: item.weight
-          })
-        )
+  getDailyTriggerChance(
+    district
+  ) {
+    const competition =
+      district
+        .competition ??
+      50;
+
+    const traffic =
+      district
+        .trafficIndex ??
+      50;
+
+    return clamp(
+      0.045 +
+      competition /
+        2500 +
+      traffic /
+        5000,
+      0.055,
+      0.105
     );
   }
 
@@ -463,24 +565,24 @@ class DistrictEventSystem {
     if (generate) {
       for (
         const district
-        of districtSystem.getAll()
+        of districtSystem
+          .getAll()
       ) {
         if (
           this.getActiveEvents(
             district.id,
             currentDay
-          ).length > 0
+          ).length >
+          0
         ) {
           continue;
         }
 
-        /*
-         * 8%日触发率：
-         * 有变化，但不会天天刷事件。
-         */
         if (
           !randomSystem.chance(
-            0.08
+            this.getDailyTriggerChance(
+              district
+            )
           )
         ) {
           continue;
@@ -489,7 +591,10 @@ class DistrictEventSystem {
         const event =
           this.startEvent(
             district.id,
-            this.pickRandomEvent(),
+            this.pickRandomEvent(
+              district.id,
+              currentDay
+            ),
             {
               startDay:
                 currentDay
@@ -541,7 +646,7 @@ class DistrictEventSystem {
               item.districtId ===
               districtId
           )
-          .slice(-10)
+          .slice(-20)
     };
   }
 }
@@ -551,5 +656,5 @@ export const districtEventSystem =
 
 export {
   DistrictEventSystem,
-  EVENTS as DISTRICT_EVENTS
+  EVENT_MAP as DISTRICT_EVENTS
 };
