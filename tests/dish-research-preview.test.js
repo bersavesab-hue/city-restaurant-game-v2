@@ -20,8 +20,6 @@ test(
               150,
 
             ingredient: {
-              baseQuality:
-                4,
 
               basePurchasePrice:
                 2,
@@ -36,8 +34,6 @@ test(
               100,
 
             ingredient: {
-              baseQuality:
-                3,
 
               basePurchasePrice:
                 1,
@@ -102,8 +98,6 @@ test(
               100,
 
             ingredient: {
-              baseQuality:
-                3,
 
               basePurchasePrice:
                 1,
@@ -118,8 +112,6 @@ test(
               100,
 
             ingredient: {
-              baseQuality:
-                3,
 
               basePurchasePrice:
                 1,
@@ -143,8 +135,6 @@ test(
               100,
 
             ingredient: {
-              baseQuality:
-                3,
 
               basePurchasePrice:
                 1,
@@ -159,8 +149,6 @@ test(
               100,
 
             ingredient: {
-              baseQuality:
-                3,
 
               basePurchasePrice:
                 1,
@@ -175,8 +163,6 @@ test(
               50,
 
             ingredient: {
-              baseQuality:
-                4,
 
               basePurchasePrice:
                 1,
@@ -191,8 +177,6 @@ test(
               20,
 
             ingredient: {
-              baseQuality:
-                4,
 
               basePurchasePrice:
                 1,
