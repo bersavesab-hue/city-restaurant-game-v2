@@ -19,6 +19,10 @@ import {
   customerLoyaltySystem
 } from "./CustomerLoyaltySystem.js";
 
+import {
+  MEMBER_POINT_POLICY
+} from "../data/memberProgramRules.js";
+
 const COUPON_TYPE = Object.freeze({
   FIXED: "fixed",
   PERCENT: "percent"
@@ -70,7 +74,13 @@ class MemberBenefitSystem {
       );
     }
 
-    return member;
+    return (
+      customerLoyaltySystem
+        .expirePointsForMember(
+          member
+        ) ??
+      member
+    );
   }
 
   issueCoupon({
@@ -82,7 +92,9 @@ class MemberBenefitSystem {
     maxDiscount = null,
     validDays = 7,
     source = "manual",
-    campaignId = null
+    campaignId = null,
+    allowLevelStack = true,
+    allowPointStack = true
   }) {
     restaurantSystem.get(
       restaurantId
@@ -175,6 +187,9 @@ class MemberBenefitSystem {
 
         source,
         campaignId,
+
+        allowLevelStack,
+        allowPointStack,
 
         usedDay:
           null,
@@ -348,7 +363,7 @@ class MemberBenefitSystem {
     const levelDiscountRate =
       level?.discount ?? 0;
 
-    const levelDiscount =
+    let levelDiscount =
       Math.min(
         subtotal,
         Math.floor(
@@ -358,7 +373,7 @@ class MemberBenefitSystem {
         )
       );
 
-    const afterLevel =
+    let afterLevel =
       subtotal -
       levelDiscount;
 
@@ -400,6 +415,15 @@ class MemberBenefitSystem {
       }
     }
 
+    if (
+      coupon &&
+      coupon.allowLevelStack ===
+        false
+    ) {
+      levelDiscount = 0;
+      afterLevel = subtotal;
+    }
+
     const couponDiscount =
       this.getCouponDiscount(
         coupon,
@@ -411,28 +435,51 @@ class MemberBenefitSystem {
       couponDiscount;
 
     const usablePoints =
-      Math.min(
-        member.points,
-        redeemPoints
-      );
+      coupon &&
+      coupon.allowPointStack ===
+        false
+        ? 0
+        : Math.min(
+            member.points,
+            redeemPoints
+          );
 
-    // 1积分抵10个金额单位，最多抵扣当前金额20%
     const maxPointDiscount =
       Math.floor(
         afterCoupon *
-        0.2
+        MEMBER_POINT_POLICY
+          .maxRedemptionRate
+      );
+
+    const maxCombinedDiscount =
+      Math.floor(
+        subtotal *
+        MEMBER_POINT_POLICY
+          .maxCombinedDiscountRate
+      );
+
+    const remainingDiscountRoom =
+      Math.max(
+        0,
+        maxCombinedDiscount -
+        levelDiscount -
+        couponDiscount
       );
 
     const pointDiscount =
       Math.min(
-        usablePoints * 10,
-        maxPointDiscount
+        usablePoints *
+          MEMBER_POINT_POLICY
+            .pointValue,
+        maxPointDiscount,
+        remainingDiscountRoom
       );
 
     const pointsUsed =
       Math.ceil(
         pointDiscount /
-        10
+        MEMBER_POINT_POLICY
+          .pointValue
       );
 
     const finalAmount =
@@ -472,6 +519,25 @@ class MemberBenefitSystem {
         couponDiscount +
         pointDiscount,
 
+      maxCombinedDiscountRate:
+        MEMBER_POINT_POLICY
+          .maxCombinedDiscountRate,
+
+      stackPolicy: {
+        levelDiscount:
+          !coupon ||
+          coupon.allowLevelStack !==
+            false,
+
+        coupon:
+          Boolean(coupon),
+
+        points:
+          !coupon ||
+          coupon.allowPointStack !==
+            false
+      },
+
       finalAmount
     };
   }
@@ -502,15 +568,13 @@ class MemberBenefitSystem {
     if (
       preview.pointsUsed > 0
     ) {
-      entitySystem.update(
-        "member_profile",
-        member.id,
-        {
+      customerLoyaltySystem
+        .redeemPoints({
+          restaurantId,
+          customerId,
           points:
-            member.points -
             preview.pointsUsed
-        }
-      );
+        });
     }
 
     if (
@@ -702,6 +766,9 @@ class MemberBenefitSystem {
           conversionCount: 0,
 
           attributedRevenue: 0,
+          attributedContributionProfit:
+            0,
+          discountCost: 0,
 
           status:
             "active",
@@ -758,13 +825,37 @@ class MemberBenefitSystem {
     campaignId,
     customerId,
     orderId,
-    revenue
+    revenue,
+    contributionProfit = null,
+    discountCost = 0
   }) {
     requireInteger(
       revenue,
       "revenue",
       0
     );
+
+    requireInteger(
+      discountCost,
+      "discountCost",
+      0
+    );
+
+    if (
+      contributionProfit !==
+        null
+    ) {
+      requireInteger(
+        Math.max(
+          0,
+          Math.round(
+            contributionProfit
+          )
+        ),
+        "contributionProfit",
+        0
+      );
+    }
 
     const campaign =
       entitySystem.get(
@@ -806,6 +897,19 @@ class MemberBenefitSystem {
           orderId,
           revenue,
 
+          contributionProfit:
+            contributionProfit ===
+              null
+              ? revenue
+              : Math.max(
+                  0,
+                  Math.round(
+                    contributionProfit
+                  )
+                ),
+
+          discountCost,
+
           day:
             currentDay()
         }
@@ -822,7 +926,33 @@ class MemberBenefitSystem {
         attributedRevenue:
           campaign
             .attributedRevenue +
-          revenue
+          revenue,
+
+        attributedContributionProfit:
+          (
+            campaign
+              .attributedContributionProfit ??
+            0
+          ) +
+          (
+            contributionProfit ===
+              null
+              ? revenue
+              : Math.max(
+                  0,
+                  Math.round(
+                    contributionProfit
+                  )
+                )
+          ),
+
+        discountCost:
+          (
+            campaign
+              .discountCost ??
+            0
+          ) +
+          discountCost
       }
     );
 
@@ -872,11 +1002,45 @@ class MemberBenefitSystem {
           )
         : 0;
 
+    const netMarketingCost =
+      campaign.budget +
+      (
+        campaign.discountCost ??
+        0
+      );
+
+    const contributionRoi =
+      netMarketingCost > 0
+        ? Number(
+            (
+              (
+                (
+                  campaign
+                    .attributedContributionProfit ??
+                  campaign
+                    .attributedRevenue
+                ) -
+                netMarketingCost
+              ) /
+              netMarketingCost *
+              100
+            ).toFixed(1)
+          )
+        : 0;
+
     return {
       ...campaign,
 
       conversionRate,
-      roi
+
+      revenueRoi:
+        roi,
+
+      roi,
+
+      netMarketingCost,
+
+      contributionRoi
     };
   }
 
@@ -979,6 +1143,30 @@ class MemberBenefitSystem {
             sum +
             item
               .attributedRevenue,
+          0
+        ),
+
+      attributedContributionProfit:
+        campaigns.reduce(
+          (sum, item) =>
+            sum +
+            (
+              item
+                .attributedContributionProfit ??
+              item
+                .attributedRevenue
+            ),
+          0
+        ),
+
+      campaignDiscountCost:
+        campaigns.reduce(
+          (sum, item) =>
+            sum +
+            (
+              item.discountCost ??
+              0
+            ),
           0
         ),
 
