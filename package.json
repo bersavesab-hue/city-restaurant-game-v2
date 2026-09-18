@@ -9,7 +9,9 @@
     "stress": "node scripts/stress-longrun.mjs",
     "stress20": "node scripts/stress-20year.mjs",
     "aging": "node scripts/aging-performance.mjs",
-    "build:android-js": "node scripts/build-android-js-v2.mjs"
+    "build:android-js": "node scripts/build-android-js-v2.mjs",
+    "test:phase2": "node scripts/phase2-gate.mjs",
+    "verify:phase2": "npm run test:phase2 && npm run build:android-js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
