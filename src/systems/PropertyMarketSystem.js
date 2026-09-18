@@ -173,6 +173,15 @@ function chooseTemplateShape(
   );
 }
 
+for (
+  const template
+  of PROPERTY_TEMPLATES_V1
+) {
+  validatePropertyTemplate(
+    template
+  );
+}
+
 function splitArea(total, count) {
   const base = Math.floor(total / count);
   const remainder = total % count;
@@ -787,181 +796,453 @@ class PropertyMarketSystem {
       );
   }
 
-  createListing(districtId, sequence, day = currentDay()) {
-    const district = districtSystem.get(districtId);
+  createListing(
+    districtId,
+    sequence,
+    day = currentDay()
+  ) {
+    const district =
+      districtSystem.get(
+        districtId
+      );
 
     if (!district) {
-      throw new Error(`District "${districtId}" does not exist`);
+      throw new Error(
+        `District "${districtId}" does not exist`
+      );
     }
 
-    const seed = hashString(`${districtId}:${sequence}:${day}`);
-    const rng = createRng(seed);
-    const cycleOffset = hashString(districtId) % PROFILE_CYCLE.length;
-    const profileId = PROFILE_CYCLE[
-      (sequence - 1 + cycleOffset) % PROFILE_CYCLE.length
-    ];
-    const profile = AREA_PROFILES[profileId];
-    const area = randomInt(rng, profile.min, profile.max);
-    const floorCount = getFloorCount(area, rng);
-    const floorAreas = splitArea(area, floorCount);
-    const usableRatio = 0.8 + rng() * 0.14;
-    const floorUsableAreas = floorAreas.map(value =>
-      Math.max(1, Math.min(value, Math.floor(value * usableRatio)))
-    );
-    const usableArea = floorUsableAreas.reduce((sum, value) => sum + value, 0);
-    const foodServiceAllowed = sequence % 9 !== 0;
-    const exhaustAllowed = foodServiceAllowed && sequence % 6 !== 0;
-    const floors = floorAreas.map((floorArea, floorIndex) =>
-      buildFloor({
-        propertySequence: `${hashString(districtId).toString(36)}_${sequence}`,
-        floorIndex,
-        floorArea,
-        usableArea: floorUsableAreas[floorIndex],
-        floorCount,
+    const seed =
+      hashString(
+        `${districtId}:${sequence}:${day}`
+      );
+
+    const rng =
+      createRng(
+        seed
+      );
+
+    const template =
+      choosePropertyTemplate(
+        districtId,
+        rng
+      );
+
+    const templateId =
+      template.id;
+
+    const area =
+      randomInt(
         rng,
-        foodServiceAllowed,
-        exhaustAllowed
-      })
-    );
+        template.areaRange.min,
+        template.areaRange.max
+      );
+
+    const floorCount =
+      choose(
+        rng,
+        template.floorOptions
+      );
+
+    const floorAreas =
+      splitArea(
+        area,
+        floorCount
+      );
+
+    const usableRatio =
+      randomFloat(
+        rng,
+        template
+          .usableRatioRange
+          .min,
+        template
+          .usableRatioRange
+          .max
+      );
+
+    const floorUsableAreas =
+      floorAreas.map(
+        value =>
+          Math.max(
+            1,
+            Math.min(
+              value,
+              Math.floor(
+                value *
+                usableRatio
+              )
+            )
+          )
+      );
+
+    const usableArea =
+      floorUsableAreas.reduce(
+        (
+          sum,
+          value
+        ) =>
+          sum +
+          value,
+        0
+      );
+
+    const preferredShape =
+      chooseTemplateShape(
+        template,
+        rng
+      );
+
+    const entranceCount =
+      randomInt(
+        rng,
+        template
+          .entranceCountRange
+          .min,
+        template
+          .entranceCountRange
+          .max
+      );
+
+    const naturalLightScore =
+      randomInt(
+        rng,
+        template
+          .naturalLightRange
+          .min,
+        template
+          .naturalLightRange
+          .max
+      );
+
+    const columnDensityPer1000 =
+      Number(
+        randomFloat(
+          rng,
+          template
+            .columnDensityPer1000Range
+            .min,
+          template
+            .columnDensityPer1000Range
+            .max
+        ).toFixed(
+          2
+        )
+      );
+
+    const foodServiceAllowed =
+      rng() <
+      template
+        .foodServiceProbability;
+
+    const effectiveExhaustProbability =
+      clamp(
+        template
+          .exhaustProbability *
+          0.75 +
+        (
+          template
+            .kitchenProfile
+            .exhaustPotential /
+          100
+        ) *
+          0.25,
+        0,
+        1
+      );
+
+    const exhaustAllowed =
+      foodServiceAllowed &&
+      rng() <
+        effectiveExhaustProbability;
+
+    const floors =
+      floorAreas.map(
+        (
+          floorArea,
+          floorIndex
+        ) =>
+          buildFloor({
+            propertySequence:
+              `${hashString(
+                districtId
+              ).toString(
+                36
+              )}_${sequence}`,
+
+            floorIndex,
+            floorArea,
+
+            usableArea:
+              floorUsableAreas[
+                floorIndex
+              ],
+
+            floorCount,
+            rng,
+            foodServiceAllowed,
+            exhaustAllowed,
+            preferredShape,
+
+            entranceCount,
+
+            naturalLightScore,
+
+            columnDensityPer1000,
+
+            kitchenProfile:
+              template
+                .kitchenProfile
+          })
+      );
 
     const districtRate =
       28 +
-      district.trafficIndex * 0.28 +
-      district.spendingPower * 0.22 +
-      district.competition * 0.06;
-    const profileRate = {
-      micro: 1.18,
-      small: 1.08,
-      medium: 1,
-      large: 0.92,
-      flagship: 0.84,
-      complex: 0.76
-    }[profileId];
-    const variance = 0.88 + rng() * 0.28;
-    const baseMonthlyRent = Math.max(
-      1200,
-      Math.round(area * districtRate * profileRate * variance)
-    );
-    const frontageMeters = Number(
-      clamp(
-        Math.sqrt(area) * (0.42 + rng() * 0.18),
-        2.5,
-        36
-      ).toFixed(1)
-    );
-    const ceilingHeight = Number(
-      clamp(2.8 + rng() * (area > 1200 ? 2.4 : 1.3), 2.8, 5.8)
-        .toFixed(1)
-    );
+      district.trafficIndex *
+        0.28 +
+      district.spendingPower *
+        0.22 +
+      district.competition *
+        0.06;
+
+    const variance =
+      0.88 +
+      rng() *
+      0.28;
+
+    const baseMonthlyRent =
+      Math.max(
+        1200,
+        Math.round(
+          area *
+          districtRate *
+          template
+            .rentRateMultiplier *
+          variance
+        )
+      );
+
+    const frontageMeters =
+      Number(
+        randomFloat(
+          rng,
+          template
+            .frontageRange
+            .min,
+          template
+            .frontageRange
+            .max
+        ).toFixed(
+          1
+        )
+      );
+
+    const ceilingHeight =
+      Number(
+        randomFloat(
+          rng,
+          template
+            .ceilingHeightRange
+            .min,
+          template
+            .ceilingHeightRange
+            .max
+        ).toFixed(
+          1
+        )
+      );
+
     const parkingConvenience =
       district
         .parkingConvenience ??
       50;
 
-    const smallParkingChance =
-      clamp(
-        0.06 +
-        parkingConvenience /
-        100 *
-        0.42,
-        0.06,
-        0.48
+    const parkingBase =
+      randomInt(
+        rng,
+        template
+          .parkingRange
+          .min,
+        template
+          .parkingRange
+          .max
       );
 
-    const parkingDensityMin =
-      Math.max(
-        70,
-        165 -
-        Math.round(
-          parkingConvenience *
-          0.55
-        )
-      );
+    const parkingSpan =
+      template
+        .parkingRange
+        .max -
+      template
+        .parkingRange
+        .min;
 
-    const parkingDensityMax =
-      Math.max(
-        parkingDensityMin +
-        30,
-        225 -
-        Math.round(
-          parkingConvenience *
-          0.45
-        )
+    const parkingAdjustment =
+      Math.round(
+        (
+          parkingConvenience -
+          50
+        ) /
+        50 *
+        parkingSpan *
+        template
+          .parkingDistrictInfluence *
+        0.45
       );
 
     const parkingSpaces =
-      area < 500
-        ? (
-            rng() <
-              smallParkingChance
-              ? randomInt(
-                  rng,
-                  1,
-                  Math.max(
-                    2,
-                    Math.round(
-                      2 +
-                      parkingConvenience /
-                      25
-                    )
-                  )
-                )
-              : 0
-          )
-        : clamp(
-            Math.floor(
-              area /
-              randomInt(
-                rng,
-                parkingDensityMin,
-                parkingDensityMax
-              )
-            ),
-            0,
-            160
-          );
-    const depositMonths = randomInt(rng, 1, 3);
-    const listingLife = randomInt(rng, 14, 42);
-    const qualityScore = clamp(
+      clamp(
+        parkingBase +
+        parkingAdjustment,
+        template
+          .parkingRange
+          .min,
+        template
+          .parkingRange
+          .max
+      );
+
+    const depositMonths =
+      randomInt(
+        rng,
+        template
+          .depositMonthsRange
+          .min,
+        template
+          .depositMonthsRange
+          .max
+      );
+
+    const listingLife =
+      randomInt(
+        rng,
+        template
+          .listingLifeDaysRange
+          .min,
+        template
+          .listingLifeDaysRange
+          .max
+      );
+
+    const kitchenReadinessScore =
       Math.round(
-        38 +
-        district.trafficIndex * 0.22 +
-        district.spendingPower * 0.16 +
         (
-          district.transitAccess ??
-          50
-        ) * 0.06 +
-        (
-          district.parkingConvenience ??
-          50
-        ) * 0.04 +
-        frontageMeters * 0.8 +
-        (exhaustAllowed ? 6 : 0) +
-        Math.min(8, parkingSpaces * 0.2)
-      ),
-      35,
-      96
-    );
-    const tags = [profile.label];
+          template
+            .kitchenProfile
+            .waterDrainQuality +
+          template
+            .kitchenProfile
+            .gasAvailability +
+          template
+            .kitchenProfile
+            .powerCapacity +
+          template
+            .kitchenProfile
+            .exhaustPotential
+        ) /
+        4
+      );
 
-    if (floorCount > 1) {
-      tags.push(`${floorCount}层`);
-    }
+    const qualityScore =
+      clamp(
+        Math.round(
+          28 +
+          district.trafficIndex *
+            0.18 +
+          district.spendingPower *
+            0.12 +
+          (
+            district
+              .transitAccess ??
+            50
+          ) *
+            0.05 +
+          (
+            district
+              .parkingConvenience ??
+            50
+          ) *
+            0.04 +
+          naturalLightScore *
+            0.08 +
+          kitchenReadinessScore *
+            0.07 +
+          frontageMeters *
+            0.55 +
+          (
+            exhaustAllowed
+              ? 5
+              : 0
+          ) +
+          Math.min(
+            7,
+            parkingSpaces *
+            0.18
+          )
+        ),
+        35,
+        96
+      );
 
-    if (exhaustAllowed) {
-      tags.push("可排烟");
-    }
+    const tags = [
+      template.name
+    ];
 
-    if (parkingSpaces > 0) {
-      tags.push("有停车位");
+    if (
+      floorCount >
+      1
+    ) {
+      tags.push(
+        `${floorCount}层`
+      );
     }
 
     if (
-      (
-        district
-          .parkingConvenience ??
-        0
-      ) >= 75
+      exhaustAllowed
+    ) {
+      tags.push(
+        "可排烟"
+      );
+    }
+
+    if (
+      parkingSpaces >
+      0
+    ) {
+      tags.push(
+        "有停车位"
+      );
+    }
+
+    if (
+      naturalLightScore >=
+      80
+    ) {
+      tags.push(
+        "采光优秀"
+      );
+    }
+
+    if (
+      frontageMeters >=
+      12
+    ) {
+      tags.push(
+        "宽门面"
+      );
+    }
+
+    if (
+      kitchenReadinessScore >=
+      85
+    ) {
+      tags.push(
+        "厨房基础条件好"
+      );
+    }
+
+    if (
+      parkingConvenience >=
+      75
     ) {
       tags.push(
         "停车便利"
@@ -973,39 +1254,79 @@ class PropertyMarketSystem {
         district
           .transitAccess ??
         0
-      ) >= 80
+      ) >=
+      80
     ) {
       tags.push(
         "公共交通便利"
       );
     }
 
-    if (floors.some(floor => floor.shape !== "rectangle")) {
-      tags.push("异形户型");
+    if (
+      floors.some(
+        floor =>
+          floor.shape !==
+          "rectangle"
+      )
+    ) {
+      tags.push(
+        "异形户型"
+      );
     }
 
-    const created = propertySystem.create({
-      districtId,
-      name: `${district.name}·${profile.label}${String(sequence).padStart(2, "0")}`,
-      area,
-      usableArea,
-      baseMonthlyRent,
-      seats: Math.max(2, Math.floor(usableArea / 4.2)),
-      depositMonths,
-      floors,
-      frontageMeters,
-      ceilingHeight,
-      parkingSpaces,
-      foodServiceAllowed,
-      exhaustAllowed,
-      renovationRules: {
-        allowPartitions: area >= 80,
-        allowWallFinish: true,
-        allowFloorFinish: true,
-        allowCeilingFinish: ceilingHeight >= 3
-      },
-      tags
-    });
+    const created =
+      propertySystem.create({
+        districtId,
+
+        name:
+          `${district.name}·${template.name}${String(
+            sequence
+          ).padStart(
+            2,
+            "0"
+          )}`,
+
+        area,
+        usableArea,
+        baseMonthlyRent,
+
+        seats:
+          Math.max(
+            2,
+            Math.floor(
+              usableArea /
+              4.2
+            )
+          ),
+
+        depositMonths,
+        floors,
+        frontageMeters,
+        ceilingHeight,
+        parkingSpaces,
+        foodServiceAllowed,
+        exhaustAllowed,
+
+        renovationRules: {
+          allowPartitions:
+            area >=
+            80 &&
+            usableRatio >=
+            0.72,
+
+          allowWallFinish:
+            true,
+
+          allowFloorFinish:
+            true,
+
+          allowCeilingFinish:
+            ceilingHeight >=
+            3
+        },
+
+        tags
+      });
 
     const recommendedVenueTypes =
       venueTypeSystem
@@ -1017,45 +1338,109 @@ class PropertyMarketSystem {
           }
         );
 
-    const property = entitySystem.update(
-      "property",
-      created.id,
-      {
-        source: "market",
-        propertyType: profileId,
-        listedDay: day,
-        expiresDay:
-          day +
-          listingLife,
-        marketMeta: {
-          profileId,
-          qualityScore,
-          seed,
-          listingLife,
+    const property =
+      entitySystem.update(
+        "property",
+        created.id,
+        {
+          source:
+            "market",
 
-          recommendedVenueTypes:
-            recommendedVenueTypes
-              .map(
-                item => ({
-                  id:
-                    item.venueTypeId,
-                  name:
-                    item.venueName,
-                  score:
-                    item.score,
-                  districtAffinity:
-                    item
-                      .districtAffinity
-                })
-              )
+          propertyType:
+            templateId,
+
+          listedDay:
+            day,
+
+          expiresDay:
+            day +
+            listingLife,
+
+          marketMeta: {
+            templateId,
+
+            templateName:
+              template.name,
+
+            qualityScore,
+            seed,
+            listingLife,
+
+            propertyFeatures: {
+              preferredShape,
+
+              usableRatio:
+                Number(
+                  usableRatio
+                    .toFixed(
+                      3
+                    )
+                ),
+
+              entranceCount,
+
+              naturalLightScore,
+
+              columnDensityPer1000,
+
+              kitchenReadinessScore,
+
+              kitchenProfile:
+                structuredClone(
+                  template
+                    .kitchenProfile
+                ),
+
+              foodServiceProbability:
+                template
+                  .foodServiceProbability,
+
+              exhaustProbability:
+                effectiveExhaustProbability
+            },
+
+            leaseProfile:
+              structuredClone(
+                template
+                  .leaseProfile
+              ),
+
+            recommendedVenueTypes:
+              recommendedVenueTypes
+                .map(
+                  item => ({
+                    id:
+                      item
+                        .venueTypeId,
+
+                    name:
+                      item
+                        .venueName,
+
+                    score:
+                      item
+                        .score,
+
+                    districtAffinity:
+                      item
+                        .districtAffinity
+                  })
+                )
+          }
         }
+      );
+
+    eventBus.emit(
+      "propertyMarket:listed",
+      {
+        districtId,
+
+        property:
+          structuredClone(
+            property
+          )
       }
     );
-
-    eventBus.emit("propertyMarket:listed", {
-      districtId,
-      property: structuredClone(property)
-    });
 
     return property;
   }
