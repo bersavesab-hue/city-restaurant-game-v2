@@ -463,7 +463,7 @@ class DishResearchSystem {
           restaurantId,
           dishId:
             dish.id,
-          initialQualityScore:
+          initialRecipeQualityScore:
             analysis.researchScore
         });
 
@@ -489,7 +489,10 @@ class DishResearchSystem {
         rankName:
           dishProgress.dishRankName,
 
-        score:
+        researchScore:
+          analysis.researchScore,
+
+        recipeQualityScore:
           dishProgress.recipeQualityScore,
 
         cost:
