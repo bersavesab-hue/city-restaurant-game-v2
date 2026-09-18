@@ -96,6 +96,31 @@
   background: #fffaf0;
 }
 
+
+.inventory-main,
+.supplier-offer__ingredient {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.ingredient-thumb {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  object-fit: cover;
+  border: 1px solid #e1d5bf;
+  border-radius: 10px;
+  background: #f2eadb;
+}
+
+.supplier-offer__ingredient .ingredient-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+}
+
 .inventory-row strong,
 .inventory-row span,
 .order-row strong,
