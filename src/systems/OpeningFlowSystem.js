@@ -294,9 +294,11 @@ class OpeningFlowSystem {
         description:
           hasPermits
             ? `${permits.issuedCount}/${permits.requiredCount}项必要许可已完成`
-            : permits.allRequirementsReady
-              ? "经营条件符合要求，可以完成开业许可检查"
-              : "部分许可条件仍未满足",
+            : permits.pendingCount > 0
+              ? `${permits.pendingCount}项许可正在审核，推进日期后自动出结果`
+              : permits.allRequirementsReady
+                ? "经营条件符合要求，可以提交必要许可申请"
+                : "部分许可条件仍未满足",
 
         complete:
           hasPermits,
