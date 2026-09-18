@@ -8,6 +8,7 @@ import {
 
 import { employeeSystem } from "./EmployeeSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
+import { districtEventSystem } from "./DistrictEventSystem.js";
 import { eventBus } from "../core/EventBus.js";
 
 class DailySettlementSystem {
@@ -95,9 +96,42 @@ class DailySettlementSystem {
         restaurantId
       );
 
+    const restaurantForCosts =
+      entitySystem.get(
+        "restaurant",
+        restaurantId
+      );
+
+    let payrollEventMultiplier =
+      1;
+
+    if (
+      restaurantForCosts
+        ?.locationId
+    ) {
+      const property =
+        entitySystem.get(
+          "property",
+          restaurantForCosts
+            .locationId
+        );
+
+      if (property) {
+        payrollEventMultiplier =
+          districtEventSystem
+            .getModifiers(
+              property.districtId
+            )
+            .payrollCostMultiplier ??
+          1;
+      }
+    }
+
     const payrollDue =
       Math.round(
-        monthlyPayroll / 30
+        monthlyPayroll /
+        30 *
+        payrollEventMultiplier
       );
 
     let payrollPaid = 0;
@@ -226,6 +260,14 @@ class DailySettlementSystem {
 
           payroll:
             payrollDue,
+
+          basePayrollDaily:
+            Math.round(
+              monthlyPayroll /
+              30
+            ),
+
+          payrollEventMultiplier,
 
           payrollDue,
 
