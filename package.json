@@ -19,8 +19,8 @@
     "test:phase2:awards": "node --test tests/ranking-awards-catalog.test.js tests/award-cycle.test.js tests/ranking-awards-pages.test.js tests/award-feedback.test.js tests/award-ceremony.test.js tests/award-feedback-command-center.test.js tests/market-ranking.test.js",
     "test:phase2:structure": "node --test tests/more-hub.test.js tests/market-strategy-ui.test.js tests/store-progress-ui.test.js tests/existing-page-entry-points.test.js tests/runtime-route-coverage.test.js tests/android-runtime-routing.test.js tests/gameplay-navigation.test.js",
     "test:data:ingredients": "node --test tests/ingredient-data-v1.test.js",
-    "test:data:dishes": "node --test tests/dish-rules.test.js tests/dish-catalog-schema.test.js tests/restaurant-dish-progress.test.js tests/dish-research.test.js tests/dish-growth.test.js tests/dish-lifecycle.test.js tests/dish-research-preview.test.js tests/dish-management-system.test.js tests/dish-center-ui.test.js",
-    "test:data:recipes": "node --test tests/cooking-method-recipe-schema.test.js tests/dish-research-preview.test.js tests/dish-research.test.js"
+    "test:data:dishes": "node --test tests/formal-dish-recipe-data.test.js tests/dish-rules.test.js tests/dish-catalog-schema.test.js tests/restaurant-dish-progress.test.js tests/dish-research.test.js tests/dish-growth.test.js tests/dish-lifecycle.test.js tests/dish-research-preview.test.js tests/dish-management-system.test.js tests/dish-center-ui.test.js",
+    "test:data:recipes": "node --test tests/formal-dish-recipe-data.test.js tests/cooking-method-recipe-schema.test.js tests/dish-research-preview.test.js tests/dish-research.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
