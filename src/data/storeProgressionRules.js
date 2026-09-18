@@ -3,7 +3,7 @@ export const STORE_PROGRESSION_SCHEMA_VERSION = 1;
 export const STORE_EXPERIENCE_POLICY =
   Object.freeze({
     orderExperience:
-      10,
+      3,
     revenueUnit:
       1000,
     revenueExperience:
