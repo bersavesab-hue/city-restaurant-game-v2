@@ -922,6 +922,14 @@ function getCheckpoint(
       restaurant.repeatRate,
     reviewScore:
       restaurant.reviewScore,
+    totalReviews:
+      restaurant.totalReviews,
+    totalServedGuests:
+      restaurant.totalServedGuests,
+    wordOfMouthScore:
+      restaurant.wordOfMouthScore ?? 0,
+    wordOfMouthFactor:
+      restaurant.wordOfMouthFactor ?? 1,
     complianceSuspended:
       Boolean(
         restaurant
@@ -1058,6 +1066,45 @@ test(
       day90.balance <
       INITIAL_CAPITAL *
         3
+    );
+
+    assert.ok(
+      day90.reputation >= 0 &&
+      day90.reputation <= 100,
+      `声望必须保持0-100：${day90.reputation}`
+    );
+
+    assert.notEqual(
+      day90.satisfaction,
+      50,
+      "长期模拟必须真实更新顾客满意度"
+    );
+
+    assert.ok(
+      day90.repeatRate > 0,
+      "长期模拟必须形成可反哺客流的复购率"
+    );
+
+    assert.notEqual(
+      day90.reviewScore,
+      3,
+      "长期模拟必须形成真实门店评分"
+    );
+
+    assert.ok(
+      day90.totalReviews > 0,
+      "长期模拟必须累计顾客评价"
+    );
+
+    assert.ok(
+      day90.totalServedGuests > 0,
+      "长期模拟必须累计服务顾客数"
+    );
+
+    assert.ok(
+      day90.wordOfMouthFactor >= 0.85 &&
+      day90.wordOfMouthFactor <= 1.2,
+      `口碑客流系数越界：${day90.wordOfMouthFactor}`
     );
 
     if (
