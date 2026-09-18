@@ -257,22 +257,19 @@ class OrderSystem {
         line.revenue
       );
 
-      if (
-        entitySystem.get(
-          "custom_dish",
-          line.menuItem.dishId
-        )
-      ) {
-        dishLifecycleSystem.recordService({
-          dishId: line.menuItem.dishId,
-          quantity: line.quantity,
-          revenue: line.revenue,
-          ingredientCost:
-            cooking.ingredientCost,
-          outputQualityScore:
-            cooking.qualityScore
-        });
-      }
+      dishLifecycleSystem.recordService({
+        restaurantId,
+        dishId:
+          line.menuItem.dishId,
+        quantity:
+          line.quantity,
+        revenue:
+          line.revenue,
+        ingredientCost:
+          cooking.ingredientCost,
+        outputQualityScore:
+          cooking.qualityScore
+      });
     }
 
     const averageQuality = Math.round(
@@ -585,22 +582,19 @@ class OrderSystem {
       totalRevenue
     );
 
-    if (
-      entitySystem.get(
-        "custom_dish",
-        menuItem.dishId
-      )
-    ) {
-      dishLifecycleSystem.recordService({
-        dishId: menuItem.dishId,
-        quantity: portions,
-        revenue: totalRevenue,
-        ingredientCost:
-          cooking.ingredientCost,
-        outputQualityScore:
-          cooking.qualityScore
-      });
-    }
+    dishLifecycleSystem.recordService({
+      restaurantId,
+      dishId:
+        menuItem.dishId,
+      quantity:
+        portions,
+      revenue:
+        totalRevenue,
+      ingredientCost:
+        cooking.ingredientCost,
+      outputQualityScore:
+        cooking.qualityScore
+    });
 
     salesChannelSystem
       .ensureRestaurantChannels(
