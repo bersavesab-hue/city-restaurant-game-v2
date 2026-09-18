@@ -15,21 +15,82 @@ class PropertyVenueSystem {
     const venueTypeId = this.getVenueTypeId(property);
     const venueType = venueTypeSystem.get(venueTypeId);
 
+    const compatibility =
+      venueTypeSystem
+        .evaluatePropertyFit(
+          venueTypeId,
+          property,
+          district
+        );
+
     return {
       property,
       district,
       venueTypeId,
       venueType,
-      districtAffinity: venueTypeSystem.getDistrictAffinity(venueTypeId, district),
-      rentMultiplier: economicBaselineSystem.getVenueRentMultiplier(venueType, district),
-      priceToleranceMultiplier: venueTypeSystem.getPriceToleranceMultiplier(venueTypeId)
+
+      compatibility,
+
+      districtAffinity:
+        venueTypeSystem
+          .getDistrictAffinity(
+            venueTypeId,
+            district
+          ),
+
+      rentMultiplier:
+        economicBaselineSystem
+          .getVenueRentMultiplier(
+            venueType,
+            district
+          ),
+
+      priceToleranceMultiplier:
+        venueTypeSystem
+          .getPriceToleranceMultiplier(
+            venueTypeId
+          ),
+
+      maintenanceMultiplier:
+        venueTypeSystem
+          .getMaintenanceMultiplier(
+            venueTypeId
+          ),
+
+      seatCapMultiplier:
+        venueType
+          .seatCapMultiplier,
+
+      deliveryBias:
+        venueType.deliveryBias,
+
+      reservationBias:
+        venueType.reservationBias,
+
+      renovationProfile:
+        structuredClone(
+          venueType
+            .renovationProfile
+        ),
+
+      propertyRequirements:
+        structuredClone(
+          venueType
+            .propertyRequirements
+        )
     };
   }
 
   setVenueType(propertyId, venueTypeId) {
-    const venue = venueTypeSystem.get(venueTypeId);
+    const venue =
+      venueTypeSystem.get(
+        venueTypeId
+      );
+
     if (!venue) {
-      throw new Error(`Unknown venue type "${venueTypeId}"`);
+      throw new Error(
+        `Unknown venue type "${venueTypeId}"`
+      );
     }
 
     const property =
@@ -41,6 +102,22 @@ class PropertyVenueSystem {
       districtSystem.get(
         property.districtId
       );
+
+    const compatibility =
+      venueTypeSystem
+        .evaluatePropertyFit(
+          venueTypeId,
+          property,
+          district
+        );
+
+    if (
+      !compatibility.eligible
+    ) {
+      throw new Error(
+        `Venue type "${venueTypeId}" is incompatible with property "${propertyId}": ${compatibility.reasons.join(", ")}`
+      );
+    }
 
     const frontageFactor =
       property.frontageMeters
@@ -120,6 +197,57 @@ class PropertyVenueSystem {
             : null
       }
     );
+  }
+
+  getCompatibility(
+    propertyId,
+    venueTypeId
+  ) {
+    const property =
+      propertySystem.get(
+        propertyId
+      );
+
+    const district =
+      districtSystem.get(
+        property.districtId
+      );
+
+    return venueTypeSystem
+      .evaluatePropertyFit(
+        venueTypeId,
+        property,
+        district
+      );
+  }
+
+  getRecommendations(
+    propertyId,
+    {
+      limit = 5,
+      includeIneligible =
+        false
+    } = {}
+  ) {
+    const property =
+      propertySystem.get(
+        propertyId
+      );
+
+    const district =
+      districtSystem.get(
+        property.districtId
+      );
+
+    return venueTypeSystem
+      .recommendForProperty(
+        property,
+        district,
+        {
+          limit,
+          includeIneligible
+        }
+      );
   }
 }
 
