@@ -18,7 +18,7 @@ test(
     assert.equal(
       STORE_PROGRESSION_DATASET_META
         .totalLevels,
-      3
+      10
     );
 
     assert.equal(
@@ -120,7 +120,7 @@ test(
     assert.equal(
       STORE_EXPERIENCE_POLICY
         .orderExperience,
-      10
+      3
     );
 
     assert.equal(
