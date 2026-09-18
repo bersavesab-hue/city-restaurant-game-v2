@@ -2,6 +2,7 @@ import { restaurantSystem } from "./RestaurantSystem.js";
 import { propertySystem } from "./PropertySystem.js";
 import { districtSystem } from "./DistrictSystem.js";
 import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
+import { customerLoyaltySystem } from "./CustomerLoyaltySystem.js";
 import { menuSystem } from "./MenuSystem.js";
 import { dishCatalogSystem } from "./DishCatalogSystem.js";
 import { marketCompetitionSystem } from "./MarketCompetitionSystem.js";
@@ -995,6 +996,13 @@ class TrafficDemandSystem {
             7
           );
 
+      const memberRetentionFactor =
+        customerLoyaltySystem
+          .getSegmentRetentionMultiplier(
+            restaurantId,
+            segment.id
+          );
+
       const districtAccessFactor =
         this.getDistrictAccessFactor(
           district,
@@ -1021,6 +1029,7 @@ class TrafficDemandSystem {
             .playerAppealMultiplier *
           positioningFactor *
           segmentRetentionFactor *
+          memberRetentionFactor *
           dishPrestigeFactor *
           renovationAppealFactor,
           0.2,
@@ -1074,6 +1083,7 @@ class TrafficDemandSystem {
         districtAccessFactor *
         districtDeliveryFactor *
         segmentRetentionFactor *
+        memberRetentionFactor *
         dishPrestigeFactor *
         renovationAppealFactor *
         priceFactor *
@@ -1142,6 +1152,8 @@ class TrafficDemandSystem {
         seasonalityFactor,
 
         segmentRetentionFactor,
+
+        memberRetentionFactor,
 
         renovationAppealFactor,
 
