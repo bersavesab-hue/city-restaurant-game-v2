@@ -8,6 +8,7 @@ import { propertySystem } from "./PropertySystem.js";
 import { venueTypeSystem } from "./VenueTypeSystem.js";
 import { economicBaselineSystem } from "./EconomicBaselineSystem.js";
 import { cityEconomySystem } from "./CityEconomySystem.js";
+import { districtEventSystem } from "./DistrictEventSystem.js";
 
 function countOrders(restaurantId, day) {
   return entitySystem
@@ -79,6 +80,19 @@ class EconomicOperatingCostSystem {
     const maintenanceMultiplier =
       venue?.maintenanceMultiplier ??
       1;
+
+    const eventOperatingCostMultiplier =
+      districtId
+        ? (
+            districtEventSystem
+              .getModifiers(
+                districtId
+              )
+              .operatingCostMultiplier ??
+            1
+          )
+        : 1;
+
     const activeFactor = openHours > 0 || orders > 0 ? 1 : 0.22;
 
     const electricityKwh =
@@ -166,7 +180,8 @@ class EconomicOperatingCostSystem {
             waste +
             internet
           ) *
-          maintenanceMultiplier
+          maintenanceMultiplier *
+          eventOperatingCostMultiplier
         )
       );
 
@@ -187,33 +202,40 @@ class EconomicOperatingCostSystem {
         electricity:
           Math.round(
             electricity *
-            maintenanceMultiplier
+            maintenanceMultiplier *
+            eventOperatingCostMultiplier
           ),
 
         water:
           Math.round(
             water *
-            maintenanceMultiplier
+            maintenanceMultiplier *
+            eventOperatingCostMultiplier
           ),
 
         gas:
           Math.round(
             gas *
-            maintenanceMultiplier
+            maintenanceMultiplier *
+            eventOperatingCostMultiplier
           ),
 
         waste:
           Math.round(
             waste *
-            maintenanceMultiplier
+            maintenanceMultiplier *
+            eventOperatingCostMultiplier
           ),
 
         internet:
           Math.round(
             internet *
-            maintenanceMultiplier
+            maintenanceMultiplier *
+            eventOperatingCostMultiplier
           )
       },
+
+      eventOperatingCostMultiplier,
 
       tariffModel:
         "reality_1_to_1_v2",
