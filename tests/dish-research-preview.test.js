@@ -7,7 +7,7 @@ import {
 
 
 test(
-  "研发预估给出稳定的成本难度时间和品质区间",
+  "研发预估给出稳定的成本难度时间和研发评分区间",
   () => {
     const result =
       calculateResolvedPreview({
@@ -59,8 +59,8 @@ test(
 
 
     assert.ok(
-      result.qualityRange.max >
-      result.qualityRange.min
+      result.researchScoreRange.max >
+      result.researchScoreRange.min
     );
 
 
