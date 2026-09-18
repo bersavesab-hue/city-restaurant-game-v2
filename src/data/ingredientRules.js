@@ -111,4 +111,4 @@ export const INGREDIENT_PROCUREMENT_GROUP =
   });
 
 
-export const INGREDIENT_SCHEMA_VERSION = 1;
+export const INGREDIENT_SCHEMA_VERSION = 2;
