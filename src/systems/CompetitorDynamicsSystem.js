@@ -2,6 +2,7 @@ import { entitySystem } from "../core/EntitySystem.js";
 import { eventBus } from "../core/EventBus.js";
 import { randomSystem } from "../core/RandomSystem.js";
 import { districtSystem } from "./DistrictSystem.js";
+import { COMPETITOR_STRATEGIES } from "../data/competitorRules.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -10,14 +11,8 @@ function clamp(value, min, max) {
   );
 }
 
-const STRATEGIES = Object.freeze([
-  "stable",
-  "discount",
-  "premium",
-  "quality",
-  "service",
-  "promotion"
-]);
+const STRATEGIES =
+  COMPETITOR_STRATEGIES;
 
 class CompetitorDynamicsSystem {
   getHealthScore(store) {
@@ -48,9 +43,21 @@ class CompetitorDynamicsSystem {
       priceScore *
         0.15;
 
+    const resilience =
+      clamp(
+        store.resilience ?? 50,
+        0,
+        100
+      );
+
     const pressure =
       (district?.competition ?? 0) *
-      0.1;
+      0.1 *
+      (
+        1 -
+        resilience *
+        0.003
+      );
 
     return Math.round(
       clamp(
@@ -61,18 +68,83 @@ class CompetitorDynamicsSystem {
     );
   }
 
+  getClosureThreshold(store) {
+    return Math.round(
+      clamp(
+        20 +
+        (
+          store.resilience ??
+          50
+        ) *
+        0.2,
+        20,
+        40
+      )
+    );
+  }
+
+  pickStrategy(store) {
+    const weights =
+      store.strategyWeights ??
+      {};
+
+    return randomSystem.weightedPick(
+      STRATEGIES.map(
+        strategy => ({
+          value: strategy,
+          weight:
+            Math.max(
+              0,
+              Number(
+                weights[strategy] ??
+                1
+              )
+            )
+        })
+      )
+    );
+  }
+
   getStrategyChanges(
     store,
     strategy
   ) {
+    const discountAggression =
+      clamp(
+        store.discountAggression ??
+        50,
+        0,
+        100
+      );
+
+    const marketing =
+      clamp(
+        store.marketingTendency ??
+        50,
+        0,
+        100
+      );
+
+    const innovation =
+      clamp(
+        store.innovationTendency ??
+        50,
+        0,
+        100
+      );
+
     switch (strategy) {
       case "discount":
         return {
           priceIndex:
             clamp(
               store.priceIndex -
-              0.03,
-              0.65,
+              (
+                0.02 +
+                discountAggression /
+                2500
+              ),
+              0.6,
               1.8
             ),
 
@@ -89,8 +161,12 @@ class CompetitorDynamicsSystem {
           priceIndex:
             clamp(
               store.priceIndex +
-              0.04,
-              0.65,
+              (
+                0.03 +
+                innovation /
+                5000
+              ),
+              0.6,
               1.8
             ),
 
@@ -113,7 +189,12 @@ class CompetitorDynamicsSystem {
         return {
           qualityScore:
             clamp(
-              store.qualityScore + 3,
+              store.qualityScore +
+              2 +
+              Math.round(
+                innovation /
+                50
+              ),
               0,
               100
             ),
@@ -122,7 +203,7 @@ class CompetitorDynamicsSystem {
             clamp(
               store.priceIndex +
               0.01,
-              0.65,
+              0.6,
               1.8
             )
         };
@@ -142,14 +223,19 @@ class CompetitorDynamicsSystem {
           priceIndex:
             clamp(
               store.priceIndex -
-              0.02,
-              0.65,
+              0.015,
+              0.6,
               1.8
             ),
 
           reputation:
             clamp(
-              store.reputation + 3,
+              store.reputation +
+              2 +
+              Math.round(
+                marketing /
+                30
+              ),
               0,
               100
             )
@@ -200,6 +286,191 @@ class CompetitorDynamicsSystem {
         strategy
       }
     );
+  }
+
+  shouldExpand(
+    store,
+    currentDay,
+    health
+  ) {
+    const tendency =
+      clamp(
+        store.expansionTendency ??
+        0,
+        0,
+        100
+      );
+
+    const lastExpansionDay =
+      store.lastExpansionDay ??
+      store.openedDay ??
+      currentDay;
+
+    if (
+      !store.active ||
+      health < 82 ||
+      tendency < 70 ||
+      (store.ageDays ?? 0) < 120 ||
+      (store.expansionGeneration ?? 0) >= 2 ||
+      currentDay -
+        lastExpansionDay <
+        120 ||
+      currentDay % 30 !== 0
+    ) {
+      return false;
+    }
+
+    const chance =
+      clamp(
+        (
+          tendency -
+          60
+        ) /
+        400,
+        0.025,
+        0.1
+      );
+
+    return randomSystem.chance(
+      chance
+    );
+  }
+
+  createExpansion(
+    store,
+    currentDay
+  ) {
+    const brandName =
+      store.brandName ??
+      store.name;
+
+    const related =
+      entitySystem.filter(
+        "competitor_store",
+        item =>
+          (
+            item.brandName ??
+            item.name
+          ) ===
+          brandName
+      );
+
+    const nextBranch =
+      related.reduce(
+        (max, item) =>
+          Math.max(
+            max,
+            item.branchNumber ??
+            1
+          ),
+        1
+      ) +
+      1;
+
+    const branch =
+      entitySystem.create(
+        "competitor_store",
+        {
+          ...store,
+
+          name:
+            `${brandName}·${nextBranch}店`,
+
+          brandName,
+
+          branchNumber:
+            nextBranch,
+
+          expansionGeneration:
+            (
+              store.expansionGeneration ??
+              0
+            ) +
+            1,
+
+          expansionTendency:
+            Math.max(
+              20,
+              (
+                store.expansionTendency ??
+                0
+              ) -
+              15
+            ),
+
+          qualityScore:
+            clamp(
+              store.qualityScore - 2,
+              0,
+              100
+            ),
+
+          serviceScore:
+            clamp(
+              store.serviceScore - 2,
+              0,
+              100
+            ),
+
+          reputation:
+            clamp(
+              store.reputation - 3,
+              0,
+              100
+            ),
+
+          active: true,
+
+          openedDay:
+            currentDay,
+
+          closedDay: null,
+
+          ageDays: 0,
+
+          weakDays: 0,
+
+          healthScore: null,
+
+          lastStrategyDay:
+            currentDay,
+
+          lastExpansionDay: null,
+
+          lastProcessedDay: null,
+
+          parentCompetitorId:
+            store.id
+        }
+      );
+
+    entitySystem.update(
+      "competitor_store",
+      store.id,
+      {
+        lastExpansionDay:
+          currentDay
+      }
+    );
+
+    eventBus.emit(
+      "competitor:expanded",
+      {
+        parentId:
+          store.id,
+
+        branchId:
+          branch.id,
+
+        districtId:
+          store.districtId,
+
+        day:
+          currentDay
+      }
+    );
+
+    return branch;
   }
 
   processStore(
@@ -256,8 +527,8 @@ class CompetitorDynamicsSystem {
       7
     ) {
       const strategy =
-        randomSystem.pick(
-          STRATEGIES
+        this.pickStrategy(
+          next
         );
 
       next = {
@@ -296,8 +567,14 @@ class CompetitorDynamicsSystem {
             (store.weakDays ?? 0) - 2
           );
 
+    const closureThreshold =
+      this.getClosureThreshold(
+        next
+      );
+
     const shouldClose =
-      weakDays >= 30;
+      weakDays >=
+      closureThreshold;
 
     const updated =
       entitySystem.update(
@@ -328,6 +605,8 @@ class CompetitorDynamicsSystem {
 
           weakDays,
 
+          closureThreshold,
+
           healthScore:
             health,
 
@@ -357,6 +636,17 @@ class CompetitorDynamicsSystem {
           day:
             currentDay
         }
+      );
+    } else if (
+      this.shouldExpand(
+        updated,
+        currentDay,
+        health
+      )
+    ) {
+      this.createExpansion(
+        updated,
+        currentDay
       );
     }
 
@@ -397,6 +687,9 @@ class CompetitorDynamicsSystem {
     let processed = 0;
     let closed = 0;
 
+    const beforeCount =
+      stores.length;
+
     for (const store of stores) {
       if (!store.active) {
         continue;
@@ -415,6 +708,18 @@ class CompetitorDynamicsSystem {
       }
     }
 
+    const afterProcessingCount =
+      entitySystem.count(
+        "competitor_store"
+      );
+
+    const expanded =
+      Math.max(
+        0,
+        afterProcessingCount -
+        beforeCount
+      );
+
     const pruned =
       this.pruneClosed(
         currentDay
@@ -423,6 +728,7 @@ class CompetitorDynamicsSystem {
     return {
       processed,
       closed,
+      expanded,
       pruned,
       total:
         entitySystem.count(
