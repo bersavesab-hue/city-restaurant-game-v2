@@ -23,6 +23,10 @@ import {
 } from "./AwardEvaluationSystem.js";
 
 import {
+  awardFeedbackSystem
+} from "./AwardFeedbackSystem.js";
+
+import {
   AWARD_DEFINITIONS
 } from "../data/awardDefinitions.js";
 
@@ -199,10 +203,20 @@ class AwardSystem {
         resultId
       )
     ) {
-      return entitySystem.get(
-        "award_result",
-        resultId
-      );
+      const existing =
+        entitySystem.get(
+          "award_result",
+          resultId
+        );
+
+
+      awardFeedbackSystem
+        .recordResult(
+          existing
+        );
+
+
+      return existing;
     }
 
 
@@ -400,6 +414,12 @@ class AwardSystem {
         );
       }
     }
+
+
+    awardFeedbackSystem
+      .recordResult(
+        result
+      );
 
 
     eventBus.emit(

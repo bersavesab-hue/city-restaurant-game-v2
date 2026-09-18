@@ -12,6 +12,10 @@ import {
   staffingRecommendationSystem
 } from "../../systems/StaffingRecommendationSystem.js";
 
+import {
+  awardFeedbackSystem
+} from "../../systems/AwardFeedbackSystem.js";
+
 
 const MAIN_ICONS =
   Object.freeze({
@@ -328,6 +332,17 @@ class GameChromeSystem {
         staffing.totalShortage;
     } catch {
       // 装修或餐位尚未形成时无需显示编制红点。
+    }
+
+
+    try {
+      badges.operations +=
+        awardFeedbackSystem
+          .getUnreadCount(
+            restaurantId
+          );
+    } catch {
+      // 尚无评奖记录时不影响导航。
     }
 
 

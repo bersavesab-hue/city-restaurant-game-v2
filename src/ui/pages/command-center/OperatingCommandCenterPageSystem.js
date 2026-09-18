@@ -2,6 +2,10 @@ import {
   operatingCommandCenterSystem
 } from "../../../systems/OperatingCommandCenterSystem.js";
 
+import {
+  awardFeedbackSystem
+} from "../../../systems/AwardFeedbackSystem.js";
+
 
 class OperatingCommandCenterPageSystem {
   getPage(
@@ -17,7 +21,13 @@ class OperatingCommandCenterPageSystem {
       ...operatingCommandCenterSystem
         .getDashboard(
           restaurantId
-        )
+        ),
+
+      awardFeedback:
+        awardFeedbackSystem
+          .getDashboard(
+            restaurantId
+          )
     };
   }
 }
