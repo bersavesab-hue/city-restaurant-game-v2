@@ -8,39 +8,17 @@ import {
   getDefaultGridSize
 } from "./PropertySystem.js";
 import { venueTypeSystem } from "./VenueTypeSystem.js";
+import {
+  PROPERTY_TEMPLATES_V1
+} from "../data/propertyTemplates.v1.js";
+import {
+  validatePropertyTemplate
+} from "../data/propertyTemplateRules.js";
 
 const DEFAULT_TARGET = 18;
 const REFRESH_DAYS = 7;
 
-const AREA_PROFILES = Object.freeze({
-  micro: { id: "micro", min: 30, max: 80, label: "街角小铺" },
-  small: { id: "small", min: 81, max: 180, label: "社区底商" },
-  medium: { id: "medium", min: 181, max: 500, label: "临街餐饮铺" },
-  large: { id: "large", min: 501, max: 1200, label: "商业街大铺" },
-  flagship: { id: "flagship", min: 1201, max: 3000, label: "餐饮旗舰铺" },
-  complex: { id: "complex", min: 3001, max: 10000, label: "餐饮综合体" }
-});
 
-const PROFILE_CYCLE = Object.freeze([
-  "micro",
-  "small",
-  "small",
-  "medium",
-  "micro",
-  "medium",
-  "large",
-  "small",
-  "medium",
-  "flagship",
-  "small",
-  "large",
-  "micro",
-  "medium",
-  "complex",
-  "small",
-  "large",
-  "medium"
-]);
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -81,6 +59,120 @@ function choose(rng, values) {
   return values[Math.min(values.length - 1, Math.floor(rng() * values.length))];
 }
 
+function randomFloat(
+  rng,
+  min,
+  max
+) {
+  return min +
+    rng() *
+    (
+      max -
+      min
+    );
+}
+
+function chooseWeighted(
+  rng,
+  entries
+) {
+  const valid =
+    entries.filter(
+      item =>
+        Number.isFinite(
+          item.weight
+        ) &&
+        item.weight > 0
+    );
+
+  if (
+    valid.length === 0
+  ) {
+    throw new Error(
+      "Weighted choice requires at least one positive weight"
+    );
+  }
+
+  const total =
+    valid.reduce(
+      (
+        sum,
+        item
+      ) =>
+        sum +
+        item.weight,
+      0
+    );
+
+  let roll =
+    rng() *
+    total;
+
+  for (
+    const item
+    of valid
+  ) {
+    roll -=
+      item.weight;
+
+    if (
+      roll <= 0
+    ) {
+      return item.value;
+    }
+  }
+
+  return valid[
+    valid.length -
+    1
+  ].value;
+}
+
+function choosePropertyTemplate(
+  districtId,
+  rng
+) {
+  return chooseWeighted(
+    rng,
+    PROPERTY_TEMPLATES_V1.map(
+      template => ({
+        value: template,
+        weight:
+          template.baseWeight *
+          (
+            template
+              .districtWeights?.[
+                districtId
+              ] ??
+            1
+          )
+      })
+    )
+  );
+}
+
+function chooseTemplateShape(
+  template,
+  rng
+) {
+  return chooseWeighted(
+    rng,
+    Object.entries(
+      template.shapeWeights
+    ).map(
+      (
+        [
+          shape,
+          weight
+        ]
+      ) => ({
+        value: shape,
+        weight
+      })
+    )
+  );
+}
+
 function splitArea(total, count) {
   const base = Math.floor(total / count);
   const remainder = total % count;
@@ -90,28 +182,19 @@ function splitArea(total, count) {
   );
 }
 
-function getFloorCount(area, rng) {
-  if (area <= 800) {
-    return 1;
-  }
-
-  if (area <= 1800) {
-    return rng() < 0.32 ? 2 : 1;
-  }
-
-  if (area <= 4000) {
-    return rng() < 0.72 ? 2 : 1;
-  }
-
-  if (area <= 7000) {
-    return randomInt(rng, 2, 3);
-  }
-
-  return randomInt(rng, 2, 4);
-}
-
-function buildPolygon(width, height, rng) {
-  if (width < 8 || height < 8 || rng() > 0.36) {
+function buildPolygon(
+  width,
+  height,
+  rng,
+  preferredShape =
+    "rectangle"
+) {
+  if (
+    width < 8 ||
+    height < 8 ||
+    preferredShape !==
+      "l_shape"
+  ) {
     return {
       shape: "rectangle",
       polygon: [
