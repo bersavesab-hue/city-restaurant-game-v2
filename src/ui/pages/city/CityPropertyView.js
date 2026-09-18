@@ -132,6 +132,15 @@ export class CityPropertyView {
             ${property.leaseTerms?.negotiable ? `<span class="is-good">可议价</span>` : ""}
             ${property.parkingSpaces > 0 ? `<span>${property.parkingSpaces}车位</span>` : ""}
           </div>
+          ${property.recommendedVenueTypes?.length
+            ? `<div class="cr-property-card__venue-types">
+                推荐业态：
+                ${property.recommendedVenueTypes
+                  .map(item => `${item.name} ${item.score}`)
+                  .join(" · ")}
+              </div>`
+            : ""
+          }
           <div class="cr-property-card__footer">
             <span>签约首付 ${money(property.quote.upfront)}</span>
             <strong>${property.quote.affordable === false ? "资金不足" : "查看房源"}</strong>
@@ -193,6 +202,13 @@ export class CityPropertyView {
         <div class="cr-property-detail__district">
           <span>推荐 ${property.recommendation?.score ?? "-"}</span>
           <span>商圈机会 ${property.recommendation?.districtOpportunityScore ?? "-"}</span>
+          <span>当前业态 ${property.venueTypeId ?? "未设定"}</span>
+          ${property.recommendedVenueTypes?.length
+            ? `<span>推荐业态 ${property.recommendedVenueTypes
+                .map(item => item.name)
+                .join(" / ")}</span>`
+            : ""
+          }
           <span>客流 ${district?.trafficIndex ?? "-"}</span>
           <span>消费力 ${district?.spendingPower ?? "-"}</span>
           <span>竞争 ${district?.competition ?? "-"}</span>
