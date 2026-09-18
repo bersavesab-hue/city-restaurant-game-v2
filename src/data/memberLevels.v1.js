@@ -44,8 +44,8 @@ export const MEMBER_LEVELS_V1 =
       id: "silver",
       name: "银卡会员",
       minVisits: 3,
-      minSpend: 3000,
-      minLifetimePoints: 30,
+      minSpend: 300,
+      minLifetimePoints: 3,
       discount: 2,
       pointMultiplier: 1.1,
       inactivityDowngradeDays: 120
@@ -54,8 +54,8 @@ export const MEMBER_LEVELS_V1 =
       id: "gold",
       name: "金卡会员",
       minVisits: 8,
-      minSpend: 12000,
-      minLifetimePoints: 120,
+      minSpend: 1200,
+      minLifetimePoints: 12,
       discount: 4,
       pointMultiplier: 1.25,
       inactivityDowngradeDays: 150
@@ -64,8 +64,8 @@ export const MEMBER_LEVELS_V1 =
       id: "black",
       name: "黑金会员",
       minVisits: 20,
-      minSpend: 40000,
-      minLifetimePoints: 400,
+      minSpend: 4000,
+      minLifetimePoints: 40,
       discount: 6,
       pointMultiplier: 1.5,
       inactivityDowngradeDays: 180
