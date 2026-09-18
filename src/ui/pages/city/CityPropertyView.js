@@ -202,7 +202,7 @@ export class CityPropertyView {
         <div class="cr-property-detail__district">
           <span>推荐 ${property.recommendation?.score ?? "-"}</span>
           <span>商圈机会 ${property.recommendation?.districtOpportunityScore ?? "-"}</span>
-          <span>当前业态 ${property.venueTypeId ?? "未设定"}</span>
+          <span>当前业态 ${property.venueTypeName ?? "未设定"}</span>
           ${property.recommendedVenueTypes?.length
             ? `<span>推荐业态 ${property.recommendedVenueTypes
                 .map(item => item.name)
