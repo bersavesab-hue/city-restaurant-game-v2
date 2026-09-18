@@ -47,6 +47,59 @@ export const COMPETITOR_CATEGORIES =
     "chef_flagship"
   ]);
 
+export function getCompetitorBaseTarget(
+  competition
+) {
+  const safeCompetition =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Number(competition) || 0
+      )
+    );
+
+  return Math.min(
+    4,
+    Math.ceil(
+      safeCompetition / 25
+    )
+  );
+}
+
+export function getCompetitorActiveLimit(
+  competition
+) {
+  const safeCompetition =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Number(competition) || 0
+      )
+    );
+
+  if (
+    safeCompetition <= 0
+  ) {
+    return 0;
+  }
+
+  const base =
+    getCompetitorBaseTarget(
+      safeCompetition
+    );
+
+  return Math.min(
+    8,
+    base +
+      1 +
+      Math.ceil(
+        safeCompetition / 40
+      )
+  );
+}
+
 function validateRange(
   range,
   field,
