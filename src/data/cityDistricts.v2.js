@@ -113,7 +113,7 @@ export const CITY_DISTRICTS_V2 =
         foodie: 8,
         student: 6,
         local_regular: 12,
-        local_regular: 10
+        freelancer: 10
       },
       venueAffinity: {
         street_shop: 1.18,
@@ -270,7 +270,7 @@ export const CITY_DISTRICTS_V2 =
         premium_foodie: 12,
         health_conscious: 10,
         business_guest: 8,
-        business_guest: 8,
+        weekend_leisure: 8,
         young_couple: 7
       },
       venueAffinity: {
@@ -427,7 +427,7 @@ export const CITY_DISTRICTS_V2 =
         late_shift_worker: 14,
         gig_worker: 8,
         budget_family: 8,
-        budget_family: 7,
+        solo_diner: 7,
         takeaway_commuter: 7,
         resident: 8
       },
@@ -476,7 +476,7 @@ export const CITY_DISTRICTS_V2 =
         nightlife: 26,
         social_group: 18,
         young_couple: 12,
-        foodie: 12,
+        mall_shopper: 12,
         student: 8,
         foodie: 9,
         young_professional: 8,
@@ -528,7 +528,7 @@ export const CITY_DISTRICTS_V2 =
       customerMix: {
         tourist: 34,
         foodie: 13,
-        foodie: 11,
+        mall_shopper: 11,
         weekend_leisure: 12,
         premium_foodie: 8,
         young_couple: 8,
@@ -634,7 +634,7 @@ export const CITY_DISTRICTS_V2 =
         mall_shopper: 18,
         young_professional: 16,
         office_worker: 12,
-        foodie: 10,
+        premium_foodie: 10,
         young_couple: 10,
         high_income: 8,
         foodie: 10,
@@ -837,7 +837,7 @@ export const CITY_DISTRICTS_V2 =
       parkingConvenience: 36,
       transitAccess: 74,
       customerMix: {
-        foodie: 20,
+        mall_shopper: 20,
         foodie: 15,
         freelancer: 13,
         young_couple: 12,
@@ -893,7 +893,7 @@ export const CITY_DISTRICTS_V2 =
         tourist: 16,
         office_worker: 15,
         high_income: 11,
-        business_guest: 12,
+        social_group: 12,
         premium_foodie: 8,
         young_professional: 10,
         foodie: 8
@@ -999,7 +999,7 @@ export const CITY_DISTRICTS_V2 =
         breakfast_commuter: 13,
         budget_family: 12,
         local_regular: 8,
-        local_regular: 8,
+        resident: 8,
         solo_diner: 6
       },
       venueAffinity: {
