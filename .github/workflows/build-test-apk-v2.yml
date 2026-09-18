@@ -68,13 +68,13 @@ jobs:
           set -euo pipefail
           APK="android/app/build/outputs/apk/debug/app-debug.apk"
           test -s "$APK"
-          cp "$APK" city-restaurant-v2-test-0.8.66.apk
-          ls -lh city-restaurant-v2-test-0.8.66.apk
+          cp "$APK" city-restaurant-v2-test.apk
+          ls -lh city-restaurant-v2-test.apk
 
       - name: Upload test APK
         uses: actions/upload-artifact@v4
         with:
-          name: city-restaurant-v2-test-0.8.66
-          path: city-restaurant-v2-test-0.8.66.apk
+          name: city-restaurant-v2-test
+          path: city-restaurant-v2-test.apk
           if-no-files-found: error
           retention-days: 7
