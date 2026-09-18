@@ -343,15 +343,31 @@ class DailySettlementSystem {
         1440
       ) + 1;
 
-    const openedDay =
+    const firstOpenedAt =
       Number.isFinite(
-        restaurant.openedAt
+        restaurant.firstOpenedAt
       )
+        ? restaurant.firstOpenedAt
+        : (
+            Number.isFinite(
+              restaurant.openedAt
+            )
+              ? restaurant.openedAt
+              : null
+          );
+
+    const openedDay =
+      firstOpenedAt !== null
         ? Math.floor(
-            restaurant.openedAt /
+            firstOpenedAt /
             1440
           ) + 1
         : (
+            (
+              restaurant
+                .totalOperatingMinutes ??
+              0
+            ) > 0 ||
             (
               restaurant
                 .totalOperatingDays ??
