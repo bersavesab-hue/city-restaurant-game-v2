@@ -1,10 +1,36 @@
+export const DISH_GROWTH_SCHEMA_VERSION = 1;
+
+export const DISH_SCORE_SEMANTICS =
+  Object.freeze({
+    researchScore: Object.freeze({
+      id: "researchScore",
+      name: "研发评分",
+      description:
+        "一次研发完成时形成的初始研发结果，只描述研发方案本身，不代表长期菜品品阶或单次出品。"
+    }),
+
+    recipeQualityScore: Object.freeze({
+      id: "recipeQualityScore",
+      name: "配方品质分",
+      description:
+        "门店长期维护的配方水平，受研发起点与后续配方改良影响，用于长期品阶判定。"
+    }),
+
+    outputQualityScore: Object.freeze({
+      id: "outputQualityScore",
+      name: "出品质量分",
+      description:
+        "某次真实制作结果，由食材批次、鲜度、厨师、难度、营销与熟练度共同决定。"
+    })
+  });
+
 export const DISH_RANK = Object.freeze({
   HOMESTYLE: Object.freeze({
     id: "homestyle",
     name: "家常",
     order: 1,
     minMasteryLevel: 1,
-    minQualityScore: 0
+    minRecipeQualityScore: 0
   }),
 
   SELECTED: Object.freeze({
@@ -12,7 +38,7 @@ export const DISH_RANK = Object.freeze({
     name: "优选",
     order: 2,
     minMasteryLevel: 2,
-    minQualityScore: 55
+    minRecipeQualityScore: 55
   }),
 
   SIGNATURE: Object.freeze({
@@ -20,7 +46,7 @@ export const DISH_RANK = Object.freeze({
     name: "招牌",
     order: 3,
     minMasteryLevel: 3,
-    minQualityScore: 68
+    minRecipeQualityScore: 68
   }),
 
   FAMOUS: Object.freeze({
@@ -28,7 +54,7 @@ export const DISH_RANK = Object.freeze({
     name: "名菜",
     order: 4,
     minMasteryLevel: 4,
-    minQualityScore: 80
+    minRecipeQualityScore: 80
   }),
 
   HOUSE_SPECIAL: Object.freeze({
@@ -36,7 +62,7 @@ export const DISH_RANK = Object.freeze({
     name: "镇店",
     order: 5,
     minMasteryLevel: 5,
-    minQualityScore: 90
+    minRecipeQualityScore: 90
   })
 });
 
@@ -101,6 +127,21 @@ export const COOK_OUTPUT_LEVELS =
     })
   ]);
 
+export function clampDishScore(
+  value,
+  fallback = 0
+) {
+  return Number.isFinite(value)
+    ? Math.max(
+        0,
+        Math.min(
+          100,
+          Number(value)
+        )
+      )
+    : fallback;
+}
+
 export function getDishMasteryLevel(
   masteryXp
 ) {
@@ -138,7 +179,7 @@ export function getDishMasteryLevel(
 
 export function getDishRank({
   masteryLevel = 1,
-  qualityScore = 0
+  recipeQualityScore = 0
 } = {}) {
   const safeMastery =
     Number.isFinite(
@@ -156,17 +197,10 @@ export function getDishRank({
       : 1;
 
   const safeQuality =
-    Number.isFinite(
-      qualityScore
-    )
-      ? Math.max(
-          0,
-          Math.min(
-            100,
-            qualityScore
-          )
-        )
-      : 0;
+    clampDishScore(
+      recipeQualityScore,
+      0
+    );
 
   let result =
     DISH_RANK.HOMESTYLE;
@@ -179,7 +213,7 @@ export function getDishRank({
       safeMastery >=
         rule.minMasteryLevel &&
       safeQuality >=
-        rule.minQualityScore
+        rule.minRecipeQualityScore
     ) {
       result =
         rule;
@@ -190,14 +224,13 @@ export function getDishRank({
 }
 
 export function getCookOutputGrade(
-  qualityScore
+  outputQualityScore
 ) {
   const score =
-    Number.isFinite(
-      qualityScore
-    )
-      ? qualityScore
-      : 0;
+    clampDishScore(
+      outputQualityScore,
+      0
+    );
 
   if (score >= 90) {
     return COOK_OUTPUT_GRADE.S;
@@ -214,13 +247,12 @@ export function getCookOutputGrade(
   return COOK_OUTPUT_GRADE.C;
 }
 
-
 export function getCookOutputLevel(
-  qualityScore
+  outputQualityScore
 ) {
   const grade =
     getCookOutputGrade(
-      qualityScore
+      outputQualityScore
     );
 
   return (
@@ -231,4 +263,67 @@ export function getCookOutputLevel(
     ) ??
     COOK_OUTPUT_LEVELS[0]
   );
+}
+
+export function validateDishGrowthRules() {
+  if (
+    DISH_RANK_LIST.length !==
+    5
+  ) {
+    throw new Error(
+      "Dish rank must contain exactly five long-term stages"
+    );
+  }
+
+  if (
+    DISH_MASTERY_THRESHOLDS.length !==
+    5
+  ) {
+    throw new Error(
+      "Dish mastery must contain exactly five levels"
+    );
+  }
+
+  if (
+    Object.keys(
+      COOK_OUTPUT_GRADE
+    ).join(",") !==
+    "C,B,A,S"
+  ) {
+    throw new Error(
+      "Cook output grades must be C/B/A/S only"
+    );
+  }
+
+  for (
+    let index = 1;
+    index <
+      DISH_RANK_LIST.length;
+    index += 1
+  ) {
+    const previous =
+      DISH_RANK_LIST[
+        index - 1
+      ];
+
+    const current =
+      DISH_RANK_LIST[
+        index
+      ];
+
+    if (
+      current.order <=
+        previous.order ||
+      current.minMasteryLevel <
+        previous.minMasteryLevel ||
+      current.minRecipeQualityScore <
+        previous.minRecipeQualityScore
+    ) {
+      throw new Error(
+        "Dish rank requirements must increase monotonically"
+      );
+    }
+  }
+
+  return true;
 }
