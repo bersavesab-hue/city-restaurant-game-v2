@@ -5,6 +5,7 @@ import { storeProgressSystem } from "./StoreProgressSystem.js";
 import { restaurantSystem } from "./RestaurantSystem.js";
 import { propertySystem } from "./PropertySystem.js";
 import { renovationRealityCostSystem } from "./RenovationRealityCostSystem.js";
+import { venueTypeSystem } from "./VenueTypeSystem.js";
 
 import {
   RENOVATION_TEMPLATES_V1,
@@ -918,7 +919,87 @@ class RenovationPlanningSystem {
       );
 
     const zoning =
-      this.getZoneAnalysis(layout);
+      this.getZoneAnalysis(
+        layout
+      );
+
+    let venueType =
+      null;
+
+    try {
+      const restaurant =
+        restaurantSystem.get(
+          restaurantId
+        );
+
+      if (
+        restaurant.locationId
+      ) {
+        const property =
+          propertySystem.get(
+            restaurant.locationId
+          );
+
+        venueType =
+          venueTypeSystem.get(
+            property.venueTypeId ??
+            "street_shop"
+          );
+      }
+    } catch {
+      venueType = null;
+    }
+
+    const minimumKitchenRatio =
+      venueType
+        ?.renovationProfile
+        ?.minKitchenRatio ??
+      0.06;
+
+    const kitchenMaximum =
+      Math.min(
+        0.82,
+        Math.max(
+          minimumKitchenRatio +
+          0.18,
+          0.28
+        )
+      );
+
+    const venueKitchenScore =
+      this.scoreBand(
+        zoning.ratios.kitchen,
+        minimumKitchenRatio,
+        kitchenMaximum
+      );
+
+    const deliveryOnly =
+      venueType
+        ?.maxServiceStyle ===
+      "delivery_only";
+
+    const effectiveZoningScore =
+      deliveryOnly
+        ? Math.round(
+            venueKitchenScore *
+              0.65 +
+            zoning.scores.service *
+              0.2 +
+            zoning.scores.open *
+              0.15
+          )
+        : Math.round(
+            zoning.scores.dining *
+              0.28 +
+            venueKitchenScore *
+              0.32 +
+            zoning.scores.service *
+              0.15 +
+            zoning.scores.waiting *
+              0.1 +
+            zoning.scores.open *
+              0.15
+          );
 
     const spacing =
       this.getTableSpacing(layout);
@@ -947,7 +1028,7 @@ class RenovationPlanningSystem {
         clamp(
           flowScore * 0.32 +
           comfortScore * 0.23 +
-          zoning.zoningScore * 0.2 +
+          effectiveZoningScore * 0.2 +
           spacing.spacingScore * 0.1 +
           completenessScore * 0.15,
           0,
@@ -955,9 +1036,38 @@ class RenovationPlanningSystem {
         )
       );
 
+    const zoningIssues =
+      [
+        ...zoning.issues
+      ].filter(
+        issue =>
+          !deliveryOnly ||
+          ![
+            "missing_dining_zone",
+            "missing_waiting_zone",
+            "dining_zone_overpacked"
+          ].includes(
+            issue
+          )
+      )
+      .filter(
+        issue =>
+          issue !==
+          "kitchen_zone_too_small"
+      );
+
+    if (
+      zoning.ratios.kitchen <
+      minimumKitchenRatio
+    ) {
+      zoningIssues.push(
+        "venue_kitchen_ratio_below_minimum"
+      );
+    }
+
     const issues = [
       ...(flow.issues ?? []),
-      ...zoning.issues,
+      ...zoningIssues,
       ...spacing.issues
     ];
 
@@ -974,14 +1084,28 @@ class RenovationPlanningSystem {
         flow: flowScore,
         comfort: comfortScore,
         zoning:
-          zoning.zoningScore,
+          effectiveZoningScore,
         spacing:
           spacing.spacingScore,
         completeness:
           completenessScore
       },
 
-      zoning,
+      zoning: {
+        ...zoning,
+
+        zoningScore:
+          effectiveZoningScore,
+
+        minimumKitchenRatio,
+
+        venueKitchenScore,
+
+        venueTypeId:
+          venueType?.id ??
+          null
+      },
+
       spacing,
       issues: [...new Set(issues)]
     };
