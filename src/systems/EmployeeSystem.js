@@ -3,6 +3,7 @@ import { eventBus } from "../core/EventBus.js";
 import { randomSystem } from "../core/RandomSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
 import { EMPLOYEE_ROLES } from "../data/employeeRoles.js";
+import { validateEmployeeRole } from "../data/employeeCareerRules.js";
 import { economicBaselineSystem } from "./EconomicBaselineSystem.js";
 
 const EMPLOYEE_STATUS = Object.freeze({
@@ -36,8 +37,14 @@ function requireRole(roleId) {
   const role = EMPLOYEE_ROLES[roleId];
 
   if (!role) {
-    throw new Error(`Unknown employee role "${roleId}"`);
+    throw new Error(
+      `Unknown employee role "${roleId}"`
+    );
   }
+
+  validateEmployeeRole(
+    role
+  );
 
   return role;
 }
