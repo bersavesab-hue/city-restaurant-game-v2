@@ -8,6 +8,10 @@ import {
   getDefaultRecipeId
 } from "../src/data/dishCatalogRules.js";
 
+import {
+  RECIPE_SCHEMA_VERSION
+} from "../src/data/recipeRules.js";
+
 const {
   ingredientCatalogSystem,
   dishCatalogSystem,
@@ -106,10 +110,19 @@ test(
     recipeSystem.load(
       [
         {
+          schemaVersion:
+            RECIPE_SCHEMA_VERSION,
+
           id:
             dish.defaultRecipeId,
 
           dishId,
+
+          variantId:
+            "standard",
+
+          name:
+            "标准做法",
 
           ingredients: [
             {
