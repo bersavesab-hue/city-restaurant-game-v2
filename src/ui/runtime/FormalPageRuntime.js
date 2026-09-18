@@ -529,7 +529,7 @@ class FormalPageRuntime {
         }
       }
     };
-
+  }
 }
 
 
