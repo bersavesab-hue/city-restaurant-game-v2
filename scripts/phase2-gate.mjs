@@ -49,7 +49,8 @@ const tests = [
   "tests/award-ceremony.test.js",
   "tests/award-feedback-command-center.test.js",
   "tests/more-hub.test.js",
-  "tests/market-strategy-ui.test.js"
+  "tests/market-strategy-ui.test.js",
+  "tests/store-progress-ui.test.js"
 ];
 
 
