@@ -176,6 +176,52 @@ const GAMEPLAY_PAGES = [
 
   {
     id:
+      "employee_recruitment",
+
+    title:
+      "招聘员工",
+
+    parent:
+      "employees",
+
+    order:
+      411,
+
+    layout:
+      "management",
+
+    metadata: {
+      hiddenFromMenu:
+        true
+    }
+  },
+
+
+  {
+    id:
+      "employee_detail",
+
+    title:
+      "员工详情",
+
+    parent:
+      "employees",
+
+    order:
+      412,
+
+    layout:
+      "management",
+
+    metadata: {
+      hiddenFromMenu:
+        true
+    }
+  },
+
+
+  {
+    id:
       "workforce-capacity",
 
     title:

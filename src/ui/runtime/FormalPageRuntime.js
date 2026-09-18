@@ -21,6 +21,33 @@ import {
 
 
 import {
+  employeeRecruitmentPageSystem
+} from "../pages/employee-recruitment/EmployeeRecruitmentPageSystem.js";
+
+import {
+  employeeRecruitmentView
+} from "../pages/employee-recruitment/EmployeeRecruitmentView.js";
+
+
+import {
+  employeeDetailPageSystem
+} from "../pages/employee-detail/EmployeeDetailPageSystem.js";
+
+import {
+  employeeDetailView
+} from "../pages/employee-detail/EmployeeDetailView.js";
+
+
+import {
+  employeeTrainingPageSystem
+} from "../pages/employee-training/EmployeeTrainingPageSystem.js";
+
+import {
+  employeeTrainingView
+} from "../pages/employee-training/EmployeeTrainingView.js";
+
+
+import {
   employeePromotionPageSystem
 } from "../pages/employee-promotion/EmployeePromotionPageSystem.js";
 
@@ -220,6 +247,39 @@ const FORMAL_PAGE_DEFINITIONS =
 
       view:
         financeCenterView
+    },
+
+
+    employee_recruitment: {
+      pageSystem:
+        employeeRecruitmentPageSystem,
+
+      view:
+        employeeRecruitmentView,
+
+      mode:
+        "mount"
+    },
+
+
+    employee_detail: {
+      pageSystem:
+        employeeDetailPageSystem,
+
+      view:
+        employeeDetailView
+    },
+
+
+    employee_training: {
+      pageSystem:
+        employeeTrainingPageSystem,
+
+      view:
+        employeeTrainingView,
+
+      mode:
+        "mount"
     },
 
 
@@ -588,6 +648,16 @@ class FormalPageRuntime {
               navigationParams.period =
                 element.dataset
                   .pagePeriod;
+            }
+
+
+            if (
+              element.dataset
+                .employeeId
+            ) {
+              navigationParams.employeeId =
+                element.dataset
+                  .employeeId;
             }
 
 

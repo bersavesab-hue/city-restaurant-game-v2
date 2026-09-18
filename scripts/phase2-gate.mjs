@@ -65,6 +65,7 @@ const tests = [
   "tests/formal-employee-generation-data.test.js",
   "tests/formal-employee-career-data.test.js",
   "tests/employee-management-ui.test.js",
+  "tests/employee-formal-pages.test.js",
   "tests/formal-customer-segment-data.test.js",
   "tests/customer-segment.test.js",
   "tests/customer-experience.test.js",
