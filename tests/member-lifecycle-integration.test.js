@@ -457,6 +457,57 @@ test(
   }
 );
 
+
+test(
+  "Lv7会员功能解锁前高倾向顾客也不会自动入会",
+  () => {
+    gameState.reset();
+
+    const restaurant =
+      restaurantSystem.create({
+        name:
+          "会员锁定测试店"
+      });
+
+    const customer =
+      customerSystem.create({
+        name:
+          "未解锁熟客",
+        budget: 10000
+      });
+
+    const result =
+      customerLoyaltyIntegrationSystem
+        .processOrder({
+          id:
+            "locked_auto_member_order",
+          restaurantId:
+            restaurant.id,
+          customerId:
+            customer.id,
+          customerSegmentId:
+            "breakfast_commuter",
+          totalRevenue: 120,
+          averageQuality: 85,
+          items: []
+        });
+
+    assert.equal(
+      result.mode,
+      "cohort"
+    );
+
+    assert.equal(
+      customerLoyaltySystem
+        .getMemberProfile(
+          restaurant.id,
+          customer.id
+        ),
+      null
+    );
+  }
+);
+
 test(
   "高入会倾向客群的已识别顾客会进入会员生命周期",
   () => {
@@ -474,6 +525,11 @@ test(
           "早餐通勤顾客",
         budget: 10000
       });
+
+    restaurantSystem.setLevel(
+      restaurant.id,
+      7
+    );
 
     const result =
       customerLoyaltyIntegrationSystem
