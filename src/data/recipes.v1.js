@@ -1,9 +1,11 @@
 export const RECIPE_DATASET_META = Object.freeze({
   "schemaVersion": 1,
-  "datasetVersion": "1.0.0",
-  "total": 350,
+  "datasetVersion": "1.1.0",
+  "total": 450,
   "standardRecipeCount": 350,
+  "alternateRecipeCount": 100,
   "dishCoverage": 350,
+  "ingredientCoverage": 220,
   "sourceIngredientCatalog": "ingredients.v1",
   "sourceIngredientCount": 220,
   "targetTotal": "450-550"
@@ -13018,6 +13020,3806 @@ export const RECIPES_V1 = Object.freeze([
       "standard",
       "specialty",
       "steam"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_mushroom_pork_rice_shoulder_pork",
+    "dishId": "mushroom_pork_rice",
+    "variantId": "shoulder_pork",
+    "name": "梅花肉香菇饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "pork_shoulder",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 34,
+    "cookingMinutes": 14,
+    "tags": [
+      "alternate",
+      "shoulder_pork"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_cumin_lamb_lamb_leg",
+    "dishId": "cumin_lamb",
+    "variantId": "lamb_leg",
+    "name": "羊腿肉孜然做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "lamb_leg",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "cumin",
+        "quantity": 5
+      },
+      {
+        "ingredientId": "chili_pepper",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 46,
+    "cookingMinutes": 14,
+    "tags": [
+      "alternate",
+      "lamb_leg"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_spicy_intestine_hotpot_chicken_feet",
+    "dishId": "spicy_intestine_hotpot",
+    "variantId": "chicken_feet",
+    "name": "鸡爪肥肠锅做法",
+    "method": "hotpot",
+    "ingredients": [
+      {
+        "ingredientId": "pork_intestine",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "chicken_feet",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "napa_cabbage",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "doubanjiang",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "dried_chili",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 62,
+    "cookingMinutes": 24,
+    "tags": [
+      "alternate",
+      "chicken_feet"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_fish_noodle_tilapia",
+    "dishId": "fish_noodle",
+    "variantId": "tilapia",
+    "name": "罗非鱼汤面做法",
+    "method": "poach",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "tilapia",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 42,
+    "cookingMinutes": 20,
+    "tags": [
+      "alternate",
+      "tilapia"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_fish_home_set_yellow_croaker",
+    "dishId": "fish_home_set",
+    "variantId": "yellow_croaker",
+    "name": "黄花鱼时蔬套餐做法",
+    "method": "steam",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "yellow_croaker",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 52,
+    "cookingMinutes": 26,
+    "tags": [
+      "alternate",
+      "yellow_croaker"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_fish_home_set_pomfret",
+    "dishId": "fish_home_set",
+    "variantId": "pomfret",
+    "name": "鲳鱼时蔬套餐做法",
+    "method": "steam",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "pomfret",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 54,
+    "cookingMinutes": 26,
+    "tags": [
+      "alternate",
+      "pomfret"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_seafood_rice_tuna",
+    "dishId": "seafood_rice",
+    "variantId": "tuna",
+    "name": "金枪鱼海鲜饭做法",
+    "method": "pan_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "tuna",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "broccoli",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "pepper_powder",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "peanut_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 58,
+    "cookingMinutes": 18,
+    "tags": [
+      "alternate",
+      "tuna"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_shrimp_egg_river_shrimp",
+    "dishId": "shrimp_egg",
+    "variantId": "river_shrimp",
+    "name": "河虾炒蛋做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "river_shrimp",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 38,
+    "cookingMinutes": 10,
+    "tags": [
+      "alternate",
+      "river_shrimp"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_seafood_hotpot_crayfish",
+    "dishId": "seafood_hotpot",
+    "variantId": "crayfish",
+    "name": "小龙虾海鲜锅做法",
+    "method": "hotpot",
+    "ingredients": [
+      {
+        "ingredientId": "crayfish",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shrimp",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "clam",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "napa_cabbage",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 64,
+    "cookingMinutes": 22,
+    "tags": [
+      "alternate",
+      "crayfish"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_clam_salad_razor_clam",
+    "dishId": "clam_salad",
+    "variantId": "razor_clam",
+    "name": "凉拌蛏子做法",
+    "method": "cold_mix",
+    "ingredients": [
+      {
+        "ingredientId": "razor_clam",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "cilantro",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "sesame_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "black_vinegar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 44,
+    "cookingMinutes": 10,
+    "tags": [
+      "alternate",
+      "razor_clam"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_seafood_noodle_mussel",
+    "dishId": "seafood_noodle",
+    "variantId": "mussel",
+    "name": "青口海鲜面做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "mussel",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shrimp",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 52,
+    "cookingMinutes": 18,
+    "tags": [
+      "alternate",
+      "mussel"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_squid_salad_cuttlefish",
+    "dishId": "squid_salad",
+    "variantId": "cuttlefish",
+    "name": "凉拌墨鱼做法",
+    "method": "cold_mix",
+    "ingredients": [
+      {
+        "ingredientId": "cuttlefish",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "cucumber",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "sesame_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "black_vinegar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 46,
+    "cookingMinutes": 10,
+    "tags": [
+      "alternate",
+      "cuttlefish"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_vegetable_rice_noodle_lettuce",
+    "dishId": "vegetable_rice_noodle",
+    "variantId": "lettuce",
+    "name": "生菜时蔬米粉做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "rice_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "lettuce",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "carrot",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "bean_sprout",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 26,
+    "cookingMinutes": 14,
+    "tags": [
+      "alternate",
+      "lettuce"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_vegetable_egg_rice_romaine",
+    "dishId": "vegetable_egg_rice",
+    "variantId": "romaine",
+    "name": "油麦菜鸡蛋饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "romaine",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "carrot",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 26,
+    "cookingMinutes": 10,
+    "tags": [
+      "alternate",
+      "romaine"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_tofu_vegetable_hotpot_water_spinach",
+    "dishId": "tofu_vegetable_hotpot",
+    "variantId": "water_spinach",
+    "name": "空心菜豆腐锅做法",
+    "method": "hotpot",
+    "ingredients": [
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "water_spinach",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "enoki_mushroom",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 16,
+    "tags": [
+      "alternate",
+      "water_spinach"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_vegetable_rice_noodle_zucchini",
+    "dishId": "vegetable_rice_noodle",
+    "variantId": "zucchini",
+    "name": "西葫芦米粉做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "rice_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "zucchini",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "carrot",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 26,
+    "cookingMinutes": 14,
+    "tags": [
+      "alternate",
+      "zucchini"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_shrimp_winter_melon_soup_luffa",
+    "dishId": "shrimp_winter_melon_soup",
+    "variantId": "luffa",
+    "name": "丝瓜鲜虾汤做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "shrimp",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "luffa",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 18,
+    "tags": [
+      "alternate",
+      "luffa"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_hot_sour_rice_noodle_mung_sprout",
+    "dishId": "hot_sour_rice_noodle",
+    "variantId": "mung_sprout",
+    "name": "绿豆芽酸辣米粉做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "rice_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "mung_bean_sprout",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "pickled_cabbage",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "chili_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "black_vinegar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 30,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "mung_sprout"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_orange_fizz_mandarin",
+    "dishId": "orange_fizz",
+    "variantId": "mandarin",
+    "name": "橘香气泡饮做法",
+    "method": "raw_prepare",
+    "ingredients": [
+      {
+        "ingredientId": "mandarin",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "soda_water",
+        "quantity": 220
+      }
+    ],
+    "difficulty": 16,
+    "cookingMinutes": 5,
+    "tags": [
+      "alternate",
+      "mandarin"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_fruit_salad_pineapple",
+    "dishId": "fruit_salad",
+    "variantId": "pineapple",
+    "name": "菠萝酸奶水果沙拉做法",
+    "method": "raw_prepare",
+    "ingredients": [
+      {
+        "ingredientId": "pineapple",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "apple",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "banana",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "yogurt",
+        "quantity": 100
+      }
+    ],
+    "difficulty": 26,
+    "cookingMinutes": 8,
+    "tags": [
+      "alternate",
+      "pineapple"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_yogurt_fruit_cup_peach",
+    "dishId": "yogurt_fruit_cup",
+    "variantId": "peach",
+    "name": "桃子酸奶杯做法",
+    "method": "raw_prepare",
+    "ingredients": [
+      {
+        "ingredientId": "yogurt",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "peach",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "apple",
+        "quantity": 150
+      }
+    ],
+    "difficulty": 22,
+    "cookingMinutes": 8,
+    "tags": [
+      "alternate",
+      "peach"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_yogurt_fruit_cup_kiwi",
+    "dishId": "yogurt_fruit_cup",
+    "variantId": "kiwi",
+    "name": "猕猴桃酸奶杯做法",
+    "method": "raw_prepare",
+    "ingredients": [
+      {
+        "ingredientId": "yogurt",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "kiwi",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "banana",
+        "quantity": 150
+      }
+    ],
+    "difficulty": 24,
+    "cookingMinutes": 8,
+    "tags": [
+      "alternate",
+      "kiwi"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_breakfast_egg_pancake_cornmeal",
+    "dishId": "breakfast_egg_pancake",
+    "variantId": "cornmeal",
+    "name": "玉米面鸡蛋早餐饼做法",
+    "method": "pan_fry",
+    "ingredients": [
+      {
+        "ingredientId": "cornmeal",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "chive",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "peanut_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 28,
+    "cookingMinutes": 12,
+    "tags": [
+      "alternate",
+      "cornmeal"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_plain_steamed_bun_high_gluten",
+    "dishId": "plain_steamed_bun",
+    "variantId": "high_gluten",
+    "name": "高筋面粉馒头做法",
+    "method": "steam",
+    "ingredients": [
+      {
+        "ingredientId": "high_gluten_flour",
+        "quantity": 160
+      },
+      {
+        "ingredientId": "sugar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 24,
+    "cookingMinutes": 24,
+    "tags": [
+      "alternate",
+      "high_gluten"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_plain_steamed_bun_whole_wheat",
+    "dishId": "plain_steamed_bun",
+    "variantId": "whole_wheat",
+    "name": "全麦馒头做法",
+    "method": "steam",
+    "ingredients": [
+      {
+        "ingredientId": "whole_wheat_flour",
+        "quantity": 160
+      },
+      {
+        "ingredientId": "sugar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 26,
+    "cookingMinutes": 24,
+    "tags": [
+      "alternate",
+      "whole_wheat"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_hot_soy_milk_whole_soybean",
+    "dishId": "hot_soy_milk",
+    "variantId": "whole_soybean",
+    "name": "黄豆现磨豆浆做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "soybean",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "mineral_water",
+        "quantity": 220
+      },
+      {
+        "ingredientId": "sugar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 22,
+    "cookingMinutes": 18,
+    "tags": [
+      "alternate",
+      "whole_soybean"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_red_bean_soup_black_bean",
+    "dishId": "red_bean_soup",
+    "variantId": "black_bean",
+    "name": "红黑豆甜汤做法",
+    "method": "simmer",
+    "ingredients": [
+      {
+        "ingredientId": "red_bean",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "black_bean",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rock_sugar",
+        "quantity": 12
+      }
+    ],
+    "difficulty": 24,
+    "cookingMinutes": 44,
+    "tags": [
+      "alternate",
+      "black_bean"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_vegetable_mushroom_dumpling_broad_bean",
+    "dishId": "vegetable_mushroom_dumpling",
+    "variantId": "broad_bean",
+    "name": "蚕豆菌菇素饺做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dumpling_wrapper",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "broad_bean",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "napa_cabbage",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 34,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "broad_bean"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_soy_braised_egg_duck_egg",
+    "dishId": "soy_braised_egg",
+    "variantId": "duck_egg",
+    "name": "酱香鸭蛋做法",
+    "method": "braise",
+    "ingredients": [
+      {
+        "ingredientId": "duck_egg",
+        "quantity": 1
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "dark_soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "rock_sugar",
+        "quantity": 12
+      }
+    ],
+    "difficulty": 24,
+    "cookingMinutes": 24,
+    "tags": [
+      "alternate",
+      "duck_egg"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_tofu_vegetable_hotpot_quail_egg",
+    "dishId": "tofu_vegetable_hotpot",
+    "variantId": "quail_egg",
+    "name": "鹌鹑蛋豆腐锅做法",
+    "method": "hotpot",
+    "ingredients": [
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "quail_egg",
+        "quantity": 4
+      },
+      {
+        "ingredientId": "napa_cabbage",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 38,
+    "cookingMinutes": 18,
+    "tags": [
+      "alternate",
+      "quail_egg"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_vinegar_cucumber_rice_vinegar",
+    "dishId": "vinegar_cucumber",
+    "variantId": "rice_vinegar",
+    "name": "米醋拍黄瓜做法",
+    "method": "cold_mix",
+    "ingredients": [
+      {
+        "ingredientId": "cucumber",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rice_vinegar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "sesame_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 16,
+    "cookingMinutes": 6,
+    "tags": [
+      "alternate",
+      "rice_vinegar"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_sesame_peanut_noodle_sweet_bean",
+    "dishId": "sesame_peanut_noodle",
+    "variantId": "sweet_bean",
+    "name": "甜面酱花生拌面做法",
+    "method": "cold_mix",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "peanut",
+        "quantity": 35
+      },
+      {
+        "ingredientId": "sweet_bean_paste",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "sesame_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "black_vinegar",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 30,
+    "cookingMinutes": 10,
+    "tags": [
+      "alternate",
+      "sweet_bean"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_duck_rice_bowl_hoisin",
+    "dishId": "duck_rice_bowl",
+    "variantId": "hoisin",
+    "name": "海鲜酱鸭腿饭做法",
+    "method": "braise",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "duck_leg",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "hoisin_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 46,
+    "cookingMinutes": 32,
+    "tags": [
+      "alternate",
+      "hoisin"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_beef_shank_salad_mustard",
+    "dishId": "beef_shank_salad",
+    "variantId": "mustard",
+    "name": "芥末牛腱凉拌做法",
+    "method": "cold_mix",
+    "ingredients": [
+      {
+        "ingredientId": "beef_shank",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "cilantro",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "mustard",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "black_vinegar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 46,
+    "cookingMinutes": 12,
+    "tags": [
+      "alternate",
+      "mustard"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_spicy_beef_hotpot_umami",
+    "dishId": "spicy_beef_hotpot",
+    "variantId": "umami",
+    "name": "鲜味麻辣牛肉锅做法",
+    "method": "hotpot",
+    "ingredients": [
+      {
+        "ingredientId": "beef",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "napa_cabbage",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "enoki_mushroom",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "doubanjiang",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "dried_chili",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "sichuan_pepper",
+        "quantity": 4
+      },
+      {
+        "ingredientId": "msg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 56,
+    "cookingMinutes": 20,
+    "tags": [
+      "alternate",
+      "umami"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_mushroom_chicken_soup_chicken_powder",
+    "dishId": "mushroom_chicken_soup",
+    "variantId": "chicken_powder",
+    "name": "鲜味香菇鸡汤做法",
+    "method": "stew",
+    "ingredients": [
+      {
+        "ingredientId": "chicken",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "chicken_powder",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 40,
+    "cookingMinutes": 48,
+    "tags": [
+      "alternate",
+      "chicken_powder"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_black_pepper_beef_tenderized",
+    "dishId": "black_pepper_beef",
+    "variantId": "tenderized",
+    "name": "嫩滑黑椒牛柳做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "beef_tenderloin",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "green_pepper",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "pepper_powder",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "baking_soda",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 48,
+    "cookingMinutes": 14,
+    "tags": [
+      "alternate",
+      "tenderized"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_tomato_egg_sunflower_oil",
+    "dishId": "tomato_egg",
+    "variantId": "sunflower_oil",
+    "name": "葵花籽油番茄炒蛋做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "tomato",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "sunflower_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 20,
+    "cookingMinutes": 8,
+    "tags": [
+      "alternate",
+      "sunflower_oil"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_egg_fried_rice_lard",
+    "dishId": "egg_fried_rice",
+    "variantId": "lard",
+    "name": "猪油蛋炒饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "chive",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "lard",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 22,
+    "cookingMinutes": 9,
+    "tags": [
+      "alternate",
+      "lard"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_mushroom_tofu_soup_daylily",
+    "dishId": "mushroom_tofu_soup",
+    "variantId": "daylily",
+    "name": "黄花菜菌菇豆腐汤做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "dried_daylily",
+        "quantity": 25
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 30,
+    "cookingMinutes": 20,
+    "tags": [
+      "alternate",
+      "daylily"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_seaweed_shrimp_soup_vermicelli",
+    "dishId": "seaweed_shrimp_soup",
+    "variantId": "vermicelli",
+    "name": "紫菜虾皮粉丝汤做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dried_seaweed",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "dried_shrimp",
+        "quantity": 15
+      },
+      {
+        "ingredientId": "vermicelli",
+        "quantity": 50
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 24,
+    "cookingMinutes": 12,
+    "tags": [
+      "alternate",
+      "vermicelli"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_mushroom_hotpot_sweet_potato_noodle",
+    "dishId": "mushroom_hotpot",
+    "variantId": "sweet_potato_noodle",
+    "name": "菌菇红薯粉锅做法",
+    "method": "hotpot",
+    "ingredients": [
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "oyster_mushroom",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "enoki_mushroom",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "bean_thread_noodle",
+        "quantity": 80
+      },
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 42,
+    "cookingMinutes": 20,
+    "tags": [
+      "alternate",
+      "sweet_potato_noodle"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_seaweed_shrimp_soup_anchovy",
+    "dishId": "seaweed_shrimp_soup",
+    "variantId": "anchovy",
+    "name": "紫菜小鱼干鲜汤做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dried_seaweed",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "dried_anchovy",
+        "quantity": 20
+      },
+      {
+        "ingredientId": "dried_shrimp",
+        "quantity": 15
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 28,
+    "cookingMinutes": 14,
+    "tags": [
+      "alternate",
+      "anchovy"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_yogurt_fruit_cup_walnut",
+    "dishId": "yogurt_fruit_cup",
+    "variantId": "walnut",
+    "name": "核桃酸奶水果杯做法",
+    "method": "raw_prepare",
+    "ingredients": [
+      {
+        "ingredientId": "yogurt",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "apple",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "banana",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "walnut",
+        "quantity": 30
+      }
+    ],
+    "difficulty": 28,
+    "cookingMinutes": 8,
+    "tags": [
+      "alternate",
+      "walnut"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_braised_duck_tangerine_peel",
+    "dishId": "braised_duck",
+    "variantId": "tangerine_peel",
+    "name": "陈皮酱鸭做法",
+    "method": "braise",
+    "ingredients": [
+      {
+        "ingredientId": "duck",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "dried_tangerine_peel",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "five_spice",
+        "quantity": 4
+      },
+      {
+        "ingredientId": "rock_sugar",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 66,
+    "cookingMinutes": 68,
+    "tags": [
+      "alternate",
+      "tangerine_peel"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_pear_drink_plum",
+    "dishId": "pear_drink",
+    "variantId": "plum",
+    "name": "话梅鲜梨饮做法",
+    "method": "simmer",
+    "ingredients": [
+      {
+        "ingredientId": "pear",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "dried_plum",
+        "quantity": 15
+      },
+      {
+        "ingredientId": "mineral_water",
+        "quantity": 220
+      },
+      {
+        "ingredientId": "rock_sugar",
+        "quantity": 12
+      }
+    ],
+    "difficulty": 20,
+    "cookingMinutes": 20,
+    "tags": [
+      "alternate",
+      "plum"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_braised_pork_belly_rice_dried_bamboo",
+    "dishId": "braised_pork_belly_rice",
+    "variantId": "dried_bamboo",
+    "name": "笋干红烧肉饭做法",
+    "method": "braise",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "pork_belly",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "dried_bamboo_shoot",
+        "quantity": 35
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "dark_soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "rock_sugar",
+        "quantity": 12
+      }
+    ],
+    "difficulty": 50,
+    "cookingMinutes": 42,
+    "tags": [
+      "alternate",
+      "dried_bamboo"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_plain_rice_congee_pickled_radish",
+    "dishId": "plain_rice_congee",
+    "variantId": "pickled_radish",
+    "name": "萝卜干白粥做法",
+    "method": "simmer",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "pickled_radish",
+        "quantity": 30
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 16,
+    "cookingMinutes": 36,
+    "tags": [
+      "alternate",
+      "pickled_radish"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_grilled_chicken_wings_cola",
+    "dishId": "grilled_chicken_wings",
+    "variantId": "cola",
+    "name": "可乐鸡翅做法",
+    "method": "braise",
+    "ingredients": [
+      {
+        "ingredientId": "chicken_wing",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "cola",
+        "quantity": 220
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "dark_soy_sauce",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 44,
+    "cookingMinutes": 28,
+    "tags": [
+      "alternate",
+      "cola"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_lime_soda_lemon_soda",
+    "dishId": "lime_soda",
+    "variantId": "lemon_soda",
+    "name": "双柠汽水做法",
+    "method": "raw_prepare",
+    "ingredients": [
+      {
+        "ingredientId": "lime",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "lemon_soda",
+        "quantity": 220
+      }
+    ],
+    "difficulty": 14,
+    "cookingMinutes": 5,
+    "tags": [
+      "alternate",
+      "lemon_soda"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_orange_apple_mix_orange_juice",
+    "dishId": "orange_apple_mix",
+    "variantId": "orange_juice",
+    "name": "橙汁苹果混合饮做法",
+    "method": "raw_prepare",
+    "ingredients": [
+      {
+        "ingredientId": "orange_juice",
+        "quantity": 220
+      },
+      {
+        "ingredientId": "apple",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "mineral_water",
+        "quantity": 220
+      }
+    ],
+    "difficulty": 18,
+    "cookingMinutes": 6,
+    "tags": [
+      "alternate",
+      "orange_juice"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_apple_fizz_apple_juice",
+    "dishId": "apple_fizz",
+    "variantId": "apple_juice",
+    "name": "苹果汁气泡饮做法",
+    "method": "raw_prepare",
+    "ingredients": [
+      {
+        "ingredientId": "apple_juice",
+        "quantity": 220
+      },
+      {
+        "ingredientId": "soda_water",
+        "quantity": 220
+      }
+    ],
+    "difficulty": 14,
+    "cookingMinutes": 5,
+    "tags": [
+      "alternate",
+      "apple_juice"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_sweet_sour_tenderloin_potato_starch",
+    "dishId": "sweet_sour_tenderloin",
+    "variantId": "potato_starch",
+    "name": "马铃薯淀粉糖醋里脊做法",
+    "method": "fry",
+    "ingredients": [
+      {
+        "ingredientId": "pork_tenderloin",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "potato_starch",
+        "quantity": 20
+      },
+      {
+        "ingredientId": "ketchup",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "vinegar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "sugar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "soybean_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 50,
+    "cookingMinutes": 18,
+    "tags": [
+      "alternate",
+      "potato_starch"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_egg_fried_rice_shrimp",
+    "dishId": "egg_fried_rice",
+    "variantId": "shrimp",
+    "name": "虾仁蛋炒饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "shrimp",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "chive",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 28,
+    "cookingMinutes": 10,
+    "tags": [
+      "alternate",
+      "shrimp"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_egg_fried_rice_mushroom",
+    "dishId": "egg_fried_rice",
+    "variantId": "mushroom",
+    "name": "香菇蛋炒饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "chive",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 26,
+    "cookingMinutes": 10,
+    "tags": [
+      "alternate",
+      "mushroom"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_tomato_egg_rice_tofu",
+    "dishId": "tomato_egg_rice",
+    "variantId": "tofu",
+    "name": "番茄豆腐鸡蛋盖饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "tomato",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 28,
+    "cookingMinutes": 12,
+    "tags": [
+      "alternate",
+      "tofu"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_braised_pork_belly_rice_mushroom",
+    "dishId": "braised_pork_belly_rice",
+    "variantId": "mushroom",
+    "name": "香菇红烧肉饭做法",
+    "method": "braise",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "pork_belly",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "dark_soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "rock_sugar",
+        "quantity": 12
+      }
+    ],
+    "difficulty": 48,
+    "cookingMinutes": 40,
+    "tags": [
+      "alternate",
+      "mushroom"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_black_pepper_beef_rice_broccoli",
+    "dishId": "black_pepper_beef_rice",
+    "variantId": "broccoli",
+    "name": "西兰花黑椒牛肉饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "beef_tenderloin",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "broccoli",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "pepper_powder",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 44,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "broccoli"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_cumin_lamb_rice_carrot",
+    "dishId": "cumin_lamb_rice",
+    "variantId": "carrot",
+    "name": "胡萝卜孜然羊肉饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "lamb",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "carrot",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "cumin",
+        "quantity": 5
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 44,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "carrot"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_mushroom_chicken_rice_dried_mushroom",
+    "dishId": "mushroom_chicken_rice",
+    "variantId": "dried_mushroom",
+    "name": "干香菇鸡腿饭做法",
+    "method": "braise",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "chicken_thigh",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "dried_shiitake",
+        "quantity": 25
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "dark_soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 42,
+    "cookingMinutes": 32,
+    "tags": [
+      "alternate",
+      "dried_mushroom"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_spicy_chicken_rice_peanut",
+    "dishId": "spicy_chicken_rice",
+    "variantId": "peanut",
+    "name": "花生鲜椒鸡丁饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "chicken_thigh",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "chili_pepper",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "peanut",
+        "quantity": 35
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 40,
+    "cookingMinutes": 14,
+    "tags": [
+      "alternate",
+      "peanut"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_pork_rib_rice_lotus_root",
+    "dishId": "pork_rib_rice",
+    "variantId": "lotus_root",
+    "name": "莲藕排骨饭做法",
+    "method": "braise",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "pork_ribs",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "lotus_root",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "dark_soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "rock_sugar",
+        "quantity": 12
+      }
+    ],
+    "difficulty": 48,
+    "cookingMinutes": 42,
+    "tags": [
+      "alternate",
+      "lotus_root"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_brisket_potato_rice_tomato",
+    "dishId": "brisket_potato_rice",
+    "variantId": "tomato",
+    "name": "番茄土豆牛腩饭做法",
+    "method": "stew",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "beef_brisket",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "potato",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "tomato",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 46,
+    "cookingMinutes": 48,
+    "tags": [
+      "alternate",
+      "tomato"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_tofu_mushroom_rice_enoki",
+    "dishId": "tofu_mushroom_rice",
+    "variantId": "enoki",
+    "name": "金针菇豆腐饭做法",
+    "method": "stew",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "enoki_mushroom",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 32,
+    "cookingMinutes": 24,
+    "tags": [
+      "alternate",
+      "enoki"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_shrimp_egg_rice_broccoli",
+    "dishId": "shrimp_egg_rice",
+    "variantId": "broccoli",
+    "name": "西兰花虾仁滑蛋饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shrimp",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "broccoli",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 42,
+    "cookingMinutes": 14,
+    "tags": [
+      "alternate",
+      "broccoli"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_salmon_rice_lemon",
+    "dishId": "salmon_rice",
+    "variantId": "lemon",
+    "name": "柠香三文鱼饭做法",
+    "method": "pan_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "salmon",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "broccoli",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "lemon",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "peanut_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 56,
+    "cookingMinutes": 18,
+    "tags": [
+      "alternate",
+      "lemon"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_duck_leg_rice_tangerine",
+    "dishId": "duck_leg_rice",
+    "variantId": "tangerine",
+    "name": "陈皮鸭腿饭做法",
+    "method": "braise",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "duck_leg",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "dried_tangerine_peel",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "dark_soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 50,
+    "cookingMinutes": 40,
+    "tags": [
+      "alternate",
+      "tangerine"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_pumpkin_rice_glutinous",
+    "dishId": "pumpkin_rice",
+    "variantId": "glutinous",
+    "name": "糯香南瓜焖饭做法",
+    "method": "claypot",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "glutinous_rice",
+        "quantity": 160
+      },
+      {
+        "ingredientId": "pumpkin",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 30,
+    "cookingMinutes": 28,
+    "tags": [
+      "alternate",
+      "glutinous"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_taro_pork_rice_preserved",
+    "dishId": "taro_pork_rice",
+    "variantId": "preserved",
+    "name": "梅干菜芋头猪肉饭做法",
+    "method": "claypot",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "taro",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "pork",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "preserved_mustard",
+        "quantity": 40
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 40,
+    "cookingMinutes": 32,
+    "tags": [
+      "alternate",
+      "preserved"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_seafood_rice_premium",
+    "dishId": "seafood_rice",
+    "variantId": "premium",
+    "name": "鲍鱼鲜虾海味饭做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "rice",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "abalone",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shrimp",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "scallop",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 68,
+    "cookingMinutes": 22,
+    "tags": [
+      "alternate",
+      "premium"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_beef_noodle_pickled",
+    "dishId": "beef_noodle",
+    "variantId": "pickled",
+    "name": "酸菜牛肉面做法",
+    "method": "stew",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "beef_shank",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "pickled_cabbage",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 46,
+    "cookingMinutes": 40,
+    "tags": [
+      "alternate",
+      "pickled"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_brisket_noodle_tomato",
+    "dishId": "brisket_noodle",
+    "variantId": "tomato",
+    "name": "番茄牛腩面做法",
+    "method": "stew",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "beef_brisket",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "tomato",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 46,
+    "cookingMinutes": 44,
+    "tags": [
+      "alternate",
+      "tomato"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_chicken_noodle_mushroom",
+    "dishId": "chicken_noodle",
+    "variantId": "mushroom",
+    "name": "香菇鸡汤面做法",
+    "method": "stew",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "chicken",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 38,
+    "cookingMinutes": 34,
+    "tags": [
+      "alternate",
+      "mushroom"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_tomato_egg_noodle_tofu",
+    "dishId": "tomato_egg_noodle",
+    "variantId": "tofu",
+    "name": "番茄豆腐鸡蛋面做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "tomato",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 30,
+    "cookingMinutes": 16,
+    "tags": [
+      "alternate",
+      "tofu"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_seafood_noodle_scallop",
+    "dishId": "seafood_noodle",
+    "variantId": "scallop",
+    "name": "扇贝海鲜面做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "scallop",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shrimp",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 56,
+    "cookingMinutes": 18,
+    "tags": [
+      "alternate",
+      "scallop"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_shrimp_noodle_seaweed",
+    "dishId": "shrimp_noodle",
+    "variantId": "seaweed",
+    "name": "紫菜鲜虾面做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "prawn",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "dried_seaweed",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 44,
+    "cookingMinutes": 16,
+    "tags": [
+      "alternate",
+      "seaweed"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_tofu_mushroom_noodle_enoki",
+    "dishId": "tofu_mushroom_noodle",
+    "variantId": "enoki",
+    "name": "金针菇豆腐面做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "enoki_mushroom",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 30,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "enoki"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_spicy_bean_noodle_peanut",
+    "dishId": "spicy_bean_noodle",
+    "variantId": "peanut",
+    "name": "花生豆瓣辣酱拌面做法",
+    "method": "cold_mix",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "doubanjiang",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "chili_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cucumber",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "peanut",
+        "quantity": 35
+      },
+      {
+        "ingredientId": "sesame_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "black_vinegar",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 34,
+    "cookingMinutes": 10,
+    "tags": [
+      "alternate",
+      "peanut"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_duck_noodle_radish",
+    "dishId": "duck_noodle",
+    "variantId": "radish",
+    "name": "萝卜干鸭腿面做法",
+    "method": "braise",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "duck_leg",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "pickled_radish",
+        "quantity": 30
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 48,
+    "cookingMinutes": 38,
+    "tags": [
+      "alternate",
+      "radish"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_fish_noodle_pickled",
+    "dishId": "fish_noodle",
+    "variantId": "pickled",
+    "name": "酸菜鱼片汤面做法",
+    "method": "poach",
+    "ingredients": [
+      {
+        "ingredientId": "dried_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "snakehead",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "pickled_cabbage",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 48,
+    "cookingMinutes": 22,
+    "tags": [
+      "alternate",
+      "pickled"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_beef_rice_noodle_sprout",
+    "dishId": "beef_rice_noodle",
+    "variantId": "sprout",
+    "name": "豆芽牛肉米粉做法",
+    "method": "stew",
+    "ingredients": [
+      {
+        "ingredientId": "rice_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "beef_shank",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "bean_sprout",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "white_radish",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 46,
+    "cookingMinutes": 38,
+    "tags": [
+      "alternate",
+      "sprout"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_chicken_rice_noodle_shiitake",
+    "dishId": "chicken_rice_noodle",
+    "variantId": "shiitake",
+    "name": "香菇鸡丝米粉做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "rice_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "chicken_breast",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 16,
+    "tags": [
+      "alternate",
+      "shiitake"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_vegetable_rice_noodle_tofu_skin",
+    "dishId": "vegetable_rice_noodle",
+    "variantId": "tofu_skin",
+    "name": "豆皮时蔬米粉做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "rice_noodle",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "tofu_skin",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "bok_choy",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "carrot",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 32,
+    "cookingMinutes": 16,
+    "tags": [
+      "alternate",
+      "tofu_skin"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_pork_cabbage_dumpling_mushroom",
+    "dishId": "pork_cabbage_dumpling",
+    "variantId": "mushroom",
+    "name": "香菇猪肉白菜水饺做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dumpling_wrapper",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "pork",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "napa_cabbage",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "mushroom"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_pork_chive_dumpling_egg",
+    "dishId": "pork_chive_dumpling",
+    "variantId": "egg",
+    "name": "鸡蛋猪肉韭菜水饺做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dumpling_wrapper",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "pork",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "chive",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "egg"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_beef_celery_dumpling_pepper",
+    "dishId": "beef_celery_dumpling",
+    "variantId": "pepper",
+    "name": "黑椒牛肉芹菜水饺做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dumpling_wrapper",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "beef",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "celery",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "pepper_powder",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 40,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "pepper"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_chicken_mushroom_dumpling_dried_mushroom",
+    "dishId": "chicken_mushroom_dumpling",
+    "variantId": "dried_mushroom",
+    "name": "干香菇鸡肉水饺做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dumpling_wrapper",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "chicken",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "dried_shiitake",
+        "quantity": 25
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 38,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "dried_mushroom"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_shrimp_chive_dumpling_tofu_skin",
+    "dishId": "shrimp_chive_dumpling",
+    "variantId": "tofu_skin",
+    "name": "豆皮鲜虾韭菜水饺做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "dumpling_wrapper",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "shrimp",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "chive",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "tofu_skin",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 46,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "tofu_skin"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_pork_wonton_shrimp_skin",
+    "dishId": "pork_wonton",
+    "variantId": "shrimp_skin",
+    "name": "虾皮鲜肉馄饨做法",
+    "method": "boil",
+    "ingredients": [
+      {
+        "ingredientId": "wonton_wrapper",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "pork",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "dried_seaweed",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "dried_shrimp",
+        "quantity": 15
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "white_pepper",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 34,
+    "cookingMinutes": 13,
+    "tags": [
+      "alternate",
+      "shrimp_skin"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_red_bean_bun_sesame",
+    "dishId": "red_bean_bun",
+    "variantId": "sesame",
+    "name": "黑芝麻红豆甜包做法",
+    "method": "steam",
+    "ingredients": [
+      {
+        "ingredientId": "wheat_flour",
+        "quantity": 160
+      },
+      {
+        "ingredientId": "red_bean",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "black_sesame",
+        "quantity": 25
+      },
+      {
+        "ingredientId": "sugar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 38,
+    "cookingMinutes": 24,
+    "tags": [
+      "alternate",
+      "sesame"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_pumpkin_bun_condensed_milk",
+    "dishId": "pumpkin_bun",
+    "variantId": "condensed_milk",
+    "name": "炼乳南瓜甜包做法",
+    "method": "steam",
+    "ingredients": [
+      {
+        "ingredientId": "wheat_flour",
+        "quantity": 160
+      },
+      {
+        "ingredientId": "pumpkin",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "condensed_milk",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "sugar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 38,
+    "cookingMinutes": 24,
+    "tags": [
+      "alternate",
+      "condensed_milk"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_vegetable_spring_roll_mung_sprout",
+    "dishId": "vegetable_spring_roll",
+    "variantId": "mung_sprout",
+    "name": "绿豆芽素春卷做法",
+    "method": "fry",
+    "ingredients": [
+      {
+        "ingredientId": "spring_roll_wrapper",
+        "quantity": 6
+      },
+      {
+        "ingredientId": "mung_bean_sprout",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "cabbage",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "carrot",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "soybean_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "corn_starch",
+        "quantity": 20
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 10,
+    "tags": [
+      "alternate",
+      "mung_sprout"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_chive_egg_pancake_shrimp_skin",
+    "dishId": "chive_egg_pancake",
+    "variantId": "shrimp_skin",
+    "name": "虾皮韭菜鸡蛋饼做法",
+    "method": "pan_fry",
+    "ingredients": [
+      {
+        "ingredientId": "wheat_flour",
+        "quantity": 160
+      },
+      {
+        "ingredientId": "chive",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "egg",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "dried_shrimp",
+        "quantity": 15
+      },
+      {
+        "ingredientId": "peanut_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 38,
+    "cookingMinutes": 12,
+    "tags": [
+      "alternate",
+      "shrimp_skin"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_green_pepper_pork_vinegar",
+    "dishId": "green_pepper_pork",
+    "variantId": "vinegar",
+    "name": "陈醋青椒里脊做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "pork_tenderloin",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "green_pepper",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "black_vinegar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 11,
+    "tags": [
+      "alternate",
+      "vinegar"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_celery_pork_tofu",
+    "dishId": "celery_pork",
+    "variantId": "tofu",
+    "name": "豆干芹菜肉片做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "pork_leg",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "celery",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "dried_tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 12,
+    "tags": [
+      "alternate",
+      "tofu"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_mushroom_pork_oyster_mushroom",
+    "dishId": "mushroom_pork",
+    "variantId": "oyster_mushroom",
+    "name": "双菇肉片做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "pork",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "oyster_mushroom",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 13,
+    "tags": [
+      "alternate",
+      "oyster_mushroom"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_black_pepper_beef_mushroom",
+    "dishId": "black_pepper_beef",
+    "variantId": "mushroom",
+    "name": "香菇黑椒牛柳做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "beef_tenderloin",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "green_pepper",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "pepper_powder",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 52,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "mushroom"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_cumin_beef_red_pepper",
+    "dishId": "cumin_beef",
+    "variantId": "red_pepper",
+    "name": "彩椒孜然牛肉做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "beef",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "cumin",
+        "quantity": 5
+      },
+      {
+        "ingredientId": "red_pepper",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "green_pepper",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 48,
+    "cookingMinutes": 14,
+    "tags": [
+      "alternate",
+      "red_pepper"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_cashew_chicken_spicy",
+    "dishId": "cashew_chicken",
+    "variantId": "spicy",
+    "name": "香辣腰果鸡丁做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "chicken_breast",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "cashew",
+        "quantity": 30
+      },
+      {
+        "ingredientId": "green_pepper",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "dried_chili",
+        "quantity": 8
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 44,
+    "cookingMinutes": 15,
+    "tags": [
+      "alternate",
+      "spicy"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_mixed_mushrooms_tofu",
+    "dishId": "mixed_mushrooms",
+    "variantId": "tofu",
+    "name": "豆腐三菇小炒做法",
+    "method": "stir_fry",
+    "ingredients": [
+      {
+        "ingredientId": "shiitake",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "oyster_mushroom",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "king_oyster_mushroom",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "tofu",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rapeseed_oil",
+        "quantity": 12
+      },
+      {
+        "ingredientId": "soy_sauce",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 40,
+    "cookingMinutes": 14,
+    "tags": [
+      "alternate",
+      "tofu"
     ]
   }
 ]);
