@@ -376,26 +376,31 @@ class SupplierTradingSystem {
         quantity
       );
 
+    const rawUnitPrice =
+      ingredient
+        .basePurchasePrice *
+      offer
+        .priceMultiplier *
+      (
+        1 +
+        marketSwing
+      ) *
+      (
+        1 -
+        relationshipDiscount
+      ) *
+      (
+        1 -
+        bulkDiscount
+      );
+
+
     const unitPrice =
       Math.max(
-        1,
-        Math.round(
-          ingredient
-            .basePurchasePrice *
-          offer
-            .priceMultiplier *
-          (
-            1 +
-            marketSwing
-          ) *
-          (
-            1 -
-            relationshipDiscount
-          ) *
-          (
-            1 -
-            bulkDiscount
-          )
+        0.0001,
+        Number(
+          rawUnitPrice
+            .toFixed(4)
         )
       );
 
@@ -430,9 +435,12 @@ class SupplierTradingSystem {
       unitPrice,
 
       totalPrice:
-        Math.round(
-          unitPrice *
-          quantity
+        Math.max(
+          1,
+          Math.round(
+            unitPrice *
+            quantity
+          )
         ),
 
       quality,
