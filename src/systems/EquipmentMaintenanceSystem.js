@@ -771,9 +771,20 @@ class EquipmentMaintenanceSystem {
                 "wear_failure",
 
               downtimeDays:
-                unit.durability <= 20
-                  ? 2
-                  : 1
+                unit.durability /
+                  Math.max(
+                    1,
+                    unit.maxDurability ??
+                    restaurantEquipmentSystem
+                      .getDefinition(
+                        unit.equipmentId
+                      )
+                      .baseDurability ??
+                    100
+                  ) <=
+                  0.2
+                    ? 2
+                    : 1
             }
           );
 
