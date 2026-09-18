@@ -14,6 +14,10 @@ import {
 } from "../src/systems/RestaurantSystem.js";
 
 import {
+  financeSystem
+} from "../src/systems/FinanceSystem.js";
+
+import {
   customerIdentitySystem
 } from "../src/systems/CustomerIdentitySystem.js";
 
@@ -243,6 +247,11 @@ test(
     restaurantSystem.setLevel(
       restaurant.id,
       7
+    );
+
+    financeSystem.createAccount(
+      restaurant.id,
+      100000
     );
 
     for (
