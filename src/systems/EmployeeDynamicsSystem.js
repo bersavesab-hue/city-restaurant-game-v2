@@ -14,6 +14,10 @@ import {
   employeeCareerSystem
 } from "./EmployeeCareerSystem.js";
 
+import {
+  districtEventSystem
+} from "./DistrictEventSystem.js";
+
 
 const AVATAR_COUNTS =
   Object.freeze({
@@ -85,6 +89,51 @@ function hashString(
 
 
 class EmployeeDynamicsSystem {
+  getEventSatisfactionMultiplier(
+    employee
+  ) {
+    try {
+      if (!employee.restaurantId) {
+        return 1;
+      }
+
+      const restaurant =
+        entitySystem.get(
+          "restaurant",
+          employee.restaurantId
+        );
+
+      if (
+        !restaurant ||
+        !restaurant.locationId
+      ) {
+        return 1;
+      }
+
+      const property =
+        entitySystem.get(
+          "property",
+          restaurant.locationId
+        );
+
+      if (!property) {
+        return 1;
+      }
+
+      return (
+        districtEventSystem
+          .getModifiers(
+            property.districtId
+          )
+          .employeeSatisfactionMultiplier ??
+        1
+      );
+    } catch {
+      return 1;
+    }
+  }
+
+
   getAvatarId(
     employee
   ) {
@@ -173,16 +222,24 @@ class EmployeeDynamicsSystem {
       100 -
       fatigue;
 
+    const eventSatisfactionMultiplier =
+      this.getEventSatisfactionMultiplier(
+        employee
+      );
+
     const rawScore =
       Math.round(
-        salary.score *
-          0.35 +
-        mood *
-          0.25 +
-        loyalty *
-          0.25 +
-        fatigueComfort *
-          0.15
+        (
+          salary.score *
+            0.35 +
+          mood *
+            0.25 +
+          loyalty *
+            0.25 +
+          fatigueComfort *
+            0.15
+        ) *
+        eventSatisfactionMultiplier
       );
 
     let state =
@@ -257,7 +314,8 @@ class EmployeeDynamicsSystem {
 
         loyalty,
 
-        fatigueComfort
+        fatigueComfort,
+        eventSatisfactionMultiplier
       },
 
       salaryState:
