@@ -445,9 +445,6 @@ test(
           unit:
             "g",
 
-          baseQuality:
-            3,
-
           storageType:
             "dry",
 
@@ -476,9 +473,6 @@ test(
 
           unit:
             "g",
-
-          baseQuality:
-            3,
 
           storageType:
             "chilled",
