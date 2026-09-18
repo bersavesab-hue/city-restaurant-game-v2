@@ -3,7 +3,10 @@ import { eventBus } from "../core/EventBus.js";
 import { randomSystem } from "../core/RandomSystem.js";
 import { districtSystem } from "./DistrictSystem.js";
 import { districtEventSystem } from "./DistrictEventSystem.js";
-import { COMPETITOR_STRATEGIES } from "../data/competitorRules.js";
+import {
+  COMPETITOR_STRATEGIES,
+  getCompetitorActiveLimit
+} from "../data/competitorRules.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -302,6 +305,33 @@ class CompetitorDynamicsSystem {
     );
   }
 
+  getDistrictActiveCount(
+    districtId
+  ) {
+    return entitySystem
+      .filter(
+        "competitor_store",
+        item =>
+          item.districtId ===
+            districtId &&
+          item.active
+      )
+      .length;
+  }
+
+  getDistrictActiveLimit(
+    districtId
+  ) {
+    const district =
+      districtSystem.get(
+        districtId
+      );
+
+    return getCompetitorActiveLimit(
+      district?.competition
+    );
+  }
+
   shouldExpand(
     store,
     currentDay,
@@ -320,8 +350,21 @@ class CompetitorDynamicsSystem {
       store.openedDay ??
       currentDay;
 
+    const activeCount =
+      this.getDistrictActiveCount(
+        store.districtId
+      );
+
+    const activeLimit =
+      this.getDistrictActiveLimit(
+        store.districtId
+      );
+
     if (
       !store.active ||
+      activeLimit <= 0 ||
+      activeCount >=
+        activeLimit ||
       health < 82 ||
       tendency < 70 ||
       (store.ageDays ?? 0) < 120 ||
@@ -354,6 +397,21 @@ class CompetitorDynamicsSystem {
     store,
     currentDay
   ) {
+    const activeLimit =
+      this.getDistrictActiveLimit(
+        store.districtId
+      );
+
+    if (
+      activeLimit <= 0 ||
+      this.getDistrictActiveCount(
+        store.districtId
+      ) >=
+        activeLimit
+    ) {
+      return null;
+    }
+
     const brandName =
       store.brandName ??
       store.name;
