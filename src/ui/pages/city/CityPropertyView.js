@@ -1,5 +1,13 @@
 import { cityPropertyPageSystem } from "./CityPropertyPageSystem.js";
 
+import {
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 function money(value) {
   return `¥${Math.round(value ?? 0).toLocaleString("zh-CN")}`;
 }
@@ -25,11 +33,27 @@ export class CityPropertyView {
     this.offerId = null;
   }
 
-  mount(root, { restaurantId = null } = {}) {
-    if (!root) throw new Error("CityPropertyView root is required");
+  mount(
+    root,
+    {
+      restaurantId = null,
+      filters = {}
+    } = {}
+  ) {
+    if (!root) {
+      throw new Error(
+        "CityPropertyView root is required"
+      );
+    }
+
     this.root = root;
-    this.restaurantId = restaurantId;
-    this.renderMarketplace();
+    this.restaurantId =
+      restaurantId;
+
+    this.renderMarketplace(
+      filters
+    );
+
     return this;
   }
 
@@ -160,7 +184,17 @@ export class CityPropertyView {
       list.append(card);
     }
 
-    this.root.append(header, districtRow, marketInfo, list);
+    this.root.append(
+      header,
+      districtRow,
+      marketInfo,
+      list
+    );
+
+    this.appendBottomNavigation(
+      "properties"
+    );
+
     return model;
   }
 
@@ -322,7 +356,16 @@ export class CityPropertyView {
     leaseButton.addEventListener("click", () => this.signSelected());
     actions.append(leaseButton);
 
-    this.root.append(back, shell, actions);
+    this.root.append(
+      back,
+      shell,
+      actions
+    );
+
+    this.appendBottomNavigation(
+      "properties"
+    );
+
     return model;
   }
 
@@ -366,6 +409,7 @@ export class CityPropertyView {
       this.months,
       this.offerId
     );
+
     const offerId =
       detail.activeOffer?.status === "accepted"
         ? detail.activeOffer.id
@@ -378,11 +422,82 @@ export class CityPropertyView {
       offerId
     });
 
-    if (typeof this.onNavigate === "function") {
-      this.onNavigate(result.nextPage, result);
+    if (
+      typeof this.onNavigate ===
+      "function"
+    ) {
+      this.onNavigate(
+        result.nextPage,
+        this.restaurantId,
+        result
+      );
     }
 
     return result;
+  }
+
+  appendBottomNavigation(
+    activePageId =
+      "properties"
+  ) {
+    if (!this.root) {
+      return;
+    }
+
+    const wrapper =
+      document.createElement(
+        "div"
+      );
+
+    wrapper.innerHTML =
+      renderBottomNavigation(
+        gameChromeSystem
+          .getNavigation({
+            restaurantId:
+              this.restaurantId,
+            activePageId
+          })
+      );
+
+    const navigation =
+      wrapper.firstElementChild;
+
+    if (!navigation) {
+      return;
+    }
+
+    navigation
+      .querySelectorAll(
+        "[data-page-target]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              const target =
+                button.dataset
+                  .pageTarget;
+
+              if (
+                target &&
+                typeof this
+                  .onNavigate ===
+                  "function"
+              ) {
+                this.onNavigate(
+                  target,
+                  this.restaurantId
+                );
+              }
+            }
+          );
+        }
+      );
+
+    this.root.append(
+      navigation
+    );
   }
 }
 
