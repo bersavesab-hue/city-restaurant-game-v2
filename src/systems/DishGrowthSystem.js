@@ -57,11 +57,11 @@ class DishGrowthSystem {
 
   getRank(
     masteryLevel,
-    qualityScore
+    recipeQualityScore
   ) {
     return getDishRank({
       masteryLevel,
-      qualityScore
+      recipeQualityScore
     });
   }
 
@@ -130,7 +130,7 @@ class DishGrowthSystem {
     const rank =
       this.getRank(
         masteryLevel,
-        progress.qualityScore ?? 60
+        progress.recipeQualityScore ?? 60
       );
 
     const updated =
@@ -227,7 +227,7 @@ class DishGrowthSystem {
         dish.dishRankOrder ??
         this.getRank(
           dish.masteryLevel ?? 1,
-          dish.qualityScore ?? 60
+          dish.recipeQualityScore ?? 60
         ).order;
 
       if (rankOrder >= 5) {
@@ -338,7 +338,7 @@ class DishGrowthSystem {
           progress.dishRankOrder ??
           this.getRank(
             masteryLevel,
-            progress.qualityScore ?? 60
+            progress.recipeQualityScore ?? 60
           ).order
         ) *
           300
@@ -361,15 +361,15 @@ class DishGrowthSystem {
       `${definition.name}：${dish.name}`
     );
 
-    const qualityScore =
-      progress.qualityScore ??
+    const recipeQualityScore =
+      progress.recipeQualityScore ??
       60;
 
     const successChance =
       clamp(
         0.72 +
         masteryLevel * 0.04 -
-        qualityScore / 350 -
+        recipeQualityScore / 350 -
         attempts * 0.01,
         0.25,
         0.85
@@ -381,7 +381,7 @@ class DishGrowthSystem {
       );
 
     let nextQuality =
-      qualityScore;
+      recipeQualityScore;
 
     const recipeChanges = {};
 
@@ -391,7 +391,7 @@ class DishGrowthSystem {
       ) {
         nextQuality =
           clamp(
-            qualityScore +
+            recipeQualityScore +
             randomSystem.int(
               2,
               4
@@ -440,7 +440,7 @@ class DishGrowthSystem {
     } else {
       nextQuality =
         clamp(
-          qualityScore -
+          recipeQualityScore -
           randomSystem.int(
             1,
             2
@@ -477,10 +477,10 @@ class DishGrowthSystem {
 
         cost,
 
-        qualityBefore:
-          qualityScore,
+        recipeQualityBefore:
+          recipeQualityScore,
 
-        qualityAfter:
+        recipeQualityAfter:
           nextQuality
       }
     ];
@@ -500,7 +500,7 @@ class DishGrowthSystem {
           restaurantId,
           dishId,
           {
-            qualityScore:
+            recipeQualityScore:
               nextQuality,
 
             dishRankId:
@@ -558,7 +558,7 @@ class DishGrowthSystem {
         success,
         cost,
 
-        qualityScore:
+        recipeQualityScore:
           nextQuality
       }
     );
@@ -632,8 +632,8 @@ class DishGrowthSystem {
           .masteryQualityBonus ??
         0,
 
-      qualityScore:
-        progress.qualityScore,
+      recipeQualityScore:
+        progress.recipeQualityScore,
 
       lifetimeSold:
         progress.lifetimeSold ??
