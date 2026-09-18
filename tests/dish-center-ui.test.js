@@ -65,9 +65,6 @@ test(
           name:
             "测试食材",
 
-          quality:
-            50,
-
           purchasePrice:
             10,
 
