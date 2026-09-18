@@ -8,31 +8,6 @@ import "./defaultPages.js";
 const GAMEPLAY_PAGES = [
   {
     id:
-      "employees-home",
-
-    title:
-      "员工",
-
-    parent:
-      "employees",
-
-    order: 401,
-
-    layout:
-      "management",
-
-    metadata: {
-      hiddenFromMenu:
-        true,
-
-      landingFor:
-        "employees"
-    }
-  },
-
-
-  {
-    id:
       "restaurant-home",
 
     title:
@@ -41,7 +16,8 @@ const GAMEPLAY_PAGES = [
     parent:
       "restaurant",
 
-    order: 201,
+    order:
+      201,
 
     layout:
       "management",
@@ -55,6 +31,7 @@ const GAMEPLAY_PAGES = [
     }
   },
 
+
   {
     id:
       "equipment-management",
@@ -65,7 +42,8 @@ const GAMEPLAY_PAGES = [
     parent:
       "restaurant",
 
-    order: 230,
+    order:
+      230,
 
     layout:
       "management"
@@ -82,7 +60,8 @@ const GAMEPLAY_PAGES = [
     parent:
       "operations",
 
-    order: 301,
+    order:
+      301,
 
     layout:
       "management",
@@ -96,6 +75,7 @@ const GAMEPLAY_PAGES = [
     }
   },
 
+
   {
     id:
       "operating-command-center",
@@ -106,7 +86,8 @@ const GAMEPLAY_PAGES = [
     parent:
       "restaurant",
 
-    order: 201,
+    order:
+      201,
 
     layout:
       "dashboard",
@@ -120,6 +101,7 @@ const GAMEPLAY_PAGES = [
     }
   },
 
+
   {
     id:
       "menu-optimization",
@@ -130,11 +112,13 @@ const GAMEPLAY_PAGES = [
     parent:
       "operations",
 
-    order: 315,
+    order:
+      315,
 
     layout:
       "management"
   },
+
 
   {
     id:
@@ -146,11 +130,13 @@ const GAMEPLAY_PAGES = [
     parent:
       "operations",
 
-    order: 325,
+    order:
+      325,
 
     layout:
       "dashboard"
   },
+
 
   {
     id:
@@ -162,11 +148,13 @@ const GAMEPLAY_PAGES = [
     parent:
       "operations",
 
-    order: 335,
+    order:
+      335,
 
     layout:
       "dashboard"
   },
+
 
   {
     id:
@@ -178,11 +166,13 @@ const GAMEPLAY_PAGES = [
     parent:
       "operations",
 
-    order: 345,
+    order:
+      345,
 
     layout:
       "management"
   },
+
 
   {
     id:
@@ -194,7 +184,8 @@ const GAMEPLAY_PAGES = [
     parent:
       "employees",
 
-    order: 415,
+    order:
+      415,
 
     layout:
       "management"

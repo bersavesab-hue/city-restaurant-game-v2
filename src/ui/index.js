@@ -65,12 +65,10 @@ export {
   BUSINESS_ANALYTICS_PERIODS
 } from "./pages/analytics/index.js";
 
-
 export {
   businessAnalyticsView,
   BusinessAnalyticsView
 } from "./pages/analytics/BusinessAnalyticsView.js";
-
 
 export {
   customerManagementPageSystem,
@@ -79,14 +77,12 @@ export {
   CustomerManagementView
 } from "./pages/customers/index.js";
 
-
 export {
   memberMarketingPageSystem,
   MemberMarketingPageSystem,
   memberMarketingView,
   MemberMarketingView
 } from "./pages/marketing/index.js";
-
 
 export {
   reputationPageSystem,
@@ -95,14 +91,12 @@ export {
   ReputationView
 } from "./pages/reputation/index.js";
 
-
 export {
   channelManagementPageSystem,
   ChannelManagementPageSystem,
   channelManagementView,
   ChannelManagementView
 } from "./pages/channels/index.js";
-
 
 export {
   menuEngineeringPageSystem,
@@ -111,14 +105,12 @@ export {
   MenuEngineeringView
 } from "./pages/menu-engineering/index.js";
 
-
 export {
   menuOptimizationPageSystem,
   MenuOptimizationPageSystem,
   menuOptimizationView,
   MenuOptimizationView
 } from "./pages/menu-optimization/index.js";
-
 
 export {
   capacityManagementPageSystem,
@@ -127,14 +119,12 @@ export {
   CapacityManagementView
 } from "./pages/capacity/index.js";
 
-
 export {
   workforceCapacityPageSystem,
   WorkforceCapacityPageSystem,
   workforceCapacityView,
   WorkforceCapacityView
 } from "./pages/workforce-capacity/index.js";
-
 
 export {
   equipmentManagementPageSystem,
@@ -143,7 +133,6 @@ export {
   EquipmentManagementView
 } from "./pages/equipment/index.js";
 
-
 export {
   equipmentMaintenancePageSystem,
   EquipmentMaintenancePageSystem,
@@ -151,14 +140,12 @@ export {
   EquipmentMaintenanceView
 } from "./pages/equipment-maintenance/index.js";
 
-
 export {
   operatingCommandCenterPageSystem,
   OperatingCommandCenterPageSystem,
   operatingCommandCenterView,
   OperatingCommandCenterView
 } from "./pages/command-center/index.js";
-
 
 export {
   gameplayNavigationSystem,
@@ -172,7 +159,6 @@ export {
   GAMEPLAY_PAGES
 } from "./registry/gameplayPages.js";
 
-
 export {
   operationsHubPageSystem,
   OperationsHubPageSystem,
@@ -181,23 +167,12 @@ export {
   PRIMARY_ENTRIES
 } from "./pages/operations-hub/index.js";
 
-
 export {
   restaurantHubPageSystem,
   RestaurantHubPageSystem,
   restaurantHubView,
   RestaurantHubView,
 } from "./pages/restaurant-hub/index.js";
-
-
-export {
-  employeesHubPageSystem,
-  EmployeesHubPageSystem,
-  employeesHubView,
-  EmployeesHubView,
-  EMPLOYEE_ENTRIES
-} from "./pages/employees-hub/index.js";
-
 
 export {
   renderGameTopBar,
@@ -209,7 +184,6 @@ export {
   renderGameScreen
 } from "./components/GameChromeView.js";
 
-
 export {
   employeePromotionPageSystem,
   EmployeePromotionPageSystem,
@@ -217,14 +191,12 @@ export {
   EmployeePromotionView
 } from "./pages/employee-promotion/index.js";
 
-
 export {
   openingSetupPageSystem,
   OpeningSetupPageSystem,
   openingSetupView,
   OpeningSetupView
 } from "./pages/opening/index.js";
-
 
 export {
   dishCenterPageSystem,
@@ -239,8 +211,6 @@ export {
   resolveMainRoot,
   buildNavigationItems
 } from "./components/GameChromeSystem.js";
-
-
 
 export {
   navigationHistorySystem,
