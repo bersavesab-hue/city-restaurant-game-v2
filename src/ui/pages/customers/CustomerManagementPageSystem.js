@@ -6,6 +6,10 @@ import {
   customerLoyaltySystem
 } from "../../../systems/CustomerLoyaltySystem.js";
 
+import {
+  customerSegmentSystem
+} from "../../../systems/CustomerSegmentSystem.js";
+
 class CustomerManagementPageSystem {
   getPage(
     restaurantId
@@ -77,7 +81,62 @@ class CustomerManagementPageSystem {
           .getLevels(),
 
       segments:
-        dashboard.segments,
+        dashboard.segments
+          .map(
+            item => {
+              const segment =
+                customerSegmentSystem
+                  .get(
+                    item.segmentId
+                  );
+
+              return {
+                ...item,
+
+                name:
+                  segment?.name ??
+                  item.segmentId,
+
+                ageRange:
+                  segment?.ageRange ??
+                  null,
+
+                occupationTags:
+                  segment
+                    ?.occupationTags ??
+                  [],
+
+                spendingPower:
+                  segment
+                    ?.spendingPower ??
+                  null,
+
+                priceSensitivity:
+                  segment
+                    ?.priceSensitivity ??
+                  null,
+
+                repeatPreference:
+                  segment
+                    ?.repeatPreference ??
+                  null,
+
+                reviewPropensity:
+                  segment
+                    ?.reviewPropensity ??
+                  null,
+
+                partySize:
+                  segment?.partySize ??
+                  null,
+
+                channelPreferences:
+                  segment
+                    ?.channelPreferences ??
+                  null
+              };
+            }
+          ),
 
       atRiskMembers:
         dashboard.atRiskMembers
