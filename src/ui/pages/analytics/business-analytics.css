@@ -761,3 +761,43 @@
     display: none;
   }
 }
+
+
+.analytics-causality-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+  padding: 10px 12px;
+  border-radius: 13px;
+  color: #fff8e9;
+  background:
+    linear-gradient(
+      135deg,
+      #1f5559,
+      #8d6546
+    );
+}
+
+.analytics-causality-intro span,
+.analytics-causality-intro strong,
+.analytics-causality-intro small {
+  display: block;
+}
+
+.analytics-causality-intro span {
+  font-size: 9px;
+  opacity: .72;
+}
+
+.analytics-causality-intro strong {
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.analytics-causality-intro small {
+  flex: 0 0 auto;
+  font-size: 8px;
+  opacity: .75;
+}
