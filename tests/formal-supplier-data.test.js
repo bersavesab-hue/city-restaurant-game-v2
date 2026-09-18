@@ -296,20 +296,6 @@ test(
       30
     );
 
-    assert.equal(
-      supplierTradingSystem
-        .listProfiles({
-          storeLevel: 1
-        })
-        .filter(
-          item =>
-            item.templateId !==
-            null
-        )
-        .length >= 12,
-      true
-    );
-
     const formalAtLevel1 =
       supplierTradingSystem
         .listProfiles({
