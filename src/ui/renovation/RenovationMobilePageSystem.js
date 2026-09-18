@@ -308,8 +308,16 @@ class RenovationMobilePageSystem {
         issuesExpanded: ui.issuesExpanded
       },
       templates: {
-        expanded: ui.templatesExpanded,
-        items: editor.templates
+        expanded:
+          ui.templatesExpanded,
+
+        recommendedTemplateId:
+          editor
+            .recommendedTemplateId ??
+          null,
+
+        items:
+          editor.templates
       },
       actions: {
         canSave: editor.actions.canSave && editor.budget.affordable,
