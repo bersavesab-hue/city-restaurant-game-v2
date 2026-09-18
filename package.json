@@ -9,7 +9,7 @@
     "stress": "node scripts/stress-longrun.mjs",
     "stress20": "node scripts/stress-20year.mjs",
     "aging": "node scripts/aging-performance.mjs",
-    "build:android-js": "node scripts/build-android-js-v2.mjs",
+    "build:android-js": "node scripts/build-android-js.mjs",
     "test:phase2": "node scripts/phase2-gate.mjs",
     "verify:phase2": "npm run test:phase2 && npm run build:android-js",
     "test:phase2:ui": "node --test tests/formal-page-runtime.test.js tests/android-runtime-routing.test.js tests/runtime-route-coverage.test.js tests/navigation-roundtrip.test.js tests/no-formal-ui-placeholder.test.js tests/gameplay-navigation.test.js tests/ui-foundation.test.js",

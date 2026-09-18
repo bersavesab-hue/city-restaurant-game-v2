@@ -1,4 +1,12 @@
 import "../theme/theme.css";
+import "./runtime-enhancements.css";
+
+import "../../systems/CustomerLoyaltyIntegrationSystem.js";
+import "../../systems/WordOfMouthSystem.js";
+
+import {
+  customerSegmentSystem
+} from "../../systems/CustomerSegmentSystem.js";
 
 import {
   saveSystem
@@ -108,6 +116,107 @@ let restaurantId =
 
 let currentView =
   null;
+
+
+const SEGMENT_NAMES =
+  new Map();
+
+let runtimeEnhancementObserver =
+  null;
+
+
+function refreshSegmentNames() {
+  SEGMENT_NAMES.clear();
+
+  for (
+    const segment
+    of customerSegmentSystem
+      .getAll()
+  ) {
+    SEGMENT_NAMES.set(
+      segment.id,
+      segment.name
+    );
+  }
+}
+
+
+function updateVisibleCustomerLabels() {
+  root
+    .querySelectorAll(
+      ".city-customer-mix article > span:first-child"
+    )
+    .forEach(
+      element => {
+        const id =
+          element.textContent
+            ?.trim();
+
+        const name =
+          SEGMENT_NAMES.get(
+            id
+          );
+
+        if (!name) {
+          return;
+        }
+
+        element.textContent =
+          name;
+
+        element.dataset
+          .segmentName =
+          id;
+      }
+    );
+}
+
+
+function startRuntimeEnhancements() {
+  refreshSegmentNames();
+  updateVisibleCustomerLabels();
+
+  runtimeEnhancementObserver
+    ?.disconnect();
+
+  runtimeEnhancementObserver =
+    new MutationObserver(
+      () => {
+        updateVisibleCustomerLabels();
+      }
+    );
+
+  runtimeEnhancementObserver
+    .observe(
+      root,
+      {
+        childList:
+          true,
+
+        subtree:
+          true
+      }
+    );
+}
+
+
+function dispatchRuntimeEvent(
+  phase,
+  current,
+  previous
+) {
+  window.dispatchEvent(
+    new CustomEvent(
+      `restaurant-game:${phase}`,
+      {
+        detail: {
+          current,
+          previous
+        }
+      }
+    )
+  );
+}
 
 
 function ensureRestaurant() {
@@ -282,16 +391,44 @@ function startRuntimeSystems() {
   gameRuntimeLoop.resume();
 
   gameRuntimeLoop.start({
-    onMinute() {
+    onMinute(
+      current,
+      previous
+    ) {
       updateVisibleClock();
+
+      dispatchRuntimeEvent(
+        "minute",
+        current,
+        previous
+      );
     },
 
-    onHour() {
+    onHour(
+      current,
+      previous
+    ) {
       updateVisibleClock();
+      updateVisibleCustomerLabels();
+
+      dispatchRuntimeEvent(
+        "hour",
+        current,
+        previous
+      );
     },
 
-    onDay() {
+    onDay(
+      current,
+      previous
+    ) {
       saveNow();
+
+      dispatchRuntimeEvent(
+        "day",
+        current,
+        previous
+      );
     },
 
     onError(error) {
@@ -358,7 +495,7 @@ function errorPage(
       "
     >
       <h2>
-        V2测试包运行错误
+        测试包运行错误
       </h2>
 
       <pre
@@ -910,6 +1047,7 @@ setInterval(
 
 
 firstLaunch();
+startRuntimeEnhancements();
 
 navigate(
   "restaurant"

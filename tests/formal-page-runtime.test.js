@@ -29,7 +29,14 @@ const EXPECTED = [
   "equipment-maintenance",
   "customers",
   "member-marketing",
-  "operations-home"
+  "operations-home",
+  "ranking-center",
+  "awards-center",
+  "honor-hall",
+  "award-ceremony",
+  "more-home",
+  "market-strategy",
+  "store-progress"
 ];
 
 

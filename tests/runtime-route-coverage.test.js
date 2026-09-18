@@ -143,7 +143,7 @@ test(
         .getLandingPage(
           "more"
         ),
-      "settings"
+      "more-home"
     );
   }
 );

@@ -35,7 +35,7 @@ fs.mkdirSync(
 
 await build({
   entryPoints: [
-    "src/ui/runtime/AndroidPlaytestEntryV2.js"
+    "src/ui/runtime/AndroidPlaytestEntry.js"
   ],
 
   outfile:
@@ -102,7 +102,7 @@ const index = `<!doctype html>
   >
 
   <title>
-    城市餐厅 V2 测试版
+    城市餐厅测试版
   </title>
 
   <link
@@ -186,6 +186,6 @@ if (
 
 
 console.log(
-  "Android V2 web bundle ready:",
+  "Android web bundle ready:",
   outputDirectory
 );

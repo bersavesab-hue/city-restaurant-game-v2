@@ -46,60 +46,9 @@
   font-size: 9px;
 }
 
-.rg-runtime-controls {
-  position: fixed;
-  z-index: 650;
-  right: max(8px, calc((100vw - min(100vw, 760px)) / 2 + 8px));
-  top: max(8px, env(safe-area-inset-top));
-  display: flex;
-  gap: 3px;
-  padding: 4px;
-  border: 1px solid rgba(109, 209, 251, 0.8);
-  border-radius: 8px;
-  background: rgba(3, 58, 112, 0.88);
-  box-shadow: 0 2px 8px rgba(0, 40, 80, 0.25);
-}
-
-.rg-runtime-controls button {
-  min-width: 30px;
-  height: 28px;
-  padding: 0 5px;
-  border: 1px solid #7ed3f5;
-  border-radius: 5px;
-  color: #fff;
-  background: #075a9f;
-  font-size: 9px;
-  font-weight: 800;
-}
-
-.rg-runtime-controls button.is-active {
-  color: #684700;
-  border-color: #dca500;
-  background: linear-gradient(#ffe86d, #ffc91e);
-}
-
-.rg-runtime-controls__time {
-  min-width: 56px;
-  display: grid;
-  place-items: center;
-  padding: 0 5px;
-  color: #fff;
-  font-size: 9px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
 .city-customer-mix article span[data-segment-name] {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-@media (max-width: 430px) {
-  .rg-runtime-controls {
-    top: max(4px, env(safe-area-inset-top));
-    right: 5px;
-    transform: scale(0.92);
-    transform-origin: top right;
-  }
-}

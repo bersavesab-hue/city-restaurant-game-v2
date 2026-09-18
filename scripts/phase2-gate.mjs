@@ -5,6 +5,14 @@ import {
 
 const tests = [
   "tests/foundation-v2-smoke.test.js",
+  "tests/word-of-mouth.test.js",
+  "tests/customer-loyalty-integration.test.js",
+  "tests/no-formal-ui-placeholder.test.js",
+  "tests/navigation-roundtrip.test.js",
+  "tests/runtime-route-coverage.test.js",
+  "tests/android-runtime-routing.test.js",
+  "tests/formal-page-runtime.test.js",
+  "tests/android-single-bootstrap.test.js",
   "tests/gameplay-navigation.test.js",
   "tests/game-chrome-unified.test.js",
 
