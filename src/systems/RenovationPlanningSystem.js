@@ -2,6 +2,18 @@ import { renovationSystem } from "./RenovationSystem.js";
 import { layoutFlowSystem } from "./LayoutFlowSystem.js";
 import { financeSystem } from "./FinanceSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
+import { restaurantSystem } from "./RestaurantSystem.js";
+import { propertySystem } from "./PropertySystem.js";
+import { renovationRealityCostSystem } from "./RenovationRealityCostSystem.js";
+
+import {
+  RENOVATION_TEMPLATES_V1,
+  RENOVATION_TEMPLATE_MAP
+} from "../data/renovationTemplates.v1.js";
+
+import {
+  validateRenovationTemplate
+} from "../data/renovationTemplateRules.js";
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -12,56 +24,13 @@ function round(value, digits = 3) {
   return Math.round(value * factor) / factor;
 }
 
-const TEMPLATES = Object.freeze({
-  balanced: {
-    id: "balanced",
-    name: "均衡小店",
-    items: [
-      "kitchen_station",
-      "cashier_counter",
-      "table_4",
-      "table_4",
-      "table_2",
-      "waiting_bench",
-      "decor_plant",
-      "decor_plant"
-    ]
-  },
-
-  quick_service: {
-    id: "quick_service",
-    name: "快餐高周转",
-    items: [
-      "kitchen_station",
-      "cashier_counter",
-      "table_2",
-      "table_2",
-      "table_2",
-      "table_2",
-      "waiting_bench",
-      "decor_plant"
-    ]
-  },
-
-  family_dining: {
-    id: "family_dining",
-    name: "家庭正餐",
-    items: [
-      "kitchen_station",
-      "cashier_counter",
-      "table_4",
-      "table_4",
-      "table_4",
-      "waiting_bench",
-      "decor_plant",
-      "decor_plant"
-    ]
-  }
-});
+const TEMPLATES =
+  RENOVATION_TEMPLATE_MAP;
 
 class RenovationPlanningSystem {
   getTemplate(id) {
-    const template = TEMPLATES[id];
+    const template =
+      TEMPLATES[id];
 
     if (!template) {
       throw new Error(
@@ -69,13 +38,379 @@ class RenovationPlanningSystem {
       );
     }
 
-    return structuredClone(template);
+    validateRenovationTemplate(
+      template
+    );
+
+    return structuredClone(
+      template
+    );
   }
 
   getTemplates() {
-    return Object.values(TEMPLATES).map(
-      item => structuredClone(item)
+    return RENOVATION_TEMPLATES_V1
+      .map(
+        item => {
+          validateRenovationTemplate(
+            item
+          );
+
+          return structuredClone(
+            item
+          );
+        }
+      );
+  }
+
+  getTemplateFurnitureCost(
+    templateOrId
+  ) {
+    const template =
+      typeof templateOrId ===
+        "string"
+        ? this.getTemplate(
+            templateOrId
+          )
+        : templateOrId;
+
+    return template.items.reduce(
+      (
+        sum,
+        furnitureId
+      ) =>
+        sum +
+        renovationSystem
+          .getFurnitureDefinition(
+            furnitureId
+          ).cost,
+      0
     );
+  }
+
+  getTemplateContext(
+    restaurantId
+  ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    const property =
+      restaurant.locationId
+        ? propertySystem.get(
+            restaurant.locationId
+          )
+        : null;
+
+    const layout =
+      renovationSystem
+        .getLayout(
+          restaurantId
+        );
+
+    const usableArea =
+      Math.max(
+        0,
+        Number(
+          property?.usableArea ??
+          property?.area ??
+          0
+        ) ||
+        0
+      );
+
+    const balance =
+      financeSystem.getBalance(
+        restaurantId
+      );
+
+    const constructionCost =
+      layout
+        ? renovationRealityCostSystem
+            .calculateForLayout(
+              layout
+            )
+            .baseConstructionCost
+        : 0;
+
+    return {
+      restaurant,
+      property,
+      layout,
+      usableArea,
+      balance,
+      constructionCost
+    };
+  }
+
+  getTemplateFit(
+    restaurantId,
+    templateOrId
+  ) {
+    const template =
+      typeof templateOrId ===
+        "string"
+        ? this.getTemplate(
+            templateOrId
+          )
+        : structuredClone(
+            templateOrId
+          );
+
+    validateRenovationTemplate(
+      template
+    );
+
+    const context =
+      this.getTemplateContext(
+        restaurantId
+      );
+
+    const catalog =
+      new Map(
+        renovationSystem
+          .getCatalog(
+            restaurantId
+          )
+          .map(
+            item => [
+              item.id,
+              item
+            ]
+          )
+      );
+
+    const furnitureCost =
+      this.getTemplateFurnitureCost(
+        template
+      );
+
+    const estimatedTotalCost =
+      furnitureCost +
+      context.constructionCost;
+
+    const levelEligible =
+      (
+        context.restaurant.level ??
+        1
+      ) >=
+        template.minLevel;
+
+    const areaEligible =
+      context.usableArea >=
+      template.minArea;
+
+    const furnitureEligible =
+      template.items.every(
+        furnitureId =>
+          catalog.get(
+            furnitureId
+          )?.unlocked ===
+            true
+      );
+
+    const budgetEligible =
+      context.balance >=
+      estimatedTotalCost;
+
+    const layoutEmpty =
+      !context.layout ||
+      (
+        context.layout
+          .placements ??
+        []
+      ).length === 0;
+
+    const positioningId =
+      context.restaurant
+        .positioningId ??
+      null;
+
+    const positioningScore =
+      template
+        .positioningIds
+        .length === 0
+        ? 82
+        : positioningId &&
+          template
+            .positioningIds
+            .includes(
+              positioningId
+            )
+          ? 100
+          : positioningId
+            ? 48
+            : 70;
+
+    const areaDistance =
+      Math.abs(
+        context.usableArea -
+        template.idealArea
+      ) /
+      Math.max(
+        1,
+        template.idealArea
+      );
+
+    const areaScore =
+      Math.round(
+        clamp(
+          100 -
+          areaDistance * 75,
+          35,
+          100
+        )
+      );
+
+    const budgetScore =
+      estimatedTotalCost <= 0
+        ? 100
+        : context.balance >=
+            estimatedTotalCost
+          ? Math.round(
+              clamp(
+                78 +
+                (
+                  context.balance -
+                  estimatedTotalCost
+                ) /
+                estimatedTotalCost *
+                22,
+                78,
+                100
+              )
+            )
+          : Math.round(
+              clamp(
+                context.balance /
+                estimatedTotalCost *
+                78,
+                0,
+                77
+              )
+            );
+
+    const fitScore =
+      Math.round(
+        areaScore * 0.4 +
+        positioningScore * 0.3 +
+        budgetScore * 0.3
+      );
+
+    const reasons = [];
+
+    if (!levelEligible) {
+      reasons.push(
+        "store_level"
+      );
+    }
+
+    if (!areaEligible) {
+      reasons.push(
+        "usable_area"
+      );
+    }
+
+    if (!furnitureEligible) {
+      reasons.push(
+        "furniture_locked"
+      );
+    }
+
+    if (!budgetEligible) {
+      reasons.push(
+        "budget"
+      );
+    }
+
+    if (!layoutEmpty) {
+      reasons.push(
+        "layout_not_empty"
+      );
+    }
+
+    return {
+      ...template,
+
+      furnitureCost,
+      constructionCost:
+        context.constructionCost,
+      estimatedTotalCost,
+
+      usableArea:
+        context.usableArea,
+      availableBalance:
+        context.balance,
+
+      levelEligible,
+      areaEligible,
+      furnitureEligible,
+      budgetEligible,
+      layoutEmpty,
+
+      areaScore,
+      positioningScore,
+      budgetScore,
+      fitScore,
+
+      executable:
+        levelEligible &&
+        areaEligible &&
+        furnitureEligible &&
+        budgetEligible &&
+        layoutEmpty,
+
+      reasons
+    };
+  }
+
+  getTemplateRecommendations(
+    restaurantId,
+    {
+      includeUnavailable =
+        false
+    } = {}
+  ) {
+    const items =
+      this.getTemplates()
+        .map(
+          template =>
+            this.getTemplateFit(
+              restaurantId,
+              template
+            )
+        )
+        .filter(
+          item =>
+            includeUnavailable ||
+            item.executable
+        )
+        .sort(
+          (a, b) =>
+            Number(
+              b.executable
+            ) -
+              Number(
+                a.executable
+              ) ||
+            b.fitScore -
+              a.fitScore ||
+            a.minLevel -
+              b.minLevel ||
+            a.estimatedTotalCost -
+              b.estimatedTotalCost
+        );
+
+    return {
+      restaurantId,
+      recommendedTemplateId:
+        items.find(
+          item =>
+            item.executable
+        )?.id ??
+        null,
+      items
+    };
   }
 
   getGeometry(placement) {
