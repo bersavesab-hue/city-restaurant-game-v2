@@ -3,6 +3,7 @@ import { eventBus } from "../core/EventBus.js";
 import { randomSystem } from "../core/RandomSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
 import { EMPLOYEE_ROLES } from "../data/employeeRoles.js";
+import { economicBaselineSystem } from "./EconomicBaselineSystem.js";
 
 const EMPLOYEE_STATUS = Object.freeze({
   ACTIVE: "active",
@@ -90,7 +91,17 @@ class EmployeeSystem {
       throw new Error(`Employee limit reached: ${limits.employees}`);
     }
 
-    const finalSalary = salary ?? role.baseSalary;
+    const laborReference =
+      economicBaselineSystem
+        .getLaborReference(
+          role.id
+        );
+
+    const finalSalary =
+      salary ??
+      laborReference
+        ?.monthlySalary ??
+      role.baseSalary;
 
     if (!Number.isInteger(finalSalary) || finalSalary <= 0) {
       throw new RangeError("Salary must be a positive integer");
@@ -227,11 +238,50 @@ class EmployeeSystem {
   }
 
   getRole(roleId) {
-    return structuredClone(requireRole(roleId));
+    const role =
+      structuredClone(
+        requireRole(
+          roleId
+        )
+      );
+
+    const reference =
+      economicBaselineSystem
+        .getLaborReference(
+          roleId
+        );
+
+    if (
+      Number.isFinite(
+        reference
+          ?.monthlySalary
+      )
+    ) {
+      role.baseSalary =
+        reference
+          .monthlySalary;
+
+      role.salaryModel =
+        "reality_1_to_1_v2";
+
+      role.salaryReference =
+        reference;
+    }
+
+    return role;
   }
 
   getRoles() {
-    return Object.values(EMPLOYEE_ROLES).map(role => structuredClone(role));
+    return Object
+      .keys(
+        EMPLOYEE_ROLES
+      )
+      .map(
+        roleId =>
+          this.getRole(
+            roleId
+          )
+      );
   }
 }
 
