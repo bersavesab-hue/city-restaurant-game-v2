@@ -27,6 +27,10 @@ import {
 } from "../data/memberLevels.v1.js";
 
 import {
+  CUSTOMER_SEGMENTS_V3
+} from "../data/customerSegments.v3.js";
+
+import {
   MEMBER_POINT_POLICY,
   getMemberEnrollmentPropensity
 } from "../data/memberProgramRules.js";
@@ -139,7 +143,19 @@ class CustomerLoyaltySystem {
         )
       );
     } catch {
-      return 50;
+      const fallback =
+        CUSTOMER_SEGMENTS_V3
+          .find(
+            item =>
+              item.id ===
+              segmentId
+          );
+
+      return fallback
+        ? getMemberEnrollmentPropensity(
+            fallback
+          )
+        : 50;
     }
   }
 
