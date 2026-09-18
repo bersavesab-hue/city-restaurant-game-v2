@@ -1044,7 +1044,7 @@ class CompetitionMetricsSystem {
                 (
                   progress
                     ?.qualityScore ??
-                  custom.qualityScore ??
+                  custom.researchQualityScore ??
                   item.averageQuality
                 ) *
                   0.45 +
