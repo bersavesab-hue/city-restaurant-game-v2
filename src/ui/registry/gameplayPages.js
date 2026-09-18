@@ -316,6 +316,24 @@ const GAMEPLAY_PAGES = [
       "dashboard"
   },
 
+
+  {
+    id:
+      "award-ceremony",
+
+    title:
+      "颁奖典礼",
+
+    parent:
+      "operations",
+
+    order:
+      368,
+
+    layout:
+      "dashboard"
+  },
+
 ];
 
 

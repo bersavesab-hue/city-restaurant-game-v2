@@ -164,6 +164,15 @@ import {
 } from "../pages/honors/HonorHallView.js";
 
 
+import {
+  awardCeremonyPageSystem
+} from "../pages/award-ceremony/AwardCeremonyPageSystem.js";
+
+import {
+  awardCeremonyView
+} from "../pages/award-ceremony/AwardCeremonyView.js";
+
+
 const FORMAL_PAGE_DEFINITIONS =
   Object.freeze({
     supply: {
@@ -217,7 +226,8 @@ const FORMAL_PAGE_DEFINITIONS =
 
       refreshEvents: [
         "traffic:hourCompleted",
-        "settlement:completed"
+        "settlement:completed",
+        "award:feedback"
       ]
     },
 
@@ -342,6 +352,18 @@ const FORMAL_PAGE_DEFINITIONS =
 
       view:
         honorHallView,
+
+      mode:
+        "mount"
+    },
+
+
+    "award-ceremony": {
+      pageSystem:
+        awardCeremonyPageSystem,
+
+      view:
+        awardCeremonyView,
 
       mode:
         "mount"

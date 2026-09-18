@@ -44,7 +44,10 @@ const tests = [
   "tests/existing-page-entry-points.test.js",
   "tests/ranking-awards-catalog.test.js",
   "tests/award-cycle.test.js",
-  "tests/ranking-awards-pages.test.js"
+  "tests/ranking-awards-pages.test.js",
+  "tests/award-feedback.test.js",
+  "tests/award-ceremony.test.js",
+  "tests/award-feedback-command-center.test.js"
 ];
 
 

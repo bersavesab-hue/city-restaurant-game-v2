@@ -229,3 +229,12 @@ export {
   honorHallView,
   HonorHallView
 } from "./pages/honors/index.js";
+
+
+export {
+  awardCeremonyPageSystem,
+  AwardCeremonyPageSystem,
+  PERIOD_NAME,
+  awardCeremonyView,
+  AwardCeremonyView
+} from "./pages/award-ceremony/index.js";
