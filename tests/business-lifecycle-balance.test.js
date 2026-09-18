@@ -1070,8 +1070,8 @@ test(
 
     assert.ok(
       day90.reputation >= 0 &&
-      day90.reputation <= 100,
-      `声望必须保持0-100：${day90.reputation}`
+      day90.reputation < 60,
+      `90天声望增长过快：${day90.reputation}`
     );
 
     assert.notEqual(
