@@ -3,6 +3,7 @@ import { gameState } from "../core/GameState.js";
 import { menuSystem } from "./MenuSystem.js";
 import { dishCatalogSystem } from "./DishCatalogSystem.js";
 import { reviewInsightSystem } from "./ReviewInsightSystem.js";
+import { businessCausalitySystem } from "./BusinessCausalitySystem.js";
 
 class OperatingReportSystem {
   getRange(period = "day") {
@@ -221,7 +222,11 @@ class OperatingReportSystem {
       );
   }
 
-  getAdvice(diagnosis, dishes) {
+  getAdvice(
+    diagnosis,
+    dishes,
+    causality = null
+  ) {
     const advice = [];
 
     const topIssue =
@@ -257,6 +262,47 @@ class OperatingReportSystem {
     ) {
       advice.push(
         "目标客群对价格敏感，检查菜单定价"
+      );
+    }
+
+    const causalId =
+      causality?.topCause?.id;
+
+    if (
+      causalId ===
+      "price"
+    ) {
+      advice.push(
+        "近期客流下降主要受价格接受度影响，优先检查目标客群与菜单涨价幅度"
+      );
+    }
+
+    if (
+      causalId ===
+      "queue" ||
+      causalId ===
+      "capacity"
+    ) {
+      advice.push(
+        "近期主要损失来自排队或接待瓶颈，优先处理厨房、前厅、座位或收银产能"
+      );
+    }
+
+    if (
+      causalId ===
+      "environment"
+    ) {
+      advice.push(
+        "环境舒适度正在拖累评价和复购，优先调整装修布局与用餐体验"
+      );
+    }
+
+    if (
+      causalId ===
+      "competition"
+    ) {
+      advice.push(
+        "区域竞争正在明显分流客流，检查定位、价格、招牌菜和目标客群适配"
       );
     }
 
@@ -324,6 +370,17 @@ class OperatingReportSystem {
           restaurantId
         );
 
+    const causality =
+      businessCausalitySystem
+        .getDashboard(
+          restaurantId,
+          period === "month"
+            ? 30
+            : period === "week"
+              ? 7
+              : 1
+        );
+
     return {
       restaurantId,
       period,
@@ -371,10 +428,13 @@ class OperatingReportSystem {
 
       diagnosis,
 
+      causality,
+
       advice:
         this.getAdvice(
           diagnosis,
-          dishes
+          dishes,
+          causality
         )
     };
   }
