@@ -13,6 +13,7 @@ const tests = [
   "tests/lease-flow.test.js",
 
   "tests/formal-renovation-furniture-data.test.js",
+  "tests/formal-renovation-template-data.test.js",
   "tests/renovation-planning.test.js",
   "tests/renovation-editor.test.js",
   "tests/renovation-mobile-page.test.js",
