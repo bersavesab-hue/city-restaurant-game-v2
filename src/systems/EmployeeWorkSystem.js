@@ -6,6 +6,9 @@ import {
 } from "./EmployeeSystem.js";
 import { renovationSystem } from "./RenovationSystem.js";
 import { layoutFlowSystem } from "./LayoutFlowSystem.js";
+import {
+  getPotentialGrowthMultiplier
+} from "../data/employeeGenerationRules.js";
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -149,19 +152,81 @@ class EmployeeWorkSystem {
     );
     const oldSkillBlocks = Math.floor(oldWorkMinutes / 240);
     const newSkillBlocks = Math.floor(totalWorkMinutes / 240);
-    const skillGain = Math.max(0, newSkillBlocks - oldSkillBlocks);
-    const role = employeeSystem.getRole(employee.roleId);
-    const skills = { ...(employee.skills ?? {}) };
+    const skillGain =
+      Math.max(
+        0,
+        newSkillBlocks -
+        oldSkillBlocks
+      );
 
-    if (skillGain > 0) {
-      skills[role.primarySkill] = clamp(
-        (skills[role.primarySkill] ?? 0) + skillGain,
+    const potentialGrowth =
+      getPotentialGrowthMultiplier(
+        employee.potential ??
+        3
+      );
+
+    const learningGrowth =
+      0.8 +
+      clamp(
+        employee.learning ??
+        60,
         0,
         100
+      ) *
+      0.004;
+
+    const growthMultiplier =
+      clamp(
+        potentialGrowth *
+        learningGrowth,
+        0.7,
+        1.6
       );
+
+    const role =
+      employeeSystem.getRole(
+        employee.roleId
+      );
+
+    const skills = {
+      ...(employee.skills ?? {})
+    };
+
+    if (skillGain > 0) {
+      skills[
+        role.primarySkill
+      ] =
+        clamp(
+          (
+            skills[
+              role.primarySkill
+            ] ??
+            0
+          ) +
+          Math.max(
+            1,
+            Math.round(
+              skillGain *
+              growthMultiplier
+            )
+          ),
+          0,
+          100
+        );
     }
 
-    const experience = (employee.experience ?? 0) + experienceGain;
+    const experience =
+      (
+        employee.experience ??
+        0
+      ) +
+      Math.max(
+        0,
+        Math.round(
+          experienceGain *
+          growthMultiplier
+        )
+      );
 
     return entitySystem.update("employee", employeeId, {
       fatigue,
