@@ -6,11 +6,28 @@ import {
   serviceCapacitySystem
 } from "../../../systems/ServiceCapacitySystem.js";
 
+import {
+  restaurantSystem
+} from "../../../systems/RestaurantSystem.js";
+
 
 class EquipmentManagementPageSystem {
   getPage(
     restaurantId
   ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    const catalog =
+      restaurantEquipmentSystem
+        .getDefinitions({
+          storeLevel:
+            restaurant.level ??
+            1
+        });
+
     return {
       pageId:
         "equipment-management",
@@ -32,9 +49,17 @@ class EquipmentManagementPageSystem {
             restaurantId
           ),
 
-      catalog:
+      storeLevel:
+        restaurant.level ??
+        1,
+
+      catalog,
+
+      lockedCount:
         restaurantEquipmentSystem
           .getDefinitions()
+          .length -
+        catalog.length
     };
   }
 }
