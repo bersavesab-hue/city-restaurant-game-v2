@@ -65,6 +65,98 @@ class TrafficSystem {
       : 0;
   }
 
+  aggregateDailyDemand(
+    dailyDemand
+  ) {
+    const segmentMap =
+      new Map();
+
+    for (
+      const hour
+      of dailyDemand?.hours ??
+      []
+    ) {
+      for (
+        const segment
+        of hour.segments ??
+        []
+      ) {
+        const expectedVisitors =
+          Math.max(
+            0,
+            Number(
+              segment.expectedVisitors
+            ) || 0
+          );
+
+        if (
+          expectedVisitors <= 0
+        ) {
+          continue;
+        }
+
+        const current =
+          segmentMap.get(
+            segment.segmentId
+          ) ?? {
+            segmentId:
+              segment.segmentId,
+            expectedVisitors: 0,
+            priceFactorTotal: 0
+          };
+
+        current.expectedVisitors +=
+          expectedVisitors;
+
+        current.priceFactorTotal +=
+          (
+            Number(
+              segment.priceFactor
+            ) ||
+            1
+          ) *
+          expectedVisitors;
+
+        segmentMap.set(
+          segment.segmentId,
+          current
+        );
+      }
+    }
+
+    return {
+      expectedVisitors:
+        Math.max(
+          0,
+          Number(
+            dailyDemand
+              ?.expectedVisitors
+          ) || 0
+        ),
+
+      segments:
+        [
+          ...segmentMap.values()
+        ].map(
+          item => ({
+            segmentId:
+              item.segmentId,
+
+            expectedVisitors:
+              item.expectedVisitors,
+
+            priceFactor:
+              item.expectedVisitors > 0
+                ? item
+                    .priceFactorTotal /
+                  item
+                    .expectedVisitors
+                : 1
+          })
+        )
+    };
+  }
+
   simulateDayAggregate(restaurantId) {
     if (
       !restaurantSystem.isOpen(
@@ -158,28 +250,40 @@ class TrafficSystem {
       dailyDemand
         .expectedVisitors;
 
-    const visitors =
-      Math.min(
-        randomSystem.int(
-          Math.max(
-            0,
-            Math.floor(
-              expected * 0.85
-            )
-          ),
-          Math.max(
-            0,
-            Math.ceil(
-              expected * 1.15
-            )
+    const incomingVisitors =
+      randomSystem.int(
+        Math.max(
+          0,
+          Math.floor(
+            expected * 0.85
           )
         ),
+        Math.max(
+          0,
+          Math.ceil(
+            expected * 1.15
+          )
+        )
+      );
+
+    const visitors =
+      Math.min(
+        incomingVisitors,
         capacity
+      );
+
+    const rejectedVisitors =
+      Math.max(
+        0,
+        incomingVisitors -
+        visitors
       );
 
     let completedOrders = 0;
     let failedOrders = 0;
     let revenue = 0;
+    let qualityTotal = 0;
+    let qualityCount = 0;
 
     const base =
       Math.floor(
@@ -247,17 +351,67 @@ class TrafficSystem {
 
         revenue +=
           order.totalRevenue;
+
+        qualityTotal +=
+          (
+            Number(
+              order.averageQuality
+            ) ||
+            60
+          ) *
+          successful;
+
+        qualityCount +=
+          successful;
       } catch {
         failedOrders += orders;
       }
     }
 
-    return {
+    const result = {
+      incomingVisitors,
+
       visitors,
+      rejectedVisitors,
+
       completedOrders,
       failedOrders,
-      revenue
+      revenue,
+
+      queuedVisitors: 0,
+      queueAbandoned: 0,
+
+      estimatedWaitMinutes:
+        rejectedVisitors > 0
+          ? 12
+          : 0,
+
+      queuePatienceMinutes:
+        12,
+
+      averageQuality:
+        qualityCount > 0
+          ? Math.round(
+              qualityTotal /
+              qualityCount
+            )
+          : 0
     };
+
+    result.experience =
+      customerExperienceSystem
+        .recordHour({
+          restaurantId,
+
+          demand:
+            this.aggregateDailyDemand(
+              dailyDemand
+            ),
+
+          result
+        });
+
+    return result;
   }
 
   simulateHour(
