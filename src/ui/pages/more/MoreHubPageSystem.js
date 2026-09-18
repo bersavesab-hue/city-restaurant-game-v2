@@ -52,6 +52,14 @@ const MORE_GROUPS =
 
       entries: [
         {
+          id: "store-progress",
+          title: "成长与解锁",
+          description: "查看等级、经验、经营上限和后续功能解锁",
+          target: "store-progress",
+          state: "ready"
+        },
+
+        {
           id: "chain",
           title: "连锁管理",
           description: "多门店、品牌扩张与连锁经营",
