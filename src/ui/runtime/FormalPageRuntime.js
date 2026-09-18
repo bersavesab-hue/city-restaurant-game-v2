@@ -1,0 +1,466 @@
+import {
+  supplyManagementPageSystem
+} from "../pages/supply/SupplyManagementPageSystem.js";
+
+import {
+  supplyManagementView
+} from "../pages/supply/SupplyManagementView.js";
+
+
+import {
+  financeCenterPageSystem
+} from "../pages/finance/FinanceCenterPageSystem.js";
+
+import {
+  financeCenterView
+} from "../pages/finance/FinanceCenterView.js";
+
+
+import {
+  employeePromotionPageSystem
+} from "../pages/employee-promotion/EmployeePromotionPageSystem.js";
+
+import {
+  employeePromotionView
+} from "../pages/employee-promotion/EmployeePromotionView.js";
+
+
+import {
+  workforceCapacityPageSystem
+} from "../pages/workforce-capacity/WorkforceCapacityPageSystem.js";
+
+import {
+  workforceCapacityView
+} from "../pages/workforce-capacity/WorkforceCapacityView.js";
+
+
+import {
+  operatingCommandCenterPageSystem
+} from "../pages/command-center/OperatingCommandCenterPageSystem.js";
+
+import {
+  operatingCommandCenterView
+} from "../pages/command-center/OperatingCommandCenterView.js";
+
+
+import {
+  capacityManagementPageSystem
+} from "../pages/capacity/CapacityManagementPageSystem.js";
+
+import {
+  capacityManagementView
+} from "../pages/capacity/CapacityManagementView.js";
+
+
+import {
+  reputationPageSystem
+} from "../pages/reputation/ReputationPageSystem.js";
+
+import {
+  reputationView
+} from "../pages/reputation/ReputationView.js";
+
+
+import {
+  channelManagementPageSystem
+} from "../pages/channels/ChannelManagementPageSystem.js";
+
+import {
+  channelManagementView
+} from "../pages/channels/ChannelManagementView.js";
+
+
+import {
+  menuOptimizationPageSystem
+} from "../pages/menu-optimization/MenuOptimizationPageSystem.js";
+
+import {
+  menuOptimizationView
+} from "../pages/menu-optimization/MenuOptimizationView.js";
+
+
+import {
+  menuEngineeringPageSystem
+} from "../pages/menu-engineering/MenuEngineeringPageSystem.js";
+
+import {
+  menuEngineeringView
+} from "../pages/menu-engineering/MenuEngineeringView.js";
+
+
+import {
+  equipmentManagementPageSystem
+} from "../pages/equipment/EquipmentManagementPageSystem.js";
+
+import {
+  equipmentManagementView
+} from "../pages/equipment/EquipmentManagementView.js";
+
+
+import {
+  equipmentMaintenancePageSystem
+} from "../pages/equipment-maintenance/EquipmentMaintenancePageSystem.js";
+
+import {
+  equipmentMaintenanceView
+} from "../pages/equipment-maintenance/EquipmentMaintenanceView.js";
+
+
+import {
+  customerManagementPageSystem
+} from "../pages/customers/CustomerManagementPageSystem.js";
+
+import {
+  customerManagementView
+} from "../pages/customers/CustomerManagementView.js";
+
+
+import {
+  memberMarketingPageSystem
+} from "../pages/marketing/MemberMarketingPageSystem.js";
+
+import {
+  memberMarketingView
+} from "../pages/marketing/MemberMarketingView.js";
+
+
+import {
+  operationsHubPageSystem
+} from "../pages/operations-hub/OperationsHubPageSystem.js";
+
+import {
+  operationsHubView
+} from "../pages/operations-hub/OperationsHubView.js";
+
+
+const FORMAL_PAGE_DEFINITIONS =
+  Object.freeze({
+    supply: {
+      pageSystem:
+        supplyManagementPageSystem,
+
+      view:
+        supplyManagementView,
+
+      mode:
+        "mount"
+    },
+
+
+    finance: {
+      pageSystem:
+        financeCenterPageSystem,
+
+      view:
+        financeCenterView
+    },
+
+
+    employee_promotion: {
+      pageSystem:
+        employeePromotionPageSystem,
+
+      view:
+        employeePromotionView
+    },
+
+
+    "workforce-capacity": {
+      pageSystem:
+        workforceCapacityPageSystem,
+
+      view:
+        workforceCapacityView
+    },
+
+
+    "operating-command-center": {
+      pageSystem:
+        operatingCommandCenterPageSystem,
+
+      view:
+        operatingCommandCenterView,
+
+      bindDataTarget:
+        true
+    },
+
+
+    capacity: {
+      pageSystem:
+        capacityManagementPageSystem,
+
+      view:
+        capacityManagementView
+    },
+
+
+    reputation: {
+      pageSystem:
+        reputationPageSystem,
+
+      view:
+        reputationView
+    },
+
+
+    channels: {
+      pageSystem:
+        channelManagementPageSystem,
+
+      view:
+        channelManagementView
+    },
+
+
+    "menu-optimization": {
+      pageSystem:
+        menuOptimizationPageSystem,
+
+      view:
+        menuOptimizationView
+    },
+
+
+    "menu-engineering": {
+      pageSystem:
+        menuEngineeringPageSystem,
+
+      view:
+        menuEngineeringView
+    },
+
+
+    "equipment-management": {
+      pageSystem:
+        equipmentManagementPageSystem,
+
+      view:
+        equipmentManagementView
+    },
+
+
+    "equipment-maintenance": {
+      pageSystem:
+        equipmentMaintenancePageSystem,
+
+      view:
+        equipmentMaintenanceView
+    },
+
+
+    customers: {
+      pageSystem:
+        customerManagementPageSystem,
+
+      view:
+        customerManagementView
+    },
+
+
+    "member-marketing": {
+      pageSystem:
+        memberMarketingPageSystem,
+
+      view:
+        memberMarketingView
+    },
+
+
+    "operations-home": {
+      pageSystem:
+        operationsHubPageSystem,
+
+      view:
+        operationsHubView
+    }
+  });
+
+
+const FORMAL_RUNTIME_PAGE_IDS =
+  Object.freeze(
+    Object.keys(
+      FORMAL_PAGE_DEFINITIONS
+    )
+  );
+
+
+class FormalPageRuntime {
+  has(
+    pageId
+  ) {
+    return Boolean(
+      FORMAL_PAGE_DEFINITIONS[
+        pageId
+      ]
+    );
+  }
+
+
+  getPageIds() {
+    return [
+      ...FORMAL_RUNTIME_PAGE_IDS
+    ];
+  }
+
+
+  mount({
+    pageId,
+    root,
+    restaurantId,
+    params = {},
+    onNavigate = null
+  }) {
+    const definition =
+      FORMAL_PAGE_DEFINITIONS[
+        pageId
+      ];
+
+
+    if (!definition) {
+      throw new Error(
+        `Formal page "${pageId}" is not registered`
+      );
+    }
+
+
+    if (!root) {
+      throw new Error(
+        "FormalPageRuntime root is required"
+      );
+    }
+
+
+    let cleanup =
+      null;
+
+
+    if (
+      definition.mode ===
+        "mount" &&
+      typeof definition.view
+        ?.mount ===
+        "function"
+    ) {
+      definition.view.mount(
+        root,
+        {
+          restaurantId,
+          ...params
+        }
+      );
+    } else {
+      const page =
+        definition.pageSystem
+          .getPage(
+            restaurantId,
+            params
+          );
+
+
+      root.innerHTML =
+        definition.view
+          .renderMarkup(
+            page
+          );
+
+
+      if (
+        typeof onNavigate ===
+        "function"
+      ) {
+        const handler =
+          event => {
+            const selector =
+              definition.bindDataTarget
+                ? (
+                    "[data-page-target],"
+                    + "[data-target]"
+                  )
+                : "[data-page-target]";
+
+
+            const element =
+              event.target
+                ?.closest?.(
+                  selector
+                );
+
+
+            if (
+              !element ||
+              !root.contains(
+                element
+              )
+            ) {
+              return;
+            }
+
+
+            const target =
+              element.dataset
+                .pageTarget ??
+              element.dataset
+                .target;
+
+
+            if (!target) {
+              return;
+            }
+
+
+            onNavigate(
+              target,
+              restaurantId
+            );
+          };
+
+
+        root.addEventListener(
+          "click",
+          handler
+        );
+
+
+        cleanup =
+          () => {
+            root.removeEventListener(
+              "click",
+              handler
+            );
+          };
+      }
+    }
+
+
+    return {
+      pageId,
+
+      destroy() {
+        cleanup?.();
+
+        if (
+          definition.mode ===
+            "mount" &&
+          typeof definition.view
+            ?.destroy ===
+            "function"
+        ) {
+          definition.view
+            .destroy();
+        }
+      }
+    };
+  }
+}
+
+
+export const formalPageRuntime =
+  new FormalPageRuntime();
+
+
+export {
+  FormalPageRuntime,
+  FORMAL_PAGE_DEFINITIONS,
+  FORMAL_RUNTIME_PAGE_IDS
+};

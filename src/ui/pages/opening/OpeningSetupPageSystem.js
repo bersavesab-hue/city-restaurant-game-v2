@@ -382,7 +382,7 @@ class OpeningSetupPageSystem {
         ),
 
       nextPage:
-        "restaurant"
+        "operating-command-center"
     };
   }
 }

@@ -21,6 +21,10 @@ import {
 } from "./CityMapViewportRuntime.js";
 
 import {
+  formalPageRuntime
+} from "./FormalPageRuntime.js";
+
+import {
   restaurantSystem
 } from "../../systems/RestaurantSystem.js";
 
@@ -854,6 +858,15 @@ function navigate(
         "city";
     }
 
+
+    if (
+      pageId ===
+      "employees"
+    ) {
+      pageId =
+        "employee_roster";
+    }
+
     if (
       pageId ===
       "restaurant"
@@ -1003,8 +1016,6 @@ function navigate(
 
     if (
       pageId ===
-      "employees" ||
-      pageId ===
       "employee_roster"
     ) {
       currentView =
@@ -1024,7 +1035,14 @@ function navigate(
 
     if (
       pageId ===
-      "operations" ||
+      "operations"
+    ) {
+      pageId =
+        "operations-home";
+    }
+
+
+    if (
       pageId ===
       "dishes"
     ) {
@@ -1066,7 +1084,7 @@ function navigate(
 
     if (
       pageId ===
-      "restaurant_home"
+      "restaurant-home"
     ) {
       currentView =
         new RestaurantHomeView({
@@ -1078,6 +1096,26 @@ function navigate(
         });
 
       currentView.mount();
+
+      return;
+    }
+
+
+    if (
+      formalPageRuntime.has(
+        pageId
+      )
+    ) {
+      currentView =
+        formalPageRuntime.mount({
+          pageId,
+          root,
+          restaurantId,
+          params,
+
+          onNavigate:
+            navigate
+        });
 
       return;
     }
@@ -1098,11 +1136,10 @@ function navigate(
 
     if (
       [
-        "supply",
-        "finance",
+
         "lease",
         "employee_training",
-        "employee_promotion",
+
         "employee_detail",
         "employee_recruitment"
       ].includes(
@@ -1206,7 +1243,7 @@ setInterval(
 firstLaunch();
 
 navigate(
-  "opening-setup"
+  "restaurant"
 );
 
 startRuntimeSystems();

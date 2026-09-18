@@ -72,7 +72,22 @@ const ACTION_TARGETS =
       "operating-command-center",
 
     "operating-command-center":
-      "operating-command-center"
+      "operating-command-center",
+
+    customers:
+      "customers",
+
+    members:
+      "member-marketing",
+
+    "member-marketing":
+      "member-marketing",
+
+    "menu-engineering":
+      "menu-engineering",
+
+    "equipment-maintenance":
+      "equipment-maintenance"
   });
 
 class GameplayNavigationSystem {

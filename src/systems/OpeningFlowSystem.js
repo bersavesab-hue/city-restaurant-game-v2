@@ -15,6 +15,11 @@ import {
 } from "./RenovationSystem.js";
 
 import {
+  renovationConstructionSystem
+} from "./RenovationConstructionSystem.js";
+
+
+import {
   employeeSystem
 } from "./EmployeeSystem.js";
 
@@ -82,6 +87,14 @@ class OpeningFlowSystem {
         .getSummary(
           restaurantId
         );
+
+
+    const construction =
+      renovationConstructionSystem
+        .getCurrent(
+          restaurantId
+        ) ??
+      null;
 
 
     const employees =
@@ -436,7 +449,7 @@ class OpeningFlowSystem {
           hasOpened,
 
         target:
-          "restaurant",
+          "operating-command-center",
 
         action:
           "open",
@@ -504,6 +517,8 @@ class OpeningFlowSystem {
       lease,
 
       renovation,
+
+      construction,
 
       employees,
 
@@ -688,13 +703,58 @@ class OpeningFlowSystem {
   getRecommendedPage(
     restaurantId
   ) {
-    return this
-      .getStatus(
+    const status =
+      this.getStatus(
         restaurantId
-      )
-      .hasOpened
-        ? "restaurant"
-        : "opening-setup";
+      );
+
+
+    if (
+      status.hasOpened
+    ) {
+      return (
+        "operating-command-center"
+      );
+    }
+
+
+    const hasLease =
+      Boolean(
+        status.lease &&
+        status.restaurant
+          .locationId
+      );
+
+
+    if (!hasLease) {
+      return "properties";
+    }
+
+
+    if (
+      status.construction
+    ) {
+      return (
+        "renovation_construction"
+      );
+    }
+
+
+    const renovationReady =
+      Boolean(
+        status.renovation
+          ?.initialized &&
+        status.renovation
+          ?.active
+      );
+
+
+    if (!renovationReady) {
+      return "renovation";
+    }
+
+
+    return "opening-setup";
   }
 }
 

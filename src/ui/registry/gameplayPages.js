@@ -189,7 +189,79 @@ const GAMEPLAY_PAGES = [
 
     layout:
       "management"
-  }
+  },
+
+
+  {
+    id:
+      "equipment-maintenance",
+
+    title:
+      "设备维护",
+
+    parent:
+      "restaurant",
+
+    order:
+      235,
+
+    layout:
+      "management"
+  },
+
+
+  {
+    id:
+      "customers",
+
+    title:
+      "顾客管理",
+
+    parent:
+      "operations",
+
+    order:
+      350,
+
+    layout:
+      "management"
+  },
+
+
+  {
+    id:
+      "menu-engineering",
+
+    title:
+      "菜单工程",
+
+    parent:
+      "operations",
+
+    order:
+      355,
+
+    layout:
+      "dashboard"
+  },
+
+
+  {
+    id:
+      "member-marketing",
+
+    title:
+      "会员营销",
+
+    parent:
+      "more",
+
+    order:
+      515,
+
+    layout:
+      "management"
+  },
 ];
 
 
