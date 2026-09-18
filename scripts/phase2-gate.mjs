@@ -41,6 +41,7 @@ const tests = [
   "tests/dish-management-system.test.js",
   "tests/dish-rules.test.js",
   "tests/dish-catalog-schema.test.js",
+  "tests/cooking-method-recipe-schema.test.js",
   "tests/restaurant-dish-progress.test.js",
   "tests/dish-research.test.js",
   "tests/dish-growth.test.js",
