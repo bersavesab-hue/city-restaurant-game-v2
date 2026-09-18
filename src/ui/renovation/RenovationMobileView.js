@@ -479,10 +479,22 @@ class RenovationMobileView {
                     class="renovation-category-tab ${category.id === page.drawer.activeCategory ? "is-active" : ""}"
                     data-action="category"
                     data-category-id="${escapeHtml(category.id)}"
-                  >${escapeHtml(category.name)}</button>
+                  >${escapeHtml(category.name)} ${category.count}/${category.total}</button>
                 `)
                 .join("")}
             </nav>
+
+            ${page.drawer.lockedCount > 0
+              ? `
+                <div class="renovation-unlock-hint">
+                  还有${page.drawer.lockedCount}件未解锁
+                  ${page.drawer.nextUnlockLevel
+                    ? ` · 下一批Lv${page.drawer.nextUnlockLevel}`
+                    : ""}
+                </div>
+              `
+              : ""
+            }
 
             <div class="renovation-furniture-strip">
               ${page.drawer.items
@@ -495,6 +507,16 @@ class RenovationMobileView {
                     ${item.unlocked ? "" : "disabled"}
                   >
                     <b>${escapeHtml(item.name)}</b>
+                    <span>
+                      ${escapeHtml(
+                        item.specTier
+                      )}
+                      ·
+                      ${escapeHtml(
+                        item.tier?.name ??
+                        ""
+                      )}
+                    </span>
                     <span>${item.width}×${item.height}</span>
                     <span>¥${formatMoney(item.cost)}</span>
                   </button>
