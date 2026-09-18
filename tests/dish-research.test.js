@@ -22,7 +22,6 @@ test(
           name: "研发米",
           category: "grain",
           unit: "portion",
-          baseQuality: 2,
           storageType: "dry",
           basePurchasePrice: 5,
           shelfLifeDays: 30,
@@ -34,7 +33,6 @@ test(
           name: "研发肉",
           category: "meat",
           unit: "portion",
-          baseQuality: 3,
           storageType: "chilled",
           basePurchasePrice: 12,
           shelfLifeDays: 5,
@@ -46,7 +44,6 @@ test(
           name: "研发菜",
           category: "vegetable",
           unit: "portion",
-          baseQuality: 2,
           storageType: "chilled",
           basePurchasePrice: 4,
           shelfLifeDays: 5,
@@ -135,24 +132,30 @@ test(
       result.dish.id
     );
 
-    assert.ok(
-      result.dish
-        .qualityLevel >= 1 &&
-      result.dish
-        .qualityLevel <= 5
+    assert.equal(
+      result.dish.masteryLevel,
+      1
     );
 
-    assert.ok(
-      [
-        "C",
-        "B",
-        "A",
-        "S",
-        "SS"
-      ].includes(
-        result.dish
-          .qualityGrade
-      )
+    assert.equal(
+      result.dish.dishRankName,
+      "家常"
+    );
+
+    assert.equal(
+      Object.prototype.hasOwnProperty.call(
+        result.dish,
+        "qualityLevel"
+      ),
+      false
+    );
+
+    assert.equal(
+      Object.prototype.hasOwnProperty.call(
+        result.dish,
+        "rarity"
+      ),
+      false
     );
 
     assert.ok(
