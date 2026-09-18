@@ -833,6 +833,276 @@ class BusinessCausalitySystem {
             a.count
         );
 
+    const hourlySegmentMap =
+      new Map();
+
+    for (
+      const row
+      of rows
+    ) {
+      for (
+        const outcome
+        of row.outcomes
+          ?.segmentOutcomes ??
+        []
+      ) {
+        const current =
+          hourlySegmentMap.get(
+            outcome.segmentId
+          ) ?? {
+            segmentId:
+              outcome.segmentId,
+
+            expectedVisitors:
+              0,
+
+            arrivals:
+              0,
+
+            served:
+              0,
+
+            rejected:
+              0,
+
+            revenue:
+              0,
+
+            priceFactorTotal:
+              0,
+
+            priceFactorWeight:
+              0,
+
+            qualityTotal:
+              0,
+
+            qualityCount:
+              0
+          };
+
+        const weight =
+          Math.max(
+            0.01,
+            Number(
+              outcome
+                .expectedVisitors
+            ) ||
+            Number(
+              outcome.arrivals
+            ) ||
+            1
+          );
+
+        current.expectedVisitors +=
+          Number(
+            outcome.expectedVisitors
+          ) || 0;
+
+        current.arrivals +=
+          Number(
+            outcome.arrivals
+          ) || 0;
+
+        current.served +=
+          Number(
+            outcome.served
+          ) || 0;
+
+        current.rejected +=
+          Number(
+            outcome.rejected
+          ) || 0;
+
+        current.revenue +=
+          Number(
+            outcome.revenue
+          ) || 0;
+
+        current.priceFactorTotal +=
+          (
+            Number(
+              outcome.priceFactor
+            ) ||
+            1
+          ) *
+          weight;
+
+        current.priceFactorWeight +=
+          weight;
+
+        if (
+          Number(
+            outcome.averageQuality
+          ) >
+          0
+        ) {
+          current.qualityTotal +=
+            Number(
+              outcome.averageQuality
+            );
+
+          current.qualityCount +=
+            1;
+        }
+
+        hourlySegmentMap.set(
+          outcome.segmentId,
+          current
+        );
+      }
+    }
+
+    const segmentImpact =
+      [
+        ...hourlySegmentMap
+          .values()
+      ]
+        .map(
+          item => {
+            const averagePriceFactor =
+              item.priceFactorWeight >
+              0
+                ? item
+                    .priceFactorTotal /
+                  item
+                    .priceFactorWeight
+                : 1;
+
+            const serviceRate =
+              item.arrivals >
+              0
+                ? item.served /
+                  item.arrivals
+                : 1;
+
+            const rejectionRate =
+              item.arrivals >
+              0
+                ? item.rejected /
+                  item.arrivals
+                : 0;
+
+            const retentionMultiplier =
+              this
+                .getSegmentDemandMultiplier(
+                  restaurantId,
+                  item.segmentId,
+                  days
+                );
+
+            let primaryDriver =
+              "balanced";
+
+            if (
+              averagePriceFactor <
+              0.94
+            ) {
+              primaryDriver =
+                "price";
+            } else if (
+              rejectionRate >
+              0.14
+            ) {
+              primaryDriver =
+                "queue";
+            } else if (
+              serviceRate <
+              0.78
+            ) {
+              primaryDriver =
+                "capacity";
+            } else if (
+              retentionMultiplier >
+              1.04
+            ) {
+              primaryDriver =
+                "positive_experience";
+            }
+
+            return {
+              ...item,
+
+              averagePriceFactor:
+                Number(
+                  averagePriceFactor
+                    .toFixed(3)
+                ),
+
+              priceTrafficImpact:
+                Number(
+                  (
+                    (
+                      averagePriceFactor -
+                      1
+                    ) *
+                    100
+                  ).toFixed(1)
+                ),
+
+              retentionMultiplier,
+
+              retentionImpact:
+                Number(
+                  (
+                    (
+                      retentionMultiplier -
+                      1
+                    ) *
+                    100
+                  ).toFixed(1)
+                ),
+
+              serviceRate:
+                Number(
+                  (
+                    serviceRate *
+                    100
+                  ).toFixed(1)
+                ),
+
+              rejectionRate:
+                Number(
+                  (
+                    rejectionRate *
+                    100
+                  ).toFixed(1)
+                ),
+
+              averageQuality:
+                item.qualityCount >
+                0
+                  ? Math.round(
+                      item.qualityTotal /
+                      item.qualityCount
+                    )
+                  : 0,
+
+              averageSpend:
+                item.served >
+                0
+                  ? Math.round(
+                      item.revenue /
+                      item.served
+                    )
+                  : 0,
+
+              primaryDriver,
+
+              primaryDriverLabel:
+                CAUSE_LABELS[
+                  primaryDriver
+                ] ??
+                primaryDriver
+            };
+          }
+        )
+        .sort(
+          (a, b) =>
+            b.revenue -
+            a.revenue
+        );
+
     const segmentRows =
       entitySystem.filter(
         "segment_experience_daily",
@@ -947,6 +1217,8 @@ class BusinessCausalitySystem {
         rows.length,
 
       segmentSummary,
+
+      segmentImpact,
 
       arrivals,
       served,
