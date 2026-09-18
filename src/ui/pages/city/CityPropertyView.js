@@ -88,7 +88,8 @@ export class CityPropertyView {
         <span>${available}套动态房源 · 每7天滚动更新</span>
       </div>
       <div class="cr-property-market-tags">
-        <span>30–10000㎡</span>
+        <span>22种房源模板</span>
+        <span>18–8000㎡动态结构</span>
         <span>真实户型</span>
         <span>可议价房源</span>
         <span>NPC会抢租</span>
@@ -109,6 +110,7 @@ export class CityPropertyView {
             <span>动态房源</span>
             ${property.qualityScore !== null ? `<span>房源评分 ${property.qualityScore}</span>` : ""}
             <span>推荐 ${property.recommendation?.score ?? "-"}</span>
+            ${property.template?.name ? `<span>${property.template.name}</span>` : ""}
             ${property.listing.remainingDays !== null ? `<span>${property.listing.remainingDays}天后下架</span>` : ""}
             ${property.competition?.daysUntilPossibleClaim !== null ? `<span>${property.competition.daysUntilPossibleClaim}天内可能被抢租</span>` : ""}
           </div>
@@ -132,6 +134,14 @@ export class CityPropertyView {
             ${property.leaseTerms?.negotiable ? `<span class="is-good">可议价</span>` : ""}
             ${property.parkingSpaces > 0 ? `<span>${property.parkingSpaces}车位</span>` : ""}
           </div>
+          ${property.propertyFeatures
+            ? `<div class="cr-property-card__structure">
+                采光 ${property.propertyFeatures.naturalLightScore}
+                · 入口 ${property.propertyFeatures.entranceCount}
+                · 厨房 ${property.propertyFeatures.kitchenReadinessScore}
+              </div>`
+            : ""
+          }
           ${property.recommendedVenueTypes?.length
             ? `<div class="cr-property-card__venue-types">
                 推荐业态：
@@ -202,6 +212,14 @@ export class CityPropertyView {
         <div class="cr-property-detail__district">
           <span>推荐 ${property.recommendation?.score ?? "-"}</span>
           <span>商圈机会 ${property.recommendation?.districtOpportunityScore ?? "-"}</span>
+          ${property.template?.name ? `<span>房源模板 ${property.template.name}</span>` : ""}
+          ${property.propertyFeatures
+            ? `<span>采光 ${property.propertyFeatures.naturalLightScore}</span>
+               <span>入口 ${property.propertyFeatures.entranceCount}</span>
+               <span>柱网 ${property.propertyFeatures.columnDensityPer1000}/千㎡</span>
+               <span>厨房准备度 ${property.propertyFeatures.kitchenReadinessScore}</span>`
+            : ""
+          }
           <span>当前业态 ${property.venueTypeName ?? "未设定"}</span>
           ${property.recommendedVenueTypes?.length
             ? `<span>推荐业态 ${property.recommendedVenueTypes
@@ -230,7 +248,12 @@ export class CityPropertyView {
         <div class="cr-property-detail__terms">
           <span>租期 ${leaseTerms.minMonths}-${leaseTerms.maxMonths}个月</span>
           <span>物业费 ${money(leaseTerms.propertyFeeMonthly)}/月</span>
+          ${Number.isFinite(leaseTerms.propertyFeePerSqm) ? `<span>物业单价 ¥${leaseTerms.propertyFeePerSqm}/㎡</span>` : ""}
           <span>转让费 ${money(leaseTerms.transferFee)}</span>
+          ${leaseTerms.transferFee > 0 && Number.isFinite(leaseTerms.transferFeeRentMultiple)
+            ? `<span>转让费约 ${leaseTerms.transferFeeRentMultiple}个月租金</span>`
+            : ""
+          }
           <span>最高免租 ${leaseTerms.rentFreeMaxDays}天</span>
           <span>续租涨幅约 ${Math.round((leaseTerms.renewalIncreaseRate ?? 0) * 100)}%</span>
         </div>
