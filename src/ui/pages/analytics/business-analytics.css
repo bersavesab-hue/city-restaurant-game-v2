@@ -801,3 +801,178 @@
   font-size: 8px;
   opacity: .75;
 }
+
+
+/* ===== Price decision review ===== */
+
+.analytics-price-review {
+  margin-top: 9px;
+}
+
+.analytics-price-decision {
+  overflow: hidden;
+  margin-top: 9px;
+  border: 1px solid #e6dccd;
+  border-radius: 13px;
+  background: #fffdf7;
+}
+
+.analytics-price-decision > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+  padding: 9px 10px;
+  border-bottom: 1px solid #ece3d6;
+  background:
+    linear-gradient(
+      90deg,
+      #f5eddf,
+      #fffaf1
+    );
+}
+
+.analytics-price-decision > header strong,
+.analytics-price-decision > header span,
+.analytics-price-change b,
+.analytics-price-change small {
+  display: block;
+}
+
+.analytics-price-decision > header strong {
+  color: #284d50;
+  font-size: 11px;
+}
+
+.analytics-price-decision > header span {
+  margin-top: 2px;
+  color: #7c817b;
+  font-size: 8px;
+}
+
+.analytics-price-change {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.analytics-price-change b {
+  font-size: 13px;
+}
+
+.analytics-price-change small {
+  margin-top: 2px;
+  color: #807b72;
+  font-size: 8px;
+}
+
+.analytics-before-after-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, 1fr);
+  gap: 6px;
+  padding: 8px;
+}
+
+.analytics-before-after-grid article {
+  min-width: 0;
+  padding: 8px;
+  border-radius: 9px;
+  background: #f3ede2;
+}
+
+.analytics-before-after-grid span,
+.analytics-before-after-grid strong,
+.analytics-before-after-grid small {
+  display: block;
+}
+
+.analytics-before-after-grid span {
+  color: #7c827b;
+  font-size: 8px;
+}
+
+.analytics-before-after-grid strong {
+  margin-top: 3px;
+  overflow: hidden;
+  color: #314f50;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analytics-before-after-grid small {
+  margin-top: 3px;
+  font-size: 8px;
+}
+
+.analytics-price-review .positive {
+  color: #2d8052;
+}
+
+.analytics-price-review .negative {
+  color: #b34f42;
+}
+
+.analytics-price-review .neutral {
+  color: #68736d;
+}
+
+.analytics-price-segments {
+  margin: 0 8px 8px;
+  border: 1px solid #eee4d6;
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.analytics-price-segment-head,
+.analytics-price-segment-row {
+  display: grid;
+  grid-template-columns:
+    1.1fr .9fr .9fr 1.15fr;
+  gap: 5px;
+  align-items: center;
+}
+
+.analytics-price-segment-head {
+  padding: 5px 7px;
+  color: #85867f;
+  background: #f0e9dc;
+  font-size: 8px;
+}
+
+.analytics-price-segment-row {
+  min-height: 38px;
+  padding: 6px 7px;
+  border-top: 1px solid #eee6da;
+  font-size: 8px;
+}
+
+.analytics-price-segment-row strong {
+  overflow: hidden;
+  color: #315254;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analytics-price-collecting {
+  margin: 8px;
+  padding: 12px;
+  border-radius: 9px;
+  color: #806e57;
+  background: #f4ecdd;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+@media (max-width: 540px) {
+  .analytics-before-after-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .analytics-price-segment-head,
+  .analytics-price-segment-row {
+    grid-template-columns:
+      1.05fr .85fr .85fr 1fr;
+  }
+}
