@@ -342,7 +342,17 @@ const FORMAL_PAGE_DEFINITIONS =
         channelManagementPageSystem,
 
       view:
-        channelManagementView
+        channelManagementView,
+
+      mode:
+        "mount",
+
+      refreshEvents: [
+        "order:completed",
+        "salesChannel:unlocked",
+        "salesChannel:changed",
+        "salesChannel:configured"
+      ]
     },
 
 
