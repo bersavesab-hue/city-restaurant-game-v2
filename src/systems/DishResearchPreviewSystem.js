@@ -71,13 +71,13 @@ function calculateResolvedPreview({ ingredients, method }) {
     95
   );
   const diversityScore = clamp(40 + categories.size * 15, 40, 100);
-  const fixedQualityPart =
+  const fixedResearchPart =
     ingredientScore * 0.45 +
     diversityScore * 0.2 +
     methodRule.techniqueScore * 0.2;
 
-  const minQuality = clamp(Math.round(fixedQualityPart + 35 * 0.15), 1, 100);
-  const maxQuality = clamp(Math.round(fixedQualityPart + 100 * 0.15), 1, 100);
+  const minResearchScore = clamp(Math.round(fixedResearchPart + 35 * 0.15), 1, 100);
+  const maxResearchScore = clamp(Math.round(fixedResearchPart + 100 * 0.15), 1, 100);
   const difficulty = Math.round(
     clamp(
       15 + ingredients.length * 7 + categories.size * 4 + methodRule.difficultyBonus,
@@ -94,11 +94,11 @@ function calculateResolvedPreview({ ingredients, method }) {
   const roundedCost = Number(estimatedCost.toFixed(2));
   const minSuggestedPrice = Math.max(
     1,
-    Math.round(estimatedCost * (2.1 + minQuality * 0.009))
+    Math.round(estimatedCost * (2.1 + minResearchScore * 0.009))
   );
   const maxSuggestedPrice = Math.max(
     1,
-    Math.round(estimatedCost * (2.1 + maxQuality * 0.009))
+    Math.round(estimatedCost * (2.1 + maxResearchScore * 0.009))
   );
 
   return {
@@ -111,7 +111,7 @@ function calculateResolvedPreview({ ingredients, method }) {
     cookingMinutes,
     estimatedCost: roundedCost,
     researchCost,
-    qualityRange: { min: minQuality, max: maxQuality },
+    researchScoreRange: { min: minResearchScore, max: maxResearchScore },
     suggestedPriceRange: { min: minSuggestedPrice, max: maxSuggestedPrice },
     priceModel: "reality_baseline_v1"
   };
