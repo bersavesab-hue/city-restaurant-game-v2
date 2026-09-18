@@ -479,7 +479,17 @@ class OrderSystem {
                 order.id,
 
               revenue:
-                committed.finalAmount
+                committed.finalAmount,
+
+              contributionProfit:
+                Math.max(
+                  0,
+                  order.grossProfit
+                ),
+
+              discountCost:
+                committed
+                  .couponDiscount
             });
         }
       }
