@@ -12,6 +12,7 @@ import {
 import { workforceCapacitySystem } from "./WorkforceCapacitySystem.js";
 import { restaurantEquipmentSystem } from "./RestaurantEquipmentSystem.js";
 import { renovationSystem } from "./RenovationSystem.js";
+import { storeProgressSystem } from "./StoreProgressSystem.js";
 
 const DEFAULT_CONFIG = Object.freeze({
   seats: 16,
@@ -169,6 +170,31 @@ class ServiceCapacitySystem {
     ) {
       throw new Error(
         "tables cannot exceed seats"
+      );
+    }
+
+    const storeLimits =
+      storeProgressSystem
+        .getLimits(
+          restaurantId
+        );
+
+    if (
+      next.tables >
+      storeLimits.tables
+    ) {
+      throw new Error(
+        `Table limit reached: ${storeLimits.tables}`
+      );
+    }
+
+    if (
+      next.kitchenStations >
+      storeLimits
+        .kitchenStations
+    ) {
+      throw new Error(
+        `Kitchen station limit reached: ${storeLimits.kitchenStations}`
       );
     }
 
