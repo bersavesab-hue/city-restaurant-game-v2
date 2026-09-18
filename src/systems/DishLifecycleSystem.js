@@ -92,14 +92,21 @@ class DishLifecycleSystem {
         masteryName;
     }
 
-    if (!progress.outputQuality) {
+    if (
+      !progress.outputQuality &&
+      (
+        progress
+          .marketPerformance
+          ?.serviceCount ??
+        0
+      ) > 0
+    ) {
       changes.outputQuality =
         getCookOutputLevel(
           progress
             .marketPerformance
             ?.averageOutputQuality ??
-          progress.recipeQualityScore ??
-          60
+          0
         );
     }
 
@@ -253,7 +260,10 @@ class DishLifecycleSystem {
     const averageOutputQuality =
       Math.round(
         (
-          old.averageOutputQuality *
+          (
+            old.averageOutputQuality ??
+            0
+          ) *
             oldPortions +
           outputScore *
             quantity
