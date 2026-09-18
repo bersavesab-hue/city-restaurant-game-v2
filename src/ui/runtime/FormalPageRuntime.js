@@ -406,7 +406,15 @@ const FORMAL_PAGE_DEFINITIONS =
         memberMarketingPageSystem,
 
       view:
-        memberMarketingView
+        memberMarketingView,
+
+      refreshEvents: [
+        "order:completed",
+        "member:enrolled",
+        "member:levelChanged",
+        "member:pointsExpired",
+        "member:pointsRedeemed"
+      ]
     },
 
 
