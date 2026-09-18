@@ -23,6 +23,10 @@ import {
 } from "../../../systems/EmployeeCareerSystem.js";
 
 import {
+  employeeStaffingSystem
+} from "../../../systems/EmployeeStaffingSystem.js";
+
+import {
   employeeDynamicsSystem
 } from "../../../systems/EmployeeDynamicsSystem.js";
 
@@ -452,6 +456,56 @@ class EmployeeManagementPageSystem {
         current.experience ??
         0,
 
+      age:
+        current.age ??
+        null,
+
+      industryExperienceMonths:
+        current
+          .industryExperienceMonths ??
+        0,
+
+      potential:
+        current.potential ??
+        3,
+
+      potentialName:
+        current.potentialName ??
+        "良好",
+
+      stability:
+        current.stability ??
+        60,
+
+      learning:
+        current.learning ??
+        60,
+
+      stressTolerance:
+        current
+          .stressTolerance ??
+        60,
+
+      teamwork:
+        current.teamwork ??
+        60,
+
+      initiative:
+        current.initiative ??
+        60,
+
+      profileName:
+        current
+          .employeeProfileName ??
+        null,
+
+      traits: [
+        ...(
+          current.traits ??
+          []
+        )
+      ],
+
       rank:
         career.rank,
 
@@ -682,6 +736,107 @@ class EmployeeManagementPageSystem {
       page.vacancies ??
       [];
 
+    let talentPool =
+      employeeStaffingSystem
+        .listCandidates(
+          restaurantId
+        );
+
+    if (
+      talentPool.length === 0 &&
+      (
+        page.staffCap ??
+        0
+      ) >
+        (
+          page.employees
+            ?.length ??
+          0
+        )
+    ) {
+      talentPool =
+        employeeStaffingSystem
+          .refreshTalentPool(
+            restaurantId,
+            {
+              count: 10,
+              replace: false
+            }
+          );
+    }
+
+    const candidates =
+      talentPool.map(
+        candidate => ({
+          id:
+            candidate.id,
+
+          name:
+            candidate.name,
+
+          roleId:
+            candidate.roleId,
+
+          roleName:
+            candidate.roleName,
+
+          age:
+            candidate.age,
+
+          experienceMonths:
+            candidate
+              .experienceMonths,
+
+          expectedSalary:
+            candidate
+              .expectedSalary,
+
+          potential:
+            candidate.potential,
+
+          potentialName:
+            candidate
+              .potentialName,
+
+          profileName:
+            candidate
+              .profileName,
+
+          traits: [
+            ...(
+              candidate.traits ??
+              []
+            )
+          ],
+
+          stability:
+            candidate.stability,
+
+          learning:
+            candidate.learning,
+
+          stressTolerance:
+            candidate
+              .stressTolerance,
+
+          teamwork:
+            candidate.teamwork,
+
+          initiative:
+            candidate.initiative,
+
+          skills: {
+            ...(
+              candidate.skills ??
+              {}
+            )
+          },
+
+          expiresDay:
+            candidate.expiresDay
+        })
+      );
+
     const warnings =
       vacancies.map(
         item => ({
@@ -769,8 +924,7 @@ class EmployeeManagementPageSystem {
       rows:
         roles,
 
-      candidates:
-        roles,
+      candidates,
 
       recommendations,
 
