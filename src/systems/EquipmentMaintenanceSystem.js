@@ -781,15 +781,27 @@ class EquipmentMaintenanceSystem {
 
 
   processFailures(
-    day
+    day,
+    {
+      excludeEquipmentUnitIds =
+        []
+    } = {}
   ) {
+    const excluded =
+      new Set(
+        excludeEquipmentUnitIds
+      );
+
     const units =
       entitySystem.filter(
         "restaurant_equipment",
         item =>
           item.status ===
             "active" &&
-          item.durability > 0
+          item.durability > 0 &&
+          !excluded.has(
+            item.id
+          )
       );
 
     const failures = [];
@@ -854,7 +866,14 @@ class EquipmentMaintenanceSystem {
 
     const failures =
       this.processFailures(
-        day
+        day,
+        {
+          excludeEquipmentUnitIds:
+            restored.map(
+              unit =>
+                unit.id
+            )
+        }
       );
 
     return {
