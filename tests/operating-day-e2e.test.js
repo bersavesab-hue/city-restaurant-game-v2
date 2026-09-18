@@ -5,6 +5,15 @@ import {
   app
 } from "../src/main.js";
 
+import {
+  DISH_SCHEMA_VERSION,
+  getDefaultRecipeId
+} from "../src/data/dishCatalogRules.js";
+
+import {
+  RECIPE_SCHEMA_VERSION
+} from "../src/data/recipeRules.js";
+
 
 const {
   gameState,
@@ -171,9 +180,6 @@ test(
           unit:
             "kg",
 
-          baseQuality:
-            4,
-
           storageType:
             "dry",
 
@@ -200,6 +206,9 @@ test(
     dishCatalogSystem.load(
       [
         {
+          schemaVersion:
+            DISH_SCHEMA_VERSION,
+
           id:
             "operating_day_dish",
 
@@ -210,7 +219,18 @@ test(
             "rice",
 
           basePrice:
-            28
+            28,
+
+          unlockLevel:
+            1,
+
+          baseDifficulty:
+            10,
+
+          defaultRecipeId:
+            getDefaultRecipeId(
+              "operating_day_dish"
+            )
         }
       ],
       {
@@ -223,11 +243,22 @@ test(
     recipeSystem.load(
       [
         {
+          schemaVersion:
+            RECIPE_SCHEMA_VERSION,
+
           id:
-            "operating_day_recipe",
+            getDefaultRecipeId(
+              "operating_day_dish"
+            ),
 
           dishId:
             "operating_day_dish",
+
+          variantId:
+            "standard",
+
+          name:
+            "标准做法",
 
           method:
             "steam",
@@ -265,7 +296,9 @@ test(
           "operating_day_dish",
 
         recipeId:
-          "operating_day_recipe",
+          getDefaultRecipeId(
+            "operating_day_dish"
+          ),
 
         price:
           28
