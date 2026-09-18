@@ -93,6 +93,8 @@ const tests = [
   "tests/member-benefit-marketing.test.js",
   "tests/member-order-checkout.test.js",
   "tests/member-lifecycle-integration.test.js",
+  "tests/formal-compliance-permit-data.test.js",
+  "tests/compliance-lifecycle-integration.test.js",
   "tests/existing-page-entry-points.test.js",
   "tests/ranking-awards-catalog.test.js",
   "tests/award-cycle.test.js",
