@@ -312,21 +312,23 @@ class DishManagementSystem {
       );
 
     const improvements =
-      dishGrowthSystem
-        .getAvailableImprovements()
-        .map(
-          item => ({
-            ...item,
+      dish.custom
+        ? dishGrowthSystem
+            .getAvailableImprovements()
+            .map(
+              item => ({
+                ...item,
 
-            unlocked:
-              (
-                progress
-                  ?.masteryLevel ??
-                1
-              ) >=
-              item.requiredLevel
-          })
-        );
+                unlocked:
+                  (
+                    progress
+                      ?.masteryLevel ??
+                    1
+                  ) >=
+                  item.requiredLevel
+              })
+            )
+        : [];
 
     return {
       pageId:
