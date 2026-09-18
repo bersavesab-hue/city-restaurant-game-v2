@@ -54,6 +54,16 @@ jobs:
           "$SDKMANAGER" --sdk_root="$ANDROID_ROOT" "platforms;android-34" "build-tools;34.0.0"
           ls -la "$ANDROID_ROOT/platforms/android-34/android.jar"
 
+      - name: Prepare stable test signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          SIGNING_DIR="$RUNNER_TEMP/city-restaurant-signing"
+          mkdir -p "$SIGNING_DIR"
+          base64 -d .github/test-signing/debug.keystore.b64 > "$SIGNING_DIR/debug.keystore"
+          echo "CITY_RESTAURANT_TEST_KEYSTORE=$SIGNING_DIR/debug.keystore" >> "$GITHUB_ENV"
+          keytool -list -keystore "$SIGNING_DIR/debug.keystore" -storepass android -alias cityrestauranttest >/dev/null
+
       - name: Build debug APK
         shell: bash
         run: |
