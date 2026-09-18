@@ -12,6 +12,10 @@ import { restaurantSystem } from "./RestaurantSystem.js";
 import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 import { economicBaselineSystem } from "./EconomicBaselineSystem.js";
 
+import {
+  getDishRank
+} from "../data/dishRules.js";
+
 function clamp(
   value,
   min,
@@ -109,46 +113,6 @@ const METHODS =
     }
   });
 
-function getGrade(score) {
-  if (score >= 90) {
-    return {
-      grade: "SS",
-      level: 5,
-      rarity: "rare"
-    };
-  }
-
-  if (score >= 80) {
-    return {
-      grade: "S",
-      level: 4,
-      rarity: "superior"
-    };
-  }
-
-  if (score >= 68) {
-    return {
-      grade: "A",
-      level: 3,
-      rarity: "premium"
-    };
-  }
-
-  if (score >= 55) {
-    return {
-      grade: "B",
-      level: 2,
-      rarity: "good"
-    };
-  }
-
-  return {
-    grade: "C",
-    level: 1,
-    rarity: "common"
-  };
-}
-
 class DishResearchSystem {
   validateIngredients(
     ingredients
@@ -230,8 +194,6 @@ class DishResearchSystem {
       );
     }
 
-    let totalQuantity = 0;
-    let qualityTotal = 0;
     let estimatedCost = 0;
 
     const categories =
@@ -245,13 +207,6 @@ class DishResearchSystem {
         ingredientCatalogSystem.get(
           item.ingredientId
         );
-
-      totalQuantity +=
-        item.quantity;
-
-      qualityTotal +=
-        ingredient.baseQuality *
-        item.quantity;
 
       const economicReference =
         economicBaselineSystem
@@ -273,20 +228,15 @@ class DishResearchSystem {
       );
     }
 
-    const averageQuality =
-      qualityTotal /
-      totalQuantity;
-
     const ingredientScore =
       clamp(
-        30 +
-        (
-          averageQuality /
-          5
-        ) *
-        70,
-        30,
-        100
+        45 +
+        ingredients.length *
+          5 +
+        categories.size *
+          10,
+        45,
+        95
       );
 
     const diversityScore =
@@ -307,12 +257,12 @@ class DishResearchSystem {
     const qualityScore =
       Math.round(
         ingredientScore *
-          0.5 +
+          0.45 +
         diversityScore *
           0.2 +
         methodRule
           .techniqueScore *
-          0.15 +
+          0.2 +
         inspirationScore *
           0.15
       );
@@ -343,11 +293,6 @@ class DishResearchSystem {
         )
       );
 
-    const grade =
-      getGrade(
-        qualityScore
-      );
-
     const researchCost =
       Math.max(
         500,
@@ -362,8 +307,8 @@ class DishResearchSystem {
 
     const markup =
       2.1 +
-      grade.level *
-        0.28;
+      qualityScore *
+        0.009;
 
     const suggestedPrice =
       Math.max(
@@ -376,8 +321,6 @@ class DishResearchSystem {
 
     return {
       qualityScore,
-
-      ...grade,
 
       ingredientScore:
         Math.round(
@@ -492,6 +435,13 @@ class DishResearchSystem {
         "time"
       );
 
+    const initialRank =
+      getDishRank({
+        masteryLevel: 1,
+        qualityScore:
+          analysis.qualityScore
+      });
+
     let dish =
       entitySystem.create(
         "custom_dish",
@@ -514,15 +464,6 @@ class DishResearchSystem {
             analysis
               .qualityScore,
 
-          qualityGrade:
-            analysis.grade,
-
-          qualityLevel:
-            analysis.level,
-
-          rarity:
-            analysis.rarity,
-
           researchCost:
             analysis
               .researchCost,
@@ -542,8 +483,14 @@ class DishResearchSystem {
           masteryLevel: 1,
           masteryQualityBonus: 0,
 
-          prestigeTitle:
-            "新研发",
+          dishRankId:
+            initialRank.id,
+
+          dishRankName:
+            initialRank.name,
+
+          dishRankOrder:
+            initialRank.order,
 
           lifetimeSold: 0,
           lifetimeRevenue: 0,
@@ -618,11 +565,11 @@ class DishResearchSystem {
         name:
           dish.name,
 
-        grade:
-          dish.qualityGrade,
+        rankId:
+          dish.dishRankId,
 
-        level:
-          dish.qualityLevel,
+        rankName:
+          dish.dishRankName,
 
         score:
           dish.qualityScore,
@@ -847,25 +794,29 @@ class DishResearchSystem {
         restaurantId
       );
 
-    const byGrade = {
-      C: 0,
-      B: 0,
-      A: 0,
-      S: 0,
-      SS: 0
+    const byRank = {
+      homestyle: 0,
+      selected: 0,
+      signature: 0,
+      famous: 0,
+      house_special: 0
     };
 
     for (
       const dish
       of dishes
     ) {
-      if (
-        dish.qualityGrade
-        in byGrade
-      ) {
-        byGrade[
-          dish.qualityGrade
-        ] += 1;
+      const rank =
+        dish.dishRankId ??
+        getDishRank({
+          masteryLevel:
+            dish.masteryLevel ?? 1,
+          qualityScore:
+            dish.qualityScore ?? 0
+        }).id;
+
+      if (rank in byRank) {
+        byRank[rank] += 1;
       }
     }
 
@@ -884,7 +835,7 @@ class DishResearchSystem {
       total:
         dishes.length,
 
-      byGrade,
+      byRank,
 
       bestDish:
         best,
