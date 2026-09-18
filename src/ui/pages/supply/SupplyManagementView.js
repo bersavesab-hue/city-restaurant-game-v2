@@ -137,10 +137,11 @@ class SupplyManagementView {
     this.root.className =
       "supply-management-page";
 
-    this.root.style.setProperty(
-      "--ingredient-atlas",
-      `url("${INGREDIENT_ATLAS_DATA_URI}")`
-    );
+    this.root.style
+      ?.setProperty?.(
+        "--ingredient-atlas",
+        `url("${INGREDIENT_ATLAS_DATA_URI}")`
+      );
 
     this.root.innerHTML = `
       <header class="supply-header">
