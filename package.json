@@ -36,7 +36,8 @@
     "test:data:events": "node --test tests/formal-random-event-data.test.js tests/random-event-integration.test.js tests/district-event.test.js tests/business-calendar.test.js",
     "test:data:marketing": "node --test tests/formal-marketing-action-data.test.js tests/marketing-action-integration.test.js tests/market-strategy-ui.test.js tests/member-benefit-marketing.test.js",
     "test:data:positionings": "node --test tests/formal-restaurant-positioning-data.test.js tests/restaurant-positioning.test.js tests/restaurant-positioning-integration.test.js tests/market-strategy-ui.test.js",
-    "test:data:channels": "node --test tests/formal-sales-channel-data.test.js tests/sales-channel.test.js tests/sales-channel-order.test.js tests/sales-channel-integration.test.js tests/order-flow.test.js"
+    "test:data:channels": "node --test tests/formal-sales-channel-data.test.js tests/sales-channel.test.js tests/sales-channel-order.test.js tests/sales-channel-integration.test.js tests/order-flow.test.js",
+    "test:data:members": "node --test tests/formal-member-program-data.test.js tests/customer-loyalty.test.js tests/customer-loyalty-integration.test.js tests/member-benefit-marketing.test.js tests/member-order-checkout.test.js tests/member-lifecycle-integration.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
