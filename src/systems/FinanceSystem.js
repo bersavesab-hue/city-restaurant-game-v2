@@ -23,6 +23,8 @@ const CATEGORY = Object.freeze({
   EQUIPMENT: "equipment",
   DECORATION: "decoration",
   MARKETING: "marketing",
+  CHANNEL: "channel",
+  RESEARCH: "research",
   TAX: "tax",
   REFUND: "refund",
   OTHER: "other"
