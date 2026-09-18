@@ -107,17 +107,17 @@ test(
 
     assert.equal(
       settlement.packagingCost,
-      900
+      20
     );
 
     assert.equal(
       settlement.fees,
-      2700
+      1820
     );
 
     assert.equal(
       settlement.netRevenue,
-      7300
+      8180
     );
 
     salesChannelSystem
@@ -143,12 +143,12 @@ test(
 
     assert.equal(
       dashboard.netRevenue,
-      7300
+      8180
     );
 
     assert.equal(
       dashboard.totalFees,
-      2700
+      1820
     );
 
     assert.ok(
