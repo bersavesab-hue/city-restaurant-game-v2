@@ -10,7 +10,7 @@ export const MEMBER_LEVEL_IDS = Object.freeze([
 export const MEMBER_POINT_POLICY =
   Object.freeze({
     earnPerAmount: 100,
-    pointValue: 10,
+    pointValue: 1,
     maxRedemptionRate: 0.2,
     expiryDays: 180,
     maxCombinedDiscountRate: 0.4,
