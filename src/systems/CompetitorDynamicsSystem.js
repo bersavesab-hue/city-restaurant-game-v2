@@ -2,6 +2,7 @@ import { entitySystem } from "../core/EntitySystem.js";
 import { eventBus } from "../core/EventBus.js";
 import { randomSystem } from "../core/RandomSystem.js";
 import { districtSystem } from "./DistrictSystem.js";
+import { districtEventSystem } from "./DistrictEventSystem.js";
 import { COMPETITOR_STRATEGIES } from "../data/competitorRules.js";
 
 function clamp(value, min, max) {
@@ -50,6 +51,18 @@ class CompetitorDynamicsSystem {
         100
       );
 
+    const eventPressure =
+      district
+        ? (
+            districtEventSystem
+              .getModifiers(
+                district.id
+              )
+              .competitorPressureMultiplier ??
+            1
+          )
+        : 1;
+
     const pressure =
       (district?.competition ?? 0) *
       0.1 *
@@ -57,7 +70,8 @@ class CompetitorDynamicsSystem {
         1 -
         resilience *
         0.003
-      );
+      ) *
+      eventPressure;
 
     return Math.round(
       clamp(
