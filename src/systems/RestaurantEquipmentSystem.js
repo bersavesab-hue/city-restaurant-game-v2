@@ -16,168 +16,23 @@ import {
 } from "./FinanceSystem.js";
 
 
+import {
+  EQUIPMENT_V1,
+  EQUIPMENT_DEFINITION_MAP
+} from "../data/equipment.v1.js";
+
+import {
+  EQUIPMENT_CAPABILITIES,
+  validateEquipmentDefinition
+} from "../data/equipmentRules.js";
+
+import {
+  recipeSystem
+} from "./RecipeSystem.js";
+
+
 const EQUIPMENT_DEFINITIONS =
-  Object.freeze({
-    gas_range: {
-      id: "gas_range",
-      name: "商用燃气灶",
-
-      equipmentKind:
-        "kitchen",
-
-      capacityPerHour:
-        12,
-
-      purchaseCost:
-        8000,
-
-      repairCostPerPoint:
-        90,
-
-      wearPer100Guests:
-        1.5
-    },
-
-    induction_range: {
-      id: "induction_range",
-      name: "商用电磁灶",
-
-      equipmentKind:
-        "kitchen",
-
-      capacityPerHour:
-        10,
-
-      purchaseCost:
-        6000,
-
-      repairCostPerPoint:
-        70,
-
-      wearPer100Guests:
-        1.2
-    },
-
-    steam_oven: {
-      id: "steam_oven",
-      name: "蒸烤一体机",
-
-      equipmentKind:
-        "kitchen",
-
-      capacityPerHour:
-        14,
-
-      purchaseCost:
-        12000,
-
-      repairCostPerPoint:
-        110,
-
-      wearPer100Guests:
-        1.1
-    },
-
-    fryer: {
-      id: "fryer",
-      name: "商用炸炉",
-
-      equipmentKind:
-        "kitchen",
-
-      capacityPerHour:
-        12,
-
-      purchaseCost:
-        7000,
-
-      repairCostPerPoint:
-        80,
-
-      wearPer100Guests:
-        1.6
-    },
-
-    prep_station: {
-      id: "prep_station",
-      name: "后厨备餐台",
-
-      equipmentKind:
-        "kitchen",
-
-      capacityPerHour:
-        8,
-
-      purchaseCost:
-        3500,
-
-      repairCostPerPoint:
-        45,
-
-      wearPer100Guests:
-        0.8
-    },
-
-    dishwasher: {
-      id: "dishwasher",
-      name: "商用洗碗机",
-
-      equipmentKind:
-        "service",
-
-      capacityPerHour:
-        24,
-
-      purchaseCost:
-        10000,
-
-      repairCostPerPoint:
-        95,
-
-      wearPer100Guests:
-        1.2
-    },
-
-    pos_terminal: {
-      id: "pos_terminal",
-      name: "收银POS机",
-
-      equipmentKind:
-        "checkout",
-
-      capacityPerHour:
-        30,
-
-      purchaseCost:
-        4500,
-
-      repairCostPerPoint:
-        55,
-
-      wearPer100Guests:
-        0.5
-    },
-
-    refrigerator: {
-      id: "refrigerator",
-      name: "商用冷藏柜",
-
-      equipmentKind:
-        "support",
-
-      capacityPerHour:
-        0,
-
-      purchaseCost:
-        9000,
-
-      repairCostPerPoint:
-        85,
-
-      wearPer100Guests:
-        0.4
-    }
-  });
+  EQUIPMENT_DEFINITION_MAP;
 
 
 function clamp(
@@ -217,11 +72,12 @@ class RestaurantEquipmentSystem {
 
 
   getDefinitions() {
-    return Object.values(
-      EQUIPMENT_DEFINITIONS
-    ).map(
+    return EQUIPMENT_V1.map(
       item => ({
-        ...item
+        ...item,
+        capabilities: [
+          ...item.capabilities
+        ]
       })
     );
   }
@@ -277,14 +133,27 @@ class RestaurantEquipmentSystem {
     equipmentId,
     quantity = 1
   }) {
-    restaurantSystem.get(
-      restaurantId
-    );
-
     const definition =
       this.getDefinition(
         equipmentId
       );
+
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    if (
+      (
+        restaurant.level ??
+        1
+      ) <
+      definition.unlockLevel
+    ) {
+      throw new Error(
+        `Equipment "${equipmentId}" unlocks at store level ${definition.unlockLevel}`
+      );
+    }
 
     if (
       !Number.isInteger(
@@ -345,8 +214,34 @@ class RestaurantEquipmentSystem {
               definition
                 .purchaseCost,
 
+            capabilityTier:
+              definition
+                .capabilityTier,
+
+            familyId:
+              definition
+                .familyId,
+
+            capabilities: [
+              ...definition
+                .capabilities
+            ],
+
+            energyType:
+              definition
+                .energyType,
+
+            energyUsePerHour:
+              definition
+                .energyUsePerHour,
+
+            footprintUnits:
+              definition
+                .footprintUnits,
+
             durability:
-              100,
+              definition
+                .baseDurability,
 
             wearProgress:
               0,
@@ -374,6 +269,177 @@ class RestaurantEquipmentSystem {
       totalCost,
       units
     };
+  }
+
+
+  getInstalledCapabilities(
+    restaurantId
+  ) {
+    const capabilities =
+      new Set();
+
+    for (
+      const unit
+      of this.list(
+        restaurantId
+      )
+    ) {
+      if (
+        unit.status !==
+          "active" ||
+        unit.durability <= 0
+      ) {
+        continue;
+      }
+
+      for (
+        const capability
+        of unit.capabilities ??
+        this.getDefinition(
+          unit.equipmentId
+        ).capabilities ??
+        []
+      ) {
+        capabilities.add(
+          capability
+        );
+      }
+    }
+
+    return [
+      ...capabilities
+    ];
+  }
+
+
+  getCapabilityCoverage(
+    restaurantId
+  ) {
+    const installed =
+      new Set(
+        this.getInstalledCapabilities(
+          restaurantId
+        )
+      );
+
+    return {
+      installed: [
+        ...installed
+      ],
+
+      total:
+        EQUIPMENT_CAPABILITIES.length,
+
+      covered:
+        installed.size,
+
+      missing:
+        EQUIPMENT_CAPABILITIES.filter(
+          capability =>
+            !installed.has(
+              capability
+            )
+        )
+    };
+  }
+
+
+  getRecipeCapabilityStatus(
+    restaurantId,
+    recipeId,
+    {
+      legacyFallback = true
+    } = {}
+  ) {
+    const requirements =
+      recipeSystem
+        .getOperationalRequirements(
+          recipeId
+        );
+
+    const activeKitchen =
+      this.list(
+        restaurantId
+      ).filter(
+        unit =>
+          unit.equipmentKind ===
+            "kitchen" &&
+          unit.status ===
+            "active" &&
+          unit.durability > 0
+      );
+
+    if (
+      legacyFallback &&
+      activeKitchen.length === 0
+    ) {
+      return {
+        recipeId,
+        compatible: true,
+        legacyFallback: true,
+        requiredCapabilities: [
+          ...requirements
+            .equipmentCapabilities
+        ],
+        installedCapabilities: [],
+        missingCapabilities: []
+      };
+    }
+
+    const installed =
+      new Set(
+        this.getInstalledCapabilities(
+          restaurantId
+        )
+      );
+
+    const missing =
+      requirements
+        .equipmentCapabilities
+        .filter(
+          capability =>
+            !installed.has(
+              capability
+            )
+        );
+
+    return {
+      recipeId,
+      compatible:
+        missing.length === 0,
+      legacyFallback: false,
+      requiredCapabilities: [
+        ...requirements
+          .equipmentCapabilities
+      ],
+      installedCapabilities: [
+        ...installed
+      ],
+      missingCapabilities:
+        missing
+    };
+  }
+
+
+  requireRecipeCapabilities(
+    restaurantId,
+    recipeId,
+    options = {}
+  ) {
+    const status =
+      this.getRecipeCapabilityStatus(
+        restaurantId,
+        recipeId,
+        options
+      );
+
+    if (!status.compatible) {
+      throw new Error(
+        `Missing equipment capabilities for recipe "${recipeId}": ${status.missingCapabilities.join(", ")}`
+      );
+    }
+
+    return status;
   }
 
 
