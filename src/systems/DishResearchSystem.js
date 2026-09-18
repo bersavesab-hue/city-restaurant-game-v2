@@ -362,7 +362,7 @@ class DishResearchSystem {
     financeSystem.expense(
       restaurantId,
       analysis.researchCost,
-      FINANCE_CATEGORY.OTHER,
+      FINANCE_CATEGORY.RESEARCH,
       `研发菜品：${name.trim()}`
     );
 
