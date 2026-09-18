@@ -317,6 +317,27 @@ test(
       ),
       false
     );
+
+    assert.equal(
+      analysis.issues.includes(
+        "no_dining_tables"
+      ),
+      false
+    );
+
+    assert.equal(
+      analysis.issues.includes(
+        "no_cashier_counter"
+      ),
+      false
+    );
+
+    assert.equal(
+      analysis.issues.includes(
+        "no_waiting_area"
+      ),
+      false
+    );
   }
 );
 
