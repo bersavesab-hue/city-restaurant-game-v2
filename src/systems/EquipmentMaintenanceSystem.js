@@ -224,11 +224,19 @@ class EquipmentMaintenanceSystem {
           unit.equipmentId
         );
 
+    const maxDurability =
+      unit.maxDurability ??
+      definition.baseDurability ??
+      100;
+
     const durabilityGain =
       Math.min(
         25,
-        100 -
-        unit.durability
+        Math.max(
+          0,
+          maxDurability -
+          unit.durability
+        )
       );
 
     const cost =
@@ -265,7 +273,7 @@ class EquipmentMaintenanceSystem {
               unit.durability +
               durabilityGain,
               0,
-              100
+              maxDurability
             ),
 
           status:
@@ -342,10 +350,15 @@ class EquipmentMaintenanceSystem {
           unit.equipmentId
         );
 
+    const maxDurability =
+      unit.maxDurability ??
+      definition.baseDurability ??
+      100;
+
     const missing =
       Math.max(
         1,
-        100 -
+        maxDurability -
         unit.durability
       );
 
@@ -393,9 +406,14 @@ class EquipmentMaintenanceSystem {
         {
           durability:
             Math.max(
-              75,
+              Math.round(
+                maxDurability *
+                0.75
+              ),
               unit.durability
             ),
+
+          maxDurability,
 
           status:
             "maintenance",
@@ -531,6 +549,8 @@ class EquipmentMaintenanceSystem {
 
           durability:
             Math.min(
+              unit.maxDurability ??
+              definition.baseDurability ??
               100,
               unit.durability +
               10
