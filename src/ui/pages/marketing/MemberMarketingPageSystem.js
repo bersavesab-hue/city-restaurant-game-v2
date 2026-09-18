@@ -6,6 +6,10 @@ import {
   memberBenefitSystem
 } from "../../../systems/MemberBenefitSystem.js";
 
+import {
+  MEMBER_POINT_POLICY
+} from "../../../data/memberProgramRules.js";
+
 class MemberMarketingPageSystem {
   getPage(
     restaurantId
@@ -39,7 +43,12 @@ class MemberMarketingPageSystem {
 
       levels:
         customerLoyaltySystem
-          .getLevels()
+          .getLevels(),
+
+      pointPolicy:
+        structuredClone(
+          MEMBER_POINT_POLICY
+        )
     };
   }
 }
