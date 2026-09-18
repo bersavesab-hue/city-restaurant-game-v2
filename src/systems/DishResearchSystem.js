@@ -21,6 +21,11 @@ import {
 } from "../data/cookingMethods.v1.js";
 
 import {
+  calculateDishResearchCost,
+  getDishResearchMarkup
+} from "../data/economicBalanceRules.js";
+
+import {
   restaurantDishSystem
 } from "./RestaurantDishSystem.js";
 
@@ -230,21 +235,16 @@ class DishResearchSystem {
       );
 
     const researchCost =
-      Math.max(
-        500,
-        Math.round(
-          700 +
-          ingredients.length *
-            250 +
-          difficulty *
-            12
-        )
-      );
+      calculateDishResearchCost({
+        ingredientCount:
+          ingredients.length,
+        difficulty
+      });
 
     const markup =
-      2.1 +
-      researchScore *
-        0.009;
+      getDishResearchMarkup(
+        researchScore
+      );
 
     const suggestedPrice =
       Math.max(
