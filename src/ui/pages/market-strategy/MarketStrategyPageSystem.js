@@ -403,10 +403,16 @@ class MarketStrategyPageSystem {
         item => {
           const availability =
             item.availability ?? {
-              canStart: false,
-              reasons: [
-                "unknown"
-              ],
+              canStart:
+                !activeTypes.has(
+                  item.id
+                ) &&
+                actions.active.length <
+                  2 &&
+                balance >=
+                  item.cost,
+
+              reasons: [],
               missingChannels: [],
               availableDay: null
             };
