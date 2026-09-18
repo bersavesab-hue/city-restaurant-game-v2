@@ -42,7 +42,8 @@
     "test:data:store-growth": "node --test tests/formal-store-progression-data.test.js tests/store-progression-integration.test.js tests/store-progress-ui.test.js tests/service-capacity.test.js tests/service-capacity-integration.test.js",
     "test:data:dish-growth": "node --test tests/formal-dish-growth-rules.test.js tests/dish-quality-semantics-integration.test.js tests/dish-rules.test.js tests/dish-growth.test.js tests/dish-lifecycle.test.js tests/restaurant-dish-progress.test.js tests/dish-research.test.js tests/dish-research-preview.test.js tests/cooking-flow.test.js tests/dish-management-system.test.js tests/dish-center-ui.test.js",
     "test:data:economy": "node --test tests/formal-economic-balance-data.test.js tests/economic-balance-integration.test.js tests/economy-foundation.test.js tests/finance-settlement.test.js tests/finance-center-ui.test.js tests/formal-sales-channel-data.test.js tests/sales-channel.test.js tests/sales-channel-order.test.js tests/sales-channel-integration.test.js tests/dish-research-preview.test.js tests/dish-research.test.js tests/dish-growth.test.js",
-    "test:phase3:balance": "node scripts/phase3-balance-gate.mjs"
+    "test:phase3:balance": "node scripts/phase3-balance-gate.mjs",
+    "test:phase3:longrun": "node scripts/phase3-longrun-gate.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
