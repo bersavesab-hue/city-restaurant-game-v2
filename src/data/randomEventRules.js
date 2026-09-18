@@ -33,7 +33,9 @@ export const RANDOM_EVENT_MULTIPLIER_FIELDS = Object.freeze([
   "payrollCostMultiplier",
   "equipmentFailureMultiplier",
   "operatingCostMultiplier",
-  "competitorPressureMultiplier"
+  "competitorPressureMultiplier",
+  "employeeSatisfactionMultiplier",
+  "reputationChangeMultiplier"
 ]);
 
 function finiteRange(range, field, id, min, max) {
