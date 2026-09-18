@@ -138,6 +138,15 @@ class SeatingSystem {
         ? renovation.queueEfficiency
         : 1;
 
+    const queueCapacityBonus =
+      renovation.active
+        ? (
+            renovation
+              .queueCapacityBonus ??
+            0
+          )
+        : 0;
+
     const queuePatienceMultiplier =
       flow.active
         ? flow.queuePatienceMultiplier
@@ -177,7 +186,8 @@ class SeatingSystem {
           ) *
           turnsPerHour *
           queueEfficiency
-        )
+        ) +
+        queueCapacityBonus
       );
 
     const capacity =
@@ -205,6 +215,7 @@ class SeatingSystem {
       queuePatienceMultiplier,
 
       queueEfficiency,
+      queueCapacityBonus,
 
       turnsPerHour,
 
