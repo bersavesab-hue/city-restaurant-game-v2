@@ -19,6 +19,28 @@ export const MEMBER_POINT_POLICY =
     enrollmentMinSatisfaction: 75
   });
 
+export const MEMBER_IDENTITY_POLICY =
+  Object.freeze({
+    unlockFeature:
+      "membership",
+
+    maxRecognizedCustomersPerSegment:
+      10,
+
+    recognitionRate:
+      0.22,
+
+    repeatCustomerBias:
+      0.78,
+
+    maxAggregateRecognizedVisits:
+      5,
+
+    maxSegmentRetentionMultiplier:
+      1.1
+  });
+
+
 export function getMemberEnrollmentPropensity(
   segment
 ) {
