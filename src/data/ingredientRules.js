@@ -78,3 +78,34 @@ export function getFreshnessState(value) {
 
   return FRESHNESS.SPOILED;
 }
+
+
+export const INGREDIENT_QUALITY_LABELS =
+  Object.freeze({
+    1: "普通",
+    2: "合格",
+    3: "优良",
+    4: "精品",
+    5: "顶级"
+  });
+
+
+export const INGREDIENT_PROCUREMENT_GROUP =
+  Object.freeze({
+    FRESH_MEAT: "fresh_meat",
+    POULTRY: "poultry",
+    AQUATIC: "aquatic",
+    PRODUCE: "produce",
+    FRUIT: "fruit",
+    GRAIN: "grain",
+    BEAN_PRODUCTS: "bean_products",
+    EGG_DAIRY: "egg_dairy",
+    SEASONING: "seasoning",
+    OIL: "oil",
+    DRY_GOODS: "dry_goods",
+    BEVERAGE: "beverage",
+    PROCESSED: "processed"
+  });
+
+
+export const INGREDIENT_SCHEMA_VERSION = 1;
