@@ -28,22 +28,35 @@ class DishRecipeBootstrapSystem {
         overwrite: false
       });
 
-    if (
-      !overwrite &&
-      dishCatalogSystem.get(
-        "egg_fried_rice"
-      ) &&
-      recipeSystem.get(
-        "recipe_egg_fried_rice_standard"
-      )
-    ) {
-      return {
-        dishes:
-          DISHES_V1.length,
+    if (!overwrite) {
+      const dishesReady =
+        DISHES_V1.every(
+          dish =>
+            dishCatalogSystem.get(
+              dish.id
+            )
+        );
 
-        recipes:
-          RECIPES_V1.length
-      };
+      const recipesReady =
+        RECIPES_V1.every(
+          recipe =>
+            recipeSystem.get(
+              recipe.id
+            )
+        );
+
+      if (
+        dishesReady &&
+        recipesReady
+      ) {
+        return {
+          dishes:
+            DISHES_V1.length,
+
+          recipes:
+            RECIPES_V1.length
+        };
+      }
     }
 
     dishCatalogSystem.load(
