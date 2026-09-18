@@ -44,13 +44,6 @@ import {
   employeeSystem
 } from "../../systems/EmployeeSystem.js";
 
-import {
-  ingredientCatalogSystem
-} from "../../systems/IngredientCatalogSystem.js";
-
-import {
-  supplierSystem
-} from "../../systems/SupplierSystem.js";
 
 import {
   openingFlowSystem
@@ -111,66 +104,6 @@ let restaurantId =
 
 let currentView =
   null;
-
-
-function seedSupplier() {
-  if (
-    supplierSystem
-      .list()
-      .length >
-    0
-  ) {
-    return;
-  }
-
-  const supplier =
-    supplierSystem.create({
-      name:
-        "新城农副产品配送",
-
-      relationship:
-        55,
-
-      reliability:
-        90
-    });
-
-  for (
-    const ingredient
-    of ingredientCatalogSystem
-      .getAll()
-  ) {
-    supplierSystem.addOffer(
-      supplier.id,
-      ingredient.id,
-      {
-        priceMultiplier:
-          1,
-
-        priceVolatility:
-          0.08,
-
-        qualityMin:
-          2,
-
-        qualityMax:
-          4,
-
-        deliveryMinutes:
-          120,
-
-        capacityPerDay:
-          5000,
-
-        minimumOrder:
-          ingredient.unit ===
-          "piece"
-            ? 5
-            : 50
-      }
-    );
-  }
-}
 
 
 function ensureRestaurant() {
@@ -267,8 +200,6 @@ function firstLaunch() {
     overwriteReferenceData:
       true
   });
-
-  seedSupplier();
 
   restaurantId =
     ensureRestaurant();
