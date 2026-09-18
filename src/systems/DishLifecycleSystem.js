@@ -4,10 +4,11 @@ import { gameState } from "../core/GameState.js";
 
 import { dishResearchSystem } from "./DishResearchSystem.js";
 import {
-  DISH_TIERS,
+  DISH_RANK_LIST,
   DISH_MASTERY_NAMES,
-  OUTPUT_QUALITY_LEVELS
-} from "../data/dishLifecycle.js";
+  getDishRank,
+  getCookOutputLevel
+} from "../data/dishRules.js";
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -30,25 +31,6 @@ function requireCustomDish(dishId) {
   }
 
   return dish;
-}
-
-function outputQuality(score) {
-  let result =
-    OUTPUT_QUALITY_LEVELS[0];
-
-  for (
-    const level
-    of OUTPUT_QUALITY_LEVELS
-  ) {
-    if (score >= level.min) {
-      result = level;
-    }
-  }
-
-  return {
-    ...result,
-    score
-  };
 }
 
 class DishLifecycleSystem {
@@ -81,11 +63,21 @@ class DishLifecycleSystem {
 
     const changes = {};
 
-    if (!dish.dishTierId) {
-      changes.dishTierId =
+    if (
+      dish.dishRankId !==
+        tier.id ||
+      dish.dishRankOrder !==
+        tier.order ||
+      dish.dishRankName !==
+        tier.name
+    ) {
+      changes.dishRankId =
         tier.id;
 
-      changes.dishTierOrder =
+      changes.dishRankName =
+        tier.name;
+
+      changes.dishRankOrder =
         tier.order;
     }
 
@@ -96,7 +88,7 @@ class DishLifecycleSystem {
 
     if (!dish.outputQuality) {
       changes.outputQuality =
-        outputQuality(
+        getCookOutputLevel(
           market.averageOutputQuality
         );
     }
@@ -122,46 +114,13 @@ class DishLifecycleSystem {
   }
 
   calculateTier(dish) {
-    const quality =
-      dish.qualityScore ?? 0;
-
-    const mastery =
-      dish.masteryLevel ?? 1;
-
-    const market =
-      dish.marketPerformance ?? {};
-
-    const sold =
-      market.sold ??
-      dish.lifetimeSold ??
-      0;
-
-    const reputation =
-      market.reputationScore ?? 0;
-
-    let tier =
-      DISH_TIERS[0];
-
-    for (
-      const candidate
-      of DISH_TIERS
-    ) {
-      if (
-        quality >=
-          candidate.minQuality &&
-        mastery >=
-          candidate.minMastery &&
-        sold >=
-          candidate.minSold &&
-        reputation >=
-          candidate.minReputation
-      ) {
-        tier = candidate;
-      }
-    }
-
     return {
-      ...tier
+      ...getDishRank({
+        masteryLevel:
+          dish.masteryLevel ?? 1,
+        qualityScore:
+          dish.qualityScore ?? 0
+      })
     };
   }
 
@@ -366,7 +325,7 @@ class DishLifecycleSystem {
           marketPerformance,
 
           outputQuality:
-            outputQuality(
+            getCookOutputLevel(
               averageOutputQuality
             ),
 
@@ -375,10 +334,13 @@ class DishLifecycleSystem {
               masteryLevel
             ],
 
-          dishTierId:
+          dishRankId:
             nextTier.id,
 
-          dishTierOrder:
+          dishRankName:
+            nextTier.name,
+
+          dishRankOrder:
             nextTier.order
         }
       );
@@ -422,7 +384,7 @@ class DishLifecycleSystem {
       this.getMastery(dishId);
 
     const nextTier =
-      DISH_TIERS.find(
+      DISH_RANK_LIST.find(
         item =>
           item.order ===
           tier.order + 1
@@ -440,10 +402,10 @@ class DishLifecycleSystem {
               current:
                 dish.qualityScore ?? 0,
               required:
-                nextTier.minQuality,
+                nextTier.minQualityScore,
               met:
                 (dish.qualityScore ?? 0) >=
-                nextTier.minQuality
+                nextTier.minQualityScore
             },
             {
               id: "mastery",
@@ -451,32 +413,10 @@ class DishLifecycleSystem {
               current:
                 dish.masteryLevel ?? 1,
               required:
-                nextTier.minMastery,
+                nextTier.minMasteryLevel,
               met:
                 (dish.masteryLevel ?? 1) >=
-                nextTier.minMastery
-            },
-            {
-              id: "sales",
-              name: "累计销量",
-              current:
-                market.sold,
-              required:
-                nextTier.minSold,
-              met:
-                market.sold >=
-                nextTier.minSold
-            },
-            {
-              id: "reputation",
-              name: "菜品口碑",
-              current:
-                market.reputationScore,
-              required:
-                nextTier.minReputation,
-              met:
-                market.reputationScore >=
-                nextTier.minReputation
+                nextTier.minMasteryLevel
             }
           ]
         : [];
@@ -499,10 +439,7 @@ class DishLifecycleSystem {
 
       researchQuality: {
         score:
-          dish.qualityScore ?? 0,
-
-        grade:
-          dish.qualityGrade ?? null
+          dish.qualityScore ?? 0
       },
 
       market:
@@ -572,7 +509,7 @@ class DishLifecycleSystem {
 
       byTier:
         Object.fromEntries(
-          DISH_TIERS.map(
+          DISH_RANK_LIST.map(
             tier => [
               tier.id,
               dishes.filter(
