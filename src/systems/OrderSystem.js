@@ -233,7 +233,7 @@ class OrderSystem {
 
       ingredientCost += cooking.ingredientCost;
       qualityTotal +=
-        cooking.qualityScore * line.quantity;
+        cooking.outputQualityScore * line.quantity;
       portionTotal += line.quantity;
 
       completedItems.push({
@@ -250,7 +250,7 @@ class OrderSystem {
           ),
         revenue: line.revenue,
         cookingRecordId: cooking.id,
-        qualityScore: cooking.qualityScore
+        outputQualityScore: cooking.outputQualityScore
       });
 
       menuSystem.recordSale(
@@ -270,7 +270,7 @@ class OrderSystem {
         ingredientCost:
           cooking.ingredientCost,
         outputQualityScore:
-          cooking.qualityScore
+          cooking.outputQualityScore
       });
     }
 
@@ -605,7 +605,7 @@ class OrderSystem {
       ingredientCost:
         cooking.ingredientCost,
       outputQualityScore:
-        cooking.qualityScore
+        cooking.outputQualityScore
     });
 
     salesChannelSystem
@@ -724,8 +724,8 @@ class OrderSystem {
                 totalRevenue,
               cookingRecordId:
                 cooking.id,
-              qualityScore:
-                cooking.qualityScore
+              outputQualityScore:
+                cooking.outputQualityScore
             }
           ],
 
@@ -739,7 +739,7 @@ class OrderSystem {
             cooking.ingredientCost,
 
           averageQuality:
-            cooking.qualityScore,
+            cooking.outputQualityScore,
 
           transactionId:
             payment.transaction.id,
