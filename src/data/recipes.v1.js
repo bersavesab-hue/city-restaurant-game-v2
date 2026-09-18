@@ -1,11 +1,12 @@
 export const RECIPE_DATASET_META = Object.freeze({
   "schemaVersion": 1,
-  "datasetVersion": "1.1.0",
-  "total": 450,
+  "datasetVersion": "1.2.0",
+  "total": 453,
   "standardRecipeCount": 350,
-  "alternateRecipeCount": 100,
+  "alternateRecipeCount": 103,
   "dishCoverage": 350,
   "ingredientCoverage": 220,
+  "cookingMethodCoverage": 22,
   "sourceIngredientCatalog": "ingredients.v1",
   "sourceIngredientCount": 220,
   "targetTotal": "450-550"
@@ -16820,6 +16821,106 @@ export const RECIPES_V1 = Object.freeze([
     "tags": [
       "alternate",
       "tofu"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_winter_melon_rib_soup_pressure",
+    "dishId": "winter_melon_rib_soup",
+    "variantId": "pressure",
+    "name": "高压冬瓜排骨汤做法",
+    "method": "pressure_cook",
+    "ingredients": [
+      {
+        "ingredientId": "winter_melon",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "pork_ribs",
+        "quantity": 180
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      },
+      {
+        "ingredientId": "cooking_wine",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 28,
+    "tags": [
+      "alternate",
+      "pressure"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_vinegar_cucumber_pickled",
+    "dishId": "vinegar_cucumber",
+    "variantId": "pickled",
+    "name": "腌渍酸甜黄瓜做法",
+    "method": "pickle",
+    "ingredients": [
+      {
+        "ingredientId": "cucumber",
+        "quantity": 120
+      },
+      {
+        "ingredientId": "rice_vinegar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "sugar",
+        "quantity": 10
+      },
+      {
+        "ingredientId": "salt",
+        "quantity": 3
+      }
+    ],
+    "difficulty": 16,
+    "cookingMinutes": 20,
+    "tags": [
+      "alternate",
+      "pickled"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "recipe_yogurt_fruit_cup_fermented",
+    "dishId": "yogurt_fruit_cup",
+    "variantId": "fermented",
+    "name": "自制发酵酸奶水果杯做法",
+    "method": "ferment",
+    "ingredients": [
+      {
+        "ingredientId": "milk",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "yogurt",
+        "quantity": 100
+      },
+      {
+        "ingredientId": "strawberry",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "banana",
+        "quantity": 150
+      },
+      {
+        "ingredientId": "sugar",
+        "quantity": 10
+      }
+    ],
+    "difficulty": 36,
+    "cookingMinutes": 60,
+    "tags": [
+      "alternate",
+      "fermented"
     ]
   }
 ]);
