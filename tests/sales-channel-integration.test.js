@@ -158,7 +158,7 @@ function stubSingleDish(
         id:
           `channel_cook_${cookingCalls}`,
         ingredientCost: 2000,
-        qualityScore: 85
+        outputQualityScore: 85
       };
     };
 
