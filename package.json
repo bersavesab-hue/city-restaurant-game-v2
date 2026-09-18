@@ -32,7 +32,8 @@
     "test:data:properties": "node --test tests/formal-property-template-data.test.js tests/property-lease-market.test.js tests/city-property-game-ui.test.js tests/formal-venue-type-data.test.js",
     "assets:ingredients": "node scripts/materialize-ingredient-atlas.mjs",
     "prebuild:android-js": "npm run assets:ingredients",
-    "test:data:competitors": "node --test tests/formal-competitor-data.test.js tests/market-competition.test.js tests/competitor-dynamics.test.js tests/market-strategy-ui.test.js"
+    "test:data:competitors": "node --test tests/formal-competitor-data.test.js tests/market-competition.test.js tests/competitor-dynamics.test.js tests/market-strategy-ui.test.js",
+    "test:data:events": "node --test tests/formal-random-event-data.test.js tests/random-event-integration.test.js tests/district-event.test.js tests/business-calendar.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
