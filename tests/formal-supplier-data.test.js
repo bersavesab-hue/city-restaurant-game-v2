@@ -148,19 +148,29 @@ test(
               )
         ).length;
 
+      const offers =
+        supplierSystem
+          .listOffers(
+            template.id
+          );
+
       assert.equal(
-        Object.keys(
-          supplier.offers
-        ).length,
+        offers.length,
         expected,
         template.id
       );
 
+      assert.equal(
+        Object.keys(
+          supplier.offers
+        ).length,
+        0,
+        `${template.id} should not persist generated offers`
+      );
+
       for (
         const offer
-        of Object.values(
-          supplier.offers
-        )
+        of offers
       ) {
         assert.ok(
           INGREDIENTS_V1.some(
@@ -189,6 +199,26 @@ test(
         );
       }
     }
+
+    const sampleOffer =
+      supplierSystem.getOffer(
+        "supplier_t1_comprehensive",
+        "pork"
+      );
+
+    assert.ok(
+      sampleOffer
+    );
+
+    assert.equal(
+      sampleOffer.generated,
+      true
+    );
+
+    assert.equal(
+      sampleOffer.ingredientId,
+      "pork"
+    );
 
     for (
       const ingredient
