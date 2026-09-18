@@ -598,7 +598,6 @@ class TrafficDemandSystem {
           environment
             .playerAppealMultiplier *
           positioningFactor *
-          channelAccessFactor *
           segmentRetentionFactor *
           dishPrestigeFactor *
           renovationAppealFactor,
