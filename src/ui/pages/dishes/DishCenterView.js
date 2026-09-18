@@ -623,21 +623,22 @@ class DishCenterView {
                         <div class="dish-quality-line">
 
                           <span>
-                            品质
+                            长期品阶
                           </span>
 
                           <strong>
                             ${escapeHtml(
-                              dish.grade
+                              dish.dishRankName ??
+                              "未培养"
                             )}
                           </strong>
 
                           ${
-                            dish.qualityScore !==
+                            dish.recipeQualityScore !==
                             null
                               ? `
                                 <small>
-                                  ${dish.qualityScore}分
+                                  配方品质 ${dish.recipeQualityScore}分
                                 </small>
                               `
                               : ""
@@ -1229,7 +1230,7 @@ class DishCenterView {
                 );
 
             this.message =
-              `研发成功：${result.dish.name} · ${result.dish.qualityGrade}级 · 品质${result.dish.qualityScore}`;
+              `研发成功：${result.dish.name} · 研发评分${result.analysis.researchScore}`;
 
             this.render();
           } catch (
@@ -1300,7 +1301,7 @@ class DishCenterView {
 
 
             this.message =
-              `研发成功：${result.dish.name} · ${result.dish.qualityGrade}级 · 品质${result.dish.qualityScore} · 建议售价${money(result.dish.basePrice)}`;
+              `研发成功：${result.dish.name} · 研发评分${result.analysis.researchScore} · 建议售价${money(result.dish.basePrice)}`;
 
 
             lab.selected.clear();
