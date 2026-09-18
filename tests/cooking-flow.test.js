@@ -11,7 +11,8 @@ import { recipeSystem } from "../src/systems/RecipeSystem.js";
 import { cookingSystem } from "../src/systems/CookingSystem.js";
 
 import {
-  DISH_SCHEMA_VERSION
+  DISH_SCHEMA_VERSION,
+  getDefaultRecipeId
 } from "../src/data/dishCatalogRules.js";
 
 import {
@@ -63,7 +64,9 @@ test(
           unlockLevel: 1,
           baseDifficulty: 35,
           defaultRecipeId:
-            "recipe_pork_rice",
+            getDefaultRecipeId(
+              "dish_pork_rice"
+            ),
           tags: ["test"]
         }
       ],
@@ -75,7 +78,9 @@ test(
         {
           schemaVersion:
             RECIPE_SCHEMA_VERSION,
-          id: "recipe_pork_rice",
+          id: getDefaultRecipeId(
+              "dish_pork_rice"
+            ),
           dishId:
             "dish_pork_rice",
           variantId:
@@ -145,7 +150,9 @@ test(
         restaurantId:
           restaurant.id,
         recipeId:
-          "recipe_pork_rice",
+          getDefaultRecipeId(
+              "dish_pork_rice"
+            ),
         portions: 2,
         chefSkill: 70
       });
