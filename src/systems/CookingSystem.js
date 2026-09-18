@@ -7,6 +7,7 @@ import { dishCatalogSystem } from "./DishCatalogSystem.js";
 import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
+import { restaurantDishSystem } from "./RestaurantDishSystem.js";
 
 import {
   getCookOutputGrade
@@ -258,32 +259,37 @@ class CookingSystem {
         )
         .qualityBonus;
 
+    const dishProgress =
+      restaurantDishSystem
+        .ensureOwned({
+          restaurantId,
+          dishId:
+            dish.id
+        });
+
     const researchQualityBonus =
-      dish.custom
-        ? clamp(
-            (
-              (
-                dish.qualityScore ??
-                60
-              ) -
-              60
-            ) *
-            0.2,
-            -5,
-            8
-          )
-        : 0;
+      clamp(
+        (
+          (
+            dishProgress
+              .qualityScore ??
+            60
+          ) -
+          60
+        ) *
+        0.2,
+        -5,
+        8
+      );
 
     const masteryQualityBonus =
-      dish.custom
-        ? clamp(
-            dish
-              .masteryQualityBonus ??
-            0,
-            0,
-            6
-          )
-        : 0;
+      clamp(
+        dishProgress
+          .masteryQualityBonus ??
+        0,
+        0,
+        6
+      );
 
     const qualityScore =
       Math.round(
