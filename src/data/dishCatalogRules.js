@@ -1,3 +1,7 @@
+import {
+  getRecipeId
+} from "./recipeRules.js";
+
 export const DISH_SCHEMA_VERSION = 1;
 
 export const DISH_ID_PATTERN =
@@ -72,5 +76,8 @@ export const DISH_DIFFICULTY_RANGE =
 export function getDefaultRecipeId(
   dishId
 ) {
-  return `recipe_${dishId}_standard`;
+  return getRecipeId(
+    dishId,
+    "standard"
+  );
 }
