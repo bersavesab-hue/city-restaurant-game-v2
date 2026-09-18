@@ -16,6 +16,10 @@ import {
   getDishRank
 } from "../data/dishRules.js";
 
+import {
+  DISH_CATEGORY_LIST
+} from "../data/dishCatalogRules.js";
+
 function clamp(
   value,
   min,
@@ -31,14 +35,12 @@ function clamp(
 }
 
 const CATEGORIES =
-  Object.freeze([
-    "rice",
-    "noodle",
-    "fast_food",
-    "stir_fry",
-    "hotpot",
-    "dessert"
-  ]);
+  Object.freeze(
+    DISH_CATEGORY_LIST.map(
+      item =>
+        item.id
+    )
+  );
 
 const METHODS =
   Object.freeze({
