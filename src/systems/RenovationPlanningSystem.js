@@ -1065,8 +1065,26 @@ class RenovationPlanningSystem {
       );
     }
 
+    const flowIssues =
+      [
+        ...(flow.issues ?? [])
+      ].filter(
+        issue =>
+          !deliveryOnly ||
+          ![
+            "no_dining_tables",
+            "no_cashier_counter",
+            "no_waiting_area",
+            "plain_environment",
+            "low_comfort",
+            "service_route_too_long"
+          ].includes(
+            issue
+          )
+      );
+
     const issues = [
-      ...(flow.issues ?? []),
+      ...flowIssues,
       ...zoningIssues,
       ...spacing.issues
     ];
