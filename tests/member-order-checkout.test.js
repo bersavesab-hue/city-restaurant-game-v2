@@ -57,6 +57,10 @@ import {
   marketActionSystem
 } from "../src/systems/MarketActionSystem.js";
 
+import {
+  dishLifecycleSystem
+} from "../src/systems/DishLifecycleSystem.js";
+
 test(
   "会员订单按等级折扣优惠券和积分后的实付金额进入财务并自动统计营销转化",
   () => {
@@ -188,6 +192,10 @@ test(
         priceMultiplier:
           1
       });
+
+    dishLifecycleSystem
+      .recordService =
+      () => null;
 
     menuSystem.get =
       () => ({
