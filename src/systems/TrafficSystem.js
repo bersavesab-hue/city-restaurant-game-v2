@@ -15,6 +15,8 @@ import { customerExperienceSystem } from "./CustomerExperienceSystem.js";
 import { businessCausalitySystem } from "./BusinessCausalitySystem.js";
 import { serviceCapacitySystem } from "./ServiceCapacitySystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
+import { salesChannelSystem } from "./SalesChannelSystem.js";
+import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
 
 import { eventBus } from "../core/EventBus.js";
 import { restaurantEquipmentSystem } from "./RestaurantEquipmentSystem.js";
@@ -439,6 +441,15 @@ class TrafficSystem {
     let qualityTotal = 0;
     let qualityCount = 0;
 
+    const marketingModifiers =
+      marketActionSystem
+        .getModifiers(
+          restaurantId
+        );
+
+    const channelStats =
+      new Map();
+
     const segmentStats =
       new Map();
 
@@ -506,6 +517,51 @@ class TrafficSystem {
         );
 
       try {
+        const segment =
+          customerSegmentSystem.get(
+            segmentId
+          );
+
+        const channelWeights =
+          salesChannelSystem
+            .getDemandWeights(
+              restaurantId,
+              {
+                segment,
+                channelMultipliers:
+                  marketingModifiers
+                    .channelMultipliers ??
+                  {}
+              }
+            );
+
+        if (
+          channelWeights.length ===
+          0
+        ) {
+          const error =
+            new Error(
+              "No sales channel has available capacity"
+            );
+
+          error.code =
+            "NO_CHANNEL_CAPACITY";
+
+          throw error;
+        }
+
+        const channelId =
+          randomSystem.weightedPick(
+            channelWeights.map(
+              item => ({
+                value:
+                  item.channelId,
+                weight:
+                  item.rawWeight
+              })
+            )
+          );
+
         const order =
           orderSystem.place({
             restaurantId,
@@ -515,6 +571,8 @@ class TrafficSystem {
             customerSegmentId:
               segmentId,
 
+            channelId,
+
             items: [
               {
                 menuItemId:
@@ -523,6 +581,24 @@ class TrafficSystem {
               }
             ]
           });
+
+        const channelStat =
+          channelStats.get(
+            channelId
+          ) ?? {
+            channelId,
+            orders: 0,
+            revenue: 0
+          };
+
+        channelStat.orders += 1;
+        channelStat.revenue +=
+          order.totalRevenue;
+
+        channelStats.set(
+          channelId,
+          channelStat
+        );
 
         completedOrders += 1;
 
@@ -725,6 +801,12 @@ class TrafficSystem {
       completedOrders,
       failedOrders,
       revenue,
+
+      channelOutcomes:
+        [
+          ...channelStats
+            .values()
+        ],
 
       averageQuality:
         qualityCount > 0
