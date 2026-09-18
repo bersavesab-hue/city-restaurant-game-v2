@@ -385,9 +385,12 @@ class RestaurantSystem {
     const reputation =
       Math.max(
         0,
-        restaurant.reputation +
-        amount *
-        eventMultiplier
+        Math.min(
+          100,
+          restaurant.reputation +
+          amount *
+          eventMultiplier
+        )
       );
 
     return entitySystem.update(
