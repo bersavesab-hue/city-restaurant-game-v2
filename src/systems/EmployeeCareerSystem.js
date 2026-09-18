@@ -8,6 +8,10 @@ import {
   EMPLOYEE_TRAINING_PROGRAMS
 } from "../data/employeeCareer.js";
 
+import {
+  getPotentialGrowthMultiplier
+} from "../data/employeeGenerationRules.js";
+
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
@@ -242,11 +246,53 @@ class EmployeeCareerSystem {
     const skills = { ...(employee.skills ?? {}) };
     const skillProfile = role.skillProfile ?? [role.primarySkill];
 
+    const potentialGrowth =
+      getPotentialGrowthMultiplier(
+        employee.potential ??
+        3
+      );
+
+    const learningGrowth =
+      0.8 +
+      clamp(
+        employee.learning ??
+        60,
+        0,
+        100
+      ) *
+      0.004;
+
+    const growthMultiplier =
+      clamp(
+        potentialGrowth *
+        learningGrowth,
+        0.7,
+        1.6
+      );
+
     for (const skill of skillProfile) {
-      const gain = skill === role.primarySkill
-        ? program.primarySkillGain
-        : program.secondarySkillGain;
-      skills[skill] = clamp((skills[skill] ?? 0) + gain, 0, 100);
+      const baseGain =
+        skill ===
+          role.primarySkill
+          ? program.primarySkillGain
+          : program.secondarySkillGain;
+
+      const gain =
+        Math.max(
+          1,
+          Math.round(
+            baseGain *
+            growthMultiplier
+          )
+        );
+
+      skills[skill] =
+        clamp(
+          (skills[skill] ?? 0) +
+          gain,
+          0,
+          100
+        );
     }
 
     const updated = entitySystem.update("employee", employeeId, {
@@ -269,6 +315,13 @@ class EmployeeCareerSystem {
     return {
       employee: updated,
       program: structuredClone(program),
+
+      growthMultiplier:
+        Number(
+          growthMultiplier
+            .toFixed(3)
+        ),
+
       promotion: this.getPromotionStatus(employeeId)
     };
   }
