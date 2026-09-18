@@ -9,6 +9,9 @@ import { venueTypeSystem } from "./VenueTypeSystem.js";
 import { economicBaselineSystem } from "./EconomicBaselineSystem.js";
 import { cityEconomySystem } from "./CityEconomySystem.js";
 import { districtEventSystem } from "./DistrictEventSystem.js";
+import {
+  calculateUtilityUsage
+} from "../data/economicBalanceRules.js";
 
 function countOrders(restaurantId, day) {
   return entitySystem
@@ -93,16 +96,20 @@ class EconomicOperatingCostSystem {
           )
         : 1;
 
-    const activeFactor = openHours > 0 || orders > 0 ? 1 : 0.22;
+    const usage =
+      calculateUtilityUsage({
+        openHours,
+        kitchenStations,
+        seats,
+        orders
+      });
 
-    const electricityKwh =
-      (openHours * (1.6 + kitchenStations * 2.4 + seats * 0.045) + orders * 0.06) * activeFactor;
-    const waterTon =
-      (openHours * 0.045 + orders * 0.012 + seats * 0.002) * activeFactor;
-    const gasCubicMeter =
-      kitchenStations > 0
-        ? (openHours * kitchenStations * 0.22 + orders * 0.035) * activeFactor
-        : 0;
+    const {
+      activeFactor,
+      electricityKwh,
+      waterTon,
+      gasCubicMeter
+    } = usage;
 
     const electricity =
       electricityKwh *
