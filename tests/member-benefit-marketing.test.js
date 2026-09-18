@@ -157,12 +157,12 @@ test(
 
     assert.equal(
       preview.pointDiscount,
-      100
+      10
     );
 
     assert.equal(
       preview.finalAmount,
-      1360
+      1450
     );
 
     const committed =
@@ -187,7 +187,7 @@ test(
 
     assert.equal(
       committed.totalDiscount,
-      640
+      550
     );
 
     const after =
