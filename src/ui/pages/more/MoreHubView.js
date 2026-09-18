@@ -166,6 +166,11 @@ class MoreHubView {
                           data-entry-state="${escapeHtml(
                             entry.state
                           )}"
+                          ${entry.state ===
+                            "locked"
+                              ? "disabled"
+                              : ""
+                          }
                         >
 
                           <strong>
@@ -196,7 +201,10 @@ class MoreHubView {
                             ${entry.state ===
                               "ready"
                                 ? "进入 →"
-                                : "待正式页面 →"
+                                : entry.state ===
+                                  "locked"
+                                  ? `Lv.${entry.unlockLevel} 解锁`
+                                  : "待正式页面 →"
                             }
                           </small>
 
