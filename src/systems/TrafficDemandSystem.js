@@ -334,6 +334,100 @@ class TrafficDemandSystem {
     );
   }
 
+  getMarketingChannelFactor(
+    restaurantId,
+    segment,
+    channelMultipliers = {}
+  ) {
+    const active =
+      salesChannelSystem
+        .getActiveChannels(
+          restaurantId
+        );
+
+    if (
+      active.length === 0
+    ) {
+      return 1;
+    }
+
+    const preferences =
+      segment
+        .channelPreferences ??
+      {};
+
+    let weighted = 0;
+    let total = 0;
+
+    for (
+      const channel
+      of active
+    ) {
+      const preference =
+        Math.max(
+          0,
+          Number(
+            preferences[
+              channel.id
+            ] ??
+            0
+          )
+        );
+
+      if (
+        preference <= 0
+      ) {
+        continue;
+      }
+
+      total +=
+        preference;
+
+      weighted +=
+        preference *
+        (
+          channelMultipliers[
+            channel.id
+          ] ??
+          1
+        );
+    }
+
+    if (
+      total <= 0
+    ) {
+      const values =
+        active.map(
+          channel =>
+            channelMultipliers[
+              channel.id
+            ] ??
+            1
+        );
+
+      return (
+        values.reduce(
+          (sum, value) =>
+            sum +
+            value,
+          0
+        ) /
+        Math.max(
+          1,
+          values.length
+        )
+      );
+    }
+
+    return clamp(
+      weighted /
+      total,
+      0.6,
+      1.8
+    );
+  }
+
+
   getChannelAccessFactor(
     restaurantId,
     segment
@@ -860,6 +954,21 @@ class TrafficDemandSystem {
           segment
         );
 
+      const marketingSegmentFactor =
+        actionModifiers
+          .segmentMultipliers?.[
+            segment.id
+          ] ??
+        1;
+
+      const marketingChannelFactor =
+        this.getMarketingChannelFactor(
+          restaurantId,
+          segment,
+          actionModifiers
+            .channelMultipliers
+        );
+
       const venueSegmentFactor =
         venueTypeSystem
           .getSegmentMultiplier(
@@ -972,7 +1081,9 @@ class TrafficDemandSystem {
         levelFactor *
         wordOfMouthFactor *
         actionModifiers
-          .demandMultiplier;
+          .demandMultiplier *
+        marketingSegmentFactor *
+        marketingChannelFactor;
 
       expectedVisitors += demand;
 
@@ -1015,6 +1126,10 @@ class TrafficDemandSystem {
         venueChannelFactor,
 
         channelAccessFactor,
+
+        marketingSegmentFactor,
+
+        marketingChannelFactor,
 
         districtAccessFactor,
 
