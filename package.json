@@ -11,7 +11,8 @@
     "aging": "node scripts/aging-performance.mjs",
     "build:android-js": "node scripts/build-android-js-v2.mjs",
     "test:phase2": "node scripts/phase2-gate.mjs",
-    "verify:phase2": "npm run test:phase2 && npm run build:android-js"
+    "verify:phase2": "npm run test:phase2 && npm run build:android-js",
+    "test:phase2:ui": "node --test tests/formal-page-runtime.test.js tests/android-runtime-routing.test.js tests/runtime-route-coverage.test.js tests/navigation-roundtrip.test.js tests/no-formal-ui-placeholder.test.js tests/gameplay-navigation.test.js tests/ui-foundation.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
