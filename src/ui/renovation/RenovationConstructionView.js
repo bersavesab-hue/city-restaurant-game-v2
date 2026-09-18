@@ -2,6 +2,10 @@ import {
   renovationConstructionPageSystem
 } from "./RenovationConstructionPageSystem.js";
 
+import {
+  eventBus
+} from "../../core/EventBus.js";
+
 
 function escapeHtml(
   value
@@ -103,6 +107,10 @@ class RenovationConstructionView {
 
     this.message =
       "";
+
+
+    this.unsubscribeConstructionReady =
+      null;
   }
 
 
@@ -119,9 +127,45 @@ class RenovationConstructionView {
     this.restaurantId =
       restaurantId;
 
+
+    this.unsubscribeConstructionReady
+      ?.();
+
+    this.unsubscribeConstructionReady =
+      eventBus.on(
+        "renovationConstruction:ready",
+        ({
+          restaurantId:
+            changedRestaurantId
+        }) => {
+          if (
+            changedRestaurantId !==
+            this.restaurantId
+          ) {
+            return;
+          }
+
+
+          this.message =
+            "装修工程已经完工，可以进行验收";
+
+          this.refresh();
+        }
+      );
+
+
     this.refresh();
 
     return this;
+  }
+
+
+  destroy() {
+    this.unsubscribeConstructionReady
+      ?.();
+
+    this.unsubscribeConstructionReady =
+      null;
   }
 
 

@@ -19,6 +19,8 @@ const tests = [
 
   "tests/opening-readiness.test.js",
   "tests/opening-flow-ui.test.js",
+  "tests/opening-live-refresh.test.js",
+  "tests/opening-journey-e2e.test.js",
 
   "tests/restaurant-home-ui.test.js",
   "tests/restaurant-home-formal-ui.test.js",

@@ -3,6 +3,10 @@ import {
 } from "./OpeningSetupPageSystem.js";
 
 import {
+  eventBus
+} from "../../../core/EventBus.js";
+
+import {
   renderGameTopBar,
   renderNoticeTicker,
   renderPageTitle,
@@ -68,6 +72,10 @@ class OpeningSetupView {
 
     this.message =
       "";
+
+
+    this.unsubscribeProcurement =
+      null;
   }
 
 
@@ -83,9 +91,44 @@ class OpeningSetupView {
     this.restaurantId =
       restaurantId;
 
+
+    this.unsubscribeProcurement
+      ?.();
+
+    this.unsubscribeProcurement =
+      eventBus.on(
+        "procurement:delivered",
+        ({
+          order
+        }) => {
+          if (
+            order?.restaurantId !==
+            this.restaurantId
+          ) {
+            return;
+          }
+
+
+          this.message =
+            "首批食材已到货，开店进度已自动刷新";
+
+          this.render();
+        }
+      );
+
+
     this.render();
 
     return this;
+  }
+
+
+  destroy() {
+    this.unsubscribeProcurement
+      ?.();
+
+    this.unsubscribeProcurement =
+      null;
   }
 
 

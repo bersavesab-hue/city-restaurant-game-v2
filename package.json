@@ -12,7 +12,8 @@
     "build:android-js": "node scripts/build-android-js-v2.mjs",
     "test:phase2": "node scripts/phase2-gate.mjs",
     "verify:phase2": "npm run test:phase2 && npm run build:android-js",
-    "test:phase2:ui": "node --test tests/formal-page-runtime.test.js tests/android-runtime-routing.test.js tests/runtime-route-coverage.test.js tests/navigation-roundtrip.test.js tests/no-formal-ui-placeholder.test.js tests/gameplay-navigation.test.js tests/ui-foundation.test.js"
+    "test:phase2:ui": "node --test tests/formal-page-runtime.test.js tests/android-runtime-routing.test.js tests/runtime-route-coverage.test.js tests/navigation-roundtrip.test.js tests/no-formal-ui-placeholder.test.js tests/gameplay-navigation.test.js tests/ui-foundation.test.js",
+    "test:phase2:opening": "node --test tests/opening-journey-e2e.test.js tests/opening-live-refresh.test.js tests/opening-journey-routing.test.js tests/opening-route-contract.test.js tests/opening-flow-ui.test.js tests/opening-readiness.test.js tests/lease-flow.test.js tests/renovation-construction-ui.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
