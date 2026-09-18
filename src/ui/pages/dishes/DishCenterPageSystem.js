@@ -43,31 +43,21 @@ import {
 } from "../../../systems/EconomicBaselineSystem.js";
 
 import {
+  getDishRank
+} from "../../../data/dishRules.js";
+
+import {
+  DISH_CATEGORY_LABELS
+} from "../../../data/dishCatalogRules.js";
+
+import {
   buildGlobalTopBarModel,
   buildNoticeTickerModel
 } from "../../components/GlobalChromeModel.js";
 
 
 const CATEGORY_LABELS =
-  Object.freeze({
-    rice:
-      "米饭主食",
-
-    noodle:
-      "面食",
-
-    fast_food:
-      "快捷餐食",
-
-    stir_fry:
-      "炒菜",
-
-    hotpot:
-      "锅物",
-
-    dessert:
-      "甜品"
-  });
+  DISH_CATEGORY_LABELS;
 
 
 const METHOD_OPTIONS =
@@ -197,46 +187,6 @@ function categoryLabel(
 }
 
 
-function gradeFromDish(
-  dish
-) {
-  if (
-    dish.qualityGrade
-  ) {
-    return dish.qualityGrade;
-  }
-
-  const score =
-    Number(
-      dish.qualityScore
-    );
-
-  if (
-    Number.isFinite(score)
-  ) {
-    if (score >= 90) {
-      return "SS";
-    }
-
-    if (score >= 80) {
-      return "S";
-    }
-
-    if (score >= 68) {
-      return "A";
-    }
-
-    if (score >= 55) {
-      return "B";
-    }
-
-    return "C";
-  }
-
-  return "基础";
-}
-
-
 function getDishImage(
   dish
 ) {
@@ -251,7 +201,8 @@ function getDishImage(
 class DishCenterPageSystem {
   getDishView(
     dish,
-    menuItem = null
+    menuItem = null,
+    storeLevel = null
   ) {
     const recipes =
       recipeSystem
@@ -288,6 +239,19 @@ class DishCenterPageSystem {
           )
         : null;
 
+    const rank =
+      dish.custom
+        ? getDishRank({
+            masteryLevel:
+              dish.masteryLevel ?? 1,
+            qualityScore:
+              dish.qualityScore ?? 0
+          })
+        : null;
+
+    const unlockLevel =
+      dish.unlockLevel ?? 1;
+
     return {
       id:
         dish.id,
@@ -315,26 +279,28 @@ class DishCenterPageSystem {
         dish.qualityScore ??
         null,
 
-      grade:
-        gradeFromDish(
-          dish
-        ),
+      dishRankId:
+        dish.dishRankId ??
+        rank?.id ??
+        null,
 
-      qualityLevel:
-        dish.qualityLevel ??
-        1,
+      dishRankName:
+        dish.dishRankName ??
+        rank?.name ??
+        null,
 
-      rarity:
-        dish.rarity ??
-        "common",
+      dishRankOrder:
+        dish.dishRankOrder ??
+        rank?.order ??
+        null,
 
-      prestigeTitle:
-        dish.prestigeTitle ??
-        (
-          dish.custom
-            ? "新研发"
-            : "经典菜"
-        ),
+      unlockLevel,
+
+      unlocked:
+        dish.custom ||
+        storeLevel === null ||
+        storeLevel >=
+          unlockLevel,
 
       masteryLevel:
         dish.masteryLevel ??
@@ -369,6 +335,7 @@ class DishCenterPageSystem {
 
       difficulty:
         recipe?.difficulty ??
+        dish.baseDifficulty ??
         null,
 
       cookingMinutes:
@@ -448,9 +415,6 @@ class DishCenterPageSystem {
             unit:
               ingredient.unit,
 
-            quality:
-              ingredient.baseQuality,
-
             purchasePrice:
               economicBaselineSystem
                 .getIngredientReference(
@@ -513,7 +477,8 @@ class DishCenterPageSystem {
 
           return this.getDishView(
             dish,
-            item
+            item,
+            restaurant.level
           );
         }
       );
@@ -534,7 +499,8 @@ class DishCenterPageSystem {
               menuMap.get(
                 dish.id
               ) ??
-              null
+              null,
+              restaurant.level
             )
         );
 
@@ -542,7 +508,8 @@ class DishCenterPageSystem {
       catalog.filter(
         dish =>
           !dish.onMenu &&
-          dish.hasRecipe
+          dish.hasRecipe &&
+          dish.unlocked
       );
 
     const activeMenu =
