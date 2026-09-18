@@ -8,6 +8,10 @@ import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
 
+import {
+  getCookOutputGrade
+} from "../data/dishRules.js";
+
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
@@ -293,15 +297,10 @@ class CookingSystem {
         )
       );
 
-    let qualityGrade = "C";
-
-    if (qualityScore >= 90) {
-      qualityGrade = "S";
-    } else if (qualityScore >= 75) {
-      qualityGrade = "A";
-    } else if (qualityScore >= 60) {
-      qualityGrade = "B";
-    }
+    const qualityGrade =
+      getCookOutputGrade(
+        qualityScore
+      );
 
     const time =
       gameState.getSection("time");
