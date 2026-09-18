@@ -55,6 +55,10 @@ import {
 } from "../../../data/cookingMethods.v1.js";
 
 import {
+  getIngredientVisual
+} from "../../../data/ingredientVisuals.js";
+
+import {
   buildGlobalTopBarModel,
   buildNoticeTickerModel
 } from "../../components/GlobalChromeModel.js";
@@ -316,6 +320,11 @@ class DishCenterPageSystem {
       .getAll()
       .map(
         ingredient => {
+          const visual =
+            getIngredientVisual(
+              ingredient.id
+            );
+
           const quantityRule =
             dishResearchPreviewSystem
               .getQuantityRule(
@@ -328,6 +337,15 @@ class DishCenterPageSystem {
 
             name:
               ingredient.name,
+
+            visualIndex:
+              visual.index,
+
+            visualCode:
+              visual.code,
+
+            image:
+              visual.image,
 
             category:
               ingredient.category,
