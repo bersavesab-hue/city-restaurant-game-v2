@@ -10,6 +10,14 @@ import { dishCatalogSystem } from "../src/systems/DishCatalogSystem.js";
 import { recipeSystem } from "../src/systems/RecipeSystem.js";
 import { cookingSystem } from "../src/systems/CookingSystem.js";
 
+import {
+  DISH_SCHEMA_VERSION
+} from "../src/data/dishCatalogRules.js";
+
+import {
+  RECIPE_SCHEMA_VERSION
+} from "../src/data/recipeRules.js";
+
 test(
   "菜品完整链路：配方 -> 扣原料 -> 成本 -> 单次出品质量 -> 出品记录",
   () => {
@@ -46,10 +54,17 @@ test(
     dishCatalogSystem.load(
       [
         {
+          schemaVersion:
+            DISH_SCHEMA_VERSION,
           id: "dish_pork_rice",
           name: "猪肉盖饭",
           category: "rice",
-          basePrice: 2800
+          basePrice: 2800,
+          unlockLevel: 1,
+          baseDifficulty: 35,
+          defaultRecipeId:
+            "recipe_pork_rice",
+          tags: ["test"]
         }
       ],
       { overwrite: true }
@@ -58,9 +73,17 @@ test(
     recipeSystem.load(
       [
         {
+          schemaVersion:
+            RECIPE_SCHEMA_VERSION,
           id: "recipe_pork_rice",
           dishId:
             "dish_pork_rice",
+          variantId:
+            "standard",
+          name:
+            "标准做法",
+          method:
+            "boil",
           difficulty: 35,
           cookingMinutes: 12,
           ingredients: [
