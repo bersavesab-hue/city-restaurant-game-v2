@@ -77,6 +77,10 @@ import {
 } from "../pages/dishes/DishCenterView.js";
 
 import {
+  BusinessAnalyticsView
+} from "../pages/analytics/BusinessAnalyticsView.js";
+
+import {
   RenovationFloorplanMobileView
 } from "../renovation/RenovationFloorplanMobileView.js";
 
@@ -1041,6 +1045,27 @@ function navigate(
 
     if (
       pageId ===
+      "analytics"
+    ) {
+      currentView =
+        new BusinessAnalyticsView();
+
+      currentView.mount(
+        root,
+        {
+          restaurantId,
+          period:
+            params.period ??
+            "week"
+        }
+      );
+
+      return;
+    }
+
+
+    if (
+      pageId ===
       "restaurant_home"
     ) {
       currentView =
@@ -1074,7 +1099,6 @@ function navigate(
     if (
       [
         "supply",
-        "analytics",
         "finance",
         "lease",
         "employee_training",
