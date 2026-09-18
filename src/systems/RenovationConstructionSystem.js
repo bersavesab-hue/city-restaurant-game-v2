@@ -18,6 +18,15 @@ import {
   renovationEditorSystem
 } from "./RenovationEditorSystem.js";
 
+import {
+  financeSystem,
+  FINANCE_CATEGORY
+} from "./FinanceSystem.js";
+
+import {
+  renovationRealityCostSystem
+} from "./RenovationRealityCostSystem.js";
+
 
 const STATUS =
   Object.freeze({
@@ -408,6 +417,11 @@ class RenovationConstructionSystem {
             saved.budget
               .purchaseCost,
 
+          expectedBaseConstructionCost:
+            saved.budget
+              .baseConstructionCost ??
+            0,
+
           analysis:
             saved.analysis,
 
@@ -436,6 +450,7 @@ class RenovationConstructionSystem {
     restaurantId,
     {
       projectCost = 0,
+      expectedBaseConstructionCost = null,
       analysis = null,
       expectedModifiers = null
     } = {}
@@ -502,6 +517,101 @@ class RenovationConstructionSystem {
           .deactivateLayout(
             restaurantId
           );
+    }
+
+
+    const constructionCost =
+      renovationRealityCostSystem
+        .calculateForLayout(
+          layout
+        );
+
+    const baseConstructionCost =
+      expectedBaseConstructionCost ===
+      null
+        ? constructionCost
+            .baseConstructionCost
+        : Math.max(
+            0,
+            Math.round(
+              Number(
+                expectedBaseConstructionCost
+              ) ||
+              0
+            )
+          );
+
+    if (
+      baseConstructionCost >
+      0
+    ) {
+      const balance =
+        financeSystem.getBalance(
+          restaurantId
+        );
+
+      if (
+        balance <
+        baseConstructionCost
+      ) {
+        throw new Error(
+          `装修基础施工资金不足：需要${baseConstructionCost}元，当前余额${balance}元`
+        );
+      }
+
+      const payment =
+        financeSystem.expense(
+          restaurantId,
+          baseConstructionCost,
+          FINANCE_CATEGORY.DECORATION,
+          `基础装修施工 ${constructionCost.area}㎡ × ${constructionCost.ratePerSquareMeter}元/㎡`
+        );
+
+      layout =
+        entitySystem.update(
+          "renovation_layout",
+          layout.id,
+          {
+            baseRenovationPaid:
+              true,
+
+            baseRenovationCost:
+              (
+                layout
+                  .baseRenovationCost ??
+                0
+              ) +
+              baseConstructionCost,
+
+            baseRenovationRatePerSquareMeter:
+              constructionCost
+                .ratePerSquareMeter,
+
+            baseRenovationTier:
+              constructionCost.tier,
+
+            baseRenovationSource:
+              constructionCost
+                .source
+                ? structuredClone(
+                    constructionCost
+                      .source
+                  )
+                : null,
+
+            baseRenovationTransactionId:
+              payment
+                .transaction
+                .id,
+
+            totalSpent:
+              (
+                layout.totalSpent ??
+                0
+              ) +
+              baseConstructionCost
+          }
+        );
     }
 
 
@@ -577,7 +687,7 @@ class RenovationConstructionSystem {
 
           placements,
 
-          projectCost:
+          furnishingCost:
             Math.max(
               0,
               Number(
@@ -585,6 +695,35 @@ class RenovationConstructionSystem {
               ) ||
               0
             ),
+
+          baseConstructionCost,
+
+          projectCost:
+            Math.max(
+              0,
+              Number(
+                projectCost
+              ) ||
+              0
+            ) +
+            baseConstructionCost,
+
+          priceModel:
+            "reality_1_to_1_v2",
+
+          constructionRatePerSquareMeter:
+            constructionCost
+              .ratePerSquareMeter,
+
+          constructionTier:
+            constructionCost.tier,
+
+          constructionSource:
+            constructionCost.source
+              ? structuredClone(
+                  constructionCost.source
+                )
+              : null,
 
           expectedModifiers:
             structuredClone(
