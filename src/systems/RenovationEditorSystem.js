@@ -613,6 +613,19 @@ class RenovationEditorSystem {
         restaurantId
       );
 
+    const fit =
+      renovationPlanningSystem
+        .getTemplateFit(
+          restaurantId,
+          templateId
+        );
+
+    if (!fit.executable) {
+      throw new Error(
+        `Renovation template "${templateId}" is not executable: ${fit.reasons.join(", ")}`
+      );
+    }
+
     const template =
       renovationPlanningSystem
         .getTemplate(templateId);
@@ -971,7 +984,16 @@ class RenovationEditorSystem {
           (item.floorId ?? session.floors[0].id) ===
           session.activeFloorId
       );
-    const analysis = this.getAnalysis(restaurantId);
+    const analysis =
+      this.getAnalysis(
+        restaurantId
+      );
+
+    const templateRecommendations =
+      renovationPlanningSystem
+        .getTemplateRecommendations(
+          restaurantId
+        );
 
     return {
       restaurantId,
@@ -1003,8 +1025,12 @@ class RenovationEditorSystem {
         ),
       analysis,
       templates:
-        renovationPlanningSystem
-          .getTemplates(),
+        templateRecommendations
+          .items,
+
+      recommendedTemplateId:
+        templateRecommendations
+          .recommendedTemplateId,
       actions: {
         canSave: true,
         canSwitchFloor:
