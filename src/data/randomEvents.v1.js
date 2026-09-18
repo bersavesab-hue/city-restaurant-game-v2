@@ -87,8 +87,7 @@ function buildModifiers(
           (
             1 -
             direction *
-            delta *
-            Math.sign(step)
+            delta
           ).toFixed(3)
         );
     } else {
@@ -97,8 +96,7 @@ function buildModifiers(
           (
             1 +
             direction *
-            delta *
-            Math.sign(step)
+            delta
           ).toFixed(3)
         );
     }
@@ -258,6 +256,129 @@ const DISTRICTS = Object.freeze({
     tourist_scenic: 1.6,
     cultural_creative: 1.5,
     sports_entertainment: 1.4
+  }
+});
+
+const SEASON_BY_EVENT = Object.freeze({
+  heat_wave: {
+    spring: 0.4,
+    summer: 2.4,
+    autumn: 0.5,
+    winter: 0.1
+  },
+  cold_snap: {
+    spring: 0.8,
+    summer: 0.1,
+    autumn: 0.7,
+    winter: 2.3
+  },
+  snow_day: {
+    spring: 0.1,
+    summer: 0,
+    autumn: 0.1,
+    winter: 3
+  },
+  typhoon_warning: {
+    spring: 0.4,
+    summer: 2,
+    autumn: 1.6,
+    winter: 0.2
+  },
+  spring_bloom: {
+    spring: 3,
+    summer: 0.3,
+    autumn: 0.2,
+    winter: 0.1
+  },
+  autumn_cool: {
+    spring: 0.4,
+    summer: 0.2,
+    autumn: 3,
+    winter: 0.4
+  },
+  school_opening: {
+    spring: 1.5,
+    summer: 0.4,
+    autumn: 1.8,
+    winter: 0.5
+  },
+  graduation_season: {
+    spring: 1.3,
+    summer: 2,
+    autumn: 0.3,
+    winter: 0.2
+  },
+  winter_break: {
+    spring: 0.2,
+    summer: 0.1,
+    autumn: 0.3,
+    winter: 2.8
+  },
+  summer_break: {
+    spring: 0.2,
+    summer: 2.8,
+    autumn: 0.2,
+    winter: 0.1
+  },
+  annual_meeting: {
+    spring: 0.5,
+    summer: 0.3,
+    autumn: 0.8,
+    winter: 2.2
+  },
+  year_end_close: {
+    spring: 0.2,
+    summer: 0.2,
+    autumn: 0.6,
+    winter: 2.5
+  },
+  wedding_peak: {
+    spring: 1.5,
+    summer: 0.9,
+    autumn: 1.8,
+    winter: 0.6
+  },
+  seasonal_harvest: {
+    spring: 0.8,
+    summer: 1.4,
+    autumn: 2.4,
+    winter: 0.5
+  },
+  refrigeration_stress: {
+    spring: 0.5,
+    summer: 2.5,
+    autumn: 0.5,
+    winter: 0.3
+  },
+  low_temp_stress: {
+    spring: 0.5,
+    summer: 0.1,
+    autumn: 0.6,
+    winter: 2.5
+  },
+  seasonal_utility_peak: {
+    spring: 0.5,
+    summer: 1.8,
+    autumn: 0.5,
+    winter: 1.8
+  },
+  tourism_campaign: {
+    spring: 1.4,
+    summer: 1.8,
+    autumn: 1.5,
+    winter: 0.8
+  },
+  festival_pop_up: {
+    spring: 1.2,
+    summer: 1.4,
+    autumn: 1.6,
+    winter: 1.1
+  },
+  clear_weekend: {
+    spring: 1.4,
+    summer: 1.2,
+    autumn: 1.5,
+    winter: 0.8
   }
 });
 
@@ -715,6 +836,7 @@ for (const family of FAMILIES) {
         districtWeights:
           family.districtWeights,
         seasonWeights:
+          SEASON_BY_EVENT[id] ??
           ALL_SEASONS,
         channels:
           family.channels,
