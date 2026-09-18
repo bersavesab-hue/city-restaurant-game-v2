@@ -66,9 +66,19 @@ class EconomicOperatingCostSystem {
       venue = null;
     }
 
-    const baseline = economicBaselineSystem.getSnapshot();
-    const economy = cityEconomySystem.getState(districtId);
-    const maintenanceMultiplier = venue?.maintenanceMultiplier ?? 1;
+    const utilities =
+      economicBaselineSystem
+        .getUtilityReference();
+
+    const economy =
+      cityEconomySystem
+        .getState(
+          districtId
+        );
+
+    const maintenanceMultiplier =
+      venue?.maintenanceMultiplier ??
+      1;
     const activeFactor = openHours > 0 || orders > 0 ? 1 : 0.22;
 
     const electricityKwh =
@@ -80,16 +90,85 @@ class EconomicOperatingCostSystem {
         ? (openHours * kitchenStations * 0.22 + orders * 0.035) * activeFactor
         : 0;
 
-    const electricity = electricityKwh * baseline.utilitiesReference.electricityPerKwh * economy.energyIndex;
-    const water = waterTon * baseline.utilitiesReference.waterPerTon;
-    const gas = gasCubicMeter * baseline.utilitiesReference.gasPerCubicMeter * economy.energyIndex;
-    const waste = baseline.utilitiesReference.wasteDisposalMonthlyBase / 30 * maintenanceMultiplier * activeFactor;
-    const internet = baseline.utilitiesReference.internetMonthlyBase / 30;
+    const electricity =
+      electricityKwh *
+      (
+        Number(
+          utilities
+            .electricityPerKwh
+        ) ||
+        0
+      ) *
+      economy.energyIndex;
 
-    const total = Math.max(
-      1,
-      Math.round((electricity + water + gas + waste + internet) * maintenanceMultiplier)
-    );
+    const water =
+      waterTon *
+      (
+        Number(
+          utilities
+            .waterPerTon
+        ) ||
+        0
+      );
+
+    const gas =
+      gasCubicMeter *
+      (
+        Number(
+          utilities
+            .gasPerCubicMeter
+        ) ||
+        0
+      ) *
+      economy.energyIndex;
+
+    const wasteBase =
+      Number(
+        utilities
+          .wasteDisposalMonthlyBase
+      );
+
+    const internetBase =
+      Number(
+        utilities
+          .internetMonthlyBase
+      );
+
+    const waste =
+      Number.isFinite(
+        wasteBase
+      ) &&
+      wasteBase >
+      0
+        ? wasteBase /
+          30 *
+          activeFactor
+        : 0;
+
+    const internet =
+      Number.isFinite(
+        internetBase
+      ) &&
+      internetBase >
+      0
+        ? internetBase /
+          30
+        : 0;
+
+    const total =
+      Math.max(
+        0,
+        Math.round(
+          (
+            electricity +
+            water +
+            gas +
+            waste +
+            internet
+          ) *
+          maintenanceMultiplier
+        )
+      );
 
     return {
       restaurantId,
@@ -105,12 +184,48 @@ class EconomicOperatingCostSystem {
         gasCubicMeter: Number(gasCubicMeter.toFixed(2))
       },
       breakdown: {
-        electricity: Math.round(electricity),
-        water: Math.round(water),
-        gas: Math.round(gas),
-        waste: Math.round(waste),
-        internet: Math.round(internet)
+        electricity:
+          Math.round(
+            electricity *
+            maintenanceMultiplier
+          ),
+
+        water:
+          Math.round(
+            water *
+            maintenanceMultiplier
+          ),
+
+        gas:
+          Math.round(
+            gas *
+            maintenanceMultiplier
+          ),
+
+        waste:
+          Math.round(
+            waste *
+            maintenanceMultiplier
+          ),
+
+        internet:
+          Math.round(
+            internet *
+            maintenanceMultiplier
+          )
       },
+
+      tariffModel:
+        "reality_1_to_1_v2",
+
+      tariffCurrency:
+        "CNY",
+
+      tariffReference:
+        structuredClone(
+          utilities
+        ),
+
       total
     };
   }
