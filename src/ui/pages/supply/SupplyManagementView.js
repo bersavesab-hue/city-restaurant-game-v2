@@ -2,6 +2,14 @@ import {
   supplyManagementPageSystem
 } from "./SupplyManagementPageSystem.js";
 
+import {
+  INGREDIENT_ATLAS_DATA_URI
+} from "../../../data/ingredientAtlas.js";
+
+import {
+  getIngredientSpriteStyle
+} from "../../../data/ingredientVisuals.js";
+
 function money(value) {
   return (
     "¥" +
@@ -25,6 +33,48 @@ function escapeHtml(value) {
       "'",
       "&#039;"
     );
+}
+
+function renderIngredientThumb(
+  ingredientId,
+  ingredientName,
+  size = 46
+) {
+  try {
+    return `
+      <span
+        class="ingredient-thumb ingredient-sprite"
+        style="${getIngredientSpriteStyle(
+          ingredientId,
+          size
+        )}"
+        role="img"
+        aria-label="${escapeHtml(
+          ingredientName
+        )}"
+      ></span>
+    `;
+  } catch {
+    return `
+      <span
+        class="ingredient-thumb ingredient-thumb--fallback"
+        role="img"
+        aria-label="${escapeHtml(
+          ingredientName
+        )}"
+      >
+        ${escapeHtml(
+          String(
+            ingredientName ??
+            "?"
+          ).slice(
+            0,
+            1
+          )
+        )}
+      </span>
+    `;
+  }
 }
 
 function riskName(level) {
@@ -86,6 +136,11 @@ class SupplyManagementView {
 
     this.root.className =
       "supply-management-page";
+
+    this.root.style.setProperty(
+      "--ingredient-atlas",
+      `url("${INGREDIENT_ATLAS_DATA_URI}")`
+    );
 
     this.root.innerHTML = `
       <header class="supply-header">
@@ -230,13 +285,11 @@ class SupplyManagementView {
                 item => `
                   <article class="inventory-row risk-${item.level}">
                     <div class="inventory-main">
-                      <img
-                        class="ingredient-thumb"
-                        src="${escapeHtml(item.image)}"
-                        alt="${escapeHtml(item.ingredientName)}"
-                        loading="lazy"
-                        onerror="this.hidden=true"
-                      >
+                      ${renderIngredientThumb(
+                        item.ingredientId,
+                        item.ingredientName,
+                        46
+                      )}
 
                       <div>
                       <strong>
@@ -373,16 +426,12 @@ class SupplyManagementView {
                   offer => `
                     <div class="supplier-offer">
                       <div class="supplier-offer__ingredient">
-                        <img
-                          class="ingredient-thumb"
-                          src="${escapeHtml(offer.image)}"
-                          alt="${escapeHtml(
-                            offer.ingredient?.name ??
-                            offer.ingredientId
-                          )}"
-                          loading="lazy"
-                          onerror="this.hidden=true"
-                        >
+                        ${renderIngredientThumb(
+                          offer.ingredientId,
+                          offer.ingredient?.name ??
+                          offer.ingredientId,
+                          38
+                        )}
 
                         <div>
                         <strong>
