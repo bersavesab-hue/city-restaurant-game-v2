@@ -24,6 +24,7 @@ class OrderSystem {
   place({
     restaurantId,
     customerId = null,
+    customerSegmentId = null,
     items,
     chefId = null,
     couponId = null,
@@ -324,6 +325,7 @@ class OrderSystem {
       {
         restaurantId,
         customerId,
+        customerSegmentId,
 
         channelId,
 
