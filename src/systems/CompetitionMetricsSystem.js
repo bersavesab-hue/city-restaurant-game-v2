@@ -30,6 +30,10 @@ import {
   trafficDemandSystem
 } from "./TrafficDemandSystem.js";
 
+import {
+  restaurantDishSystem
+} from "./RestaurantDishSystem.js";
+
 
 function clamp(
   value,
@@ -984,6 +988,12 @@ class CompetitionMetricsSystem {
             item.dishId
           );
 
+        const progress =
+          restaurantDishSystem.get(
+            restaurantId,
+            item.dishId
+          );
+
         const ageDays =
           custom?.createdDay
             ? Math.max(
@@ -1031,7 +1041,12 @@ class CompetitionMetricsSystem {
         const innovationScore =
           custom
             ? round1(
-                custom.qualityScore *
+                (
+                  progress
+                    ?.qualityScore ??
+                  custom.qualityScore ??
+                  item.averageQuality
+                ) *
                   0.45 +
                 Math.min(
                   100,
@@ -1041,7 +1056,8 @@ class CompetitionMetricsSystem {
                 Math.min(
                   100,
                   (
-                    custom.masteryLevel ??
+                    progress
+                      ?.masteryLevel ??
                     1
                   ) *
                   12
@@ -1050,8 +1066,8 @@ class CompetitionMetricsSystem {
                 Math.min(
                   100,
                   (
-                    custom
-                      .successfulImprovements ??
+                    progress
+                      ?.successfulImprovements ??
                     0
                   ) *
                   20
@@ -1087,17 +1103,17 @@ class CompetitionMetricsSystem {
           ageDays,
 
           qualityScore:
-            custom
+            progress
               ?.qualityScore ??
             item.averageQuality,
 
           masteryLevel:
-            custom
+            progress
               ?.masteryLevel ??
             1,
 
           improvementCount:
-            custom
+            progress
               ?.successfulImprovements ??
             0,
 
