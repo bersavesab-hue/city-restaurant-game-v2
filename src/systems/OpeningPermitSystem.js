@@ -473,15 +473,6 @@ class OpeningPermitSystem {
     const day =
       currentDay();
 
-    this.expireDuePermits(
-      restaurantId,
-      day,
-      {
-        createViolation:
-          false
-      }
-    );
-
     const context =
       this.getRequirementContext(
         restaurantId
