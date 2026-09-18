@@ -157,22 +157,31 @@ class LayoutFlowSystem {
     const prep =
       geometries.filter(
         item =>
-          item.placement.furnitureId ===
-          "prep_counter"
+          renovationSystem
+            .hasFurnitureRole(
+              item.definition,
+              "prep"
+            )
       );
 
     const cashiers =
       geometries.filter(
         item =>
-          item.placement.furnitureId ===
-          "cashier_counter"
+          renovationSystem
+            .hasFurnitureRole(
+              item.definition,
+              "cashier"
+            )
       );
 
     const waiting =
       geometries.filter(
         item =>
-          item.placement.furnitureId ===
-          "waiting_bench"
+          renovationSystem
+            .hasFurnitureRole(
+              item.definition,
+              "waiting"
+            )
       );
 
     const decor =
@@ -311,16 +320,46 @@ class LayoutFlowSystem {
       ) *
       0.5;
 
+    const decorComfort =
+      decor.reduce(
+        (
+          sum,
+          item
+        ) =>
+          sum +
+          (
+            item.definition
+              .comfort ??
+            0.008
+          ),
+        0
+      );
+
     const comfortMultiplier =
       clamp(
         1.02 +
         Math.min(
-          0.06,
-          decor.length * 0.01
+          0.08,
+          decorComfort
         ) -
         crowdingPenalty,
         0.85,
-        1.08
+        1.1
+      );
+
+    const waitingEffect =
+      waiting.reduce(
+        (
+          sum,
+          item
+        ) =>
+          sum +
+          (
+            item.definition
+              .queueEfficiency ??
+            0.03
+          ),
+        0
       );
 
     const waitingSupport =
@@ -328,11 +367,11 @@ class LayoutFlowSystem {
         ? clamp(
             1 +
             Math.min(
-              0.15,
-              waiting.length * 0.06
+              0.18,
+              waitingEffect
             ),
             1,
-            1.15
+            1.18
           )
         : 0.88;
 
