@@ -3,6 +3,7 @@ import { eventBus } from "../core/EventBus.js";
 import { restaurantSystem } from "./RestaurantSystem.js";
 import { reviewInsightSystem } from "./ReviewInsightSystem.js";
 import { layoutFlowSystem } from "./LayoutFlowSystem.js";
+import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -12,6 +13,62 @@ function clamp(value, min, max) {
 }
 
 class CustomerExperienceSystem {
+  getWeightedSegmentPreference(
+    demand,
+    field,
+    fallback = 50
+  ) {
+    const segments =
+      demand?.segments ??
+      [];
+
+    let total = 0;
+    let weighted = 0;
+
+    for (
+      const item
+      of segments
+    ) {
+      const amount =
+        Math.max(
+          0,
+          item.expectedVisitors ??
+          0
+        );
+
+      if (
+        amount <= 0
+      ) {
+        continue;
+      }
+
+      const segment =
+        customerSegmentSystem.get(
+          item.segmentId
+        );
+
+      if (!segment) {
+        continue;
+      }
+
+      total +=
+        amount;
+
+      weighted +=
+        (
+          segment[field] ??
+          fallback
+        ) *
+        amount;
+    }
+
+    return total > 0
+      ? weighted /
+        total
+      : fallback;
+  }
+
+
   getPriceScore(demand) {
     const segments =
       demand?.segments ?? [];
@@ -228,11 +285,35 @@ class CustomerExperienceSystem {
         waitScore * 0.12
       );
 
+    const repeatPreference =
+      this.getWeightedSegmentPreference(
+        demand,
+        "repeatPreference",
+        50
+      );
+
+    const repeatPreferenceFactor =
+      clamp(
+        0.75 +
+        repeatPreference /
+        200,
+        0.75,
+        1.25
+      );
+
+    const reviewPropensity =
+      this.getWeightedSegmentPreference(
+        demand,
+        "reviewPropensity",
+        50
+      );
+
     const repeatRate =
       Math.round(
         clamp(
           (satisfaction - 30) *
-            1.35,
+            1.35 *
+            repeatPreferenceFactor,
           0,
           90
         )
@@ -262,12 +343,23 @@ class CustomerExperienceSystem {
           )
         : oldSatisfaction;
 
+    const reviewRate =
+      clamp(
+        0.04 +
+        reviewPropensity /
+        100 *
+        0.14,
+        0.04,
+        0.18
+      );
+
     const reviewCount =
       served > 0
         ? Math.max(
             1,
             Math.round(
-              served * 0.12
+              served *
+              reviewRate
             )
           )
         : 0;
@@ -395,6 +487,24 @@ class CustomerExperienceSystem {
       layoutFlowScore:
         layout.flowScore,
       repeatRate,
+
+      repeatPreference:
+        Math.round(
+          repeatPreference
+        ),
+
+      reviewPropensity:
+        Math.round(
+          reviewPropensity
+        ),
+
+      reviewRate:
+        Number(
+          reviewRate.toFixed(
+            3
+          )
+        ),
+
       reviewScore:
         updated.reviewScore,
       reputation:
