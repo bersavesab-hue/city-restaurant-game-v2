@@ -737,7 +737,8 @@ class DishCenterPageSystem {
               menuMap.get(
                 dish.id
               ) ??
-              null
+              null,
+              restaurant.level
             )
         ),
 
