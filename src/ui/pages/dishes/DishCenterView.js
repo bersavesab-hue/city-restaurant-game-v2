@@ -17,6 +17,10 @@ import {
   DishResearchLab
 } from "./DishResearchLab.js";
 
+import {
+  INGREDIENT_ATLAS_DATA_URI
+} from "../../../data/ingredientAtlas.js";
+
 
 function escapeHtml(
   value
@@ -836,6 +840,11 @@ class DishCenterView {
 
 
   render() {
+    this.root.style.setProperty(
+      "--ingredient-atlas",
+      `url("${INGREDIENT_ATLAS_DATA_URI}")`
+    );
+
     this.page =
       this.pageSystem
         .getPage(
