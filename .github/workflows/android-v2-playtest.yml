@@ -34,7 +34,7 @@ jobs:
         run: npm install
 
       - name: Run V2 foundation smoke tests
-        run: node --test tests/foundation-v2-smoke.test.js tests/business-causality.test.js tests/business-analytics-causality-ui.test.js
+        run: node --test tests/foundation-v2-smoke.test.js tests/business-causality.test.js tests/pricing-decision-impact.test.js tests/business-analytics-causality-ui.test.js
 
       - name: Build V2 game bundle
         run: npm run build:android-js
