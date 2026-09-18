@@ -29,6 +29,9 @@ const tests = [
   "tests/operating-cycle.test.js",
   "tests/operating-day-e2e.test.js",
   "tests/formal-runtime-live-refresh.test.js",
+  "tests/formal-runtime-navigation-params.test.js",
+  "tests/analytics-live-refresh.test.js",
+  "tests/operating-feedback-ui.test.js",
   "tests/operating-analytics.test.js",
   "tests/business-analytics-ui.test.js",
 

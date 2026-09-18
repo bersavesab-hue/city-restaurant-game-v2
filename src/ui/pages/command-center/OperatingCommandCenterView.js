@@ -94,6 +94,73 @@ class OperatingCommandCenterView {
         </section>
 
 
+        ${
+          page.previousDay
+            ? `
+              <section class="command-center__daily-report">
+
+                <header>
+                  <div>
+                    <span>
+                      第${page.previousDay.day}天
+                    </span>
+
+                    <h2>
+                      昨日经营日报
+                    </h2>
+                  </div>
+
+                  <button
+                    type="button"
+                    data-page-target="analytics"
+                    data-page-period="day"
+                  >
+                    查看完整日报 →
+                  </button>
+                </header>
+
+
+                <div class="command-center__grid">
+
+                  <article>
+                    <span>营业额</span>
+                    <strong>
+                      ${money(
+                        page.previousDay.revenue
+                      )}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <span>订单</span>
+                    <strong>
+                      ${page.previousDay.orders}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <span>经营利润</span>
+                    <strong>
+                      ${money(
+                        page.previousDay.operatingProfit
+                      )}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <span>经营经验</span>
+                    <strong>
+                      +${page.previousDay.experienceGained}
+                    </strong>
+                  </article>
+
+                </div>
+
+              </section>
+            `
+            : ""
+        }
+
         <section class="command-center__priority">
 
           <h2>

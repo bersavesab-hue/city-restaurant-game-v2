@@ -278,6 +278,72 @@ class OperatingCommandCenterSystem {
   }
 
 
+  getPreviousDaySummary(
+    restaurantId
+  ) {
+    const currentDay =
+      this.getDay();
+
+
+    const settlements =
+      entitySystem.filter(
+        "daily_settlement",
+        item =>
+          item.restaurantId ===
+            restaurantId &&
+          item.day <
+            currentDay
+      );
+
+
+    if (
+      settlements.length ===
+      0
+    ) {
+      return null;
+    }
+
+
+    const latest =
+      [...settlements]
+        .sort(
+          (a, b) =>
+            b.day -
+            a.day
+        )[0];
+
+
+    return {
+      day:
+        latest.day,
+
+      orders:
+        latest.orders ?? 0,
+
+      revenue:
+        latest.revenue ?? 0,
+
+      ingredientCost:
+        latest.ingredientCost ?? 0,
+
+      payroll:
+        latest.payrollDue ??
+        latest.payroll ??
+        0,
+
+      operatingProfit:
+        latest.operatingProfit ?? 0,
+
+      cashOperatingProfit:
+        latest.cashOperatingProfit ??
+        latest.operatingProfit ??
+        0,
+
+      experienceGained:
+        latest.experienceGained ?? 0
+    };
+  }
+
   getInventoryRisk(
     restaurantId
   ) {
@@ -601,6 +667,12 @@ class OperatingCommandCenterSystem {
         restaurantId
       );
 
+
+    const previousDay =
+      this.getPreviousDaySummary(
+        restaurantId
+      );
+
     const workforce =
       safe(
         () =>
@@ -683,6 +755,7 @@ class OperatingCommandCenterSystem {
 
       sales,
       finance,
+      previousDay,
       capacity,
       inventory,
       workforce,

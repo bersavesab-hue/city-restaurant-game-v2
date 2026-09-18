@@ -429,9 +429,23 @@ class FormalPageRuntime {
             }
 
 
+            const navigationParams = {};
+
+
+            if (
+              element.dataset
+                .pagePeriod
+            ) {
+              navigationParams.period =
+                element.dataset
+                  .pagePeriod;
+            }
+
+
             onNavigate(
               target,
-              restaurantId
+              restaurantId,
+              navigationParams
             );
           };
 

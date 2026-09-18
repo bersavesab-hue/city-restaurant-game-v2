@@ -1,4 +1,8 @@
 import {
+  eventBus
+} from "../../../core/EventBus.js";
+
+import {
   businessAnalyticsPageSystem
 } from "./BusinessAnalyticsPageSystem.js";
 
@@ -194,6 +198,10 @@ class BusinessAnalyticsView {
 
     this.section =
       "overview";
+
+
+    this.liveUnsubscribers =
+      [];
   }
 
   mount(
@@ -224,9 +232,77 @@ class BusinessAnalyticsView {
     this.period =
       period;
 
+
+    this.bindLiveUpdates();
+
     this.render();
 
     return this;
+  }
+
+  bindLiveUpdates() {
+    for (
+      const unsubscribe
+      of this.liveUnsubscribers
+    ) {
+      unsubscribe?.();
+    }
+
+
+    this.liveUnsubscribers =
+      [];
+
+
+    const refresh =
+      payload => {
+        const changedRestaurantId =
+          payload
+            ?.restaurantId ??
+          payload
+            ?.settlement
+            ?.restaurantId ??
+          null;
+
+
+        if (
+          changedRestaurantId !==
+            null &&
+          changedRestaurantId !==
+            this.restaurantId
+        ) {
+          return;
+        }
+
+
+        this.render();
+      };
+
+
+    this.liveUnsubscribers.push(
+      eventBus.on(
+        "traffic:hourCompleted",
+        refresh
+      ),
+
+      eventBus.on(
+        "settlement:completed",
+        refresh
+      )
+    );
+  }
+
+
+  destroy() {
+    for (
+      const unsubscribe
+      of this.liveUnsubscribers
+    ) {
+      unsubscribe?.();
+    }
+
+
+    this.liveUnsubscribers =
+      [];
   }
 
   getPage() {
