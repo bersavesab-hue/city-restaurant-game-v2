@@ -229,7 +229,16 @@ class SupplyManagementView {
             ? page.inventory.map(
                 item => `
                   <article class="inventory-row risk-${item.level}">
-                    <div>
+                    <div class="inventory-main">
+                      <img
+                        class="ingredient-thumb"
+                        src="${escapeHtml(item.image)}"
+                        alt="${escapeHtml(item.ingredientName)}"
+                        loading="lazy"
+                        onerror="this.hidden=true"
+                      >
+
+                      <div>
                       <strong>
                         ${escapeHtml(
                           item.ingredientName
@@ -244,6 +253,7 @@ class SupplyManagementView {
                         在途
                         ${item.pending}
                       </span>
+                      </div>
                     </div>
 
                     <div>
@@ -347,7 +357,19 @@ class SupplyManagementView {
                 ${supplier.offers.map(
                   offer => `
                     <div class="supplier-offer">
-                      <div>
+                      <div class="supplier-offer__ingredient">
+                        <img
+                          class="ingredient-thumb"
+                          src="${escapeHtml(offer.image)}"
+                          alt="${escapeHtml(
+                            offer.ingredient?.name ??
+                            offer.ingredientId
+                          )}"
+                          loading="lazy"
+                          onerror="this.hidden=true"
+                        >
+
+                        <div>
                         <strong>
                           ${escapeHtml(
                             offer.ingredient?.name ??
@@ -362,6 +384,7 @@ class SupplyManagementView {
                           最低
                           ${offer.minimumOrder}
                         </span>
+                        </div>
                       </div>
 
                       <input
