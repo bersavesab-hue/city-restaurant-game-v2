@@ -1,13 +1,15 @@
 export const ECONOMIC_BASELINE = {
-  schemaVersion: 2,
-  snapshotId: "cn_reference_2026q3_seed",
+  schemaVersion: 3,
+  snapshotId: "cn_2026_09_real_price_snapshot",
   currency: "CNY",
   regionModel: "virtual_city_cn_reference",
 
   sourcePolicy: {
     mode: "snapshot",
     description: "现实数据只作为基准锚点；游戏价格由基准值与城市、季节、供需、品质、事件、合同等系数组合计算。",
-    refreshStrategy: "版本化快照，可由后续公开统计/批发市场/行业数据导入器覆盖，不允许业务页面写死价格。",
+    pricingScale: 1,
+    strictNominalRmb: true,
+    refreshStrategy: "版本化现实价格快照。优先使用农业农村部、商务部、国家统计局及地方公开监测数据；无官方点价时使用可追溯市场样本，不允许业务页面写死或使用纯游戏化随机价格。",
     supportedSourceKinds: [
       "official_statistics",
       "wholesale_market",
@@ -31,14 +33,124 @@ export const ECONOMIC_BASELINE = {
   },
 
   ingredientReference: {
-    pork: { unit: "kg", referencePrice: 26, volatility: 0.18 },
-    chicken: { unit: "kg", referencePrice: 18, volatility: 0.14 },
-    egg: { unit: "piece", referencePrice: 0.75, volatility: 0.11 },
-    tomato: { unit: "kg", referencePrice: 7, volatility: 0.22 },
-    pepper: { unit: "kg", referencePrice: 9, volatility: 0.24 },
-    rice: { unit: "kg", referencePrice: 6, volatility: 0.08 },
-    soy_sauce: { unit: "l", referencePrice: 18, volatility: 0.07 },
-    oil: { unit: "l", referencePrice: 13, volatility: 0.12 }
+    pork: {
+      sourceUnit: "kg",
+      gameUnit: "g",
+      referencePrice: 17.48,
+      volatility: 0.18,
+      marketLevel: "wholesale",
+      observedPeriod: "2026-09-07/2026-09-13",
+      sourceKind: "official_wholesale_monitoring",
+      sourceName: "商务部市场运行和消费促进司",
+      sourceUrl: "https://cif.mofcom.gov.cn/cif/html/price_index/synpc_index/2026/9/1789612766076.html"
+    },
+
+    chicken: {
+      sourceUnit: "kg",
+      gameUnit: "g",
+      referencePrice: 17.29,
+      volatility: 0.14,
+      marketLevel: "wholesale",
+      observedDate: "2026-09-08",
+      sourceKind: "official_wholesale_monitoring",
+      sourceName: "农业农村部市场与信息化司",
+      sourceUrl: "https://cif.mofcom.gov.cn/newsite/html/shenzhen/html/24454065/2026/9/9/1788943802796.html"
+    },
+
+    egg: {
+      sourceUnit: "kg",
+      gameUnit: "piece",
+      referencePrice: 10.88,
+      gramsPerPiece: 55,
+      volatility: 0.11,
+      marketLevel: "wholesale",
+      observedDate: "2026-09-08",
+      sourceKind: "official_wholesale_monitoring",
+      sourceName: "农业农村部市场与信息化司",
+      sourceUrl: "https://cif.mofcom.gov.cn/newsite/html/shenzhen/html/24454065/2026/9/9/1788943802796.html"
+    },
+
+    tomato: {
+      sourceUnit: "kg",
+      gameUnit: "g",
+      referencePrice: 6.27,
+      volatility: 0.22,
+      marketLevel: "retail_36_city",
+      observedPeriod: "2026-08-24/2026-08-30",
+      sourceKind: "official_retail_monitoring",
+      sourceName: "商务部市场运行和消费促进司",
+      sourceUrl: "https://cif.mofcom.gov.cn/cif/html/nfcpdt_pc/2026/9/1788333058708.html"
+    },
+
+    pepper: {
+      sourceUnit: "kg",
+      gameUnit: "g",
+      referencePrice: 7.65,
+      volatility: 0.24,
+      marketLevel: "retail_36_city",
+      observedPeriod: "2026-09-07/2026-09-13",
+      sourceKind: "official_retail_monitoring",
+      sourceName: "商务部市场运行和消费促进司",
+      sourceUrl: "https://cif.mofcom.gov.cn/cif/html/nfcpdt_pc/2026/9/1789611921994.html"
+    },
+
+    rice: {
+      sourceUnit: "kg",
+      gameUnit: "g",
+      referencePrice: 6.41,
+      volatility: 0.08,
+      marketLevel: "retail_36_city",
+      observedPeriod: "2026-09-07/2026-09-13",
+      sourceKind: "official_retail_monitoring",
+      sourceName: "商务部市场运行和消费促进司",
+      sourceUrl: "https://cif.mofcom.gov.cn/cif/html/nfcpdt_pc/2026/9/1789611921994.html"
+    },
+
+    soy_sauce: {
+      sourceUnit: "l",
+      gameUnit: "ml",
+      referencePrice: 18,
+      volatility: 0.07,
+      marketLevel: "market_sample",
+      observedPeriod: "2026-Q3",
+      sourceKind: "market_sample",
+      sourceName: "大众商超调味品样本"
+    },
+
+    oil: {
+      sourceUnit: "l",
+      gameUnit: "ml",
+      referencePrice: 12.66,
+      volatility: 0.12,
+      marketLevel: "retail_36_city",
+      observedPeriod: "2026-09-07/2026-09-13",
+      sourceKind: "official_retail_monitoring",
+      sourceName: "商务部市场运行和消费促进司",
+      sourceUrl: "https://cif.mofcom.gov.cn/cif/html/nfcpdt_pc/2026/9/1789611921994.html"
+    }
+  },
+
+  laborMarketReference: {
+    industry:
+      "住宿和餐饮业",
+
+    statisticalYear:
+      2024,
+
+    privateUnitAnnualAverage:
+      54042,
+
+    privateUnitMonthlyAverage:
+      4503.5,
+
+    sourceKind:
+      "official_statistics",
+
+    sourceName:
+      "国家统计局",
+
+    sourceUrl:
+      "https://www.stats.gov.cn/WZWSREL2VuZ2xpc2gvUHJlc3NSZWxlYXNlLzIwMjUwNS90MjAyNTA1MjBfMTk1OTg4NS5odG1s"
   },
 
   laborReference: {
