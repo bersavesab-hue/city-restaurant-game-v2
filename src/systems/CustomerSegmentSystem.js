@@ -1,4 +1,8 @@
 import { dataRegistry } from "../core/DataRegistry.js";
+import {
+  CUSTOMER_SEGMENT_SCHEMA_VERSION,
+  validateFormalCustomerSegment
+} from "../data/customerSegmentRules.js";
 
 const COLLECTION =
   "customer_segments";
@@ -166,6 +170,15 @@ function validateSegment(item) {
     }
   }
 
+  if (
+    item.schemaVersion ===
+      CUSTOMER_SEGMENT_SCHEMA_VERSION
+  ) {
+    validateFormalCustomerSegment(
+      item
+    );
+  }
+
   return true;
 }
 
@@ -230,6 +243,46 @@ class CustomerSegmentSystem {
       segment.hourWeights?.[
         hour
       ] ?? 0
+    );
+  }
+
+  getDistrictAffinity(
+    id,
+    zoneType
+  ) {
+    const segment =
+      this.get(id);
+
+    if (!segment) {
+      return 0;
+    }
+
+    return (
+      segment
+        .districtAffinity?.[
+          zoneType
+        ] ??
+      0.7
+    );
+  }
+
+  getChannelPreference(
+    id,
+    channelId
+  ) {
+    const segment =
+      this.get(id);
+
+    if (!segment) {
+      return 0;
+    }
+
+    return (
+      segment
+        .channelPreferences?.[
+          channelId
+        ] ??
+      0
     );
   }
 }
