@@ -95,7 +95,7 @@ class RestaurantDishSystem {
   ensureOwned({
     restaurantId,
     dishId,
-    initialQualityScore = null
+    initialRecipeQualityScore = null
   }) {
     restaurantSystem.get(
       restaurantId
@@ -126,17 +126,17 @@ class RestaurantDishSystem {
       );
     }
 
-    const qualityScore =
+    const recipeQualityScore =
       clamp(
         Number.isFinite(
-          initialQualityScore
+          initialRecipeQualityScore
         )
-          ? initialQualityScore
+          ? initialRecipeQualityScore
           : (
               Number.isFinite(
-                dish.researchQualityScore
+                dish.researchScore
               )
-                ? dish.researchQualityScore
+                ? dish.researchScore
                 : 60
             ),
         1,
@@ -148,7 +148,7 @@ class RestaurantDishSystem {
     const rank =
       getDishRank({
         masteryLevel,
-        qualityScore
+        recipeQualityScore
       });
 
     const time =
@@ -179,7 +179,7 @@ class RestaurantDishSystem {
 
         masteryQualityBonus: 0,
 
-        qualityScore,
+        recipeQualityScore,
 
         dishRankId:
           rank.id,
@@ -215,7 +215,7 @@ class RestaurantDishSystem {
 
         outputQuality:
           getCookOutputLevel(
-            qualityScore
+            recipeQualityScore
           )
       },
       {
