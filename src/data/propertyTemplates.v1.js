@@ -887,7 +887,7 @@ export const PROPERTY_TEMPLATES_V1 =
         water: 88,
         gas: 86,
         power: 84,
-        exhaust: 9
+        exhaust: 90
       }),
       districtWeights: {
         residential: 1.45,
@@ -961,8 +961,8 @@ export const PROPERTY_TEMPLATES_V1 =
       listingLife: [24, 65],
       lease: LEASE_DESTINATION,
       kitchen: kitchenProfile({
-        water: 9,
-        gas: 9,
+        water: 90,
+        gas: 90,
         power: 86,
         exhaust: 94
       }),
