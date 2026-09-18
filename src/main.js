@@ -25,6 +25,7 @@ import { openingInventorySystem } from "./systems/OpeningInventorySystem.js";
 import { openingPermitSystem } from "./systems/OpeningPermitSystem.js";
 import { financeSystem } from "./systems/FinanceSystem.js";
 import { employeeSystem } from "./systems/EmployeeSystem.js";
+import { employeeGenerationSystem } from "./systems/EmployeeGenerationSystem.js";
 import { employeeWorkSystem } from "./systems/EmployeeWorkSystem.js";
 import { employeeStaffingSystem } from "./systems/EmployeeStaffingSystem.js";
 import { employeeCareerSystem } from "./systems/EmployeeCareerSystem.js";
@@ -139,6 +140,7 @@ function bootstrap() {
       openingInventorySystem,
       financeSystem,
       employeeSystem,
+      employeeGenerationSystem,
       employeeWorkSystem,
       employeeStaffingSystem,
       employeeCareerSystem,
