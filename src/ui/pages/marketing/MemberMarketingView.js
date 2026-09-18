@@ -232,7 +232,7 @@ class MemberMarketingView {
         </section>
 
         <section>
-          <h2>会员活动ROI</h2>
+          <h2>会员营销活动ROI</h2>
 
           ${
             page.campaigns.length
