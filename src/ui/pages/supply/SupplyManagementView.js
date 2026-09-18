@@ -353,8 +353,23 @@ class SupplyManagementView {
                 </span>
               </div>
 
+              <div class="supplier-offer-summary">
+                可供
+                <strong>
+                  ${supplier.offerCount}
+                </strong>
+                种食材
+                ·
+                当前预览前6种
+              </div>
+
               <div class="supplier-offers">
-                ${supplier.offers.map(
+                ${supplier.offers
+                  .slice(
+                    0,
+                    6
+                  )
+                  .map(
                   offer => `
                     <div class="supplier-offer">
                       <div class="supplier-offer__ingredient">
