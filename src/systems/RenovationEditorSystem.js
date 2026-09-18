@@ -62,7 +62,13 @@ class RenovationEditorSystem {
       return "kitchen";
     }
 
-    if (definition.id === "waiting_bench") {
+    if (
+      renovationSystem
+        .hasFurnitureRole(
+          definition,
+          "waiting"
+        )
+    ) {
       return "waiting";
     }
 
@@ -260,6 +266,23 @@ class RenovationEditorSystem {
           .getFurnitureDefinition(
             placement.furnitureId
           );
+
+      const restaurant =
+        restaurantSystem.get(
+          restaurantId
+        );
+
+      if (
+        (
+          restaurant.level ??
+          1
+        ) <
+          definition.unlockLevel
+      ) {
+        throw new Error(
+          `Furniture "${definition.id}" unlocks at store level ${definition.unlockLevel}`
+        );
+      }
 
       if (
         definition.requiresFeature &&
