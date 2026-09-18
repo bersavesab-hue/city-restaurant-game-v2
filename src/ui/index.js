@@ -247,3 +247,11 @@ export {
   moreHubView,
   MoreHubView
 } from "./pages/more/index.js";
+
+
+export {
+  marketStrategyPageSystem,
+  MarketStrategyPageSystem,
+  marketStrategyView,
+  MarketStrategyView
+} from "./pages/market-strategy/index.js";
