@@ -11,6 +11,7 @@ import { storeProgressSystem } from "./StoreProgressSystem.js";
 import { renovationSystem } from "./RenovationSystem.js";
 import { layoutFlowSystem } from "./LayoutFlowSystem.js";
 import { renovationPlanningSystem } from "./RenovationPlanningSystem.js";
+import { renovationRealityCostSystem } from "./RenovationRealityCostSystem.js";
 
 const CATEGORY_LABELS = Object.freeze({
   dining: "桌椅",
@@ -759,7 +760,28 @@ class RenovationEditorSystem {
     }
 
     const purchaseCost =
-      equipment + decoration;
+      equipment +
+      decoration;
+
+    const liveLayout =
+      renovationSystem
+        .getLayout(
+          restaurantId
+        );
+
+    const construction =
+      renovationRealityCostSystem
+        .calculateForLayout(
+          liveLayout
+        );
+
+    const baseConstructionCost =
+      construction
+        .baseConstructionCost;
+
+    const totalProjectCost =
+      purchaseCost +
+      baseConstructionCost;
 
     const balance =
       financeSystem.getBalance(
@@ -768,13 +790,46 @@ class RenovationEditorSystem {
 
     return {
       balance,
+
       equipment,
+
       decoration,
+
       purchaseCost,
+
+      furnishingCost:
+        purchaseCost,
+
+      baseConstructionCost,
+
+      constructionRatePerSquareMeter:
+        construction
+          .ratePerSquareMeter,
+
+      constructionTier:
+        construction.tier,
+
+      constructionArea:
+        construction.area,
+
+      constructionSource:
+        construction.source,
+
+      priceModel:
+        "reality_1_to_1_v2",
+
+      currency:
+        "CNY",
+
+      totalProjectCost,
+
       remaining:
-        balance - purchaseCost,
+        balance -
+        totalProjectCost,
+
       affordable:
-        balance >= purchaseCost
+        balance >=
+        totalProjectCost
     };
   }
 
