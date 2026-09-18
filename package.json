@@ -23,7 +23,8 @@
     "test:data:recipes": "node --test tests/formal-dish-recipe-data.test.js tests/cooking-method-recipe-schema.test.js tests/dish-research-preview.test.js tests/dish-research.test.js",
     "test:data:suppliers": "node --test tests/formal-supplier-data.test.js tests/supply-management.test.js",
     "test:data:equipment": "node --test tests/formal-equipment-data.test.js tests/equipment-maintenance.test.js",
-    "test:data:renovation": "node --test tests/formal-renovation-furniture-data.test.js tests/renovation-editor.test.js tests/renovation-planning.test.js tests/renovation-mobile-page.test.js"
+    "test:data:renovation": "node --test tests/formal-renovation-furniture-data.test.js tests/formal-renovation-template-data.test.js tests/renovation-editor.test.js tests/renovation-planning.test.js tests/renovation-mobile-page.test.js",
+    "test:data:renovation-templates": "node --test tests/formal-renovation-template-data.test.js tests/renovation-planning.test.js tests/renovation-mobile-page.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
