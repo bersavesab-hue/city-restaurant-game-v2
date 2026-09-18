@@ -9,8 +9,15 @@ import {
   INGREDIENT_VISUALS,
   getIngredientVisual,
   getIngredientVisualByIndex,
-  getIngredientImagePath
+  getIngredientImagePath,
+  getIngredientSpriteStyle
 } from "../src/data/ingredientVisuals.js";
+
+import {
+  INGREDIENT_ATLAS_DATA_URI,
+  INGREDIENT_ATLAS_COLUMNS,
+  INGREDIENT_ATLAS_ROWS
+} from "../src/data/ingredientAtlas.js";
 
 test(
   "220种食材与220个美术槽位严格1比1对应",
@@ -164,5 +171,64 @@ test(
         "鸡胸肉"
       ]
     );
+  }
+);
+
+
+test(
+  "220种正式食材全部拥有可用图集槽位",
+  () => {
+    assert.match(
+      INGREDIENT_ATLAS_DATA_URI,
+      /^data:image\/webp;base64,UklGR/
+    );
+
+    assert.equal(
+      INGREDIENT_ATLAS_COLUMNS,
+      16
+    );
+
+    assert.equal(
+      INGREDIENT_ATLAS_ROWS,
+      17
+    );
+
+    for (
+      const visual
+      of INGREDIENT_VISUALS
+    ) {
+      assert.equal(
+        Number.isInteger(
+          visual.spriteSlot
+        ),
+        true
+      );
+
+      assert.equal(
+        visual.spriteSlot >= 1 &&
+        visual.spriteSlot <= 271,
+        true
+      );
+
+      assert.equal(
+        visual.spriteColumn >= 0 &&
+        visual.spriteColumn < 16,
+        true
+      );
+
+      assert.equal(
+        visual.spriteRow >= 0 &&
+        visual.spriteRow < 17,
+        true
+      );
+
+      assert.match(
+        getIngredientSpriteStyle(
+          visual.id,
+          40
+        ),
+        /background-position:/
+      );
+    }
   }
 );
