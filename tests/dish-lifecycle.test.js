@@ -12,7 +12,7 @@ const {
 } = app.systems;
 
 test(
-  "菜品支持随机研发等级品质熟练度销量成本利润口碑和招牌成长",
+  "菜品支持研发评分配方品质熟练度出品质量销量利润和长期品阶成长",
   () => {
     ingredientCatalogSystem.load(
       [
@@ -106,7 +106,7 @@ test(
         restaurant.id,
         developed.dish.id,
         {
-          qualityScore: 72,
+          recipeQualityScore: 72,
           masteryLevel: 3,
           masteryXp: 220
         }
