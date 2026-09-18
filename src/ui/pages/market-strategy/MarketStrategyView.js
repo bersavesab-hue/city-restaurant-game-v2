@@ -84,6 +84,163 @@ function eventCategoryName(
 }
 
 
+function marketingCategoryName(
+  value
+) {
+  return {
+    local_acquisition: "本地拉新",
+    discount_conversion: "优惠转化",
+    brand_building: "品牌建设",
+    content_social: "内容传播",
+    delivery_growth: "外卖与自取",
+    community_scene: "社区场景",
+    member_retention: "会员复购",
+    group_business: "团餐与宴请",
+    seasonal_event: "节庆主题"
+  }[value] ??
+  "其他营销";
+}
+
+
+function marketingChannelName(
+  value
+) {
+  return {
+    dine_in: "堂食",
+    pickup: "到店自取",
+    delivery: "外卖",
+    reservation: "预约"
+  }[value] ??
+  value;
+}
+
+
+function marketingStatusText(
+  item
+) {
+  if (item.active) {
+    return "执行中";
+  }
+
+  if (item.canStart) {
+    return "可执行";
+  }
+
+  const reasons =
+    item.lockedReasons ??
+    [];
+
+  if (
+    reasons.includes(
+      "restaurant_level"
+    )
+  ) {
+    return (
+      "需门店 Lv." +
+      item.minRestaurantLevel
+    );
+  }
+
+  if (
+    reasons.includes(
+      "required_channel"
+    )
+  ) {
+    return (
+      "需开启：" +
+      (
+        item.missingChannels ??
+        []
+      )
+        .map(
+          marketingChannelName
+        )
+        .join("、")
+    );
+  }
+
+  if (
+    reasons.includes(
+      "cooldown"
+    )
+  ) {
+    return (
+      "冷却至第" +
+      item.availableDay +
+      "天"
+    );
+  }
+
+  if (
+    reasons.includes(
+      "exclusive_group"
+    )
+  ) {
+    return "同类营销正在执行";
+  }
+
+  if (
+    reasons.includes(
+      "active_limit"
+    )
+  ) {
+    return "同时最多执行2项";
+  }
+
+  if (
+    reasons.includes(
+      "insufficient_funds"
+    )
+  ) {
+    return "资金不足";
+  }
+
+  if (
+    reasons.includes(
+      "already_active"
+    )
+  ) {
+    return "执行中";
+  }
+
+  return "当前不可执行";
+}
+
+
+function groupMarketingActions(
+  actions
+) {
+  const groups =
+    new Map();
+
+  for (
+    const item
+    of actions
+  ) {
+    if (
+      !groups.has(
+        item.category
+      )
+    ) {
+      groups.set(
+        item.category,
+        []
+      );
+    }
+
+    groups.get(
+      item.category
+    ).push(
+      item
+    );
+  }
+
+  return [
+    ...groups.entries()
+  ];
+}
+
+
 class MarketStrategyView {
   constructor({
     pageSystem =
@@ -289,47 +446,77 @@ class MarketStrategyView {
 
           <div>
 
-            ${page.actions.available
+            ${groupMarketingActions(
+              page.actions.available
+            )
               .map(
-                item => `
-                  <article>
-
-                    <strong>
-                      ${item.name}
-                    </strong>
-
-                    <span>
-                      ${money(
-                        item.cost
+                ([
+                  category,
+                  items
+                ]) => `
+                  <section
+                    class="market-strategy__action-group"
+                    data-marketing-category="${category}"
+                  >
+                    <h3>
+                      ${marketingCategoryName(
+                        category
                       )}
-                      ·
-                      ${item.durationDays}天
-                    </span>
+                    </h3>
 
-                    <small>
-                      ${item.active
-                        ? "执行中"
-                        : item.canStart
-                          ? "可执行"
-                          : "当前不可执行"
-                      }
-                    </small>
+                    <div>
+                      ${items
+                        .map(
+                          item => `
+                            <article>
 
-                    <button
-                      type="button"
-                      data-market-action="${item.id}"
-                      ${item.canStart
-                        ? ""
-                        : "disabled"
-                      }
-                    >
-                      ${item.active
-                        ? "执行中"
-                        : "开始行动"
-                      }
-                    </button>
+                              <strong>
+                                ${item.name}
+                              </strong>
 
-                  </article>
+                              <span>
+                                ${money(
+                                  item.cost
+                                )}
+                                ·
+                                ${item.durationDays}天
+                                ·
+                                Lv.${item.minRestaurantLevel}
+                              </span>
+
+                              <p>
+                                ${item.description}
+                              </p>
+
+                              <small>
+                                ${marketingStatusText(
+                                  item
+                                )}
+                                ·
+                                冷却
+                                ${item.cooldownDays}天
+                              </small>
+
+                              <button
+                                type="button"
+                                data-market-action="${item.id}"
+                                ${item.canStart
+                                  ? ""
+                                  : "disabled"
+                                }
+                              >
+                                ${item.active
+                                  ? "执行中"
+                                  : "开始行动"
+                                }
+                              </button>
+
+                            </article>
+                          `
+                        )
+                        .join("")}
+                    </div>
+                  </section>
                 `
               )
               .join("")}
