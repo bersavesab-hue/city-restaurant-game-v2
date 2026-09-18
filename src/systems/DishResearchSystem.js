@@ -17,6 +17,10 @@ import {
 } from "../data/dishCatalogRules.js";
 
 import {
+  COOKING_METHOD_MAP
+} from "../data/cookingMethods.v1.js";
+
+import {
   restaurantDishSystem
 } from "./RestaurantDishSystem.js";
 
@@ -43,77 +47,7 @@ const CATEGORIES =
   );
 
 const METHODS =
-  Object.freeze({
-    stir_fry: {
-      id: "stir_fry",
-      name: "炒制",
-      baseMinutes: 12,
-      difficultyBonus: 15,
-      techniqueScore: 76,
-      defaultCategory:
-        "stir_fry"
-    },
-
-    steam: {
-      id: "steam",
-      name: "蒸制",
-      baseMinutes: 18,
-      difficultyBonus: 10,
-      techniqueScore: 80,
-      defaultCategory:
-        "rice"
-    },
-
-    boil: {
-      id: "boil",
-      name: "煮制",
-      baseMinutes: 15,
-      difficultyBonus: 8,
-      techniqueScore: 72,
-      defaultCategory:
-        "noodle"
-    },
-
-    stew: {
-      id: "stew",
-      name: "炖煮",
-      baseMinutes: 35,
-      difficultyBonus: 20,
-      techniqueScore: 82,
-      defaultCategory:
-        "hotpot"
-    },
-
-    fry: {
-      id: "fry",
-      name: "炸制",
-      baseMinutes: 12,
-      difficultyBonus: 18,
-      techniqueScore: 74,
-      defaultCategory:
-        "fast_food"
-    },
-
-    cold_mix: {
-      id: "cold_mix",
-      name: "凉拌",
-      baseMinutes: 8,
-      difficultyBonus: 5,
-      techniqueScore: 70,
-      defaultCategory:
-        "stir_fry"
-    },
-
-    bake: {
-      id: "bake",
-      name: "烤制",
-      baseMinutes: 25,
-      difficultyBonus: 20,
-      techniqueScore: 79,
-      defaultCategory:
-        "fast_food"
-    }
-  });
+  COOKING_METHOD_MAP;
 
 class DishResearchSystem {
   validateIngredients(
