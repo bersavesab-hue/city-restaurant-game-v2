@@ -192,8 +192,10 @@ class OrderSystem {
       );
 
     salesChannelSystem
-      .ensureRestaurantChannels(
-        restaurantId
+      .assertCapacity(
+        restaurantId,
+        channelId,
+        1
       );
 
     const channelSettlement =
@@ -608,36 +610,6 @@ class OrderSystem {
           channelId,
           grossRevenue:
             totalRevenue,
-
-          paidAmount:
-            totalRevenue,
-
-          channelId,
-
-          channelGrossRevenue:
-            channelSettlement.grossRevenue,
-
-          channelCommission:
-            channelSettlement.commission,
-
-          channelPackagingCost:
-            channelSettlement.packagingCost,
-
-          channelFees:
-            channelSettlement.fees,
-
-          channelNetRevenue:
-            channelSettlement.netRevenue,
-
-          channelCommissionTransactionId:
-            channelCommissionPayment
-              ?.transaction?.id ??
-            null,
-
-          channelPackagingTransactionId:
-            channelPackagingPayment
-              ?.transaction?.id ??
-            null,
           orderCount
         });
 
@@ -691,6 +663,36 @@ class OrderSystem {
           aggregate: true,
           orderCount,
           status: "completed",
+
+          channelId,
+
+          channelGrossRevenue:
+            channelSettlement.grossRevenue,
+
+          channelCommission:
+            channelSettlement.commission,
+
+          channelPackagingCost:
+            channelSettlement.packagingCost,
+
+          channelFees:
+            channelSettlement.fees,
+
+          channelNetRevenue:
+            channelSettlement.netRevenue,
+
+          channelCommissionTransactionId:
+            channelCommissionPayment
+              ?.transaction?.id ??
+            null,
+
+          channelPackagingTransactionId:
+            channelPackagingPayment
+              ?.transaction?.id ??
+            null,
+
+          paidAmount:
+            totalRevenue,
 
           chefEmployeeId:
             chef.employee.id,
