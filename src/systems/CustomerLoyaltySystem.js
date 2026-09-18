@@ -7,6 +7,10 @@ import {
 } from "../core/GameState.js";
 
 import {
+  eventBus
+} from "../core/EventBus.js";
+
+import {
   customerSystem
 } from "./CustomerSystem.js";
 
@@ -14,44 +18,21 @@ import {
   restaurantSystem
 } from "./RestaurantSystem.js";
 
-const MEMBER_LEVELS = Object.freeze([
-  {
-    id: "member",
-    name: "注册会员",
-    minVisits: 0,
-    minSpend: 0,
-    minPoints: 0,
-    discount: 0,
-    pointMultiplier: 1
-  },
-  {
-    id: "silver",
-    name: "银卡会员",
-    minVisits: 3,
-    minSpend: 3000,
-    minPoints: 30,
-    discount: 2,
-    pointMultiplier: 1.1
-  },
-  {
-    id: "gold",
-    name: "金卡会员",
-    minVisits: 8,
-    minSpend: 12000,
-    minPoints: 120,
-    discount: 4,
-    pointMultiplier: 1.25
-  },
-  {
-    id: "black",
-    name: "黑金会员",
-    minVisits: 20,
-    minSpend: 40000,
-    minPoints: 400,
-    discount: 6,
-    pointMultiplier: 1.5
-  }
-]);
+import {
+  customerSegmentSystem
+} from "./CustomerSegmentSystem.js";
+
+import {
+  MEMBER_LEVELS_V1
+} from "../data/memberLevels.v1.js";
+
+import {
+  MEMBER_POINT_POLICY,
+  getMemberEnrollmentPropensity
+} from "../data/memberProgramRules.js";
+
+const MEMBER_LEVELS =
+  MEMBER_LEVELS_V1;
 
 function clamp(
   value,
@@ -81,14 +62,26 @@ function requirePositiveInteger(
   }
 }
 
+function currentDay() {
+  return gameState
+    .getSection(
+      "time"
+    ).day;
+}
+
 class CustomerLoyaltySystem {
   getLevelByStats({
     visits = 0,
     totalSpend = 0,
-    points = 0
+    points = 0,
+    lifetimePoints = null
   }) {
     let result =
       MEMBER_LEVELS[0];
+
+    const qualificationPoints =
+      lifetimePoints ??
+      points;
 
     for (
       const level
@@ -99,8 +92,8 @@ class CustomerLoyaltySystem {
           level.minVisits &&
         totalSpend >=
           level.minSpend &&
-        points >=
-          level.minPoints
+        qualificationPoints >=
+          level.minLifetimePoints
       ) {
         result = level;
       }
@@ -124,6 +117,54 @@ class CustomerLoyaltySystem {
     );
   }
 
+  getLevelIndex(id) {
+    return MEMBER_LEVELS
+      .findIndex(
+        item =>
+          item.id === id
+      );
+  }
+
+  getEnrollmentPropensity(
+    segmentId
+  ) {
+    if (!segmentId) {
+      return 50;
+    }
+
+    try {
+      return getMemberEnrollmentPropensity(
+        customerSegmentSystem.get(
+          segmentId
+        )
+      );
+    } catch {
+      return 50;
+    }
+  }
+
+  shouldAutoEnroll({
+    segmentId,
+    satisfaction,
+    spend = 0
+  }) {
+    return (
+      this.getEnrollmentPropensity(
+        segmentId
+      ) >=
+        MEMBER_POINT_POLICY
+          .enrollmentThreshold &&
+      Number(
+        satisfaction
+      ) >=
+        MEMBER_POINT_POLICY
+          .enrollmentMinSatisfaction &&
+      Number(
+        spend
+      ) > 0
+    );
+  }
+
   findMember(
     restaurantId,
     customerId
@@ -144,7 +185,8 @@ class CustomerLoyaltySystem {
   enrollMember({
     restaurantId,
     customerId,
-    segmentId = null
+    segmentId = null,
+    source = "manual"
   }) {
     restaurantSystem.get(
       restaurantId
@@ -165,37 +207,381 @@ class CustomerLoyaltySystem {
     }
 
     const day =
-      gameState.getSection(
-        "time"
-      ).day;
+      currentDay();
 
-    return entitySystem.create(
-      "member_profile",
+    const member =
+      entitySystem.create(
+        "member_profile",
+        {
+          restaurantId,
+          customerId,
+          segmentId,
+
+          joinedDay: day,
+          enrollmentSource:
+            source,
+
+          lastVisitDay: null,
+
+          visits: 0,
+          repeatVisits: 0,
+
+          totalSpend: 0,
+          averageSpend: 0,
+          averageSatisfaction: 0,
+
+          points: 0,
+          lifetimePoints: 0,
+          lifetimeRedeemedPoints: 0,
+          lifetimeExpiredPoints: 0,
+
+          levelId: "member",
+          highestLevelId: "member",
+          lastLevelChangeDay:
+            day,
+
+          favoriteDishCounts: {},
+
+          lastOrderId: null
+        }
+      );
+
+    eventBus.emit(
+      "member:enrolled",
       {
         restaurantId,
         customerId,
+        memberId:
+          member.id,
         segmentId,
-
-        joinedDay: day,
-        lastVisitDay: null,
-
-        visits: 0,
-        repeatVisits: 0,
-
-        totalSpend: 0,
-        averageSpend: 0,
-        averageSatisfaction: 0,
-
-        points: 0,
-        lifetimePoints: 0,
-
-        levelId: "member",
-
-        favoriteDishCounts: {},
-
-        lastOrderId: null
+        source
       }
     );
+
+    return member;
+  }
+
+  listPointLots(
+    memberProfileId
+  ) {
+    return entitySystem
+      .filter(
+        "member_point_lot",
+        item =>
+          item.memberProfileId ===
+            memberProfileId
+      )
+      .sort(
+        (a, b) =>
+          a.expiresDay -
+            b.expiresDay ||
+          a.earnedDay -
+            b.earnedDay
+      );
+  }
+
+  ensurePointLedger(
+    member
+  ) {
+    const lots =
+      this.listPointLots(
+        member.id
+      );
+
+    if (
+      lots.length === 0 &&
+      (
+        member.points ??
+        0
+      ) > 0
+    ) {
+      const day =
+        currentDay();
+
+      entitySystem.create(
+        "member_point_lot",
+        {
+          memberProfileId:
+            member.id,
+          restaurantId:
+            member.restaurantId,
+          customerId:
+            member.customerId,
+
+          source:
+            "legacy_migration",
+
+          earnedPoints:
+            member.points,
+
+          remainingPoints:
+            member.points,
+
+          earnedDay:
+            day,
+
+          expiresDay:
+            day +
+            MEMBER_POINT_POLICY
+              .expiryDays -
+            1,
+
+          status:
+            "active"
+        }
+      );
+    }
+
+    return this.listPointLots(
+      member.id
+    );
+  }
+
+  expirePointsForMember(
+    memberOrRestaurantId,
+    customerId = null,
+    day = currentDay()
+  ) {
+    let member =
+      typeof memberOrRestaurantId ===
+        "object"
+        ? memberOrRestaurantId
+        : this.findMember(
+            memberOrRestaurantId,
+            customerId
+          );
+
+    if (!member) {
+      return null;
+    }
+
+    this.ensurePointLedger(
+      member
+    );
+
+    let expired = 0;
+
+    for (
+      const lot
+      of this.listPointLots(
+        member.id
+      )
+    ) {
+      if (
+        lot.status ===
+          "active" &&
+        lot.remainingPoints > 0 &&
+        lot.expiresDay <
+          day
+      ) {
+        expired +=
+          lot.remainingPoints;
+
+        entitySystem.update(
+          "member_point_lot",
+          lot.id,
+          {
+            remainingPoints: 0,
+            status: "expired",
+            expiredDay: day
+          }
+        );
+      }
+    }
+
+    if (
+      expired >
+      0
+    ) {
+      member =
+        entitySystem.update(
+          "member_profile",
+          member.id,
+          {
+            points:
+              Math.max(
+                0,
+                (
+                  member.points ??
+                  0
+                ) -
+                expired
+              ),
+
+            lifetimeExpiredPoints:
+              (
+                member
+                  .lifetimeExpiredPoints ??
+                0
+              ) +
+              expired
+          }
+        );
+
+      eventBus.emit(
+        "member:pointsExpired",
+        {
+          restaurantId:
+            member.restaurantId,
+          customerId:
+            member.customerId,
+          memberId:
+            member.id,
+          expiredPoints:
+            expired,
+          day
+        }
+      );
+    }
+
+    return member;
+  }
+
+  redeemPoints({
+    restaurantId,
+    customerId,
+    points
+  }) {
+    requirePositiveInteger(
+      points,
+      "points"
+    );
+
+    if (
+      points === 0
+    ) {
+      return {
+        pointsUsed: 0,
+        remainingPoints:
+          this.findMember(
+            restaurantId,
+            customerId
+          )?.points ??
+          0
+      };
+    }
+
+    let member =
+      this.findMember(
+        restaurantId,
+        customerId
+      );
+
+    if (!member) {
+      throw new Error(
+        "Customer is not a member of this restaurant"
+      );
+    }
+
+    member =
+      this.expirePointsForMember(
+        member
+      );
+
+    if (
+      points >
+      member.points
+    ) {
+      throw new Error(
+        "Insufficient member points"
+      );
+    }
+
+    let remaining =
+      points;
+
+    for (
+      const lot
+      of this.listPointLots(
+        member.id
+      )
+    ) {
+      if (
+        remaining <= 0
+      ) {
+        break;
+      }
+
+      if (
+        lot.status !==
+          "active" ||
+        lot.remainingPoints <=
+          0
+      ) {
+        continue;
+      }
+
+      const used =
+        Math.min(
+          remaining,
+          lot.remainingPoints
+        );
+
+      const lotRemaining =
+        lot.remainingPoints -
+        used;
+
+      entitySystem.update(
+        "member_point_lot",
+        lot.id,
+        {
+          remainingPoints:
+            lotRemaining,
+          status:
+            lotRemaining > 0
+              ? "active"
+              : "redeemed",
+          redeemedDay:
+            lotRemaining > 0
+              ? lot.redeemedDay ??
+                null
+              : currentDay()
+        }
+      );
+
+      remaining -=
+        used;
+    }
+
+    const updated =
+      entitySystem.update(
+        "member_profile",
+        member.id,
+        {
+          points:
+            member.points -
+            points,
+
+          lifetimeRedeemedPoints:
+            (
+              member
+                .lifetimeRedeemedPoints ??
+              0
+            ) +
+            points
+        }
+      );
+
+    eventBus.emit(
+      "member:pointsRedeemed",
+      {
+        restaurantId,
+        customerId,
+        memberId:
+          member.id,
+        pointsUsed:
+          points,
+        remainingPoints:
+          updated.points
+      }
+    );
+
+    return {
+      pointsUsed:
+        points,
+      remainingPoints:
+        updated.points
+    };
   }
 
   recordMemberVisit({
@@ -244,6 +630,11 @@ class CustomerLoyaltySystem {
         });
     }
 
+    member =
+      this.expirePointsForMember(
+        member
+      );
+
     const visits =
       member.visits + 1;
 
@@ -262,7 +653,8 @@ class CustomerLoyaltySystem {
         0,
         Math.floor(
           spend /
-          100 *
+          MEMBER_POINT_POLICY
+            .earnPerAmount *
           currentLevel
             .pointMultiplier
         )
@@ -318,52 +710,305 @@ class CustomerLoyaltySystem {
       this.getLevelByStats({
         visits,
         totalSpend,
-        points
+        lifetimePoints
       });
 
-    return entitySystem.update(
-      "member_profile",
-      member.id,
+    const day =
+      currentDay();
+
+    if (
+      earnedPoints >
+      0
+    ) {
+      entitySystem.create(
+        "member_point_lot",
+        {
+          memberProfileId:
+            member.id,
+          restaurantId,
+          customerId,
+
+          source:
+            "purchase",
+
+          orderId,
+
+          earnedPoints,
+
+          remainingPoints:
+            earnedPoints,
+
+          earnedDay:
+            day,
+
+          expiresDay:
+            day +
+            MEMBER_POINT_POLICY
+              .expiryDays -
+            1,
+
+          status:
+            "active"
+        }
+      );
+    }
+
+    const currentHighestIndex =
+      Math.max(
+        0,
+        this.getLevelIndex(
+          member.highestLevelId ??
+          member.levelId
+        )
+      );
+
+    const nextLevelIndex =
+      this.getLevelIndex(
+        nextLevel.id
+      );
+
+    const updated =
+      entitySystem.update(
+        "member_profile",
+        member.id,
+        {
+          segmentId:
+            segmentId ??
+            member.segmentId,
+
+          lastVisitDay:
+            day,
+
+          visits,
+
+          repeatVisits:
+            Math.max(
+              0,
+              visits - 1
+            ),
+
+          totalSpend,
+
+          averageSpend:
+            Math.round(
+              totalSpend /
+              visits
+            ),
+
+          averageSatisfaction,
+
+          points,
+          lifetimePoints,
+
+          levelId:
+            nextLevel.id,
+
+          highestLevelId:
+            MEMBER_LEVELS[
+              Math.max(
+                currentHighestIndex,
+                nextLevelIndex
+              )
+            ].id,
+
+          lastLevelChangeDay:
+            nextLevel.id !==
+              member.levelId
+              ? day
+              : (
+                  member
+                    .lastLevelChangeDay ??
+                  day
+                ),
+
+          favoriteDishCounts,
+
+          lastOrderId:
+            orderId
+        }
+      );
+
+    if (
+      updated.levelId !==
+      member.levelId
+    ) {
+      eventBus.emit(
+        "member:levelChanged",
+        {
+          restaurantId,
+          customerId,
+          memberId:
+            member.id,
+          previousLevelId:
+            member.levelId,
+          levelId:
+            updated.levelId,
+          reason:
+            "qualification",
+          day
+        }
+      );
+    }
+
+    return updated;
+  }
+
+  refreshMemberLevel(
+    member,
+    day = currentDay()
+  ) {
+    member =
+      this.expirePointsForMember(
+        member,
+        null,
+        day
+      );
+
+    if (
+      !member ||
+      member.levelId ===
+        "member" ||
+      member.lastVisitDay ===
+        null
+    ) {
+      return member;
+    }
+
+    const level =
+      this.getLevel(
+        member.levelId
+      );
+
+    if (
+      !level ||
+      level.inactivityDowngradeDays ===
+        null
+    ) {
+      return member;
+    }
+
+    const inactiveDays =
+      day -
+      member.lastVisitDay;
+
+    const sinceLevelChange =
+      day -
+      (
+        member
+          .lastLevelChangeDay ??
+        member.lastVisitDay
+      );
+
+    if (
+      inactiveDays <
+        level
+          .inactivityDowngradeDays ||
+      sinceLevelChange <
+        MEMBER_POINT_POLICY
+          .downgradeCooldownDays
+    ) {
+      return member;
+    }
+
+    const index =
+      this.getLevelIndex(
+        member.levelId
+      );
+
+    const previous =
+      MEMBER_LEVELS[
+        Math.max(
+          0,
+          index - 1
+        )
+      ];
+
+    const updated =
+      entitySystem.update(
+        "member_profile",
+        member.id,
+        {
+          levelId:
+            previous.id,
+          lastLevelChangeDay:
+            day
+        }
+      );
+
+    eventBus.emit(
+      "member:levelChanged",
       {
-        segmentId:
-          segmentId ??
-          member.segmentId,
-
-        lastVisitDay:
-          gameState.getSection(
-            "time"
-          ).day,
-
-        visits,
-
-        repeatVisits:
-          Math.max(
-            0,
-            visits - 1
-          ),
-
-        totalSpend,
-
-        averageSpend:
-          Math.round(
-            totalSpend /
-            visits
-          ),
-
-        averageSatisfaction,
-
-        points,
-        lifetimePoints,
-
+        restaurantId:
+          member.restaurantId,
+        customerId:
+          member.customerId,
+        memberId:
+          member.id,
+        previousLevelId:
+          member.levelId,
         levelId:
-          nextLevel.id,
-
-        favoriteDishCounts,
-
-        lastOrderId:
-          orderId
+          previous.id,
+        reason:
+          "inactivity",
+        day
       }
     );
+
+    return updated;
+  }
+
+  processDay(
+    day = currentDay()
+  ) {
+    let expiredMembers = 0;
+    let downgradedMembers = 0;
+
+    const members =
+      entitySystem.list(
+        "member_profile"
+      );
+
+    for (
+      const member
+      of members
+    ) {
+      const beforePoints =
+        member.points ??
+        0;
+
+      const beforeLevel =
+        member.levelId;
+
+      const updated =
+        this.refreshMemberLevel(
+          member,
+          day
+        );
+
+      if (
+        updated &&
+        updated.points <
+          beforePoints
+      ) {
+        expiredMembers += 1;
+      }
+
+      if (
+        updated &&
+        updated.levelId !==
+          beforeLevel
+      ) {
+        downgradedMembers +=
+          1;
+      }
+    }
+
+    return {
+      members:
+        members.length,
+      expiredMembers,
+      downgradedMembers
+    };
   }
 
   recordAnonymousTraffic({
@@ -400,9 +1045,7 @@ class CustomerLoyaltySystem {
     }
 
     const day =
-      gameState.getSection(
-        "time"
-      ).day;
+      currentDay();
 
     const existing =
       entitySystem
@@ -477,7 +1120,7 @@ class CustomerLoyaltySystem {
           existing
             .satisfactionTotal +
           satisfactionValue *
-            served,
+          served,
 
         satisfactionCount:
           existing
@@ -490,12 +1133,30 @@ class CustomerLoyaltySystem {
   getMembers(
     restaurantId
   ) {
+    const members =
+      entitySystem
+        .filter(
+          "member_profile",
+          item =>
+            item.restaurantId ===
+              restaurantId
+        );
+
+    for (
+      const member
+      of members
+    ) {
+      this.expirePointsForMember(
+        member
+      );
+    }
+
     return entitySystem
       .filter(
         "member_profile",
         item =>
           item.restaurantId ===
-          restaurantId
+            restaurantId
       )
       .sort(
         (a, b) =>
@@ -508,7 +1169,7 @@ class CustomerLoyaltySystem {
     restaurantId,
     customerId
   ) {
-    const member =
+    let member =
       this.findMember(
         restaurantId,
         customerId
@@ -517,6 +1178,11 @@ class CustomerLoyaltySystem {
     if (!member) {
       return null;
     }
+
+    member =
+      this.expirePointsForMember(
+        member
+      );
 
     const customer =
       customerSystem.get(
@@ -554,6 +1220,11 @@ class CustomerLoyaltySystem {
 
       favoriteDishes,
 
+      pointLots:
+        this.listPointLots(
+          member.id
+        ),
+
       isRepeatCustomer:
         member.visits >= 2
     };
@@ -564,9 +1235,7 @@ class CustomerLoyaltySystem {
     inactivityDays = 14
   ) {
     const day =
-      gameState.getSection(
-        "time"
-      ).day;
+      currentDay();
 
     return this
       .getMembers(
@@ -591,7 +1260,7 @@ class CustomerLoyaltySystem {
         "customer_cohort_daily",
         item =>
           item.restaurantId ===
-          restaurantId
+            restaurantId
       );
 
     const map =
@@ -678,7 +1347,12 @@ class CustomerLoyaltySystem {
                 item
                   .satisfactionCount
               )
-            : 0
+            : 0,
+
+        enrollmentPropensity:
+          this.getEnrollmentPropensity(
+            item.segmentId
+          )
       })
     );
   }
@@ -816,6 +1490,52 @@ class CustomerLoyaltySystem {
           : 0,
 
       averageMemberSatisfaction,
+
+      currentPoints:
+        members.reduce(
+          (sum, item) =>
+            sum +
+            (
+              item.points ??
+              0
+            ),
+          0
+        ),
+
+      lifetimePoints:
+        members.reduce(
+          (sum, item) =>
+            sum +
+            (
+              item.lifetimePoints ??
+              0
+            ),
+          0
+        ),
+
+      pointsRedeemed:
+        members.reduce(
+          (sum, item) =>
+            sum +
+            (
+              item
+                .lifetimeRedeemedPoints ??
+              0
+            ),
+          0
+        ),
+
+      pointsExpired:
+        members.reduce(
+          (sum, item) =>
+            sum +
+            (
+              item
+                .lifetimeExpiredPoints ??
+              0
+            ),
+          0
+        ),
 
       anonymousVisitors,
       anonymousServed,
