@@ -24,11 +24,31 @@ function requireMenuItem(id) {
 
 class MenuSystem {
   addItem({ restaurantId, dishId, recipeId = null, price = null }) {
-    requireRestaurant(restaurantId);
+    const restaurant =
+      requireRestaurant(
+        restaurantId
+      );
 
     const dish = dishCatalogSystem.get(dishId);
     if (!dish) {
       throw new Error(`Dish "${dishId}" does not exist`);
+    }
+
+    const unlockLevel =
+      dish.custom
+        ? 1
+        : (
+            dish.unlockLevel ??
+            1
+          );
+
+    if (
+      restaurant.level <
+      unlockLevel
+    ) {
+      throw new Error(
+        `Dish "${dishId}" requires store level ${unlockLevel}`
+      );
     }
 
     if (
@@ -40,6 +60,7 @@ class MenuSystem {
 
     const finalRecipeId =
       recipeId ??
+      dish.defaultRecipeId ??
       recipeSystem.getByDish(dishId)[0]?.id;
 
     const recipe = recipeSystem.get(finalRecipeId);
