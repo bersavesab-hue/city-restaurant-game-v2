@@ -26,7 +26,8 @@
     "test:data:renovation": "node --test tests/formal-renovation-furniture-data.test.js tests/formal-renovation-template-data.test.js tests/renovation-editor.test.js tests/renovation-planning.test.js tests/renovation-mobile-page.test.js",
     "test:data:renovation-templates": "node --test tests/formal-renovation-template-data.test.js tests/renovation-planning.test.js tests/renovation-mobile-page.test.js",
     "test:data:employees": "node --test tests/formal-employee-generation-data.test.js tests/formal-employee-career-data.test.js tests/employee-management-ui.test.js",
-    "test:data:customers": "node --test tests/formal-customer-segment-data.test.js tests/customer-segment.test.js tests/customer-experience.test.js"
+    "test:data:customers": "node --test tests/formal-customer-segment-data.test.js tests/customer-segment.test.js tests/customer-experience.test.js",
+    "test:data:districts": "node --test tests/formal-district-data.test.js tests/property-lease-market.test.js tests/city-property-game-ui.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
