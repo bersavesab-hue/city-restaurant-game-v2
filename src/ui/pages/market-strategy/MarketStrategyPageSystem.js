@@ -400,25 +400,57 @@ class MarketStrategyPageSystem {
 
     const availableActions =
       actions.available.map(
-        item => ({
-          ...structuredClone(
-            item
-          ),
+        item => {
+          const availability =
+            item.availability ?? {
+              canStart: false,
+              reasons: [
+                "unknown"
+              ],
+              missingChannels: [],
+              availableDay: null
+            };
 
-          active:
-            activeTypes.has(
-              item.id
+          return {
+            ...structuredClone(
+              item
             ),
 
-          canStart:
-            !activeTypes.has(
-              item.id
-            ) &&
-            actions.active.length <
-              2 &&
-            balance >=
-              item.cost
-        })
+            active:
+              activeTypes.has(
+                item.id
+              ),
+
+            canStart:
+              !activeTypes.has(
+                item.id
+              ) &&
+              availability.canStart,
+
+            lockedReasons:
+              [
+                ...(
+                  availability
+                    .reasons ??
+                  []
+                )
+              ],
+
+            missingChannels:
+              [
+                ...(
+                  availability
+                    .missingChannels ??
+                  []
+                )
+              ],
+
+            availableDay:
+              availability
+                .availableDay ??
+              null
+          };
+        }
       );
 
 
