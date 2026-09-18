@@ -279,6 +279,173 @@ class HonorArchiveSystem {
         limit
       );
   }
+
+  getPeriodIndex(
+    record
+  ) {
+    const key =
+      String(
+        record.periodKey ??
+        ""
+      );
+
+
+    if (record.period === "monthly") {
+      const match =
+        key.match(
+          /Y(\d+)-M(\d+)/
+        );
+
+      return match
+        ? (
+            (
+              Number(match[1]) -
+              1
+            ) *
+            12 +
+            Number(match[2])
+          )
+        : 0;
+    }
+
+
+    if (record.period === "quarterly") {
+      const match =
+        key.match(
+          /Y(\d+)-Q(\d+)/
+        );
+
+      return match
+        ? (
+            (
+              Number(match[1]) -
+              1
+            ) *
+            4 +
+            Number(match[2])
+          )
+        : 0;
+    }
+
+
+    const match =
+      key.match(
+        /Y(\d+)/
+      );
+
+
+    return match
+      ? Number(match[1])
+      : 0;
+  }
+
+
+  list(
+    restaurantId,
+    {
+      period = null,
+      division = null,
+      subjectType = null
+    } = {}
+  ) {
+    return this
+      .listByRestaurant(
+        restaurantId
+      )
+      .filter(
+        item =>
+          (
+            !period ||
+            item.period ===
+              period
+          ) &&
+          (
+            !division ||
+            item.division ===
+              division
+          ) &&
+          (
+            !subjectType ||
+            item.subjectType ===
+              subjectType
+          )
+      )
+      .map(
+        item => ({
+          ...item,
+
+          periodIndex:
+            this.getPeriodIndex(
+              item
+            ),
+
+          reputationReward:
+            item.reward
+              ?.reputation ??
+            0,
+
+          experienceReward:
+            item.reward
+              ?.experience ??
+            0
+        })
+      );
+  }
+
+
+  getSummary(
+    restaurantId
+  ) {
+    const hall =
+      this.getHall(
+        restaurantId
+      );
+
+
+    return {
+      restaurantId,
+
+      totalHonors:
+        hall.totalWins,
+
+      uniqueAwardCount:
+        hall.uniqueAwards,
+
+      prestigePoints:
+        hall.prestigePoints,
+
+      annualWins:
+        hall.byPeriod
+          .annual ??
+        0,
+
+      monthlyWins:
+        hall.byPeriod
+          .monthly ??
+        0,
+
+      quarterlyWins:
+        hall.byPeriod
+          .quarterly ??
+        0,
+
+      highestPrestige:
+        hall.highestPrestige,
+
+      nominations:
+        hall.journey
+          .nominations,
+
+      finalistAppearances:
+        hall.journey
+          .finalistAppearances,
+
+      wins:
+        hall.journey
+          .wins
+    };
+  }
+
 }
 
 

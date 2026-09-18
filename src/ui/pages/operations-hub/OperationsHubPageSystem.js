@@ -78,6 +78,28 @@ const PRIMARY_ENTRIES =
       target: "finance",
 
       secondary: []
+    },
+
+    {
+      id: "competition",
+      title: "榜单与荣誉",
+      description:
+        "市场排名、周期评奖、提名入围与永久荣誉",
+      target: "ranking-center",
+
+      secondary: [
+        {
+          title: "奖项中心",
+          target:
+            "awards-center"
+        },
+
+        {
+          title: "荣誉馆",
+          target:
+            "honor-hall"
+        }
+      ]
     }
   ]);
 

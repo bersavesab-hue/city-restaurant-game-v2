@@ -262,6 +262,60 @@ const GAMEPLAY_PAGES = [
     layout:
       "management"
   },
+
+  {
+    id:
+      "ranking-center",
+
+    title:
+      "排行榜",
+
+    parent:
+      "operations",
+
+    order:
+      365,
+
+    layout:
+      "dashboard"
+  },
+
+
+  {
+    id:
+      "awards-center",
+
+    title:
+      "奖项中心",
+
+    parent:
+      "operations",
+
+    order:
+      366,
+
+    layout:
+      "dashboard"
+  },
+
+
+  {
+    id:
+      "honor-hall",
+
+    title:
+      "荣誉馆",
+
+    parent:
+      "operations",
+
+    order:
+      367,
+
+    layout:
+      "dashboard"
+  },
+
 ];
 
 

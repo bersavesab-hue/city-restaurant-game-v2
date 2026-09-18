@@ -204,3 +204,28 @@ export {
 } from "./navigation/NavigationHistorySystem.js";
 
 export { cityPropertyView } from "./pages/city/CityPropertyView.js";
+
+
+export {
+  rankingCenterPageSystem,
+  RankingCenterPageSystem,
+  RANKING_PERIODS,
+  RANKING_CATEGORIES,
+  rankingCenterView,
+  RankingCenterView
+} from "./pages/ranking/index.js";
+
+export {
+  awardsPageSystem,
+  AwardsPageSystem,
+  PERIOD_OPTIONS,
+  awardsView,
+  AwardsView
+} from "./pages/awards/index.js";
+
+export {
+  honorHallPageSystem,
+  HonorHallPageSystem,
+  honorHallView,
+  HonorHallView
+} from "./pages/honors/index.js";

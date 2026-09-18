@@ -523,7 +523,7 @@ class AwardEvaluationSystem {
                 : index <
                   finalistCount
                   ? "finalist"
-                  : "nominee",
+                  : "nominated",
 
             awardScore:
               scoreOf(

@@ -137,6 +137,33 @@ import {
 } from "../pages/operations-hub/OperationsHubView.js";
 
 
+import {
+  rankingCenterPageSystem
+} from "../pages/ranking/RankingCenterPageSystem.js";
+
+import {
+  rankingCenterView
+} from "../pages/ranking/RankingCenterView.js";
+
+
+import {
+  awardsPageSystem
+} from "../pages/awards/AwardsPageSystem.js";
+
+import {
+  awardsView
+} from "../pages/awards/AwardsView.js";
+
+
+import {
+  honorHallPageSystem
+} from "../pages/honors/HonorHallPageSystem.js";
+
+import {
+  honorHallView
+} from "../pages/honors/HonorHallView.js";
+
+
 const FORMAL_PAGE_DEFINITIONS =
   Object.freeze({
     supply: {
@@ -282,6 +309,42 @@ const FORMAL_PAGE_DEFINITIONS =
 
       view:
         operationsHubView
+    },
+
+
+    "ranking-center": {
+      pageSystem:
+        rankingCenterPageSystem,
+
+      view:
+        rankingCenterView,
+
+      mode:
+        "mount"
+    },
+
+
+    "awards-center": {
+      pageSystem:
+        awardsPageSystem,
+
+      view:
+        awardsView,
+
+      mode:
+        "mount"
+    },
+
+
+    "honor-hall": {
+      pageSystem:
+        honorHallPageSystem,
+
+      view:
+        honorHallView,
+
+      mode:
+        "mount"
     }
   });
 
@@ -357,7 +420,8 @@ class FormalPageRuntime {
         root,
         {
           restaurantId,
-          ...params
+          ...params,
+          onNavigate
         }
       );
     } else {
