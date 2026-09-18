@@ -5,6 +5,7 @@ import { operatingAnalyticsSystem } from "../../../systems/OperatingAnalyticsSys
 import { operatingReportSystem } from "../../../systems/OperatingReportSystem.js";
 import { inventorySystem } from "../../../systems/InventorySystem.js";
 import { procurementSystem } from "../../../systems/ProcurementSystem.js";
+import { customerSegmentSystem } from "../../../systems/CustomerSegmentSystem.js";
 
 const PERIODS = Object.freeze([
   {
@@ -278,6 +279,80 @@ class BusinessAnalyticsPageSystem {
           )
     };
   }
+
+  getCausalityView(
+    causality,
+    finance
+  ) {
+    const segments =
+      (
+        causality
+          ?.segmentImpact ??
+        []
+      ).map(
+        item => {
+          const segment =
+            customerSegmentSystem
+              .get(
+                item.segmentId
+              );
+
+          return {
+            ...item,
+
+            segmentName:
+              segment?.name ??
+              item.segmentId
+          };
+        }
+      );
+
+    return {
+      summary: {
+        topCause:
+          causality?.topCause ??
+          null,
+
+        averageSatisfaction:
+          causality
+            ?.averageSatisfaction ??
+          0,
+
+        averageWaitMinutes:
+          causality
+            ?.averageWaitMinutes ??
+          0,
+
+        serviceRate:
+          causality
+            ?.serviceRate ??
+          0,
+
+        revenueChange:
+          finance
+            .revenueChange,
+
+        profitChange:
+          finance
+            .profitChange,
+
+        orderChange:
+          finance
+            .orderChange
+      },
+
+      segments,
+
+      latest:
+        causality?.latest ??
+        null,
+
+      causes:
+        causality?.causes ??
+        []
+    };
+  }
+
 
   buildAlerts({
     finance,
@@ -641,6 +716,12 @@ class BusinessAnalyticsPageSystem {
       supply,
       diagnosis:
         report.diagnosis,
+
+      causality:
+        this.getCausalityView(
+          report.causality,
+          finance
+        ),
 
       alerts,
       decisions
