@@ -265,3 +265,34 @@ export {
   storeProgressView,
   StoreProgressView
 } from "./pages/progress/index.js";
+
+
+export {
+  employeeRecruitmentPageSystem,
+  EmployeeRecruitmentPageSystem
+} from "./pages/employee-recruitment/EmployeeRecruitmentPageSystem.js";
+
+export {
+  employeeRecruitmentView,
+  EmployeeRecruitmentView
+} from "./pages/employee-recruitment/EmployeeRecruitmentView.js";
+
+export {
+  employeeDetailPageSystem,
+  EmployeeDetailPageSystem
+} from "./pages/employee-detail/EmployeeDetailPageSystem.js";
+
+export {
+  employeeDetailView,
+  EmployeeDetailView
+} from "./pages/employee-detail/EmployeeDetailView.js";
+
+export {
+  employeeTrainingPageSystem,
+  EmployeeTrainingPageSystem
+} from "./pages/employee-training/EmployeeTrainingPageSystem.js";
+
+export {
+  employeeTrainingView,
+  EmployeeTrainingView
+} from "./pages/employee-training/EmployeeTrainingView.js";

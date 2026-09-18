@@ -944,10 +944,6 @@ function navigate(
       [
 
         "lease",
-        "employee_training",
-
-        "employee_detail",
-        "employee_recruitment"
       ].includes(
         pageId
       )

@@ -17,6 +17,9 @@ import "../src/ui/registry/gameplayPages.js";
 const EXPECTED = [
   "supply",
   "finance",
+  "employee_recruitment",
+  "employee_detail",
+  "employee_training",
   "employee_promotion",
   "workforce-capacity",
   "operating-command-center",
