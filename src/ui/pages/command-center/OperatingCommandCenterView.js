@@ -36,6 +36,22 @@ function channelName(
 
 class OperatingCommandCenterView {
   renderMarkup(page) {
+    const awardFeedback =
+      page.awardFeedback ?? {
+        unreadCount:
+          0,
+
+        notifications:
+          [],
+
+        cycleWarnings:
+          [],
+
+        rankingChase:
+          []
+      };
+
+
     return `
       <main class="command-center">
 
@@ -281,6 +297,136 @@ class OperatingCommandCenterView {
               </section>
             `
         }
+
+        <section class="command-center__awards-feedback">
+
+          <header>
+            <div>
+              <span>
+                竞争与荣誉
+              </span>
+
+              <h2>
+                榜单与奖项进度
+              </h2>
+            </div>
+
+            <nav>
+              <button
+                type="button"
+                data-page-target="ranking-center"
+              >
+                排行榜
+              </button>
+
+              <button
+                type="button"
+                data-page-target="awards-center"
+              >
+                奖项中心
+              </button>
+
+              <button
+                type="button"
+                data-page-target="honor-hall"
+              >
+                荣誉馆
+              </button>
+            </nav>
+          </header>
+
+
+          ${
+            awardFeedback
+              .cycleWarnings
+              .length
+              ? `
+                <article>
+                  <strong>
+                    ${awardFeedback.cycleWarnings[0].name}
+                  </strong>
+
+                  <span>
+                    距离结算
+                    ${awardFeedback.cycleWarnings[0].remainingDays}
+                    天
+                  </span>
+                </article>
+              `
+              : ""
+          }
+
+
+          ${
+            awardFeedback
+              .rankingChase
+              .length
+              ? awardFeedback
+                  .rankingChase
+                  .map(
+                    item => `
+                      <article>
+                        <strong>
+                          ${item.boardTitle}
+                        </strong>
+
+                        <span>
+                          当前第
+                          ${item.rank}
+                          名
+                        </span>
+
+                        <small>
+                          ${
+                            item.firstPlace
+                              ? "当前榜首"
+                              : item.topThree
+                                ? `距离第${item.targetRank}名还差 ${Number(item.gap.toFixed(1))}`
+                                : `距离前三还差 ${Number(item.gap.toFixed(1))}`
+                          }
+                        </small>
+                      </article>
+                    `
+                  )
+                  .join("")
+              : `
+                <p>
+                  当前还没有形成可比较的榜单数据。
+                </p>
+              `
+          }
+
+
+          ${
+            awardFeedback
+              .notifications
+              .length
+              ? `
+                <div class="command-center__award-notices">
+                  ${awardFeedback.notifications
+                    .map(
+                      item => `
+                        <button
+                          type="button"
+                          data-page-target="${item.action}"
+                        >
+                          <strong>
+                            ${item.title}
+                          </strong>
+
+                          <span>
+                            ${item.message}
+                          </span>
+                        </button>
+                      `
+                    )
+                    .join("")}
+                </div>
+              `
+              : ""
+          }
+
+        </section>
 
         <section class="command-center__management-shortcuts">
 

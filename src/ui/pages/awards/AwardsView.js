@@ -2,6 +2,10 @@ import {
   awardsPageSystem
 } from "./AwardsPageSystem.js";
 
+import {
+  awardFeedbackSystem
+} from "../../../systems/AwardFeedbackSystem.js";
+
 
 const STAGE_NAME =
   Object.freeze({
@@ -179,7 +183,17 @@ class AwardsView {
     this.onNavigate =
       onNavigate;
 
-    return this.render();
+    const page =
+      this.render();
+
+
+    awardFeedbackSystem
+      .markAllRead(
+        restaurantId
+      );
+
+
+    return page;
   }
 
 
