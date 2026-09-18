@@ -10,6 +10,11 @@ import {
   COOKING_METHOD_MAP
 } from "../data/cookingMethods.v1.js";
 
+import {
+  calculateDishResearchCost,
+  getDishResearchMarkup
+} from "../data/economicBalanceRules.js";
+
 
 const METHOD_RULES =
   COOKING_METHOD_MAP;
@@ -86,19 +91,31 @@ function calculateResolvedPreview({ ingredients, method }) {
     )
   );
   const cookingMinutes = Math.max(5, Math.round(methodRule.baseMinutes + ingredients.length * 2));
-  const researchCost = Math.max(
-    500,
-    Math.round(700 + ingredients.length * 250 + difficulty * 12)
-  );
+  const researchCost =
+    calculateDishResearchCost({
+      ingredientCount:
+        ingredients.length,
+      difficulty
+    });
 
   const roundedCost = Number(estimatedCost.toFixed(2));
   const minSuggestedPrice = Math.max(
     1,
-    Math.round(estimatedCost * (2.1 + minResearchScore * 0.009))
+    Math.round(
+      estimatedCost *
+      getDishResearchMarkup(
+        minResearchScore
+      )
+    )
   );
   const maxSuggestedPrice = Math.max(
     1,
-    Math.round(estimatedCost * (2.1 + maxResearchScore * 0.009))
+    Math.round(
+      estimatedCost *
+      getDishResearchMarkup(
+        maxResearchScore
+      )
+    )
   );
 
   return {
