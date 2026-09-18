@@ -66,6 +66,19 @@ class TrafficSystem {
   }
 
   simulateDayAggregate(restaurantId) {
+    if (
+      !restaurantSystem.isOpen(
+        restaurantId
+      )
+    ) {
+      return {
+        visitors: 0,
+        completedOrders: 0,
+        failedOrders: 0,
+        revenue: 0
+      };
+    }
+
     const schedule =
       operatingScheduleSystem.get(
         restaurantId
