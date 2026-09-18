@@ -32,6 +32,11 @@ test(
           "产能测试店"
       });
 
+    restaurantSystem.setLevel(
+      restaurant.id,
+      2
+    );
+
     serviceCapacitySystem
       .configure(
         restaurant.id,
