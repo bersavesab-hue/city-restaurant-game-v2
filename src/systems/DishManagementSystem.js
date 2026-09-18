@@ -115,11 +115,6 @@ function getIngredientInfo(
         basePurchasePrice:
           ingredient
             ?.basePurchasePrice ??
-          0,
-
-        baseQuality:
-          ingredient
-            ?.baseQuality ??
           0
       };
     }
@@ -162,9 +157,6 @@ class DishManagementSystem {
 
               category:
                 dish.category,
-
-              qualityGrade:
-                dish.qualityGrade,
 
               basePrice:
                 dish.basePrice,
@@ -326,12 +318,6 @@ class DishManagementSystem {
         qualityScore:
           dish.qualityScore,
 
-        qualityGrade:
-          dish.qualityGrade,
-
-        rarity:
-          dish.rarity,
-
         basePrice:
           dish.basePrice,
 
@@ -346,8 +332,14 @@ class DishManagementSystem {
         createdDay:
           dish.createdDay,
 
-        prestigeTitle:
-          dish.prestigeTitle,
+        dishRankId:
+          dish.dishRankId,
+
+        dishRankName:
+          dish.dishRankName,
+
+        dishRankOrder:
+          dish.dishRankOrder,
 
         improvementAttempts:
           dish
@@ -465,9 +457,6 @@ class DishManagementSystem {
 
               unit:
                 item.unit,
-
-              baseQuality:
-                item.baseQuality,
 
               basePurchasePrice:
                 item
