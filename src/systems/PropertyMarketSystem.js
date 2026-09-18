@@ -425,17 +425,88 @@ class PropertyMarketSystem {
       clamp(2.8 + rng() * (area > 1200 ? 2.4 : 1.3), 2.8, 5.8)
         .toFixed(1)
     );
+    const parkingConvenience =
+      district
+        .parkingConvenience ??
+      50;
+
+    const smallParkingChance =
+      clamp(
+        0.06 +
+        parkingConvenience /
+        100 *
+        0.42,
+        0.06,
+        0.48
+      );
+
+    const parkingDensityMin =
+      Math.max(
+        70,
+        165 -
+        Math.round(
+          parkingConvenience *
+          0.55
+        )
+      );
+
+    const parkingDensityMax =
+      Math.max(
+        parkingDensityMin +
+        30,
+        225 -
+        Math.round(
+          parkingConvenience *
+          0.45
+        )
+      );
+
     const parkingSpaces =
       area < 500
-        ? (rng() < 0.18 ? randomInt(rng, 1, 5) : 0)
-        : clamp(Math.floor(area / randomInt(rng, 90, 180)), 0, 160);
+        ? (
+            rng() <
+              smallParkingChance
+              ? randomInt(
+                  rng,
+                  1,
+                  Math.max(
+                    2,
+                    Math.round(
+                      2 +
+                      parkingConvenience /
+                      25
+                    )
+                  )
+                )
+              : 0
+          )
+        : clamp(
+            Math.floor(
+              area /
+              randomInt(
+                rng,
+                parkingDensityMin,
+                parkingDensityMax
+              )
+            ),
+            0,
+            160
+          );
     const depositMonths = randomInt(rng, 1, 3);
     const listingLife = randomInt(rng, 14, 42);
     const qualityScore = clamp(
       Math.round(
         38 +
         district.trafficIndex * 0.22 +
-        district.spendingPower * 0.2 +
+        district.spendingPower * 0.16 +
+        (
+          district.transitAccess ??
+          50
+        ) * 0.06 +
+        (
+          district.parkingConvenience ??
+          50
+        ) * 0.04 +
         frontageMeters * 0.8 +
         (exhaustAllowed ? 6 : 0) +
         Math.min(8, parkingSpaces * 0.2)
@@ -455,6 +526,30 @@ class PropertyMarketSystem {
 
     if (parkingSpaces > 0) {
       tags.push("有停车位");
+    }
+
+    if (
+      (
+        district
+          .parkingConvenience ??
+        0
+      ) >= 75
+    ) {
+      tags.push(
+        "停车便利"
+      );
+    }
+
+    if (
+      (
+        district
+          .transitAccess ??
+        0
+      ) >= 80
+    ) {
+      tags.push(
+        "公共交通便利"
+      );
     }
 
     if (floors.some(floor => floor.shape !== "rectangle")) {
