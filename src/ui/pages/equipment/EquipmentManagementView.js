@@ -20,6 +20,44 @@ function kindName(kind) {
 }
 
 
+function capabilityName(
+  capability
+) {
+  return {
+    range: "灶台",
+    wok: "炒制",
+    steamer: "蒸制",
+    pot: "煮制",
+    stew_pot: "炖煮",
+    fryer: "油炸",
+    flat_pan: "香煎",
+    grill: "烧烤",
+    roaster: "烤制",
+    oven: "烘焙",
+    claypot: "砂锅",
+    hotpot_burner: "涮煮",
+    pressure_cooker: "高压",
+    cold_prep: "冷加工",
+    pickling: "腌渍",
+    fermentation: "发酵",
+    smoker: "烟熏",
+    sous_vide: "低温慢煮"
+  }[capability] ?? capability;
+}
+
+
+function energyName(
+  type
+) {
+  return {
+    electric: "电",
+    gas: "燃气",
+    mixed: "混合能源",
+    none: "无动力"
+  }[type] ?? type;
+}
+
+
 class EquipmentManagementView {
   renderMarkup(page) {
     const dashboard =
@@ -60,6 +98,18 @@ class EquipmentManagementView {
               ${dashboard.maintenanceDue}
             </strong>
           </article>
+        </section>
+
+        <section>
+          <h2>烹饪能力</h2>
+
+          <p>
+            已覆盖
+            ${dashboard.capabilityCoverage.covered}
+            /
+            ${dashboard.capabilityCoverage.total}
+            种正式能力
+          </p>
         </section>
 
         <section>
@@ -127,6 +177,14 @@ class EquipmentManagementView {
         <section>
           <h2>设备市场</h2>
 
+          <p>
+            门店Lv${page.storeLevel}
+            ·
+            已解锁${page.catalog.length}台
+            ·
+            待解锁${page.lockedCount}台
+          </p>
+
           ${
             page.catalog
               .map(
@@ -140,6 +198,9 @@ class EquipmentManagementView {
                       ${kindName(
                         item.equipmentKind
                       )}
+                      ·
+                      ${item.capabilityTier}
+                      ${item.tier?.name ?? ""}
                     </span>
 
                     <span>
@@ -147,6 +208,29 @@ class EquipmentManagementView {
                         item.purchaseCost
                       )}
                     </span>
+
+                    <span>
+                      ${energyName(
+                        item.energyType
+                      )}
+                      ${item.energyUsePerHour}/小时
+                      ·
+                      占地
+                      ${item.footprintUnits}
+                    </span>
+
+                    ${item.capabilities.length
+                      ? `
+                        <span>
+                          ${item.capabilities
+                            .map(
+                              capabilityName
+                            )
+                            .join(" · ")}
+                        </span>
+                      `
+                      : ""
+                    }
 
                     ${
                       item.capacityPerHour > 0
