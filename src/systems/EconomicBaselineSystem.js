@@ -108,18 +108,233 @@ class EconomicBaselineSystem {
   }
 
   getLaborReference(roleId) {
-    const value = this.snapshot.laborReference?.[roleId];
-    return value ? structuredClone(value) : null;
+    const value =
+      this.snapshot
+        .laborReference?.[
+          roleId
+        ];
+
+    if (!value) {
+      return null;
+    }
+
+    return {
+      ...structuredClone(
+        value
+      ),
+
+      marketReference:
+        structuredClone(
+          this.snapshot
+            .laborMarketReference ??
+          null
+        )
+    };
   }
 
-  getFurnitureReference(furnitureId) {
-    const value = this.snapshot.furnitureReference?.[furnitureId];
-    return Number.isFinite(value) ? value : null;
+  getLaborMarketReference() {
+    return structuredClone(
+      this.snapshot
+        .laborMarketReference ??
+      null
+    );
   }
 
-  getCommercialRentReference(districtId) {
-    const value = this.snapshot.commercialRentReference?.[districtId];
-    return Number.isFinite(value) ? value : null;
+  getFurnitureReference(
+    furnitureId
+  ) {
+    const value =
+      this.snapshot
+        .furnitureReference?.[
+          furnitureId
+        ];
+
+    return Number.isFinite(
+      value
+    )
+      ? value
+      : null;
+  }
+
+  getFurnitureReferenceDetail(
+    furnitureId
+  ) {
+    const price =
+      this.getFurnitureReference(
+        furnitureId
+      );
+
+    if (
+      !Number.isFinite(
+        price
+      )
+    ) {
+      return null;
+    }
+
+    return {
+      furnitureId,
+      price,
+
+      marketReference:
+        structuredClone(
+          this.snapshot
+            .furnitureMarketReference ??
+          null
+        )
+    };
+  }
+
+  getEquipmentReference(
+    equipmentId
+  ) {
+    const price =
+      this.snapshot
+        .equipmentReference?.[
+          equipmentId
+        ];
+
+    if (
+      !Number.isFinite(
+        price
+      )
+    ) {
+      return null;
+    }
+
+    return {
+      equipmentId,
+      price,
+
+      sample:
+        structuredClone(
+          this.snapshot
+            .equipmentMarketReference
+            ?.samples?.[
+              equipmentId
+            ] ??
+          null
+        ),
+
+      marketReference:
+        structuredClone(
+          this.snapshot
+            .equipmentMarketReference ??
+          null
+        )
+    };
+  }
+
+  getUtilityReference() {
+    return structuredClone(
+      this.snapshot
+        .utilitiesReference ??
+      {}
+    );
+  }
+
+  getLogisticsReference() {
+    return structuredClone(
+      this.snapshot
+        .logisticsReference ??
+      {}
+    );
+  }
+
+  getRenovationReference() {
+    return structuredClone(
+      this.snapshot
+        .renovationReference ??
+      {}
+    );
+  }
+
+  getCommercialRentContext(
+    districtId
+  ) {
+    const reference =
+      this.snapshot
+        .commercialRentReference;
+
+    const anchor =
+      reference?.citywideAnchor;
+
+    if (
+      !anchor ||
+      !Number.isFinite(
+        anchor
+          .monthlyPerSquareMeter
+      )
+    ) {
+      return null;
+    }
+
+    const districtFactor =
+      Number.isFinite(
+        reference
+          .districtFactor?.[
+            districtId
+          ]
+      )
+        ? reference
+            .districtFactor[
+              districtId
+            ]
+        : 1;
+
+    return {
+      districtId,
+
+      citywideMonthlyPerSquareMeter:
+        anchor
+          .monthlyPerSquareMeter,
+
+      districtFactor,
+
+      referencePerSquareMeter:
+        Number(
+          (
+            anchor
+              .monthlyPerSquareMeter *
+            districtFactor
+          ).toFixed(
+            2
+          )
+        ),
+
+      sourceKind:
+        anchor.sourceKind ??
+        null,
+
+      sourceName:
+        anchor.sourceName ??
+        null,
+
+      sourceUrl:
+        anchor.sourceUrl ??
+        null,
+
+      observedYear:
+        anchor.observedYear ??
+        null,
+
+      note:
+        anchor.note ??
+        null
+    };
+  }
+
+  getCommercialRentReference(
+    districtId
+  ) {
+    return (
+      this
+        .getCommercialRentContext(
+          districtId
+        )
+        ?.referencePerSquareMeter ??
+      null
+    );
   }
 
   getVenueRentMultiplier(venueType, district) {
@@ -148,8 +363,22 @@ class EconomicBaselineSystem {
     floorFactor = 1,
     eventFactor = 1
   }) {
-    const referencePerSquareMeter = this.getCommercialRentReference(districtId);
-    if (!referencePerSquareMeter || !Number.isFinite(area) || area <= 0) {
+    const rentContext =
+      this.getCommercialRentContext(
+        districtId
+      );
+
+    const referencePerSquareMeter =
+      rentContext
+        ?.referencePerSquareMeter;
+
+    if (
+      !referencePerSquareMeter ||
+      !Number.isFinite(
+        area
+      ) ||
+      area <= 0
+    ) {
       return null;
     }
 
@@ -169,7 +398,21 @@ class EconomicBaselineSystem {
       area,
       referencePerSquareMeter,
       multiplier,
-      monthlyRent: Math.max(1, Math.round(referencePerSquareMeter * area * multiplier))
+      monthlyRent:
+        Math.max(
+          1,
+          Math.round(
+            referencePerSquareMeter *
+            area *
+            multiplier
+          )
+        ),
+
+      priceModel:
+        "reality_1_to_1_v2",
+
+      source:
+        rentContext
     };
   }
 
