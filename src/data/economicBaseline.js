@@ -3,6 +3,9 @@ export const ECONOMIC_BASELINE = {
   snapshotId: "cn_2026_09_real_price_snapshot",
   currency: "CNY",
   regionModel: "virtual_city_cn_reference",
+  referenceCity: "郑州",
+  referenceProvince: "河南",
+  nominalCurrencyScale: 1,
 
   sourcePolicy: {
     mode: "reality_1_to_1",
@@ -17,6 +20,9 @@ export const ECONOMIC_BASELINE = {
       "platform_index",
       "utility_tariff",
       "commercial_listing_sample",
+      "market_platform_sample",
+      "market_equipment_sample",
+      "derived_from_real_anchor",
       "manual_reference"
     ]
   },
@@ -165,60 +171,357 @@ export const ECONOMIC_BASELINE = {
 
   commercialRentReference: {
     unit: "sqm_month",
-    old_town: 85,
-    cbd: 210,
-    university: 75,
-    premium_residential: 130,
-    residential: 60,
-    transport_hub: 160,
-    industrial_park: 45,
-    nightlife: 120,
-    tourist_scenic: 95,
-    suburban_resort: 38
+
+    citywideAnchor: {
+      dailyPerSquareMeter:
+        2.1,
+
+      monthlyPerSquareMeter:
+        63,
+
+      observedYear:
+        2026,
+
+      sourceKind:
+        "commercial_listing_sample",
+
+      sourceName:
+        "58同城郑州商铺租金走势",
+
+      sourceUrl:
+        "https://zz.58.com/fangjia/shangpuzujin/",
+
+      note:
+        "2026年郑州商铺日均租金2.1元/㎡/天，按30天折算63元/㎡/月。虚拟商圈只应用位置系数，不改变人民币1:1尺度。"
+    },
+
+    districtFactor: {
+      old_town:
+        0.96,
+
+      cbd:
+        1.55,
+
+      university:
+        0.82,
+
+      premium_residential:
+        1.28,
+
+      residential:
+        0.76,
+
+      transport_hub:
+        1.34,
+
+      industrial_park:
+        0.64,
+
+      nightlife:
+        1.18,
+
+      tourist_scenic:
+        1.08,
+
+      suburban_resort:
+        0.72
+    }
   },
 
   utilitiesReference: {
-    electricityPerKwh: 0.92,
-    waterPerTon: 5.2,
-    gasPerCubicMeter: 3.9,
-    wasteDisposalMonthlyBase: 380,
-    internetMonthlyBase: 180
+    electricityPerKwh:
+      0.662973375,
+
+    electricity: {
+      billingClass:
+        "工商业用电-单一制-不满1千伏",
+
+      valueStatus:
+        "last_fully_parsed_all_in_tariff",
+
+      observedPeriod:
+        "2024-11",
+
+      currentTariffPublicationPeriod:
+        "2026-09",
+
+      currentTariffPublicationState:
+        "published_monthly_table_requires_numeric_import",
+
+      sourceKind:
+        "utility_tariff",
+
+      sourceName:
+        "国网河南省电力公司代理购电工商业用户电价表",
+
+      sourceUrl:
+        "https://energydc.cn/policy/henan/2024-11/70b0d56e-d38e-11f0-9aa1-46a1f660a16d",
+
+      currentPublicationIndexUrl:
+        "https://energydc.cn/policy",
+
+      note:
+        "系统只使用已完整解析的工商业全口径电度电价，不把代理购电价格单独冒充终端电价。2026年9月河南表已发布，待数值导入后替换。"
+    },
+
+    waterPerTon:
+      5.95,
+
+    water: {
+      billingClass:
+        "非居民生活用水",
+
+      observedPolicyDate:
+        "2017-01-01",
+
+      sourceKind:
+        "utility_tariff",
+
+      sourceName:
+        "郑州市非居民用水综合水价",
+
+      sourceUrl:
+        "https://public.zhengzhou.gov.cn/D0105Y/173749.jhtml"
+    },
+
+    gasPerCubicMeter:
+      4.55,
+
+    gas: {
+      billingClass:
+        "市区非居民管道天然气",
+
+      nonHeating:
+        4.55,
+
+      heatingSeason:
+        4.8,
+
+      observedPolicyDate:
+        "2026-08-31",
+
+      sourceKind:
+        "utility_tariff",
+
+      sourceName:
+        "郑州市发展和改革委员会非居民管道燃气销售价格批复",
+
+      sourceUrl:
+        "https://public.zhengzhou.gov.cn/D300201X/10227654.jhtml"
+    },
+
+    wasteDisposalMonthlyBase:
+      null,
+
+    internetMonthlyBase:
+      null,
+
+    unsourcedChargesPolicy:
+      "没有可追溯现实报价时不自动扣除固定垃圾清运费或宽带费。"
   },
 
   logisticsReference: {
-    cityDeliveryBase: 18,
-    coldChainMultiplier: 1.45,
-    rushMultiplier: 1.35,
-    distanceCostPerKm: 2.4
+    model:
+      "same_city_small_van",
+
+    includedKm:
+      5,
+
+    cityDeliveryBase:
+      30,
+
+    distanceCostPerKmAfterBase:
+      3,
+
+    coldChainMultiplier:
+      null,
+
+    rushMultiplier:
+      null,
+
+    observedPeriod:
+      "2026-08",
+
+    sourceKind:
+      "market_platform_sample",
+
+    sourceName:
+      "同城货运市场计价样本（小面包车）",
+
+    sourceUrl:
+      "https://wuliu.huolala.cn/freight-query.html",
+
+    note:
+      "平台官方页面确认按重量/体积与线路动态报价；30元/5公里、超距约3元/公里为2026公开市场样本，正式订单仍允许供应商报价覆盖。"
   },
 
   renovationReference: {
-    basicPerSquareMeter: 850,
-    standardPerSquareMeter: 1450,
-    premiumPerSquareMeter: 2600,
-    privateDiningPerSquareMeter: 3200,
-    resortOutdoorPerSquareMeter: 780
+    unit:
+      "sqm",
+
+    basicPerSquareMeter:
+      1000,
+
+    standardPerSquareMeter:
+      1800,
+
+    premiumPerSquareMeter:
+      3000,
+
+    privateDiningPerSquareMeter:
+      3500,
+
+    resortOutdoorPerSquareMeter:
+      800,
+
+    marketRanges: {
+      basic:
+        [800, 1200],
+
+      standard:
+        [1500, 2500],
+
+      premium:
+        [2500, 5000]
+    },
+
+    observedPeriod:
+      "2026",
+
+    sourceKind:
+      "industry_market_sample",
+
+    sourceName:
+      "2026餐饮工装公开市场报价区间",
+
+    sourceUrl:
+      "https://www.csjcs.com/news/shangxun/Article-CvV4bF-476057.html",
+
+    note:
+      "装修费按真实人民币/㎡计价，设备另计；具体门店可因城市、面积、消防、排烟和材料等级产生真实差异。"
   },
 
   furnitureReference: {
-    table_2: 1200,
-    table_4: 2200,
-    booth_4: 4200,
-    kitchen_station: 12000,
-    prep_counter: 3800,
-    cashier_counter: 3200,
-    waiting_bench: 1800,
-    decor_plant: 600,
-    decor_feature: 6200
+    table_2:
+      800,
+
+    table_4:
+      1200,
+
+    booth_4:
+      2800,
+
+    kitchen_station:
+      2200,
+
+    prep_counter:
+      700,
+
+    cashier_counter:
+      2500,
+
+    waiting_bench:
+      900,
+
+    decor_plant:
+      180,
+
+    decor_feature:
+      3000
+  },
+
+  furnitureMarketReference: {
+    observedPeriod:
+      "2026",
+
+    sourceKind:
+      "market_equipment_sample",
+
+    sourceName:
+      "2026餐饮商用家具与后厨设备公开市场样本",
+
+    sourceUrl:
+      "https://www.csjcs.com/news/shangxun/Article-LLEqnx-573803.html",
+
+    note:
+      "家具为同规格全新商用品的中位采购预算；后续可由具体供应商SKU报价覆盖。"
   },
 
   equipmentReference: {
-    kitchenStation: 12000,
-    refrigerator: 6800,
-    freezer: 7200,
-    dishwasher: 9600,
-    exhaustSystem: 18000,
-    posTerminal: 2600
+    kitchenStation:
+      2200,
+
+    refrigerator:
+      6969,
+
+    freezer:
+      6969,
+
+    dishwasher:
+      9600,
+
+    exhaustSystem:
+      5000,
+
+    posTerminal:
+      2500
+  },
+
+  equipmentMarketReference: {
+    observedPeriod:
+      "2026",
+
+    sourceKind:
+      "market_equipment_sample",
+
+    samples: {
+      kitchenStation: {
+        marketRange:
+          [1800, 3500],
+
+        sourceName:
+          "2026商用猛火灶公开市场区间",
+
+        sourceUrl:
+          "https://www.csjcs.com/news/shangxun/Article-LLEqnx-573803.html"
+      },
+
+      refrigerator: {
+        referencePrice:
+          6969,
+
+        specification:
+          "四门立式商用冷柜",
+
+        sourceName:
+          "苏宁易购圣托DHD03公开报价",
+
+        sourceUrl:
+          "https://www.suning.com/item/0070064032/12383643168.html"
+      },
+
+      posTerminal: {
+        referencePrice:
+          2500,
+
+        sourceName:
+          "智慧餐饮一体收银终端公开报价",
+
+        sourceUrl:
+          "https://www.kxsdd.cn/front/EFood/price"
+      },
+
+      exhaustSystem: {
+        marketRange:
+          [2500, 8000],
+
+        sourceName:
+          "2026低空油烟净化设备公开市场区间",
+
+        sourceUrl:
+          "https://www.csjcs.com/news/shangxun/Article-LLEqnx-573803.html"
+      }
+    }
   },
 
   demandElasticity: {
