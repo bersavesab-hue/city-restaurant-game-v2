@@ -13,10 +13,6 @@ import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 import { economicBaselineSystem } from "./EconomicBaselineSystem.js";
 
 import {
-  getDishRank
-} from "../data/dishRules.js";
-
-import {
   DISH_CATEGORY_LIST
 } from "../data/dishCatalogRules.js";
 
@@ -441,13 +437,6 @@ class DishResearchSystem {
         "time"
       );
 
-    const initialRank =
-      getDishRank({
-        masteryLevel: 1,
-        qualityScore:
-          analysis.qualityScore
-      });
-
     let dish =
       entitySystem.create(
         "custom_dish",
@@ -466,7 +455,7 @@ class DishResearchSystem {
 
           custom: true,
 
-          qualityScore:
+          researchQualityScore:
             analysis
               .qualityScore,
 
@@ -483,28 +472,7 @@ class DishResearchSystem {
           createdDay:
             time.day,
 
-          recipeId: null,
-
-          masteryXp: 0,
-          masteryLevel: 1,
-          masteryQualityBonus: 0,
-
-          dishRankId:
-            initialRank.id,
-
-          dishRankName:
-            initialRank.name,
-
-          dishRankOrder:
-            initialRank.order,
-
-          lifetimeSold: 0,
-          lifetimeRevenue: 0,
-
-          improvementAttempts: 0,
-          successfulImprovements: 0,
-
-          improvementHistory: []
+          recipeId: null
         }
       );
 
@@ -555,14 +523,15 @@ class DishResearchSystem {
         }
       );
 
-    restaurantDishSystem
-      .ensureOwned({
-        restaurantId,
-        dishId:
-          dish.id,
-        initialQualityScore:
-          analysis.qualityScore
-      });
+    const dishProgress =
+      restaurantDishSystem
+        .ensureOwned({
+          restaurantId,
+          dishId:
+            dish.id,
+          initialQualityScore:
+            analysis.qualityScore
+        });
 
     const history = [
       ...(
@@ -581,13 +550,13 @@ class DishResearchSystem {
           dish.name,
 
         rankId:
-          dish.dishRankId,
+          dishProgress.dishRankId,
 
         rankName:
-          dish.dishRankName,
+          dishProgress.dishRankName,
 
         score:
-          dish.qualityScore,
+          dishProgress.qualityScore,
 
         cost:
           analysis
@@ -817,18 +786,26 @@ class DishResearchSystem {
       house_special: 0
     };
 
+    const entries =
+      dishes.map(
+        dish => ({
+          dish,
+          progress:
+            restaurantDishSystem.get(
+              restaurantId,
+              dish.id
+            )
+        })
+      );
+
     for (
-      const dish
-      of dishes
+      const entry
+      of entries
     ) {
       const rank =
-        dish.dishRankId ??
-        getDishRank({
-          masteryLevel:
-            dish.masteryLevel ?? 1,
-          qualityScore:
-            dish.qualityScore ?? 0
-        }).id;
+        entry.progress
+          ?.dishRankId ??
+        "homestyle";
 
       if (rank in byRank) {
         byRank[rank] += 1;
@@ -836,12 +813,21 @@ class DishResearchSystem {
     }
 
     const best =
-      [...dishes]
+      [...entries]
         .sort(
           (a, b) =>
-            b.qualityScore -
-            a.qualityScore
-        )[0] ??
+            (
+              b.progress
+                ?.qualityScore ??
+              0
+            ) -
+            (
+              a.progress
+                ?.qualityScore ??
+              0
+            )
+        )[0]
+        ?.dish ??
       null;
 
     return {
