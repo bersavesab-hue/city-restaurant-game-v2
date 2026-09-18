@@ -99,6 +99,25 @@ class CityPropertyPageSystem {
         ?.qualityScore ??
       50;
 
+    const templateId =
+      enriched
+        .marketMeta
+        ?.templateId ??
+      enriched.propertyType ??
+      null;
+
+    const templateName =
+      enriched
+        .marketMeta
+        ?.templateName ??
+      templateId;
+
+    const propertyFeatures =
+      enriched
+        .marketMeta
+        ?.propertyFeatures ??
+      null;
+
     const recommendedVenueTypes =
       enriched
         .marketMeta
@@ -206,7 +225,27 @@ class CityPropertyPageSystem {
       tags: [...(enriched.tags ?? [])],
       floors: buildFloorSummary(enriched),
       source: enriched.source ?? "manual",
-      propertyType: enriched.propertyType ?? null,
+      propertyType:
+        enriched.propertyType ??
+        null,
+
+      template:
+        templateId
+          ? {
+              id:
+                templateId,
+              name:
+                templateName
+            }
+          : null,
+
+      propertyFeatures:
+        propertyFeatures
+          ? structuredClone(
+              propertyFeatures
+            )
+          : null,
+
       qualityScore,
 
       recommendation: {
