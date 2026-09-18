@@ -26,6 +26,7 @@ const EXPECTED = [
   "capacity",
   "reputation",
   "channels",
+  "compliance-center",
   "menu-optimization",
   "menu-engineering",
   "equipment-management",
