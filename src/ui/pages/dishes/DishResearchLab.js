@@ -1,3 +1,7 @@
+import {
+  getIngredientSpriteStyle
+} from "../../../data/ingredientVisuals.js";
+
 function escapeHtml(
   value
 ) {
@@ -27,6 +31,47 @@ function escapeHtml(
     );
 }
 
+
+function renderIngredientSprite(
+  ingredient,
+  size = 34
+) {
+  try {
+    return `
+      <span
+        class="dish-ingredient-sprite ingredient-sprite"
+        style="${getIngredientSpriteStyle(
+          ingredient.id,
+          size
+        )}"
+        role="img"
+        aria-label="${escapeHtml(
+          ingredient.name
+        )}"
+      ></span>
+    `;
+  } catch {
+    return `
+      <span
+        class="dish-ingredient-sprite dish-ingredient-sprite--fallback"
+        role="img"
+        aria-label="${escapeHtml(
+          ingredient.name
+        )}"
+      >
+        ${escapeHtml(
+          String(
+            ingredient.name ??
+            "?"
+          ).slice(
+            0,
+            1
+          )
+        )}
+      </span>
+    `;
+  }
+}
 
 function money(
   value
@@ -564,6 +609,13 @@ class DishResearchLab {
                             class="dish-ingredient-select"
                             data-research-ingredient-toggle="${ingredient.id}"
                           >
+
+                            <span class="dish-ingredient-art">
+                              ${renderIngredientSprite(
+                                ingredient,
+                                34
+                              )}
+                            </span>
 
                             <span
                               class="dish-ingredient-checkbox"
