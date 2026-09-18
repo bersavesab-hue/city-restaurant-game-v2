@@ -51,6 +51,8 @@ test(
     const supplier =
       supplierSystem.create({
         name: "战略食材供应商",
+        capabilityTier: "T4",
+        maxCreditDays: 30,
         relationship: 90,
         reliability: 95
       });
@@ -76,7 +78,12 @@ test(
         );
 
     assert.equal(
-      profile.tier.id,
+      profile.capabilityTier.id,
+      "T4"
+    );
+
+    assert.equal(
+      profile.partnership.id,
       "strategic"
     );
 
