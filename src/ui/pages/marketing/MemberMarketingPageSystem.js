@@ -3,6 +3,10 @@ import {
 } from "../../../systems/CustomerLoyaltySystem.js";
 
 import {
+  customerIdentitySystem
+} from "../../../systems/CustomerIdentitySystem.js";
+
+import {
   memberBenefitSystem
 } from "../../../systems/MemberBenefitSystem.js";
 
@@ -37,6 +41,12 @@ class MemberMarketingPageSystem {
 
       loyalty,
       marketing,
+
+      identity:
+        customerIdentitySystem
+          .getSummary(
+            restaurantId
+          ),
 
       campaigns:
         marketing.campaigns,
