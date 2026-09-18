@@ -1,5 +1,6 @@
 import { customerSegmentBootstrapSystem } from "./CustomerSegmentBootstrapSystem.js";
 import { ingredientBootstrapSystem } from "./IngredientBootstrapSystem.js";
+import { supplierBootstrapSystem } from "./SupplierBootstrapSystem.js";
 import { dishRecipeBootstrapSystem } from "./DishRecipeBootstrapSystem.js";
 import { districtBootstrapSystem } from "./DistrictBootstrapSystem.js";
 import { cityExpansionMigrationSystem } from "./CityExpansionMigrationSystem.js";
@@ -22,6 +23,8 @@ class GameFoundationSystem {
     ingredientBootstrapSystem.ensureLoaded({
       overwrite: overwriteReferenceData
     });
+
+    supplierBootstrapSystem.ensureLoaded();
 
     dishRecipeBootstrapSystem.ensureLoaded({
       overwrite: overwriteReferenceData
@@ -58,6 +61,7 @@ class GameFoundationSystem {
       dishRecipes: dishRecipeBootstrapSystem.ensureLoaded({
         overwrite: false
       }),
+      suppliers: supplierBootstrapSystem.ensureLoaded(),
       districts: districtBootstrapSystem.ensureLoaded(),
       venueTypes: venueTypeSystem.getAll(),
       seedProperties,
