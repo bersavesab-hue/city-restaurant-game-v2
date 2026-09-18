@@ -141,9 +141,43 @@ test(
         restaurant.id
       );
 
+    const expectedSpent =
+      [
+        "table_4",
+        "kitchen_station",
+        "cashier_counter"
+      ]
+        .reduce(
+          (
+            sum,
+            furnitureId
+          ) => {
+            const item =
+              renovationSystem
+                .getCatalog(
+                  restaurant.id
+                )
+                .find(
+                  candidate =>
+                    candidate.id ===
+                    furnitureId
+                );
+
+            return (
+              sum +
+              Number(
+                item?.cost ??
+                0
+              )
+            );
+          },
+          0
+        );
+
     assert.equal(
-      before - after,
-      7900
+      before -
+      after,
+      expectedSpent
     );
 
     const activeSummary =

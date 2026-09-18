@@ -1,22 +1,8 @@
-export {
-  UI_TOKENS
-} from "./theme/tokens.js";
-export {
-  buildGameClockModel,
-  toCalendarDate
-} from "./components/GameClockModel.js";
-export {
-  buildGlobalTopBarModel,
-  buildNoticeTickerModel
-} from "./components/GlobalChromeModel.js";
-export {
-  PageRegistry,
-  pageRegistry
-} from "./registry/PageRegistry.js";
-export {
-  CORE_PAGES,
-  registerDefaultPages
-} from "./registry/defaultPages.js";
+export { UI_TOKENS } from "./theme/tokens.js";
+export { buildGameClockModel, toCalendarDate } from "./components/GameClockModel.js";
+export { buildGlobalTopBarModel, buildNoticeTickerModel } from "./components/GlobalChromeModel.js";
+export { PageRegistry, pageRegistry } from "./registry/PageRegistry.js";
+export { CORE_PAGES, registerDefaultPages } from "./registry/defaultPages.js";
 export {
   renovationMobilePageSystem,
   RenovationMobilePageSystem,
@@ -35,6 +21,7 @@ export {
 export {
   cityPropertyPageSystem,
   CityPropertyPageSystem,
+  cityPropertyView,
   CityPropertyView
 } from "./pages/city/index.js";
 
@@ -187,6 +174,7 @@ export {
   RestaurantHubPageSystem,
   restaurantHubView,
   RestaurantHubView,
+  RESTAURANT_ENTRIES
 } from "./pages/restaurant-hub/index.js";
 
 
@@ -240,11 +228,17 @@ export {
   buildNavigationItems
 } from "./components/GameChromeSystem.js";
 
-
+export {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderMetricCards,
+  renderPanelTitle,
+  renderBottomNavigation,
+  renderGameScreen
+} from "./components/GameChromeView.js";
 
 export {
   navigationHistorySystem,
   NavigationHistorySystem
 } from "./navigation/NavigationHistorySystem.js";
-
-export { cityPropertyView } from "./pages/city/CityPropertyView.js";

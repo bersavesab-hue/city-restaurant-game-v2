@@ -246,5 +246,3 @@ export {
   navigationHistorySystem,
   NavigationHistorySystem
 } from "./navigation/NavigationHistorySystem.js";
-
-export { cityPropertyView } from "./pages/city/CityPropertyView.js";

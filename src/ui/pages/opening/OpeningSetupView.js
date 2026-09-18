@@ -651,7 +651,7 @@ class OpeningSetupView {
                               : "disabled"
                           }
                         >
-                          ★ 正式营业
+                          ★ 正式开业
                         </button>
                       `
                       : `
@@ -662,7 +662,7 @@ class OpeningSetupView {
                             next.target
                           )}"
                         >
-                          去完成 ·
+                          继续准备 ·
                           ${escapeHtml(
                             next.label
                           )}

@@ -35,6 +35,7 @@ export {
 export {
   cityPropertyPageSystem,
   CityPropertyPageSystem,
+  cityPropertyView,
   CityPropertyView
 } from "./pages/city/index.js";
 
@@ -246,5 +247,3 @@ export {
   navigationHistorySystem,
   NavigationHistorySystem
 } from "./navigation/NavigationHistorySystem.js";
-
-export { cityPropertyView } from "./pages/city/CityPropertyView.js";

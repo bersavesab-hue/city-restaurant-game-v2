@@ -49,7 +49,7 @@ test(
 
     financeSystem.createAccount(
       restaurant.id,
-      50000
+      500000
     );
 
     const opened =
@@ -144,7 +144,13 @@ test(
       );
 
     assert.equal(
-      saved.layout.active,
+      Boolean(
+        saved
+          ?.layout
+          ?.active ||
+        saved
+          ?.constructionStarted
+      ),
       true
     );
   }

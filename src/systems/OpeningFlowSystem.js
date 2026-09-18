@@ -254,12 +254,12 @@ class OpeningFlowSystem {
           "renovation",
 
         label:
-          "装修验收",
+          "装修布局",
 
         description:
           hasRenovation
             ? `${renovation.modifiers?.seats ?? 0}个餐位 · ${renovation.modifiers?.kitchenStations ?? 0}个厨房工位`
-            : "完成装修施工并正式验收启用",
+            : "完成装修布局、施工并正式验收启用",
 
         complete:
           hasRenovation,
@@ -423,11 +423,11 @@ class OpeningFlowSystem {
           "opening",
 
         label:
-          "正式营业",
+          "正式开业",
 
         description:
           hasOpened
-            ? "门店已经正式开始经营"
+            ? "门店已经正式开业并开始经营"
             : preparationReady
               ? "全部准备完成，可以正式开业"
               : "仍有开业条件未完成",

@@ -13,13 +13,13 @@ const MAIN_LANDINGS =
       "properties",
 
     restaurant:
-      "restaurant-home",
+      "operating-command-center",
 
     operations:
       "operations-home",
 
     employees:
-      "employees-home",
+      "employee_roster",
 
     more:
       "settings"
@@ -41,7 +41,7 @@ const ACTION_TARGETS =
       "supply",
 
     employees:
-      "employees-home",
+      "employee_roster",
 
     staffing:
       "employee_roster",

@@ -56,28 +56,6 @@ function gradeClass(
 }
 
 
-
-function normalizeIngredientQuantityRule(ingredient) {
-  const raw = ingredient?.quantityRule ?? {};
-
-  const min =
-    Number.isFinite(raw.min)
-      ? raw.min
-      : 1;
-
-  const max =
-    Number.isFinite(raw.max)
-      ? Math.max(raw.max, min)
-      : min;
-
-  const step =
-    Number.isFinite(raw.step) && raw.step > 0
-      ? raw.step
-      : 1;
-
-  return { min, max, step };
-}
-
 class DishResearchLab {
   constructor({
     pageSystem,
@@ -424,7 +402,8 @@ class DishResearchLab {
                 自由组合食材并精确调整每份用量
               </span>
             </div>
-<b>
+
+            <b>
               已研发
               ${this.page.research.customCount}
               /
@@ -582,7 +561,9 @@ class DishResearchLab {
                         this.quantities.get(
                           ingredient.id
                         ) ??
-                        normalizeIngredientQuantityRule(ingredient).defaultValue;
+                        ingredient
+                          .quantityRule
+                          .defaultValue;
 
                       return `
                         <article
@@ -657,9 +638,9 @@ class DishResearchLab {
 
                               <input
                                 type="number"
-                                min="${normalizeIngredientQuantityRule(ingredient).min}"
-                                max="${normalizeIngredientQuantityRule(ingredient).max}"
-                                step="${normalizeIngredientQuantityRule(ingredient).step}"
+                                min="${ingredient.quantityRule.min}"
+                                max="${ingredient.quantityRule.max}"
+                                step="${ingredient.quantityRule.step}"
                                 value="${quantity}"
                                 data-ingredient-quantity="${ingredient.id}"
                                 ${
@@ -843,7 +824,8 @@ class DishResearchLab {
     }
 
 
-    const rule = normalizeIngredientQuantityRule(ingredient);
+    const rule =
+      ingredient.quantityRule;
 
 
     const quantity =
@@ -882,7 +864,8 @@ class DishResearchLab {
     }
 
 
-    const rule = normalizeIngredientQuantityRule(ingredient);
+    const rule =
+      ingredient.quantityRule;
 
 
     const current =

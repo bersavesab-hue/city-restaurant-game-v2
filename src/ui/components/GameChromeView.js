@@ -110,11 +110,12 @@ export function renderGameTopBar(
 
 
   return `
-    <header class="rg-topbar">
-
-      <section class="rg-topbar__identity">
-
-        <div
+    <header
+      class="rg-topbar"
+      aria-label="门店 天气 资金 等级"
+    >
+<section class="rg-topbar__identity">
+<div
           class="rg-topbar__avatar"
           data-image-slot="restaurant-avatar"
         >
@@ -131,6 +132,22 @@ export function renderGameTopBar(
             )}
           </strong>
 
+          ${
+            model?.actions
+              ?.canRename
+              ? `
+                <button
+                  type="button"
+                  class="rg-store-rename"
+                  data-action="rename-store"
+                >
+                  改名
+                </button>
+              `
+              : ""
+          }
+
+
           <span>
             ${escapeHtml(
               subtitle ??
@@ -146,6 +163,7 @@ export function renderGameTopBar(
 
 
       <section class="rg-topbar__clock">
+<i class="rg-topbar__weather-label">天气</i>
 
         <span>
           ${
@@ -626,6 +644,7 @@ export function renderGameScreen({
   noticeTicker,
   pageTitle,
   body = "",
+  content = null,
   bottomNavigation = []
 } = {}) {
   return `
@@ -634,7 +653,10 @@ export function renderGameScreen({
       ${
         topBar
           ? renderGameTopBar(
-              topBar
+              topBar?.model ??
+              topBar,
+              topBar?.options ??
+              {}
             )
           : ""
       }
@@ -642,6 +664,7 @@ export function renderGameScreen({
       ${
         noticeTicker
           ? renderNoticeTicker(
+              noticeTicker?.model ??
               noticeTicker
             )
           : ""
@@ -650,15 +673,25 @@ export function renderGameScreen({
       ${
         pageTitle
           ? renderPageTitle(
+              pageTitle?.model ??
               pageTitle
             )
           : ""
       }
 
-      ${body}
+      ${
+        content ??
+        body
+      }
 
       ${renderBottomNavigation(
-        bottomNavigation
+        Array.isArray(
+          bottomNavigation
+        )
+          ? bottomNavigation
+          : bottomNavigation
+              ?.items ??
+            []
       )}
 
     </main>

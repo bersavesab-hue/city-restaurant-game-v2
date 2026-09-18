@@ -1,6 +1,7 @@
 export {
   restaurantHubPageSystem,
   RestaurantHubPageSystem,
+  RESTAURANT_ENTRIES
 } from "./RestaurantHubPageSystem.js";
 
 export {

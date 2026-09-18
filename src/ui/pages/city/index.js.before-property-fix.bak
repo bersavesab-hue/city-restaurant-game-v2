@@ -22,8 +22,3 @@ export {
   propertyDetailView,
   PropertyDetailView
 } from "./PropertyDetailView.js";
-
-export {
-  CityPropertyView,
-  cityPropertyView
-} from "./CityPropertyView.js";

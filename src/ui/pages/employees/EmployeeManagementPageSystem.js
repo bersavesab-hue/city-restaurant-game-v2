@@ -575,6 +575,231 @@ class EmployeeManagementPageSystem {
   }
 
 
+
+
+
+
+
+  getRecruitmentPage(
+    restaurantId
+  ) {
+    const page =
+      this.getPage(
+        restaurantId
+      );
+
+    const staffingRoles =
+      page.staffing
+        ?.roles ??
+      [];
+
+    const roles =
+      employeeSystem
+        .getRoles()
+        .map(
+          role => {
+            const plan =
+              staffingRoles
+                .find(
+                  item =>
+                    item.roleId ===
+                    role.id
+                ) ??
+              null;
+
+            return {
+              ...role,
+
+              current:
+                plan?.current ??
+                0,
+
+              recommended:
+                plan?.recommended ??
+                0,
+
+              shortage:
+                plan?.shortage ??
+                0,
+
+              surplus:
+                plan?.surplus ??
+                0,
+
+              staffingState:
+                plan?.state ??
+                "balanced",
+
+              staffingReason:
+                plan?.reason ??
+                "",
+
+              baseSalary:
+                Number(
+                  role.baseSalary
+                ) ||
+                0,
+
+              salaryReference:
+                role.salaryReference ??
+                null
+            };
+          }
+        );
+
+    const recommendations =
+      staffingRoles.map(
+        item => ({
+          ...item,
+
+          message:
+            item.shortage > 0
+              ? `${item.name}建议补充${item.shortage}人`
+              : item.surplus > 0
+                ? `${item.name}当前富余${item.surplus}人`
+                : `${item.name}当前配置合理`
+        })
+      );
+
+    const salaryReferences =
+      roles.map(
+        role => ({
+          roleId:
+            role.id,
+
+          name:
+            role.name,
+
+          baseSalary:
+            role.baseSalary,
+
+          salaryReference:
+            role.salaryReference
+        })
+      );
+
+    const vacancies =
+      page.vacancies ??
+      [];
+
+    const warnings =
+      vacancies.map(
+        item => ({
+          roleId:
+            item.roleId,
+
+          label:
+            item.name,
+
+          shortage:
+            item.shortage,
+
+          message:
+            `${item.name}建议补充${item.shortage}人`
+        })
+      );
+
+    return {
+      pageId:
+        "employee_recruitment",
+
+      restaurantId,
+
+      topBar:
+        page.topBar,
+
+      noticeTicker:
+        page.noticeTicker,
+
+      employees:
+        page.employees ??
+        [],
+
+      currentEmployees:
+        page.employees ??
+        [],
+
+      currentCount:
+        page.employees
+          ?.length ??
+        0,
+
+      staffCap:
+        page.staffCap ??
+        0,
+
+      availableSlots:
+        Math.max(
+          0,
+          (
+            page.staffCap ??
+            0
+          ) -
+          (
+            page.employees
+              ?.length ??
+            0
+          )
+        ),
+
+      payroll:
+        employeeSystem
+          .getPayroll(
+            restaurantId
+          ),
+
+      staffing:
+        page.staffing,
+
+      staffingRoles,
+
+      vacancies,
+
+      roles,
+
+      roleOptions:
+        roles,
+
+      positions:
+        roles,
+
+      items:
+        roles,
+
+      rows:
+        roles,
+
+      candidates:
+        roles,
+
+      recommendations,
+
+      hiringRecommendations:
+        recommendations,
+
+      staffingRecommendations:
+        recommendations,
+
+      salaryReferences,
+
+      salaryBenchmarks:
+        salaryReferences,
+
+      warnings,
+
+      bottomNavigation:
+        page.bottomNavigation ??
+        []
+    };
+  }
+
+
+
+
+
+
+
+
   getPage(
     restaurantId
   ) {

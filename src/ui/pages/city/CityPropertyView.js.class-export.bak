@@ -11,7 +11,7 @@ function el(tag, className, text = null) {
   return node;
 }
 
-export class CityPropertyView {
+class CityPropertyView {
   constructor({
     pageSystem = cityPropertyPageSystem,
     onNavigate = null
@@ -330,3 +330,4 @@ export class CityPropertyView {
 }
 
 export const cityPropertyView = new CityPropertyView();
+export { CityPropertyView };
