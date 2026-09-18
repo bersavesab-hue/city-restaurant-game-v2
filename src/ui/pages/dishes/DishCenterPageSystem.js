@@ -51,6 +51,10 @@ import {
 } from "../../../data/dishCatalogRules.js";
 
 import {
+  COOKING_METHODS_V1
+} from "../../../data/cookingMethods.v1.js";
+
+import {
   buildGlobalTopBarModel,
   buildNoticeTickerModel
 } from "../../components/GlobalChromeModel.js";
@@ -61,105 +65,20 @@ const CATEGORY_LABELS =
 
 
 const METHOD_OPTIONS =
-  Object.freeze([
-    {
-      id:
-        "stir_fry",
-
-      name:
-        "炒制",
-
-      icon:
-        "炒",
-
-      description:
-        "爆炒快出餐"
-    },
-
-    {
-      id:
-        "steam",
-
-      name:
-        "蒸制",
-
-      icon:
-        "蒸",
-
-      description:
-        "稳定保留食材品质"
-    },
-
-    {
-      id:
-        "boil",
-
-      name:
-        "煮制",
-
-      icon:
-        "煮",
-
-      description:
-        "适合汤面与主食"
-    },
-
-    {
-      id:
-        "stew",
-
-      name:
-        "炖煮",
-
-      icon:
-        "炖",
-
-      description:
-        "耗时较长，品质潜力高"
-    },
-
-    {
-      id:
-        "fry",
-
-      name:
-        "炸制",
-
-      icon:
-        "炸",
-
-      description:
-        "高效率高香气"
-    },
-
-    {
-      id:
-        "cold_mix",
-
-      name:
-        "凉拌",
-
-      icon:
-        "拌",
-
-      description:
-        "快速制作"
-    },
-
-    {
-      id:
-        "bake",
-
-      name:
-        "烤制",
-
-      icon:
-        "烤",
-
-      description:
-        "风味突出"
-    }
-  ]);
+  Object.freeze(
+    COOKING_METHODS_V1.map(
+      method => ({
+        id:
+          method.id,
+        name:
+          method.name,
+        icon:
+          method.icon,
+        description:
+          method.description
+      })
+    )
+  );
 
 
 function safeBalance(
