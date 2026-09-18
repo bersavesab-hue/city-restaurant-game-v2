@@ -2,9 +2,25 @@ plugins {
     id 'com.android.application'
 }
 
+def testKeystorePath =
+    System.getenv(
+        "CITY_RESTAURANT_TEST_KEYSTORE"
+    )
+
 android {
     namespace 'com.cityrestaurant.game'
     compileSdk 34
+
+    signingConfigs {
+        testDebug {
+            if (testKeystorePath) {
+                storeFile file(testKeystorePath)
+                storePassword "android"
+                keyAlias "cityrestauranttest"
+                keyPassword "android"
+            }
+        }
+    }
 
     defaultConfig {
         applicationId "com.cityrestaurant.v2playtest"
@@ -19,6 +35,10 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
+
+            if (testKeystorePath) {
+                signingConfig signingConfigs.testDebug
+            }
         }
 
         release {
