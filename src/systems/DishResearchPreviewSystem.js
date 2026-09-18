@@ -6,17 +6,13 @@ import {
   economicBaselineSystem
 } from "./EconomicBaselineSystem.js";
 
+import {
+  COOKING_METHOD_MAP
+} from "../data/cookingMethods.v1.js";
+
 
 const METHOD_RULES =
-  Object.freeze({
-    stir_fry: { id: "stir_fry", name: "炒制", baseMinutes: 12, difficultyBonus: 15, techniqueScore: 76 },
-    steam: { id: "steam", name: "蒸制", baseMinutes: 18, difficultyBonus: 10, techniqueScore: 80 },
-    boil: { id: "boil", name: "煮制", baseMinutes: 15, difficultyBonus: 8, techniqueScore: 72 },
-    stew: { id: "stew", name: "炖煮", baseMinutes: 35, difficultyBonus: 20, techniqueScore: 82 },
-    fry: { id: "fry", name: "炸制", baseMinutes: 12, difficultyBonus: 18, techniqueScore: 74 },
-    cold_mix: { id: "cold_mix", name: "凉拌", baseMinutes: 8, difficultyBonus: 5, techniqueScore: 70 },
-    bake: { id: "bake", name: "烤制", baseMinutes: 25, difficultyBonus: 20, techniqueScore: 79 }
-  });
+  COOKING_METHOD_MAP;
 
 
 const QUANTITY_RULES =
