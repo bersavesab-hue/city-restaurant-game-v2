@@ -15,18 +15,16 @@ import {
   DISH_CATEGORY_LIST
 } from "../data/dishCatalogRules.js";
 
+import {
+  COOKING_METHODS_V1
+} from "../data/cookingMethods.v1.js";
+
 const DISH_CATEGORIES =
   DISH_CATEGORY_LIST;
 
-const COOKING_METHODS = Object.freeze([
-  { id: "stir_fry", name: "炒制" },
-  { id: "steam", name: "蒸制" },
-  { id: "boil", name: "煮制" },
-  { id: "stew", name: "炖煮" },
-  { id: "fry", name: "炸制" },
-  { id: "cold_mix", name: "凉拌" },
-  { id: "bake", name: "烤制" }
-]);
+const COOKING_METHODS =
+  COOKING_METHODS_V1;
+
 
 function safeBalance(restaurantId) {
   try {
