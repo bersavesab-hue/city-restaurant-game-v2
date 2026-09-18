@@ -10,6 +10,10 @@ import {
   financeSystem
 } from "../../../systems/FinanceSystem.js";
 
+import {
+  economicBalanceSystem
+} from "../../../systems/EconomicBalanceSystem.js";
+
 const PERIOD_DAYS = {
   day: 1,
   week: 7,
@@ -27,6 +31,8 @@ const CATEGORY_NAMES = {
   equipment: "设备",
   decoration: "装修",
   marketing: "营销",
+  channel: "渠道费用",
+  research: "研发费用",
   tax: "税费",
   refund: "退款",
   other: "其他"
@@ -278,6 +284,37 @@ class FinanceCenterPageSystem {
         period
       );
 
+    const summary =
+      this.getSummary(
+        transactions
+      );
+
+    const categories =
+      this.getCategories(
+        transactions
+      );
+
+    const range =
+      this.getRange(
+        period
+      );
+
+    const health =
+      economicBalanceSystem
+        .analyze({
+          balance:
+            account.balance,
+          summary,
+          categories,
+          periodDays:
+            Math.max(
+              1,
+              range.endDay -
+              range.startDay +
+              1
+            )
+        });
+
     return {
       pageId:
         "finance",
@@ -304,8 +341,7 @@ class FinanceCenterPageSystem {
         }
       ],
 
-      range:
-        this.getRange(period),
+      range,
 
       account: {
         balance:
@@ -323,20 +359,16 @@ class FinanceCenterPageSystem {
           )
       },
 
-      summary:
-        this.getSummary(
-          transactions
-        ),
+      summary,
+
+      health,
 
       payables:
         this.getPayables(
           restaurantId
         ),
 
-      categories:
-        this.getCategories(
-          transactions
-        ),
+      categories,
 
       transactions:
         transactions.map(
