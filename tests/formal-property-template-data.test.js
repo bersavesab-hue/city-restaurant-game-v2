@@ -23,9 +23,12 @@ import { app } from "../src/main.js";
 const {
   propertyMarketSystem,
   propertyLeaseMarketSystem,
-  venueTypeSystem,
-  cityPropertyPageSystem
+  venueTypeSystem
 } = app.systems;
+
+const {
+  cityPropertyPageSystem
+} = app.ui;
 
 
 test(
