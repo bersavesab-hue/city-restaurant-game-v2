@@ -247,6 +247,10 @@ class RestaurantEquipmentSystem {
               definition
                 .baseDurability,
 
+            maxDurability:
+              definition
+                .baseDurability,
+
             wearProgress:
               0,
 
@@ -448,28 +452,40 @@ class RestaurantEquipmentSystem {
 
 
   getConditionFactor(
-    durability
+    durability,
+    maxDurability = 100
   ) {
-    const value =
-      clamp(
-        durability ?? 0,
-        0,
+    const maximum =
+      Math.max(
+        1,
+        maxDurability ??
         100
       );
 
-    if (value <= 0) {
+    const ratio =
+      clamp(
+        (
+          durability ??
+          0
+        ) /
+        maximum,
+        0,
+        1
+      );
+
+    if (ratio <= 0) {
       return 0;
     }
 
-    if (value < 25) {
+    if (ratio < 0.25) {
       return 0.5;
     }
 
-    if (value < 50) {
+    if (ratio < 0.5) {
       return 0.75;
     }
 
-    if (value < 75) {
+    if (ratio < 0.75) {
       return 0.9;
     }
 
@@ -478,21 +494,36 @@ class RestaurantEquipmentSystem {
 
 
   getConditionName(
-    durability
+    durability,
+    maxDurability = 100
   ) {
-    if (durability <= 0) {
+    const maximum =
+      Math.max(
+        1,
+        maxDurability ??
+        100
+      );
+
+    const ratio =
+      (
+        durability ??
+        0
+      ) /
+      maximum;
+
+    if (ratio <= 0) {
       return "故障";
     }
 
-    if (durability < 25) {
+    if (ratio < 0.25) {
       return "严重老化";
     }
 
-    if (durability < 50) {
+    if (ratio < 0.5) {
       return "老化";
     }
 
-    if (durability < 75) {
+    if (ratio < 0.75) {
       return "正常磨损";
     }
 
@@ -520,7 +551,9 @@ class RestaurantEquipmentSystem {
           0
         ) *
         this.getConditionFactor(
-          unit.durability
+          unit.durability,
+          unit.maxDurability ??
+          100
         )
       )
     );
@@ -750,10 +783,17 @@ class RestaurantEquipmentSystem {
       );
     }
 
+    const maxDurability =
+      unit.maxDurability ??
+      this.getDefinition(
+        unit.equipmentId
+      ).baseDurability ??
+      100;
+
     const missing =
       Math.max(
         0,
-        100 -
+        maxDurability -
         unit.durability
       );
 
@@ -787,7 +827,9 @@ class RestaurantEquipmentSystem {
         unit.id,
         {
           durability:
-            100,
+            maxDurability,
+
+          maxDurability,
 
           wearProgress:
             0,
@@ -894,12 +936,16 @@ class RestaurantEquipmentSystem {
 
           conditionName:
             this.getConditionName(
-              unit.durability
+              unit.durability,
+              unit.maxDurability ??
+              100
             ),
 
           conditionFactor:
             this.getConditionFactor(
-              unit.durability
+              unit.durability,
+              unit.maxDurability ??
+              100
             ),
 
           effectiveCapacity:
