@@ -4,6 +4,7 @@ import { procurementSystem } from "../../../systems/ProcurementSystem.js";
 import { ingredientCatalogSystem } from "../../../systems/IngredientCatalogSystem.js";
 import { supplierSystem } from "../../../systems/SupplierSystem.js";
 import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
+import { getIngredientVisual } from "../../../data/ingredientVisuals.js";
 
 function safeBalance(
   restaurantId
@@ -32,12 +33,54 @@ class SupplyManagementPageSystem {
         .listProfiles({
           storeLevel:
             restaurant.level
-        });
+        })
+        .map(
+          supplier => ({
+            ...supplier,
+            offers:
+              supplier.offers.map(
+                offer => {
+                  const visual =
+                    getIngredientVisual(
+                      offer.ingredientId
+                    );
+
+                  return {
+                    ...offer,
+                    visualIndex:
+                      visual.index,
+                    visualCode:
+                      visual.code,
+                    image:
+                      visual.image
+                  };
+                }
+              )
+          })
+        );
 
     const inventory =
       supplierTradingSystem
         .getInventoryDashboard(
           restaurantId
+        )
+        .map(
+          item => {
+            const visual =
+              getIngredientVisual(
+                item.ingredientId
+              );
+
+            return {
+              ...item,
+              visualIndex:
+                visual.index,
+              visualCode:
+                visual.code,
+              image:
+                visual.image
+            };
+          }
         );
 
     const orders =
@@ -285,7 +328,15 @@ class SupplyManagementPageSystem {
               name:
                 item.name,
               unit:
-                item.unit
+                item.unit,
+              visualIndex:
+                getIngredientVisual(
+                  item.id
+                ).index,
+              image:
+                getIngredientVisual(
+                  item.id
+                ).image
             })
           )
     };
