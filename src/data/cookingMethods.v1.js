@@ -412,6 +412,25 @@ export function validateCookingMethod(
   }
 
   if (
+    typeof method.icon !== "string" ||
+    !method.icon.trim()
+  ) {
+    throw new Error(
+      `Cooking method "${method.id}" requires an icon`
+    );
+  }
+
+  if (
+    typeof method.description !==
+      "string" ||
+    !method.description.trim()
+  ) {
+    throw new Error(
+      `Cooking method "${method.id}" requires a description`
+    );
+  }
+
+  if (
     !Number.isInteger(
       method.baseMinutes
     ) ||
@@ -479,7 +498,11 @@ export function validateCookingMethod(
         !VALID_EQUIPMENT_CAPABILITIES.has(
           capability
         )
-    )
+    ) ||
+    new Set(
+      method.equipmentCapabilities
+    ).size !==
+      method.equipmentCapabilities.length
   ) {
     throw new Error(
       `Cooking method "${method.id}" has invalid equipmentCapabilities`
