@@ -14,6 +14,7 @@ const {
   financeSystem,
   employeeSystem,
   employeeDynamicsSystem,
+  dailySettlementSystem,
   supplierSystem,
   procurementSystem,
   districtEventSystem,
@@ -200,6 +201,26 @@ test(
     assert.ok(
       afterSatisfaction <
       beforeSatisfaction
+    );
+
+    const payrollSettlement =
+      dailySettlementSystem
+        .settle(
+          labor.restaurant.id,
+          1
+        );
+
+    assert.ok(
+      payrollSettlement
+        .payrollEventMultiplier >
+      1
+    );
+
+    assert.ok(
+      payrollSettlement
+        .payrollDue >
+      payrollSettlement
+        .basePayrollDaily
     );
 
     const equipment =
