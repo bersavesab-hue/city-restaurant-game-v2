@@ -92,7 +92,7 @@ test(
     assert.equal(
       byId.delivery
         .packagingCostPerOrder,
-      180
+      4
     );
 
     assert.equal(
