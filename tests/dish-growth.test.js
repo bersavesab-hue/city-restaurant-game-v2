@@ -111,6 +111,7 @@ test(
     const status =
       dishGrowthSystem
         .getStatus(
+          restaurant.id,
           research.dish.id
         );
 
