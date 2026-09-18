@@ -275,12 +275,12 @@ class CookingSystem {
             dish.id
         });
 
-    const researchQualityBonus =
+    const recipeQualityBonus =
       clamp(
         (
           (
             dishProgress
-              .qualityScore ??
+              .recipeQualityScore ??
             60
           ) -
           60
@@ -299,21 +299,21 @@ class CookingSystem {
         6
       );
 
-    const qualityScore =
+    const outputQualityScore =
       Math.round(
         clamp(
           baseQualityScore +
           qualityBonus +
-          researchQualityBonus +
+          recipeQualityBonus +
           masteryQualityBonus,
           0,
           100
         )
       );
 
-    const qualityGrade =
+    const outputGrade =
       getCookOutputGrade(
-        qualityScore
+        outputQualityScore
       );
 
     const time =
@@ -346,8 +346,8 @@ class CookingSystem {
           difficulty:
             recipe.difficulty,
 
-          qualityScore,
-          qualityGrade,
+          outputQualityScore,
+          outputGrade,
 
           consumed,
 
