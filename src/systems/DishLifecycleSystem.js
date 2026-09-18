@@ -98,7 +98,7 @@ class DishLifecycleSystem {
           progress
             .marketPerformance
             ?.averageOutputQuality ??
-          progress.qualityScore ??
+          progress.recipeQualityScore ??
           60
         );
     }
@@ -127,8 +127,8 @@ class DishLifecycleSystem {
       ...getDishRank({
         masteryLevel:
           progress.masteryLevel ?? 1,
-        qualityScore:
-          progress.qualityScore ?? 60
+        recipeQualityScore:
+          progress.recipeQualityScore ?? 60
       })
     };
   }
@@ -236,9 +236,12 @@ class DishLifecycleSystem {
           )
         : 0;
 
-    const qualityScore =
+    const outputScore =
       outputQualityScore ??
-      progress.qualityScore ??
+      progress
+        .marketPerformance
+        ?.averageOutputQuality ??
+      progress.recipeQualityScore ??
       60;
 
     const oldPortions =
@@ -252,7 +255,7 @@ class DishLifecycleSystem {
         (
           old.averageOutputQuality *
             oldPortions +
-          qualityScore *
+          outputScore *
             quantity
         ) /
         Math.max(
@@ -271,22 +274,22 @@ class DishLifecycleSystem {
 
     let reputationDelta = 0;
 
-    if (qualityScore >= 90) {
+    if (outputScore >= 90) {
       reputationDelta = 5;
     } else if (
-      qualityScore >= 80
+      outputScore >= 80
     ) {
       reputationDelta = 4;
     } else if (
-      qualityScore >= 70
+      outputScore >= 70
     ) {
       reputationDelta = 2;
     } else if (
-      qualityScore >= 60
+      outputScore >= 60
     ) {
       reputationDelta = 1;
     } else if (
-      qualityScore < 50
+      outputScore < 50
     ) {
       reputationDelta = -3;
     }
@@ -464,22 +467,23 @@ class DishLifecycleSystem {
       nextRank
         ? [
             {
-              id: "quality",
-              name: "菜品品质",
+              id: "recipe_quality",
+              name: "配方品质分",
               current:
-                progress.qualityScore ??
+                progress
+                  .recipeQualityScore ??
                 0,
               required:
                 nextRank
-                  .minQualityScore,
+                  .minRecipeQualityScore,
               met:
                 (
                   progress
-                    .qualityScore ??
+                    .recipeQualityScore ??
                   0
                 ) >=
                 nextRank
-                  .minQualityScore
+                  .minRecipeQualityScore
             },
             {
               id: "mastery",
@@ -521,8 +525,8 @@ class DishLifecycleSystem {
       outputQuality:
         progress.outputQuality,
 
-      qualityScore:
-        progress.qualityScore,
+      recipeQualityScore:
+        progress.recipeQualityScore,
 
       market:
         structuredClone(
