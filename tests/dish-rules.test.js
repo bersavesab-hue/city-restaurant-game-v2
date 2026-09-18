@@ -52,12 +52,12 @@ test(
 );
 
 test(
-  "菜品品阶同时受熟练度与菜品质量分控制",
+  "菜品品阶同时受熟练度与配方品质分控制",
   () => {
     assert.equal(
       getDishRank({
         masteryLevel: 1,
-        qualityScore: 100
+        recipeQualityScore: 100
       }).name,
       "家常"
     );
@@ -65,7 +65,7 @@ test(
     assert.equal(
       getDishRank({
         masteryLevel: 3,
-        qualityScore: 70
+        recipeQualityScore: 70
       }).name,
       "招牌"
     );
@@ -73,7 +73,7 @@ test(
     assert.equal(
       getDishRank({
         masteryLevel: 5,
-        qualityScore: 85
+        recipeQualityScore: 85
       }).name,
       "名菜"
     );
@@ -81,7 +81,7 @@ test(
     assert.equal(
       getDishRank({
         masteryLevel: 5,
-        qualityScore: 95
+        recipeQualityScore: 95
       }).name,
       "镇店"
     );
