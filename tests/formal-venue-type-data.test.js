@@ -473,18 +473,43 @@ test(
   () => {
     gameState.reset();
 
-    const property =
-      propertyMarketSystem
-        .createListing(
-          "residential",
-          901,
-          1
-        );
+    let property =
+      null;
+
+    for (
+      let sequence = 901;
+      sequence < 931;
+      sequence += 1
+    ) {
+      const candidate =
+        propertyMarketSystem
+          .createListing(
+            "residential",
+            sequence,
+            1
+          );
+
+      if (
+        candidate
+          .marketMeta
+          ?.recommendedVenueTypes
+          ?.length >
+        0
+      ) {
+        property =
+          candidate;
+        break;
+      }
+    }
+
+    assert.ok(
+      property,
+      "expected at least one generated property with executable venue recommendations"
+    );
 
     const recommendations =
       property.marketMeta
-        ?.recommendedVenueTypes ??
-      [];
+        .recommendedVenueTypes;
 
     assert.ok(
       recommendations.length >
