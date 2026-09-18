@@ -10,6 +10,7 @@ import {
 
 import { restaurantSystem } from "./RestaurantSystem.js";
 import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
+import { economicBaselineSystem } from "./EconomicBaselineSystem.js";
 
 function clamp(
   value,
@@ -252,9 +253,19 @@ class DishResearchSystem {
         ingredient.baseQuality *
         item.quantity;
 
+      const economicReference =
+        economicBaselineSystem
+          .getIngredientReference(
+            ingredient.id
+          );
+
+      const unitPrice =
+        economicReference
+          ?.normalizedUnitPrice ??
+        ingredient.basePurchasePrice;
+
       estimatedCost +=
-        ingredient
-          .basePurchasePrice *
+        unitPrice *
         item.quantity;
 
       categories.add(
