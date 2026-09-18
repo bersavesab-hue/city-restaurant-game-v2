@@ -46,6 +46,7 @@ import { dishResearchSystem } from "./systems/DishResearchSystem.js";
 import { dishResearchPreviewSystem } from "./systems/DishResearchPreviewSystem.js";
 import { dishGrowthSystem } from "./systems/DishGrowthSystem.js";
 import { dishLifecycleSystem } from "./systems/DishLifecycleSystem.js";
+import { restaurantDishSystem } from "./systems/RestaurantDishSystem.js";
 
 import { menuSystem } from "./systems/MenuSystem.js";
 import { customerSystem } from "./systems/CustomerSystem.js";
@@ -157,6 +158,7 @@ function bootstrap() {
       dishResearchPreviewSystem,
       dishGrowthSystem,
       dishLifecycleSystem,
+      restaurantDishSystem,
       dishManagementSystem,
 
       menuSystem,
