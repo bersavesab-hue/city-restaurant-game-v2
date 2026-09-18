@@ -45,6 +45,22 @@ class MemberMarketingView {
 
         <section class="marketing-kpis">
           <article>
+            <span>识别熟客</span>
+            <strong>
+              ${page.identity
+                .recognizedCustomers}
+            </strong>
+          </article>
+
+          <article>
+            <span>熟客识别访问</span>
+            <strong>
+              ${page.identity
+                .recognizedVisits}
+            </strong>
+          </article>
+
+          <article>
             <span>会员数</span>
             <strong>
               ${page.loyalty.members}
