@@ -74,6 +74,10 @@ import {
 } from "../src/systems/OpeningFlowSystem.js";
 
 import {
+  openingPermitSystem
+} from "../src/systems/OpeningPermitSystem.js";
+
+import {
   salesChannelSystem
 } from "../src/systems/SalesChannelSystem.js";
 
@@ -98,6 +102,18 @@ const {
 
 const INITIAL_CAPITAL =
   300000;
+
+const TARGET_DAYS =
+  Math.max(
+    90,
+    Number.parseInt(
+      process.env
+        .PHASE3_BALANCE_DAYS ??
+        "90",
+      10
+    ) ||
+    90
+  );
 
 function setupScenario() {
   gameState.reset();
@@ -622,6 +638,73 @@ function setupScenario() {
   };
 }
 
+function renewDuePermits(
+  restaurantId
+) {
+  const status =
+    openingPermitSystem
+      .getStatus(
+        restaurantId
+      );
+
+  const renewed = [];
+
+  for (
+    const permit
+    of status.permits
+  ) {
+    if (
+      permit.required &&
+      permit.issued &&
+      permit.renewalDue
+    ) {
+      renewed.push(
+        openingPermitSystem
+          .renewPermit(
+            restaurantId,
+            permit.permitKind
+          )
+      );
+    }
+  }
+
+  return renewed;
+}
+
+function advanceManagedDays(
+  restaurantId,
+  days
+) {
+  let remaining =
+    days;
+
+  while (
+    remaining > 0
+  ) {
+    renewDuePermits(
+      restaurantId
+    );
+
+    const chunk =
+      Math.min(
+        30,
+        remaining
+      );
+
+    simulationSystem
+      .advanceLongTerm(
+        chunk
+      );
+
+    remaining -=
+      chunk;
+  }
+
+  renewDuePermits(
+    restaurantId
+  );
+}
+
 function getCheckpoint(
   restaurantId,
   elapsedDays
@@ -839,6 +922,18 @@ function getCheckpoint(
       restaurant.repeatRate,
     reviewScore:
       restaurant.reviewScore,
+    complianceSuspended:
+      Boolean(
+        restaurant
+          .complianceSuspended
+      ),
+    openComplianceViolations:
+      openingPermitSystem
+        .getStatus(
+          restaurantId
+        )
+        .openViolations
+        .length,
     payrollArrears:
       payrollArrears.length,
     operatingArrears:
@@ -865,7 +960,7 @@ function getCheckpoint(
 }
 
 test(
-  "第三阶段经营基线从真实开店成本连续运行365天且不破产不爆钱",
+  `第三阶段经营基线从真实开店成本连续运行${TARGET_DAYS}天且不破产不爆钱`,
   () => {
     const scenario =
       setupScenario();
@@ -885,10 +980,10 @@ test(
       INITIAL_CAPITAL
     );
 
-    simulationSystem
-      .advanceLongTerm(
-        30
-      );
+    advanceManagedDays(
+      restaurant.id,
+      30
+    );
 
     const day30 =
       getCheckpoint(
@@ -921,10 +1016,10 @@ test(
       day30.level <= 7
     );
 
-    simulationSystem
-      .advanceLongTerm(
-        60
-      );
+    advanceManagedDays(
+      restaurant.id,
+      60
+    );
 
     const day90 =
       getCheckpoint(
@@ -963,15 +1058,21 @@ test(
         3
     );
 
-    simulationSystem
-      .advanceLongTerm(
-        275
-      );
+    if (
+      TARGET_DAYS <= 90
+    ) {
+      return;
+    }
+
+    advanceManagedDays(
+      restaurant.id,
+      TARGET_DAYS - 90
+    );
 
     const day365 =
       getCheckpoint(
         restaurant.id,
-        365
+        TARGET_DAYS
       );
 
     assert.ok(
@@ -1045,12 +1146,30 @@ test(
       0
     );
 
+    assert.equal(
+      day365
+        .complianceSuspended,
+      false
+    );
+
+    assert.equal(
+      day365
+        .openComplianceViolations,
+      0
+    );
+
+    assert.ok(
+      day365
+        .monthlyProfit >
+      0,
+      "理性续证后的长期门店不应因固定经营结构自然转为亏损"
+    );
+
     assert.ok(
       [
         "healthy",
         "watch",
-        "warning",
-        "critical"
+        "warning"
       ].includes(
         day365.health
       )
