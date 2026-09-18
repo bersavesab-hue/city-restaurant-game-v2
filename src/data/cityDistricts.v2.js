@@ -486,7 +486,7 @@ export const CITY_DISTRICTS_V2 =
         nightlife_store: 1.3,
         street_shop: 1.12,
         rooftop_restaurant: 1.18,
-        barbecue_store: 1.05,
+        nightlife_store: 1.05,
         villa_private_kitchen: 0.82,
         breakfast_store: 0.4
       },
@@ -749,7 +749,7 @@ export const CITY_DISTRICTS_V2 =
         cloud_kitchen: 1.28,
         fast_service_store: 1.2,
         street_shop: 0.95,
-        cafe_store: 1.08
+        street_shop: 1.08
       },
       positioningAffinity: {
         quick_service: 1.35,
@@ -851,7 +851,7 @@ export const CITY_DISTRICTS_V2 =
         old_brand_shop: 1.12,
         courtyard_restaurant: 1.18,
         rooftop_restaurant: 1.08,
-        cafe_store: 1.12
+        street_shop: 1.12
       },
       positioningAffinity: {
         quick_service: 0.82,
@@ -955,7 +955,7 @@ export const CITY_DISTRICTS_V2 =
         nightlife_store: 1.18,
         street_shop: 1.12,
         mall_store: 1.06,
-        barbecue_store: 1.1
+        nightlife_store: 1.1
       },
       positioningAffinity: {
         quick_service: 1.12,
