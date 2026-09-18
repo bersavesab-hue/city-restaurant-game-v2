@@ -1,5 +1,7 @@
 *.backup*.js
 android/app/build/
+android/app/src/main/assets/
+*.apk
 # Dependencies
 node_modules/
 # Local backups
