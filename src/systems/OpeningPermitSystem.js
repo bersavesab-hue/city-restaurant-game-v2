@@ -26,10 +26,6 @@ import {
   recipeSystem
 } from "./RecipeSystem.js";
 
-import {
-  cookingMethodRequiresExhaust
-} from "../data/cookingMethods.v1.js";
-
 
 const PERMIT_DEFINITIONS =
   Object.freeze([
@@ -241,12 +237,15 @@ class OpeningPermitSystem {
             item.recipeId
           );
 
-        return (
-          recipe &&
-          cookingMethodRequiresExhaust(
-            recipe.method
+        if (!recipe) {
+          return false;
+        }
+
+        return recipeSystem
+          .getOperationalRequirements(
+            recipe.id
           )
-        );
+          .requiresExhaust;
       }
     );
   }
