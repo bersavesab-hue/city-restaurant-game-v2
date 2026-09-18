@@ -12,6 +12,7 @@ import { restaurantPositioningSystem } from "./RestaurantPositioningSystem.js";
 import { dishGrowthSystem } from "./DishGrowthSystem.js";
 import { renovationSystem } from "./RenovationSystem.js";
 import { wordOfMouthSystem } from "./WordOfMouthSystem.js";
+import { businessCausalitySystem } from "./BusinessCausalitySystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -385,6 +386,14 @@ class TrafficDemandSystem {
             segment.id
           );
 
+      const segmentRetentionFactor =
+        businessCausalitySystem
+          .getSegmentDemandMultiplier(
+            restaurantId,
+            segment.id,
+            7
+          );
+
       const playerAppeal =
         clamp(
           priceFactor *
@@ -398,6 +407,7 @@ class TrafficDemandSystem {
           environment
             .playerAppealMultiplier *
           positioningFactor *
+          segmentRetentionFactor *
           dishPrestigeFactor *
           renovationAppealFactor,
           0.2,
@@ -441,6 +451,7 @@ class TrafficDemandSystem {
           .demandMultiplier *
         calendarFactor *
         positioningFactor *
+        segmentRetentionFactor *
         dishPrestigeFactor *
         renovationAppealFactor *
         priceFactor *
@@ -479,6 +490,8 @@ class TrafficDemandSystem {
         calendarFactor,
 
         positioningFactor,
+
+        segmentRetentionFactor,
 
         renovationAppealFactor,
 
