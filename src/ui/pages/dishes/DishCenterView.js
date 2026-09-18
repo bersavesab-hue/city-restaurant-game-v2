@@ -840,10 +840,11 @@ class DishCenterView {
 
 
   render() {
-    this.root.style.setProperty(
-      "--ingredient-atlas",
-      `url("${INGREDIENT_ATLAS_DATA_URI}")`
-    );
+    this.root.style
+      ?.setProperty?.(
+        "--ingredient-atlas",
+        `url("${INGREDIENT_ATLAS_DATA_URI}")`
+      );
 
     this.page =
       this.pageSystem
