@@ -5,12 +5,68 @@ function clamp(value, min, max) {
 }
 
 function normalizeUnitPrice(reference) {
-  const unit = reference.unit;
-  const price = reference.referencePrice;
+  const sourceUnit =
+    reference.sourceUnit ??
+    reference.unit;
 
-  if (unit === "kg") return price / 1000;
-  if (unit === "l") return price / 1000;
-  return price;
+  const gameUnit =
+    reference.gameUnit ??
+    reference.unit;
+
+  const price =
+    reference.referencePrice;
+
+  if (
+    sourceUnit === "kg" &&
+    gameUnit === "g"
+  ) {
+    return price / 1000;
+  }
+
+  if (
+    sourceUnit === "l" &&
+    gameUnit === "ml"
+  ) {
+    return price / 1000;
+  }
+
+  if (
+    sourceUnit === "kg" &&
+    gameUnit === "piece"
+  ) {
+    const gramsPerPiece =
+      Number(
+        reference.gramsPerPiece
+      );
+
+    if (
+      !Number.isFinite(
+        gramsPerPiece
+      ) ||
+      gramsPerPiece <= 0
+    ) {
+      throw new Error(
+        "gramsPerPiece is required for kg-to-piece conversion"
+      );
+    }
+
+    return (
+      price /
+      1000 *
+      gramsPerPiece
+    );
+  }
+
+  if (
+    sourceUnit ===
+    gameUnit
+  ) {
+    return price;
+  }
+
+  throw new Error(
+    `Unsupported reality price unit conversion: ${sourceUnit} -> ${gameUnit}`
+  );
 }
 
 class EconomicBaselineSystem {
@@ -41,7 +97,13 @@ class EconomicBaselineSystem {
 
     return {
       ...structuredClone(reference),
-      normalizedUnitPrice: normalizeUnitPrice(reference)
+      unit:
+        reference.gameUnit ??
+        reference.unit,
+      normalizedUnitPrice:
+        normalizeUnitPrice(
+          reference
+        )
     };
   }
 
@@ -124,8 +186,25 @@ class EconomicBaselineSystem {
     if (!reference) return null;
 
     const macro =
-      (this.snapshot.macro?.foodPriceIndex ?? 1) *
-      (this.snapshot.macro?.consumerPriceIndex ?? 1);
+      this.snapshot.sourcePolicy
+        ?.strictNominalRmb
+        ? (
+            this.snapshot.macro
+              ?.foodPriceIndex ??
+            1
+          )
+        : (
+            (
+              this.snapshot.macro
+                ?.foodPriceIndex ??
+              1
+            ) *
+            (
+              this.snapshot.macro
+                ?.consumerPriceIndex ??
+              1
+            )
+          );
 
     const multiplier = clamp(
       macro *
@@ -141,9 +220,38 @@ class EconomicBaselineSystem {
 
     return {
       ingredientId,
-      unit: reference.unit,
-      referencePrice: reference.referencePrice,
-      normalizedUnitPrice: reference.normalizedUnitPrice,
+      unit:
+        reference.unit,
+
+      sourceUnit:
+        reference.sourceUnit ??
+        reference.unit,
+
+      referencePrice:
+        reference.referencePrice,
+
+      normalizedUnitPrice:
+        reference.normalizedUnitPrice,
+
+      sourceKind:
+        reference.sourceKind ??
+        null,
+
+      sourceName:
+        reference.sourceName ??
+        null,
+
+      sourceUrl:
+        reference.sourceUrl ??
+        null,
+
+      observedDate:
+        reference.observedDate ??
+        null,
+
+      observedPeriod:
+        reference.observedPeriod ??
+        null,
       multiplier,
       price: reference.normalizedUnitPrice * multiplier,
       volatility: reference.volatility ?? 0
