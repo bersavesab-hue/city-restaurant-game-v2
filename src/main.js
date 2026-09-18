@@ -80,6 +80,7 @@ import { competitorDynamicsSystem } from "./systems/CompetitorDynamicsSystem.js"
 import { seatingSystem } from "./systems/SeatingSystem.js";
 import { renovationSystem } from "./systems/RenovationSystem.js";
 import { renovationConstructionSystem } from "./systems/RenovationConstructionSystem.js";
+import { equipmentMaintenanceSystem } from "./systems/EquipmentMaintenanceSystem.js";
 import { layoutFlowSystem } from "./systems/LayoutFlowSystem.js";
 import { renovationPlanningSystem } from "./systems/RenovationPlanningSystem.js";
 import { renovationEditorSystem } from "./systems/RenovationEditorSystem.js";
@@ -197,6 +198,7 @@ function bootstrap() {
       seatingSystem,
       renovationSystem,
       renovationConstructionSystem,
+      equipmentMaintenanceSystem,
       layoutFlowSystem,
       renovationPlanningSystem,
       renovationEditorSystem,
