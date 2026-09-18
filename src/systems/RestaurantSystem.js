@@ -71,6 +71,8 @@ class RestaurantSystem {
 
           openedAt: null,
 
+          firstOpenedAt: null,
+
           closedAt: null
         }
       );
@@ -168,6 +170,13 @@ class RestaurantSystem {
 
           openedAt:
             time.totalMinutes,
+
+          firstOpenedAt:
+            Number.isFinite(
+              restaurant.firstOpenedAt
+            )
+              ? restaurant.firstOpenedAt
+              : time.totalMinutes,
 
           closedAt: null
         }
