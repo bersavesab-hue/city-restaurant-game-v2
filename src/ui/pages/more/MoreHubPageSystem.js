@@ -14,6 +14,10 @@ import {
   awardFeedbackSystem
 } from "../../../systems/AwardFeedbackSystem.js";
 
+import {
+  storeProgressSystem
+} from "../../../systems/StoreProgressSystem.js";
+
 
 const MORE_GROUPS =
   Object.freeze([
@@ -27,7 +31,8 @@ const MORE_GROUPS =
           title: "会员营销",
           description: "会员等级、权益、营销活动与顾客维护",
           target: "member-marketing",
-          state: "ready"
+          state: "ready",
+          unlockFeature: "membership"
         },
         {
           id: "honor-hall",
@@ -72,7 +77,8 @@ const MORE_GROUPS =
           title: "连锁管理",
           description: "多门店、品牌扩张与连锁经营",
           target: "chain",
-          state: "placeholder"
+          state: "placeholder",
+          unlockFeature: "chain_management"
         }
       ]
     },
@@ -156,6 +162,47 @@ class MoreHubPageSystem {
       groups:
         structuredClone(
           MORE_GROUPS
+        ).map(
+          group => ({
+            ...group,
+
+            entries:
+              group.entries
+                .map(
+                  entry => {
+                    if (
+                      !entry
+                        .unlockFeature
+                    ) {
+                      return entry;
+                    }
+
+                    const unlocked =
+                      storeProgressSystem
+                        .isUnlocked(
+                          restaurantId,
+                          entry
+                            .unlockFeature
+                        );
+
+                    return {
+                      ...entry,
+
+                      state:
+                        unlocked
+                          ? entry.state
+                          : "locked",
+
+                      unlockLevel:
+                        storeProgressSystem
+                          .getUnlockLevel(
+                            entry
+                              .unlockFeature
+                          )
+                    };
+                  }
+                )
+          })
         )
     };
   }
