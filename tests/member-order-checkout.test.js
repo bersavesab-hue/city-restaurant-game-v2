@@ -303,30 +303,30 @@ test(
       500
     );
 
-    // 10积分抵100
+    // 10积分抵10
     assert.equal(
       order.pointDiscount,
-      100
+      10
     );
 
     assert.equal(
       order.totalDiscount,
-      640
+      550
     );
 
     assert.equal(
       order.paidAmount,
-      1360
+      1450
     );
 
     assert.equal(
       order.totalRevenue,
-      1360
+      1450
     );
 
     assert.equal(
       order.grossProfit,
-      760
+      850
     );
 
     assert.ok(
@@ -338,7 +338,7 @@ test(
         restaurant.id
       ),
       balanceBeforeOrder +
-      1360
+      1450
     );
 
     const transaction =
@@ -349,7 +349,7 @@ test(
 
     assert.equal(
       transaction.amount,
-      1360
+      1450
     );
 
     assert.equal(
@@ -388,7 +388,7 @@ test(
     assert.equal(
       campaign
         .attributedRevenue,
-      1360
+      1450
     );
   }
 );
