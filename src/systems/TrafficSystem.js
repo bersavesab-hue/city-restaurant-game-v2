@@ -12,6 +12,7 @@ import { trafficDemandSystem } from "./TrafficDemandSystem.js";
 import { customerChoiceSystem } from "./CustomerChoiceSystem.js";
 import { seatingSystem } from "./SeatingSystem.js";
 import { customerExperienceSystem } from "./CustomerExperienceSystem.js";
+import { businessCausalitySystem } from "./BusinessCausalitySystem.js";
 import { serviceCapacitySystem } from "./ServiceCapacitySystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
 
@@ -438,6 +439,9 @@ class TrafficSystem {
     let qualityTotal = 0;
     let qualityCount = 0;
 
+    const segmentStats =
+      new Map();
+
     for (
       let i = 0;
       i < visitors;
@@ -460,6 +464,26 @@ class TrafficSystem {
             )
         );
 
+      const segmentStat =
+        segmentStats.get(
+          segmentId
+        ) ?? {
+          segmentId,
+          arrivals: 0,
+          served: 0,
+          failed: 0,
+          revenue: 0,
+          qualityTotal: 0,
+          qualityCount: 0
+        };
+
+      segmentStat.arrivals += 1;
+
+      segmentStats.set(
+        segmentId,
+        segmentStat
+      );
+
       const menuItem =
         customerChoiceSystem
           .chooseMenuItem(
@@ -469,6 +493,9 @@ class TrafficSystem {
 
       if (!menuItem) {
         failedOrders += 1;
+
+        segmentStat.failed += 1;
+
         continue;
       }
 
@@ -484,6 +511,9 @@ class TrafficSystem {
             restaurantId,
 
             customerId: null,
+
+            customerSegmentId:
+              segmentId,
 
             items: [
               {
@@ -503,8 +533,20 @@ class TrafficSystem {
 
         revenue +=
           order.totalRevenue;
+
+        segmentStat.served += 1;
+
+        segmentStat.revenue +=
+          order.totalRevenue;
+
+        segmentStat.qualityTotal +=
+          order.averageQuality;
+
+        segmentStat.qualityCount += 1;
       } catch (error) {
         failedOrders += 1;
+
+        segmentStat.failed += 1;
 
         eventBus.emit(
           "traffic:orderFailed",
@@ -530,9 +572,119 @@ class TrafficSystem {
       }
     }
 
+    const throughputPerMinute =
+      visitors > 0
+        ? visitors / 60
+        : 0;
+
+    const estimatedWaitMinutes =
+      seating.queuedVisitors > 0 &&
+      throughputPerMinute > 0
+        ? Math.ceil(
+            seating.queuedVisitors /
+            throughputPerMinute
+          )
+        : 0;
+
+    const totalDemandWeight =
+      demand.segments.reduce(
+        (sum, item) =>
+          sum +
+          Math.max(
+            0,
+            item.expectedVisitors ??
+            0
+          ),
+        0
+      );
+
+    const segmentOutcomes =
+      demand.segments.map(
+        item => {
+          const stat =
+            segmentStats.get(
+              item.segmentId
+            ) ?? {
+              segmentId:
+                item.segmentId,
+              arrivals: 0,
+              served: 0,
+              failed: 0,
+              revenue: 0,
+              qualityTotal: 0,
+              qualityCount: 0
+            };
+
+          const rejectedShare =
+            totalDemandWeight > 0
+              ? rejectedVisitors *
+                (
+                  Math.max(
+                    0,
+                    item.expectedVisitors ??
+                    0
+                  ) /
+                  totalDemandWeight
+                )
+              : 0;
+
+          return {
+            segmentId:
+              item.segmentId,
+
+            expectedVisitors:
+              item.expectedVisitors,
+
+            arrivals:
+              stat.arrivals,
+
+            served:
+              stat.served,
+
+            failed:
+              stat.failed,
+
+            rejected:
+              Number(
+                rejectedShare
+                  .toFixed(2)
+              ),
+
+            revenue:
+              stat.revenue,
+
+            averageQuality:
+              stat.qualityCount > 0
+                ? Math.round(
+                    stat.qualityTotal /
+                    stat.qualityCount
+                  )
+                : 0,
+
+            priceFactor:
+              item.priceFactor,
+
+            competitionFactor:
+              item.competitionFactor,
+
+            marketShare:
+              item.marketShare
+          };
+        }
+      );
+
     const result = {
+      incomingVisitors,
+
       visitors,
       rejectedVisitors,
+
+      estimatedWaitMinutes,
+
+      queuePatienceMinutes:
+        seating.queuePatienceMinutes,
+
+      segmentOutcomes,
 
       queuedVisitors:
         seating.queuedVisitors,
@@ -642,6 +794,14 @@ class TrafficSystem {
           checkoutCapacity:
             configuredCapacity
               .checkoutGuests
+        });
+
+    result.causalityRecord =
+      businessCausalitySystem
+        .recordHour({
+          restaurantId,
+          demand,
+          result
         });
 
     eventBus.emit(
