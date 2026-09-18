@@ -758,6 +758,7 @@ export const VENUE_TYPES_V2 =
       seatCapMultiplier: 0.72,
       minKitchenRatio: 0.12,
       queueSpaceBias: 0.85,
+      requiresExhaust: false,
       targetSegments: {
         student: 1.22,
         young_couple: 1.28,
