@@ -6,6 +6,7 @@ import { propertyLeaseMarketSystem } from "../../../systems/PropertyLeaseMarketS
 import { financeSystem } from "../../../systems/FinanceSystem.js";
 import { leaseSystem } from "../../../systems/LeaseSystem.js";
 import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
+import { venueTypeSystem } from "../../../systems/VenueTypeSystem.js";
 import { pageRegistry } from "../../registry/PageRegistry.js";
 
 function clamp(
@@ -97,6 +98,36 @@ class CityPropertyPageSystem {
         .marketMeta
         ?.qualityScore ??
       50;
+
+    const recommendedVenueTypes =
+      enriched
+        .marketMeta
+        ?.recommendedVenueTypes ??
+      (
+        district
+          ? venueTypeSystem
+              .recommendForProperty(
+                enriched,
+                district,
+                {
+                  limit: 3
+                }
+              )
+              .map(
+                item => ({
+                  id:
+                    item.venueTypeId,
+                  name:
+                    item.venueName,
+                  score:
+                    item.score,
+                  districtAffinity:
+                    item
+                      .districtAffinity
+                })
+              )
+          : []
+      );
 
     const districtOpportunityScore =
       district
@@ -192,6 +223,15 @@ class CityPropertyPageSystem {
 
         positioningScore
       },
+
+      venueTypeId:
+        enriched.venueTypeId ??
+        null,
+
+      recommendedVenueTypes:
+        structuredClone(
+          recommendedVenueTypes
+        ),
       landlord: structuredClone(enriched.landlord ?? null),
       leaseTerms: structuredClone(enriched.leaseTerms ?? null),
       competition: {
