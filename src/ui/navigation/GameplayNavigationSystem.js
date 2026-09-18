@@ -87,7 +87,16 @@ const ACTION_TARGETS =
       "menu-engineering",
 
     "equipment-maintenance":
-      "equipment-maintenance"
+      "equipment-maintenance",
+
+    market:
+      "market-strategy",
+
+    competition:
+      "market-strategy",
+
+    "market-strategy":
+      "market-strategy"
   });
 
 class GameplayNavigationSystem {
