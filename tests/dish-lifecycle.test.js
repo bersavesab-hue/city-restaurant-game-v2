@@ -24,7 +24,6 @@ test(
           name: "生命周期米",
           category: "grain",
           unit: "portion",
-          baseQuality: 3,
           storageType: "dry",
           basePurchasePrice: 5,
           shelfLifeDays: 30,
@@ -36,7 +35,6 @@ test(
           name: "生命周期肉",
           category: "meat",
           unit: "portion",
-          baseQuality: 4,
           storageType: "chilled",
           basePurchasePrice: 14,
           shelfLifeDays: 5,
@@ -48,7 +46,6 @@ test(
           name: "生命周期菜",
           category: "vegetable",
           unit: "portion",
-          baseQuality: 3,
           storageType: "chilled",
           basePurchasePrice: 4,
           shelfLifeDays: 5,
@@ -60,7 +57,6 @@ test(
           name: "生命周期香料",
           category: "seasoning",
           unit: "portion",
-          baseQuality: 4,
           storageType: "dry",
           basePurchasePrice: 3,
           shelfLifeDays: 60,
@@ -114,7 +110,6 @@ test(
         developed.dish.id,
         {
           qualityScore: 72,
-          qualityGrade: "A",
           masteryLevel: 3,
           masteryXp: 220
         }
