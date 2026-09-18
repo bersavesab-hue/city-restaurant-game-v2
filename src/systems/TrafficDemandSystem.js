@@ -13,6 +13,7 @@ import { dishGrowthSystem } from "./DishGrowthSystem.js";
 import { renovationSystem } from "./RenovationSystem.js";
 import { wordOfMouthSystem } from "./WordOfMouthSystem.js";
 import { businessCausalitySystem } from "./BusinessCausalitySystem.js";
+import { salesChannelSystem } from "./SalesChannelSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -58,56 +59,240 @@ class TrafficDemandSystem {
     };
   }
 
-  getCustomerMix(district) {
+  getCustomerMix(
+    district
+  ) {
     const segments =
       customerSegmentSystem
         .getAll();
 
-    if (segments.length === 0) {
+    if (
+      segments.length === 0
+    ) {
       return [];
     }
+
+    const weights =
+      new Map();
 
     const source =
       district?.customerMix;
 
     if (source) {
-      const valid =
-        Object.entries(source)
-          .filter(
-            ([id, weight]) =>
-              customerSegmentSystem
-                .exists(id) &&
-              Number.isFinite(weight) &&
-              weight > 0
+      for (
+        const [
+          id,
+          weight
+        ]
+        of Object.entries(
+          source
+        )
+      ) {
+        if (
+          customerSegmentSystem
+            .exists(
+              id
+            ) &&
+          Number.isFinite(
+            weight
+          ) &&
+          weight > 0
+        ) {
+          weights.set(
+            id,
+            weight
           );
+        }
+      }
+    }
 
-      const total =
-        valid.reduce(
-          (sum, [, weight]) =>
-            sum + weight,
-          0
+    const zoneType =
+      district?.zoneType ??
+      district?.id ??
+      null;
+
+    for (
+      const segment
+      of segments
+    ) {
+      if (
+        weights.has(
+          segment.id
+        )
+      ) {
+        continue;
+      }
+
+      const affinity =
+        zoneType
+          ? customerSegmentSystem
+              .getDistrictAffinity(
+                segment.id,
+                zoneType
+              )
+          : 0.7;
+
+      if (
+        affinity <= 0.85
+      ) {
+        continue;
+      }
+
+      const presence =
+        Math.max(
+          0,
+          Number(
+            segment.basePresence ??
+            1
+          )
         );
 
-      if (total > 0) {
-        return valid.map(
-          ([segmentId, weight]) => ({
-            segmentId,
-            share:
-              weight / total
-          })
+      const supplementalWeight =
+        Math.min(
+          4.5,
+          presence *
+          Math.max(
+            0,
+            affinity -
+            0.85
+          ) *
+          1.4
+        );
+
+      if (
+        supplementalWeight >
+        0
+      ) {
+        weights.set(
+          segment.id,
+          supplementalWeight
         );
       }
     }
 
-    const share =
-      1 / segments.length;
+    if (
+      weights.size === 0
+    ) {
+      const share =
+        1 /
+        segments.length;
 
-    return segments.map(
-      segment => ({
-        segmentId:
-          segment.id,
-        share
+      return segments.map(
+        segment => ({
+          segmentId:
+            segment.id,
+          share
+        })
+      );
+    }
+
+    const total =
+      [
+        ...weights.values()
+      ].reduce(
+        (
+          sum,
+          weight
+        ) =>
+          sum +
+          weight,
+        0
+      );
+
+    return [
+      ...weights.entries()
+    ].map(
+      (
+        [
+          segmentId,
+          weight
+        ]
+      ) => ({
+        segmentId,
+        share:
+          weight /
+          total
       })
+    );
+  }
+
+  getChannelAccessFactor(
+    restaurantId,
+    segment
+  ) {
+    const active =
+      salesChannelSystem
+        .getActiveChannels(
+          restaurantId
+        );
+
+    if (
+      active.length === 0
+    ) {
+      return 0.75;
+    }
+
+    const preferences =
+      segment
+        .channelPreferences ??
+      {
+        dine_in: 1
+      };
+
+    const totalPreference =
+      Object.values(
+        preferences
+      ).reduce(
+        (
+          sum,
+          value
+        ) =>
+          sum +
+          Math.max(
+            0,
+            Number(
+              value
+            ) ||
+            0
+          ),
+        0
+      );
+
+    if (
+      totalPreference <= 0
+    ) {
+      return 1;
+    }
+
+    const activePreference =
+      active.reduce(
+        (
+          sum,
+          channel
+        ) =>
+          sum +
+          Math.max(
+            0,
+            Number(
+              preferences[
+                channel.id
+              ] ??
+              0
+            )
+          ),
+        0
+      );
+
+    const coverage =
+      activePreference /
+      totalPreference;
+
+    return clamp(
+      0.72 +
+      coverage *
+      0.48,
+      0.72,
+      1.2
     );
   }
 
@@ -386,6 +571,12 @@ class TrafficDemandSystem {
             segment.id
           );
 
+      const channelAccessFactor =
+        this.getChannelAccessFactor(
+          restaurantId,
+          segment
+        );
+
       const segmentRetentionFactor =
         businessCausalitySystem
           .getSegmentDemandMultiplier(
@@ -407,6 +598,7 @@ class TrafficDemandSystem {
           environment
             .playerAppealMultiplier *
           positioningFactor *
+          channelAccessFactor *
           segmentRetentionFactor *
           dishPrestigeFactor *
           renovationAppealFactor,
@@ -451,6 +643,7 @@ class TrafficDemandSystem {
           .demandMultiplier *
         calendarFactor *
         positioningFactor *
+        channelAccessFactor *
         segmentRetentionFactor *
         dishPrestigeFactor *
         renovationAppealFactor *
@@ -490,6 +683,8 @@ class TrafficDemandSystem {
         calendarFactor,
 
         positioningFactor,
+
+        channelAccessFactor,
 
         segmentRetentionFactor,
 
