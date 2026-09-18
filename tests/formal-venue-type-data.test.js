@@ -6,6 +6,10 @@ import {
 } from "../src/core/GameState.js";
 
 import {
+  entitySystem
+} from "../src/core/EntitySystem.js";
+
+import {
   VENUE_TYPES_V2,
   VENUE_TYPE_DATASET_META
 } from "../src/data/venueTypes.v2.js";
@@ -347,6 +351,16 @@ test(
         locationId:
           property.id
       });
+
+    entitySystem.update(
+      "restaurant",
+      restaurant.id,
+      {
+        level: 2,
+        reputation: 10,
+        customerSatisfaction: 60
+      }
+    );
 
     const context =
       trafficDemandSystem
