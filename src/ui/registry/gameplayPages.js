@@ -378,6 +378,24 @@ const GAMEPLAY_PAGES = [
       "dashboard"
   },
 
+
+  {
+    id:
+      "store-progress",
+
+    title:
+      "成长与解锁",
+
+    parent:
+      "more",
+
+    order:
+      505,
+
+    layout:
+      "management"
+  },
+
 ];
 
 

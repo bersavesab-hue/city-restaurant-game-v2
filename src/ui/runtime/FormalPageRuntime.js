@@ -191,6 +191,15 @@ import {
 } from "../pages/market-strategy/MarketStrategyView.js";
 
 
+import {
+  storeProgressPageSystem
+} from "../pages/progress/StoreProgressPageSystem.js";
+
+import {
+  storeProgressView
+} from "../pages/progress/StoreProgressView.js";
+
+
 const FORMAL_PAGE_DEFINITIONS =
   Object.freeze({
     supply: {
@@ -406,6 +415,18 @@ const FORMAL_PAGE_DEFINITIONS =
 
       view:
         marketStrategyView,
+
+      mode:
+        "mount"
+    },
+
+
+    "store-progress": {
+      pageSystem:
+        storeProgressPageSystem,
+
+      view:
+        storeProgressView,
 
       mode:
         "mount"
