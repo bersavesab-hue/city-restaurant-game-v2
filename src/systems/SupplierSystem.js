@@ -213,6 +213,20 @@ class SupplierSystem {
         template.unlockLevel,
       maxCreditDays:
         template.maxCreditDays,
+      priceIndex:
+        template.priceIndex,
+      priceVolatility:
+        template.priceVolatility,
+      qualityMin:
+        template.qualityMin,
+      qualityMax:
+        template.qualityMax,
+      deliveryMinutes:
+        template.deliveryMinutes,
+      minimumOrderFactor:
+        template.minimumOrderFactor,
+      capacityFactor:
+        template.capacityFactor,
       reliability:
         template.reliability
     };
@@ -257,18 +271,19 @@ class SupplierSystem {
           template.reliability
       });
 
-    if (!offers) {
-      return created;
-    }
-
     return entitySystem.update(
       "supplier",
       created.id,
       {
-        offers:
-          structuredClone(
-            offers
-          )
+        ...staticFields,
+        ...(offers
+          ? {
+              offers:
+                structuredClone(
+                  offers
+                )
+            }
+          : {})
       }
     );
   }
