@@ -84,6 +84,43 @@ function supplyRiskLabel(value) {
   return "正常";
 }
 
+function signedPercent(
+  value
+) {
+  const number =
+    Number(value ?? 0);
+
+  if (
+    Math.abs(number) <
+    0.05
+  ) {
+    return "0%";
+  }
+
+  return (
+    (number > 0 ? "+" : "") +
+    number +
+    "%"
+  );
+}
+
+function impactClass(
+  value
+) {
+  const number =
+    Number(value ?? 0);
+
+  if (number > 0.5) {
+    return "positive";
+  }
+
+  if (number < -0.5) {
+    return "negative";
+  }
+
+  return "neutral";
+}
+
 class BusinessAnalyticsView {
   constructor({
     pageSystem =
@@ -250,6 +287,7 @@ class BusinessAnalyticsView {
       <nav class="analytics-tabs">
         ${[
           ["overview", "总览"],
+          ["causality", "经营因果"],
           ["dishes", "菜品"],
           ["team", "员工"],
           ["supply", "供应链"]
@@ -301,6 +339,15 @@ class BusinessAnalyticsView {
   }
 
   renderSection(page) {
+    if (
+      this.section ===
+      "causality"
+    ) {
+      return this.renderCausality(
+        page
+      );
+    }
+
     if (
       this.section ===
       "dishes"
@@ -637,6 +684,356 @@ class BusinessAnalyticsView {
       </div>
     `;
   }
+
+  renderCausality(page) {
+    const causality =
+      page.causality;
+
+    const summary =
+      causality.summary;
+
+    const latest =
+      causality.latest;
+
+    return `
+      <section class="analytics-impact-kpis">
+
+        <article>
+          <span>
+            主要经营原因
+          </span>
+
+          <strong>
+            ${
+              escapeHtml(
+                summary.topCause
+                  ?.label ??
+                "数据积累中"
+              )
+            }
+          </strong>
+
+          <small>
+            最近经营结果的首要驱动
+          </small>
+        </article>
+
+        <article>
+          <span>
+            顾客满意度
+          </span>
+
+          <strong>
+            ${summary.averageSatisfaction}
+          </strong>
+
+          <small>
+            /100
+          </small>
+        </article>
+
+        <article>
+          <span>
+            平均等待
+          </span>
+
+          <strong>
+            ${summary.averageWaitMinutes}分钟
+          </strong>
+
+          <small>
+            排队与服务共同影响
+          </small>
+        </article>
+
+        <article>
+          <span>
+            接待完成率
+          </span>
+
+          <strong>
+            ${summary.serviceRate}%
+          </strong>
+
+          <small>
+            实际服务 / 到店顾客
+          </small>
+        </article>
+
+      </section>
+
+
+      <section class="analytics-panel analytics-decision-impact">
+
+        <header>
+          <div>
+            <span>
+              决策结果
+            </span>
+
+            <h2>
+              这段时间经营发生了什么
+            </h2>
+          </div>
+        </header>
+
+
+        <div class="analytics-decision-impact-grid">
+
+          <article>
+            <span>
+              营收
+            </span>
+
+            <strong
+              class="${impactClass(
+                summary.revenueChange
+              )}"
+            >
+              ${changeText(
+                summary.revenueChange
+              )}
+            </strong>
+          </article>
+
+          <article>
+            <span>
+              订单
+            </span>
+
+            <strong
+              class="${impactClass(
+                summary.orderChange
+              )}"
+            >
+              ${changeText(
+                summary.orderChange
+              )}
+            </strong>
+          </article>
+
+          <article>
+            <span>
+              利润
+            </span>
+
+            <strong
+              class="${impactClass(
+                summary.profitChange
+              )}"
+            >
+              ${changeText(
+                summary.profitChange
+              )}
+            </strong>
+          </article>
+
+          <article>
+            <span>
+              当前首要问题
+            </span>
+
+            <strong>
+              ${
+                escapeHtml(
+                  latest
+                    ?.primaryCause
+                    ?.label ??
+                  summary.topCause
+                    ?.label ??
+                  "暂无明显问题"
+                )
+              }
+            </strong>
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <section class="analytics-panel">
+
+        <header>
+          <div>
+            <span>
+              客群变化
+            </span>
+
+            <h2>
+              不同顾客对经营决策的反应
+            </h2>
+          </div>
+
+          <small>
+            价格影响为当前定价对该客群需求的直接作用
+          </small>
+        </header>
+
+
+        <div class="analytics-segment-table">
+
+          <div class="analytics-segment-head">
+            <span>
+              客群
+            </span>
+
+            <span>
+              价格影响
+            </span>
+
+            <span>
+              留存反馈
+            </span>
+
+            <span>
+              接待率
+            </span>
+
+            <span>
+              客单价
+            </span>
+
+            <span>
+              主要原因
+            </span>
+          </div>
+
+
+          ${
+            causality.segments.length
+              ? causality.segments
+                  .map(
+                    segment => `
+                      <article>
+
+                        <strong>
+                          ${escapeHtml(
+                            segment.segmentName
+                          )}
+                        </strong>
+
+                        <span
+                          class="${impactClass(
+                            segment.priceTrafficImpact
+                          )}"
+                        >
+                          ${signedPercent(
+                            segment.priceTrafficImpact
+                          )}
+                        </span>
+
+                        <span
+                          class="${impactClass(
+                            segment.retentionImpact
+                          )}"
+                        >
+                          ${signedPercent(
+                            segment.retentionImpact
+                          )}
+                        </span>
+
+                        <span>
+                          ${segment.serviceRate}%
+                        </span>
+
+                        <span>
+                          ${money(
+                            segment.averageSpend
+                          )}
+                        </span>
+
+                        <b>
+                          ${escapeHtml(
+                            segment.primaryDriverLabel
+                          )}
+                        </b>
+
+                      </article>
+                    `
+                  )
+                  .join("")
+              : `
+                <div class="analytics-empty">
+                  营业后会逐小时积累客群因果数据
+                </div>
+              `
+          }
+
+        </div>
+
+      </section>
+
+
+      <section class="analytics-panel">
+
+        <header>
+          <div>
+            <span>
+              原因分布
+            </span>
+
+            <h2>
+              最近最常出现的经营瓶颈
+            </h2>
+          </div>
+        </header>
+
+
+        <div class="analytics-cause-list">
+
+          ${
+            causality.causes.length
+              ? causality.causes
+                  .map(
+                    cause => `
+                      <article>
+
+                        <span>
+                          ${escapeHtml(
+                            cause.label
+                          )}
+                        </span>
+
+                        <div>
+                          <i
+                            style="
+                              width:${Math.min(
+                                100,
+                                cause.count /
+                                Math.max(
+                                  1,
+                                  causality.causes[0]
+                                    ?.count ??
+                                  1
+                                ) *
+                                100
+                              )}%;
+                            "
+                          ></i>
+                        </div>
+
+                        <strong>
+                          ${cause.count}小时
+                        </strong>
+
+                      </article>
+                    `
+                  )
+                  .join("")
+              : `
+                <div class="analytics-empty">
+                  暂无经营原因记录
+                </div>
+              `
+          }
+
+        </div>
+
+      </section>
+    `;
+  }
+
 
   renderDishes(page) {
     return `
