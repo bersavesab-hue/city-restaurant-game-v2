@@ -84,6 +84,24 @@ test(
       2
     );
 
+    assert.ok(
+      opened.templates
+        .recommendedTemplateId
+    );
+
+    assert.ok(
+      opened.templates.items.length >
+      0
+    );
+
+    assert.equal(
+      opened.templates.items.every(
+        item =>
+          item.executable
+      ),
+      true
+    );
+
     const diningCategory =
       opened.drawer.categories
         .find(
