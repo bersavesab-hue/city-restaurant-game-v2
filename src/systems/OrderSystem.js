@@ -518,7 +518,8 @@ class OrderSystem {
     portions,
     orderCount,
     chefId = null,
-    channelId = "dine_in"
+    channelId = "dine_in",
+    customerSegmentId = null
   }) {
     financeSystem.getAccount(
       restaurantId
@@ -669,6 +670,7 @@ class OrderSystem {
         {
           restaurantId,
           customerId: null,
+          customerSegmentId,
 
           aggregate: true,
           orderCount,
