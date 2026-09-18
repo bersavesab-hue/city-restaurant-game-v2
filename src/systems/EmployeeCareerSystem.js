@@ -2,6 +2,7 @@ import { entitySystem } from "../core/EntitySystem.js";
 import { eventBus } from "../core/EventBus.js";
 import { financeSystem, FINANCE_CATEGORY } from "./FinanceSystem.js";
 import { employeeSystem } from "./EmployeeSystem.js";
+import { economicBaselineSystem } from "./EconomicBaselineSystem.js";
 import {
   EMPLOYEE_CAREER_RANKS,
   EMPLOYEE_TRAINING_PROGRAMS
@@ -60,7 +61,18 @@ class EmployeeCareerSystem {
       ? requireRank(rankId)
       : this.getRank(employee);
 
-    return Math.round(role.baseSalary * rank.salaryMultiplier);
+    const marketSalary =
+      economicBaselineSystem
+        .getLaborReference(
+          employee.roleId
+        )
+        ?.monthlySalary ??
+      role.baseSalary;
+
+    return Math.round(
+      marketSalary *
+      rank.salaryMultiplier
+    );
   }
 
   getSalarySatisfaction(employeeOrId) {
