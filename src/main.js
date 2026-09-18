@@ -36,6 +36,7 @@ import { ingredientCatalogSystem } from "./systems/IngredientCatalogSystem.js";
 import { dishRecipeBootstrapSystem } from "./systems/DishRecipeBootstrapSystem.js";
 import { inventorySystem } from "./systems/InventorySystem.js";
 import { supplierSystem } from "./systems/SupplierSystem.js";
+import { supplierBootstrapSystem } from "./systems/SupplierBootstrapSystem.js";
 import { supplierTradingSystem } from "./systems/SupplierTradingSystem.js";
 import { procurementSystem } from "./systems/ProcurementSystem.js";
 import { autoProcurementSystem } from "./systems/AutoProcurementSystem.js";
@@ -149,6 +150,7 @@ function bootstrap() {
       dishRecipeBootstrapSystem,
       inventorySystem,
       supplierSystem,
+      supplierBootstrapSystem,
       supplierTradingSystem,
       procurementSystem,
       autoProcurementSystem,
