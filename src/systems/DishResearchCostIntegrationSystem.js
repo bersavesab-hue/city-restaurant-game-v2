@@ -1,6 +1,9 @@
 import { dishResearchSystem } from "./DishResearchSystem.js";
 import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 import { economicBaselineSystem } from "./EconomicBaselineSystem.js";
+import {
+  getDishResearchMarkup
+} from "../data/economicBalanceRules.js";
 
 class DishResearchCostIntegrationSystem {
   constructor() {
@@ -27,18 +30,17 @@ class DishResearchCostIntegrationSystem {
     dishResearchSystem.analyze = ({ ingredients, method }) => {
       const base = this.originalAnalyze({ ingredients, method });
       const estimatedCost = this.calculateRealityIngredientCost(ingredients);
-      const gradeLevel =
-        base.grade === "SS" ? 5 :
-        base.grade === "S" ? 4 :
-        base.grade === "A" ? 3 :
-        base.grade === "B" ? 2 : 1;
-      const markup = 2.1 + gradeLevel * 0.28;
+      const markup =
+        getDishResearchMarkup(
+          base.researchScore
+        );
 
       return {
         ...base,
         estimatedCost: Number(estimatedCost.toFixed(2)),
         suggestedPrice: Math.max(1, Math.round(estimatedCost * markup)),
-        priceModel: "reality_baseline_v1"
+        priceModel:
+          "reality_price_plus_gameplay_balance_v1"
       };
     };
 
