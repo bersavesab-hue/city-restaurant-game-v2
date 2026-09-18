@@ -525,6 +525,7 @@ class DishManagementSystem {
 
     dishLifecycleSystem
       .ensureProfile(
+        restaurantId,
         result.dish.id
       );
 
@@ -534,6 +535,7 @@ class DishManagementSystem {
       lifecycle:
         dishLifecycleSystem
           .getStatus(
+            restaurantId,
             result.dish.id
           )
     };
