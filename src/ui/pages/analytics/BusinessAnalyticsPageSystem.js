@@ -6,6 +6,7 @@ import { operatingReportSystem } from "../../../systems/OperatingReportSystem.js
 import { inventorySystem } from "../../../systems/InventorySystem.js";
 import { procurementSystem } from "../../../systems/ProcurementSystem.js";
 import { customerSegmentSystem } from "../../../systems/CustomerSegmentSystem.js";
+import { pricingDecisionImpactSystem } from "../../../systems/PricingDecisionImpactSystem.js";
 
 const PERIODS = Object.freeze([
   {
@@ -351,6 +352,42 @@ class BusinessAnalyticsPageSystem {
         causality?.causes ??
         []
     };
+  }
+
+
+  getPricingDecisionView(
+    restaurantId
+  ) {
+    return pricingDecisionImpactSystem
+      .getRecentDecisions(
+        restaurantId,
+        {
+          days: 14,
+          windowHours: 6,
+          limit: 5
+        }
+      )
+      .map(
+        decision => ({
+          ...decision,
+
+          segments:
+            decision.segments
+              .map(
+                segment => ({
+                  ...segment,
+
+                  segmentName:
+                    customerSegmentSystem
+                      .get(
+                        segment.segmentId
+                      )
+                      ?.name ??
+                    segment.segmentId
+                })
+              )
+        })
+      );
   }
 
 
@@ -721,6 +758,11 @@ class BusinessAnalyticsPageSystem {
         this.getCausalityView(
           report.causality,
           finance
+        ),
+
+      pricingDecisions:
+        this.getPricingDecisionView(
+          restaurantId
         ),
 
       alerts,
