@@ -2,6 +2,10 @@ import {
   SALES_CHANNEL_SCHEMA_VERSION
 } from "./salesChannelRules.js";
 
+import {
+  CHANNEL_ECONOMY_POLICY
+} from "./economicBalanceRules.js";
+
 function channel({
   id,
   name,
@@ -45,7 +49,10 @@ export const SALES_CHANNELS_V1 =
       description: "门店现场用餐，依赖座位与前厅服务能力。",
       defaultActive: true,
       commissionRate: 0,
-      packagingCostPerOrder: 0,
+      packagingCostPerOrder:
+        CHANNEL_ECONOMY_POLICY
+          .defaultPackagingCost
+          .dine_in,
       capacityMultiplier: 1,
       demandMultiplier: 1,
       defaultOrderLimitPerHour: 36,
@@ -62,7 +69,10 @@ export const SALES_CHANNELS_V1 =
       description: "顾客提前下单后到店取餐，不占用座位但消耗后厨和取餐能力。",
       defaultActive: false,
       commissionRate: 0,
-      packagingCostPerOrder: 2,
+      packagingCostPerOrder:
+        CHANNEL_ECONOMY_POLICY
+          .defaultPackagingCost
+          .pickup,
       capacityMultiplier: 1.15,
       demandMultiplier: 0.22,
       defaultOrderLimitPerHour: 24,
@@ -79,7 +89,10 @@ export const SALES_CHANNELS_V1 =
       description: "第三方配送渠道，承担平台抽佣与包装成本，不占用门店座位。",
       defaultActive: false,
       commissionRate: 18,
-      packagingCostPerOrder: 4,
+      packagingCostPerOrder:
+        CHANNEL_ECONOMY_POLICY
+          .defaultPackagingCost
+          .delivery,
       capacityMultiplier: 1.35,
       demandMultiplier: 0.38,
       defaultOrderLimitPerHour: 30,
@@ -96,7 +109,10 @@ export const SALES_CHANNELS_V1 =
       description: "提前锁定座位和到店时间，适合高客单与多人就餐。",
       defaultActive: false,
       commissionRate: 0,
-      packagingCostPerOrder: 0,
+      packagingCostPerOrder:
+        CHANNEL_ECONOMY_POLICY
+          .defaultPackagingCost
+          .reservation,
       capacityMultiplier: 0.92,
       demandMultiplier: 0.12,
       defaultOrderLimitPerHour: 12,
