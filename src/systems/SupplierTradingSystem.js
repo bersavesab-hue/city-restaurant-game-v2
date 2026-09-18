@@ -163,6 +163,10 @@ class SupplierTradingSystem {
       id:
         supplier.id,
 
+      templateId:
+        supplier.templateId ??
+        null,
+
       name:
         supplier.name,
 
