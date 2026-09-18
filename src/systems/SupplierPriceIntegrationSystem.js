@@ -7,15 +7,6 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-function hashString(value) {
-  let hash = 2166136261;
-  for (let index = 0; index < String(value).length; index += 1) {
-    hash ^= String(value).charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
-}
-
 class SupplierPriceIntegrationSystem {
   constructor() {
     this.registered = false;
@@ -39,21 +30,47 @@ class SupplierPriceIntegrationSystem {
 
       const supplier = supplierSystem.get(supplierId);
       const offer = supplierSystem.getOffer(supplierId, ingredientId);
-      const time = gameState.getSection("time") ?? { day: 1 };
-      const economy = cityEconomySystem.getState();
-      const phase = (hashString(ingredientId) % 1000) / 1000 * Math.PI * 2;
-      const volatility = clamp(offer?.priceVolatility ?? reference.volatility ?? 0.1, 0, 0.5);
-      const marketWave = 1 + Math.sin((time.day ?? 1) * 0.47 + phase) * volatility;
-      const relationshipDiscount = 1 - (supplier.relationship / 100) * 0.08;
-      const qualityFactor = clamp(0.86 + (base.quality ?? 3) * 0.055, 0.9, 1.18);
+      const relationshipDiscount =
+        1 -
+        (
+          supplier.relationship /
+          100
+        ) *
+        0.08;
 
-      const calculated = economicBaselineSystem.calculateIngredientPrice({
-        ingredientId,
-        seasonFactor: economy.foodPriceIndex,
-        supplyDemandFactor: marketWave,
-        qualityFactor,
-        contractFactor: (offer?.priceMultiplier ?? 1) * relationshipDiscount
-      });
+      const qualityFactor =
+        clamp(
+          0.86 +
+          (
+            base.quality ??
+            3
+          ) *
+          0.055,
+          0.9,
+          1.18
+        );
+
+      const calculated =
+        economicBaselineSystem
+          .calculateIngredientPrice({
+            ingredientId,
+
+            seasonFactor:
+              1,
+
+            supplyDemandFactor:
+              1,
+
+            qualityFactor,
+
+            contractFactor:
+              (
+                offer
+                  ?.priceMultiplier ??
+                1
+              ) *
+              relationshipDiscount
+          });
 
       if (!calculated) {
         return base;
@@ -68,7 +85,7 @@ class SupplierPriceIntegrationSystem {
         totalPrice,
         referenceUnitPrice: reference.normalizedUnitPrice,
         marketPriceMultiplier: calculated.multiplier,
-        priceModel: "reality_baseline_v1"
+        priceModel: "reality_1_to_1_v2"
       };
     };
 
