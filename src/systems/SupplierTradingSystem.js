@@ -124,9 +124,10 @@ class SupplierTradingSystem {
       );
 
     const offers =
-      Object.values(
-        supplier.offers ?? {}
-      );
+      supplierSystem
+        .listOffers(
+          supplierId
+        );
 
     const averageQuality =
       offers.length > 0
@@ -716,13 +717,14 @@ class SupplierTradingSystem {
       of supplierSystem.list()
     ) {
       for (
-        const ingredientId
-        of Object.keys(
-          supplier.offers ?? {}
-        )
+        const offer
+        of supplierSystem
+          .listOffers(
+            supplier.id
+          )
       ) {
         involved.add(
-          ingredientId
+          offer.ingredientId
         );
       }
     }
