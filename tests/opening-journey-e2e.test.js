@@ -634,6 +634,33 @@ test(
 
     assert.equal(
       permits.status.complete,
+      false
+    );
+
+
+    assert.ok(
+      permits.status.pendingCount >
+      0
+    );
+
+
+    /*
+     * 正式证照需要审核时间。
+     * 当前最长办理时间为2天。
+     */
+    timeSystem.advance(
+      2 * 1440
+    );
+
+
+    status =
+      openingFlowSystem.getStatus(
+        restaurant.id
+      );
+
+
+    assert.equal(
+      status.permits.complete,
       true
     );
 
