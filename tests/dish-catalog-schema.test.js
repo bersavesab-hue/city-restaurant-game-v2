@@ -13,6 +13,10 @@ import {
   validateDish
 } from "../src/systems/DishCatalogSystem.js";
 
+import {
+  RECIPE_SCHEMA_VERSION
+} from "../src/data/recipeRules.js";
+
 const {
   ingredientCatalogSystem,
   dishCatalogSystem,
@@ -216,11 +220,20 @@ test(
     recipeSystem.load(
       [
         {
+          schemaVersion:
+            RECIPE_SCHEMA_VERSION,
+
           id:
             dish.defaultRecipeId,
 
           dishId:
             dish.id,
+
+          variantId:
+            "standard",
+
+          name:
+            "标准做法",
 
           ingredients: [
             {
