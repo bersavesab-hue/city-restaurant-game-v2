@@ -1,3 +1,7 @@
+import {
+  storeProgressSystem
+} from "../../../systems/StoreProgressSystem.js";
+
 const PRIMARY_ENTRIES =
   Object.freeze([
     {
@@ -86,6 +90,7 @@ const PRIMARY_ENTRIES =
       description:
         "门店定位、市场份额、竞争店、商圈事件和营销动作",
       target: "market-strategy",
+      unlockFeature: "marketing",
 
       secondary: [
         {
@@ -122,7 +127,9 @@ const PRIMARY_ENTRIES =
 
 
 class OperationsHubPageSystem {
-  getPage() {
+  getPage(
+    restaurantId = null
+  ) {
     return {
       pageId:
         "operations-home",
@@ -133,17 +140,41 @@ class OperationsHubPageSystem {
       entries:
         PRIMARY_ENTRIES
           .map(
-            entry => ({
-              ...entry,
+            entry => {
+              const unlocked =
+                !entry.unlockFeature ||
+                restaurantId === null ||
+                storeProgressSystem
+                  .isUnlocked(
+                    restaurantId,
+                    entry.unlockFeature
+                  );
 
-              secondary:
-                entry.secondary
-                  .map(
-                    item => ({
-                      ...item
-                    })
-                  )
-            })
+              return {
+                ...entry,
+
+                state:
+                  unlocked
+                    ? "ready"
+                    : "locked",
+
+                unlockLevel:
+                  entry.unlockFeature
+                    ? storeProgressSystem
+                        .getUnlockLevel(
+                          entry.unlockFeature
+                        )
+                    : null,
+
+                secondary:
+                  entry.secondary
+                    .map(
+                      item => ({
+                        ...item
+                      })
+                    )
+              };
+            }
           )
     };
   }
