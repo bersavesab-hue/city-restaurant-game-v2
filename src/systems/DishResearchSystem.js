@@ -20,6 +20,10 @@ import {
   DISH_CATEGORY_LIST
 } from "../data/dishCatalogRules.js";
 
+import {
+  restaurantDishSystem
+} from "./RestaurantDishSystem.js";
+
 function clamp(
   value,
   min,
@@ -550,6 +554,15 @@ class DishResearchSystem {
             recipe.id
         }
       );
+
+    restaurantDishSystem
+      .ensureOwned({
+        restaurantId,
+        dishId:
+          dish.id,
+        initialQualityScore:
+          analysis.qualityScore
+      });
 
     const history = [
       ...(
