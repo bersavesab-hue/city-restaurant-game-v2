@@ -32,6 +32,9 @@ export const INGREDIENT_QUALITY = Object.freeze({
   RARE: 5
 });
 
+export const DEFAULT_INGREDIENT_BATCH_QUALITY =
+  INGREDIENT_QUALITY.PREMIUM;
+
 export const STORAGE_TYPE = Object.freeze({
   ROOM: "room",
   CHILLED: "chilled",
