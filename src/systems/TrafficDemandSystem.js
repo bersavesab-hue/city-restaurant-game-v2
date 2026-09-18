@@ -832,6 +832,8 @@ class TrafficDemandSystem {
       );
 
     const districtPositioningFactor =
+      positioningContext
+        .districtFit ??
       districtSystem
         .getPositioningAffinity(
           district,
