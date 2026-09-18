@@ -8,6 +8,7 @@ import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
 import { restaurantDishSystem } from "./RestaurantDishSystem.js";
+import { restaurantEquipmentSystem } from "./RestaurantEquipmentSystem.js";
 
 import {
   getCookOutputGrade
@@ -107,6 +108,13 @@ class CookingSystem {
         `Recipe "${recipeId}" does not exist`
       );
     }
+
+    const equipmentStatus =
+      restaurantEquipmentSystem
+        .requireRecipeCapabilities(
+          restaurantId,
+          recipeId
+        );
 
     const dish =
       dishCatalogSystem.get(
@@ -350,7 +358,15 @@ class CookingSystem {
             time.day,
 
           cookingMinutes:
-            recipe.cookingMinutes
+            recipe.cookingMinutes,
+
+          equipmentCapabilities:
+            equipmentStatus
+              .requiredCapabilities,
+
+          equipmentFallback:
+            equipmentStatus
+              .legacyFallback
         }
       );
 
