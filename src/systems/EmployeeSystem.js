@@ -122,6 +122,25 @@ class EmployeeSystem {
       fatigue: 0,
       mood: 70,
       loyalty: 50,
+
+      potential: 3,
+      potentialName: "良好",
+      growthMultiplier: 1,
+
+      stability: 60,
+      learning: 60,
+      stressTolerance: 60,
+      teamwork: 60,
+      initiative: 60,
+
+      age: null,
+      industryExperienceMonths: 0,
+      employeeProfileId: null,
+      employeeProfileName: null,
+      archetype: null,
+      growthOrientation: null,
+      traits: [],
+
       skills: buildInitialSkills(role),
       totalWorkMinutes: 0,
       hiredAt: Date.now(),
