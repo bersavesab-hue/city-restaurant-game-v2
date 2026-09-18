@@ -155,7 +155,42 @@ class CustomerLoyaltyIntegrationSystem {
             order.customerId
           );
 
-      if (member) {
+      let resolvedMember =
+        member;
+
+      const segmentId =
+        order.customerSegmentId ??
+        order.segmentId ??
+        null;
+
+      if (
+        !resolvedMember &&
+        segmentId &&
+        customerLoyaltySystem
+          .shouldAutoEnroll({
+            segmentId,
+            satisfaction,
+            spend:
+              revenue
+          })
+      ) {
+        resolvedMember =
+          customerLoyaltySystem
+            .enrollMember({
+              restaurantId:
+                order.restaurantId,
+
+              customerId:
+                order.customerId,
+
+              segmentId,
+
+              source:
+                "behavioral_auto"
+            });
+      }
+
+      if (resolvedMember) {
         customerLoyaltySystem
           .recordMemberVisit({
             restaurantId:
@@ -175,7 +210,9 @@ class CustomerLoyaltyIntegrationSystem {
             dishIds:
               this.getDishIds(
                 order
-              )
+              ),
+
+            segmentId
           });
 
         this.markProcessed(
