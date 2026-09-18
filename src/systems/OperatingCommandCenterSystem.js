@@ -278,6 +278,248 @@ class OperatingCommandCenterSystem {
   }
 
 
+  getLatestHourSnapshot(
+    restaurantId
+  ) {
+    const day =
+      this.getDay();
+
+
+    const records =
+      entitySystem.filter(
+        "service_capacity_record",
+        item =>
+          item.restaurantId ===
+            restaurantId &&
+          item.day === day &&
+          item.source ===
+            "actual_traffic"
+      );
+
+
+    if (
+      records.length ===
+      0
+    ) {
+      return null;
+    }
+
+
+    const latest =
+      [...records]
+        .sort(
+          (a, b) =>
+            (b.totalMinutes ?? 0) -
+            (a.totalMinutes ?? 0)
+        )[0];
+
+
+    const orders =
+      entitySystem.filter(
+        "customer_order",
+        order =>
+          order.restaurantId ===
+            restaurantId &&
+          order.status ===
+            "completed" &&
+          order.day === day &&
+          order.createdAt ===
+            latest.totalMinutes
+      );
+
+
+    let orderCount = 0;
+    let revenue = 0;
+    let portions = 0;
+    let qualityTotal = 0;
+    let qualityWeight = 0;
+
+
+    for (
+      const order
+      of orders
+    ) {
+      const count =
+        order.aggregate
+          ? (
+              order.orderCount ??
+              1
+            )
+          : 1;
+
+
+      orderCount +=
+        count;
+
+      revenue +=
+        order.channelNetRevenue ??
+        order.paidAmount ??
+        order.totalRevenue ??
+        0;
+
+      const orderPortions =
+        (
+          order.items ??
+          []
+        ).reduce(
+          (sum, item) =>
+            sum +
+            (item.quantity ?? 0),
+          0
+        );
+
+      portions +=
+        orderPortions;
+
+      if (
+        Number.isFinite(
+          order.averageQuality
+        )
+      ) {
+        const weight =
+          Math.max(
+            1,
+            orderPortions
+          );
+
+        qualityTotal +=
+          order.averageQuality *
+          weight;
+
+        qualityWeight +=
+          weight;
+      }
+    }
+
+
+    const minuteOfDay =
+      (latest.totalMinutes ?? 0) %
+      1440;
+
+    const hour =
+      Math.floor(
+        minuteOfDay / 60
+      );
+
+
+    return {
+      day,
+      hour,
+
+      totalMinutes:
+        latest.totalMinutes ?? 0,
+
+      arrivals:
+        latest.arrivals ?? 0,
+
+      served:
+        latest.servedGuests ?? 0,
+
+      waiting:
+        latest.waitingGuests ?? 0,
+
+      abandoned:
+        latest.abandonedGuests ?? 0,
+
+      estimatedWaitMinutes:
+        latest.estimatedWaitMinutes ?? 0,
+
+      lostRevenue:
+        latest.lostRevenue ?? 0,
+
+      serviceRate:
+        latest.serviceRate ?? 100,
+
+      abandonmentRate:
+        latest.abandonmentRate ?? 0,
+
+      bottleneck:
+        latest.bottleneck ?? null,
+
+      capacity:
+        latest.capacity ?? null,
+
+      orders:
+        orderCount,
+
+      revenue,
+      portions,
+
+      averageQuality:
+        qualityWeight > 0
+          ? Math.round(
+              qualityTotal /
+              qualityWeight
+            )
+          : 0
+    };
+  }
+
+
+  getWorkforcePulse(
+    restaurantId
+  ) {
+    const employees =
+      entitySystem.filter(
+        "employee",
+        employee =>
+          employee.restaurantId ===
+            restaurantId &&
+          employee.status !==
+            "fired"
+      );
+
+
+    if (
+      employees.length ===
+      0
+    ) {
+      return {
+        total: 0,
+        averageFatigue: 0,
+        highFatigue: 0,
+        maxFatigue: 0
+      };
+    }
+
+
+    const fatigue =
+      employees.map(
+        employee =>
+          Math.max(
+            0,
+            employee.fatigue ?? 0
+          )
+      );
+
+
+    return {
+      total:
+        employees.length,
+
+      averageFatigue:
+        Math.round(
+          fatigue.reduce(
+            (sum, value) =>
+              sum + value,
+            0
+          ) /
+          fatigue.length
+        ),
+
+      highFatigue:
+        fatigue.filter(
+          value =>
+            value >= 75
+        ).length,
+
+      maxFatigue:
+        Math.max(
+          ...fatigue
+        )
+    };
+  }
+
   getPreviousDaySummary(
     restaurantId
   ) {
@@ -642,6 +884,18 @@ class OperatingCommandCenterSystem {
         restaurantId
       );
 
+
+    const latestHour =
+      this.getLatestHourSnapshot(
+        restaurantId
+      );
+
+
+    const workforcePulse =
+      this.getWorkforcePulse(
+        restaurantId
+      );
+
     const finance =
       safe(
         () =>
@@ -754,11 +1008,13 @@ class OperatingCommandCenterSystem {
       },
 
       sales,
+      latestHour,
       finance,
       previousDay,
       capacity,
       inventory,
       workforce,
+      workforcePulse,
       menu,
       storeCapacity,
       priorities

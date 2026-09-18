@@ -32,6 +32,8 @@ const tests = [
   "tests/formal-runtime-navigation-params.test.js",
   "tests/analytics-live-refresh.test.js",
   "tests/operating-feedback-ui.test.js",
+  "tests/operating-live-visualization.test.js",
+  "tests/operating-live-snapshot.test.js",
   "tests/operating-analytics.test.js",
   "tests/business-analytics-ui.test.js",
 

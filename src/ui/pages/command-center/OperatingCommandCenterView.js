@@ -161,6 +161,127 @@ class OperatingCommandCenterView {
             : ""
         }
 
+        ${
+          page.latestHour
+            ? `
+              <section class="command-center__live-hour">
+
+                <header>
+                  <div>
+                    <span>
+                      最新营业小时
+                    </span>
+
+                    <h2>
+                      ${String(
+                        page.latestHour.hour
+                      ).padStart(2, "0")}:00 经营现场
+                    </h2>
+                  </div>
+
+                  <strong>
+                    ${
+                      page.latestHour.bottleneck
+                        ? `当前瓶颈：${page.latestHour.bottleneck.name ?? page.latestHour.bottleneck.id}`
+                        : "当前无明显瓶颈"
+                    }
+                  </strong>
+                </header>
+
+
+                <div class="command-center__grid">
+
+                  <article>
+                    <span>到店 / 接待</span>
+                    <strong>
+                      ${page.latestHour.arrivals}
+                      /
+                      ${page.latestHour.served}
+                    </strong>
+                    <small>
+                      接待率 ${page.latestHour.serviceRate}%
+                    </small>
+                  </article>
+
+                  <article>
+                    <span>本小时订单</span>
+                    <strong>
+                      ${page.latestHour.orders}
+                    </strong>
+                    <small>
+                      出餐 ${page.latestHour.portions} 份
+                    </small>
+                  </article>
+
+                  <article>
+                    <span>本小时营收</span>
+                    <strong>
+                      ${money(page.latestHour.revenue)}
+                    </strong>
+                    <small>
+                      平均出品 ${page.latestHour.averageQuality}
+                    </small>
+                  </article>
+
+                  <article>
+                    <span>排队 / 流失</span>
+                    <strong>
+                      ${page.latestHour.waiting}
+                      /
+                      ${page.latestHour.abandoned}
+                    </strong>
+                    <small>
+                      预计等待 ${page.latestHour.estimatedWaitMinutes} 分钟
+                    </small>
+                  </article>
+
+                  <article>
+                    <span>库存风险</span>
+                    <strong>
+                      ${page.inventory.lowStockCount + page.inventory.outOfStockCount}
+                    </strong>
+                    <small>
+                      缺货 ${page.inventory.outOfStockCount} · 低库存 ${page.inventory.lowStockCount}
+                    </small>
+                  </article>
+
+                  <article>
+                    <span>员工平均疲劳</span>
+                    <strong>
+                      ${page.workforcePulse.averageFatigue}
+                    </strong>
+                    <small>
+                      高疲劳 ${page.workforcePulse.highFatigue} 人
+                    </small>
+                  </article>
+
+                </div>
+
+                ${
+                  page.latestHour.abandoned > 0
+                    ? `
+                      <p class="command-center__live-warning">
+                        本小时流失
+                        ${page.latestHour.abandoned}
+                        位顾客，预计损失
+                        ${money(page.latestHour.lostRevenue)}
+                      </p>
+                    `
+                    : ""
+                }
+
+              </section>
+            `
+            : `
+              <section class="command-center__live-hour">
+                <h2>营业现场</h2>
+                <p>
+                  今天还没有完成营业小时，开门后这里会实时显示客流、订单和产能瓶颈。
+                </p>
+              </section>
+            `
+        }
+
         <section class="command-center__priority">
 
           <h2>
