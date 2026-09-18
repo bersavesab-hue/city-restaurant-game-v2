@@ -207,6 +207,31 @@ function marketingStatusText(
 }
 
 
+function positioningStatusText(
+  item
+) {
+  if (item.canSelect) {
+    return "可选择";
+  }
+
+  if (
+    (
+      item.lockedReasons ??
+      []
+    ).includes(
+      "restaurant_level"
+    )
+  ) {
+    return (
+      "需门店 Lv." +
+      item.minRestaurantLevel
+    );
+  }
+
+  return "当前不可选择";
+}
+
+
 function groupMarketingActions(
   actions
 ) {
@@ -401,6 +426,10 @@ class MarketStrategyView {
                         ? "is-active"
                         : ""
                     }"
+                    ${item.canSelect
+                      ? ""
+                      : "disabled"
+                    }
                   >
 
                     <strong>
@@ -410,17 +439,41 @@ class MarketStrategyView {
                     <span>
                       综合匹配
                       ${item.fitScore}
+                      ·
+                      ${positioningStatusText(
+                        item
+                      )}
                     </span>
+
+                    <p>
+                      ${item.description ??
+                        ""
+                      }
+                    </p>
 
                     <small>
                       商圈
                       ${item.districtFit}
                       ·
-                      菜单
+                      菜品
                       ${item.categoryFit}
                       ·
                       价格
                       ${item.priceFit}
+                    </small>
+
+                    <small>
+                      业态
+                      ${item.venueFit}
+                      ·
+                      装修
+                      ${item.renovationFit}
+                      ·
+                      营销
+                      ${item.marketingFit}
+                      ·
+                      竞争
+                      ${item.competitionFit}
                     </small>
 
                   </button>
