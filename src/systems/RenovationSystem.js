@@ -11,106 +11,19 @@ import { propertySystem } from "./PropertySystem.js";
 import { propertyFloorplanSystem } from "./PropertyFloorplanSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
 
-const FURNITURE = Object.freeze({
-  table_2: {
-    id: "table_2",
-    name: "双人桌",
-    type: "table",
-    width: 2,
-    height: 1,
-    cost: 900,
-    seats: 2
-  },
+import {
+  RENOVATION_FURNITURE_V1,
+  RENOVATION_FURNITURE_MAP
+} from "../data/renovationFurniture.v1.js";
 
-  table_4: {
-    id: "table_4",
-    name: "四人桌",
-    type: "table",
-    width: 2,
-    height: 2,
-    cost: 1600,
-    seats: 4
-  },
+import {
+  getFurnitureSpecTier,
+  hasFurnitureRole,
+  validateFurnitureDefinition
+} from "../data/renovationFurnitureRules.js";
 
-  booth_4: {
-    id: "booth_4",
-    name: "四人卡座",
-    type: "table",
-    width: 3,
-    height: 2,
-    cost: 2800,
-    seats: 4,
-    appeal: 0.01,
-    requiresFeature: "advanced_renovation"
-  },
-
-  kitchen_station: {
-    id: "kitchen_station",
-    name: "基础灶台",
-    type: "kitchen",
-    width: 2,
-    height: 2,
-    cost: 4500,
-    kitchenStations: 1
-  },
-
-  prep_counter: {
-    id: "prep_counter",
-    name: "备餐台",
-    type: "kitchen_support",
-    width: 2,
-    height: 1,
-    cost: 2600,
-    kitchenEfficiency: 0.08,
-    maxCount: 3,
-    requiresFeature: "advanced_renovation"
-  },
-
-  cashier_counter: {
-    id: "cashier_counter",
-    name: "收银台",
-    type: "service",
-    width: 2,
-    height: 1,
-    cost: 1800,
-    serviceEfficiency: 0.08,
-    maxCount: 2
-  },
-
-  waiting_bench: {
-    id: "waiting_bench",
-    name: "等候长椅",
-    type: "service",
-    width: 2,
-    height: 1,
-    cost: 1200,
-    queueEfficiency: 0.08,
-    maxCount: 3
-  },
-
-  decor_plant: {
-    id: "decor_plant",
-    name: "绿植装饰",
-    type: "decor",
-    width: 1,
-    height: 1,
-    cost: 500,
-    appeal: 0.01,
-    maxCount: 8
-  },
-
-  decor_feature: {
-    id: "decor_feature",
-    name: "主题装饰",
-    type: "decor",
-    width: 2,
-    height: 2,
-    cost: 4200,
-    appeal: 0.04,
-    maxCount: 3,
-    requiresFeature: "advanced_renovation"
-  }
-});
+const FURNITURE =
+  RENOVATION_FURNITURE_MAP;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -124,26 +37,88 @@ function requireInteger(value, name) {
 
 class RenovationSystem {
   getFurnitureDefinition(id) {
-    const definition = FURNITURE[id];
+    const definition =
+      FURNITURE[id];
 
     if (!definition) {
-      throw new Error(`Unknown furniture "${id}"`);
+      throw new Error(
+        `Unknown furniture "${id}"`
+      );
     }
 
-    return structuredClone(definition);
+    validateFurnitureDefinition(
+      definition
+    );
+
+    return structuredClone(
+      definition
+    );
   }
 
-  getCatalog(restaurantId = null) {
-    return Object.values(FURNITURE).map((item) => ({
-      ...structuredClone(item),
-      unlocked:
-        !item.requiresFeature ||
-        restaurantId === null ||
-        storeProgressSystem.isUnlocked(
-          restaurantId,
-          item.requiresFeature
-        )
-    }));
+  hasFurnitureRole(
+    definitionOrId,
+    role
+  ) {
+    const definition =
+      typeof definitionOrId ===
+        "string"
+        ? this.getFurnitureDefinition(
+            definitionOrId
+          )
+        : definitionOrId;
+
+    return hasFurnitureRole(
+      definition,
+      role
+    );
+  }
+
+  getCatalog(
+    restaurantId = null
+  ) {
+    const restaurant =
+      restaurantId === null
+        ? null
+        : restaurantSystem.get(
+            restaurantId
+          );
+
+    return RENOVATION_FURNITURE_V1
+      .map(
+        item => {
+          const levelUnlocked =
+            restaurant === null ||
+            (
+              restaurant.level ??
+              1
+            ) >=
+              item.unlockLevel;
+
+          const featureUnlocked =
+            !item.requiresFeature ||
+            restaurant === null ||
+            storeProgressSystem
+              .isUnlocked(
+                restaurantId,
+                item.requiresFeature
+              );
+
+          return {
+            ...structuredClone(
+              item
+            ),
+
+            tier:
+              getFurnitureSpecTier(
+                item.specTier
+              ),
+
+            unlocked:
+              levelUnlocked &&
+              featureUnlocked
+          };
+        }
+      );
   }
 
   findLayout(restaurantId) {
@@ -453,6 +428,23 @@ class RenovationSystem {
     const layout = this.requireLayout(restaurantId);
     const definition = this.getFurnitureDefinition(furnitureId);
 
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    if (
+      (
+        restaurant.level ??
+        1
+      ) <
+        definition.unlockLevel
+    ) {
+      throw new Error(
+        `Furniture "${furnitureId}" unlocks at store level ${definition.unlockLevel}`
+      );
+    }
+
     if (
       definition.requiresFeature &&
       !storeProgressSystem.isUnlocked(
@@ -460,7 +452,9 @@ class RenovationSystem {
         definition.requiresFeature
       )
     ) {
-      throw new Error(`Furniture "${furnitureId}" is not unlocked`);
+      throw new Error(
+        `Furniture "${furnitureId}" is not unlocked`
+      );
     }
 
     this.validateLimits(restaurantId, layout, definition);
@@ -588,7 +582,9 @@ class RenovationSystem {
       kitchenEfficiency: 1,
       serviceEfficiency: 1,
       queueEfficiency: 1,
-      appealMultiplier: 1
+      queueCapacityBonus: 0,
+      appealMultiplier: 1,
+      comfortBonus: 0
     };
 
     for (const placement of layout.placements ?? []) {
@@ -599,14 +595,53 @@ class RenovationSystem {
       result.kitchenStations += item.kitchenStations ?? 0;
       result.kitchenEfficiency += item.kitchenEfficiency ?? 0;
       result.serviceEfficiency += item.serviceEfficiency ?? 0;
-      result.queueEfficiency += item.queueEfficiency ?? 0;
-      result.appealMultiplier += item.appeal ?? 0;
+      result.queueEfficiency +=
+        item.queueEfficiency ?? 0;
+
+      result.queueCapacityBonus +=
+        item.queueCapacityBonus ?? 0;
+
+      result.appealMultiplier +=
+        item.appeal ?? 0;
+
+      result.comfortBonus +=
+        item.comfort ?? 0;
     }
 
-    result.kitchenEfficiency = clamp(result.kitchenEfficiency, 1, 1.3);
-    result.serviceEfficiency = clamp(result.serviceEfficiency, 1, 1.2);
-    result.queueEfficiency = clamp(result.queueEfficiency, 1, 1.25);
-    result.appealMultiplier = clamp(result.appealMultiplier, 1, 1.15);
+    result.kitchenEfficiency =
+      clamp(
+        result.kitchenEfficiency,
+        1,
+        1.35
+      );
+
+    result.serviceEfficiency =
+      clamp(
+        result.serviceEfficiency,
+        1,
+        1.25
+      );
+
+    result.queueEfficiency =
+      clamp(
+        result.queueEfficiency,
+        1,
+        1.3
+      );
+
+    result.appealMultiplier =
+      clamp(
+        result.appealMultiplier,
+        1,
+        1.18
+      );
+
+    result.comfortBonus =
+      clamp(
+        result.comfortBonus,
+        0,
+        0.12
+      );
 
     return result;
   }
@@ -623,7 +658,9 @@ class RenovationSystem {
         kitchenEfficiency: 1,
         serviceEfficiency: 1,
         queueEfficiency: 1,
-        appealMultiplier: 1
+        queueCapacityBonus: 0,
+        appealMultiplier: 1,
+        comfortBonus: 0
       };
     }
 
