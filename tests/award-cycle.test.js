@@ -181,3 +181,127 @@ test("奖项查询API在首个周期结束前可安全调用", () => {
     0
   );
 });
+
+
+test(
+  "菜品员工奖不刷门店成长且门店奖周期奖励存在总上限",
+  () => {
+    gameState.reset();
+
+    const restaurant =
+      restaurantSystem.create({
+        name:
+          "奖项奖励上限测试店"
+      });
+
+    const dishReward =
+      awardSystem
+        .allocateStoreReward(
+          {
+            subject: "dish",
+            period: "monthly",
+            reward: {
+              reputation: 20,
+              experience: 2000
+            }
+          },
+          {
+            restaurantId:
+              restaurant.id
+          },
+          "Y1-M01"
+        );
+
+    assert.deepEqual(
+      dishReward,
+      {
+        reputation: 0,
+        experience: 0
+      }
+    );
+
+    const first =
+      awardSystem
+        .allocateStoreReward(
+          {
+            subject:
+              "restaurant",
+            period:
+              "monthly",
+            reward: {
+              reputation: 2,
+              experience: 120
+            }
+          },
+          {
+            restaurantId:
+              restaurant.id
+          },
+          "Y1-M01"
+        );
+
+    assert.deepEqual(
+      first,
+      {
+        reputation: 2,
+        experience: 120
+      }
+    );
+
+    const second =
+      awardSystem
+        .allocateStoreReward(
+          {
+            subject:
+              "restaurant",
+            period:
+              "monthly",
+            reward: {
+              reputation: 2,
+              experience: 250
+            }
+          },
+          {
+            restaurantId:
+              restaurant.id
+          },
+          "Y1-M01"
+        );
+
+    assert.deepEqual(
+      second,
+      {
+        reputation: 0,
+        experience: 180
+      }
+    );
+
+    const exhausted =
+      awardSystem
+        .allocateStoreReward(
+          {
+            subject:
+              "restaurant",
+            period:
+              "monthly",
+            reward: {
+              reputation: 2,
+              experience: 500
+            }
+          },
+          {
+            restaurantId:
+              restaurant.id
+          },
+          "Y1-M01"
+        );
+
+    assert.deepEqual(
+      exhausted,
+      {
+        reputation: 0,
+        experience: 0
+      }
+    );
+  }
+);
