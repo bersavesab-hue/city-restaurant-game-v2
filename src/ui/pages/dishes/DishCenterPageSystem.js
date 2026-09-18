@@ -39,6 +39,10 @@ import {
 } from "../../../systems/StoreProgressSystem.js";
 
 import {
+  economicBaselineSystem
+} from "../../../systems/EconomicBaselineSystem.js";
+
+import {
   buildGlobalTopBarModel,
   buildNoticeTickerModel
 } from "../../components/GlobalChromeModel.js";
@@ -448,6 +452,11 @@ class DishCenterPageSystem {
               ingredient.baseQuality,
 
             purchasePrice:
+              economicBaselineSystem
+                .getIngredientReference(
+                  ingredient.id
+                )
+                ?.normalizedUnitPrice ??
               ingredient.basePurchasePrice,
 
             shelfLifeDays:
