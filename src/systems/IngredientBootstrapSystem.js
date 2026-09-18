@@ -11,13 +11,24 @@ class IngredientBootstrapSystem {
   ensureLoaded({
     overwrite = true
   } = {}) {
-    if (
-      ingredientCatalogSystem.count() >
-        0 &&
-      !overwrite
-    ) {
-      return ingredientCatalogSystem
-        .count();
+    let effectiveOverwrite =
+      overwrite;
+
+    if (!overwrite) {
+      const complete =
+        INGREDIENTS_V1.every(
+          ingredient =>
+            ingredientCatalogSystem.get(
+              ingredient.id
+            )
+        );
+
+      if (complete) {
+        return INGREDIENTS_V1.length;
+      }
+
+      effectiveOverwrite =
+        true;
     }
 
 
@@ -25,7 +36,8 @@ class IngredientBootstrapSystem {
       .load(
         INGREDIENTS_V1,
         {
-          overwrite
+          overwrite:
+            effectiveOverwrite
         }
       );
   }
