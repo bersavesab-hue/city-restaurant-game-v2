@@ -21,7 +21,8 @@
     "test:data:ingredients": "node --test tests/ingredient-data-v1.test.js tests/ingredient-visual-manifest.test.js",
     "test:data:dishes": "node --test tests/formal-dish-recipe-data.test.js tests/dish-rules.test.js tests/dish-catalog-schema.test.js tests/restaurant-dish-progress.test.js tests/dish-research.test.js tests/dish-growth.test.js tests/dish-lifecycle.test.js tests/dish-research-preview.test.js tests/dish-management-system.test.js tests/dish-center-ui.test.js",
     "test:data:recipes": "node --test tests/formal-dish-recipe-data.test.js tests/cooking-method-recipe-schema.test.js tests/dish-research-preview.test.js tests/dish-research.test.js",
-    "test:data:suppliers": "node --test tests/formal-supplier-data.test.js tests/supply-management.test.js"
+    "test:data:suppliers": "node --test tests/formal-supplier-data.test.js tests/supply-management.test.js",
+    "test:data:equipment": "node --test tests/formal-equipment-data.test.js tests/equipment-maintenance.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
