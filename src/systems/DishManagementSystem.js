@@ -342,9 +342,9 @@ class DishManagementSystem {
         category:
           dish.category,
 
-        qualityScore:
+        recipeQualityScore:
           progress
-            ?.qualityScore ??
+            ?.recipeQualityScore ??
           null,
 
         basePrice:
