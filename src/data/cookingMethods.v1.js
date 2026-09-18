@@ -4,6 +4,48 @@ import {
 
 export const COOKING_METHOD_SCHEMA_VERSION = 1;
 
+export const COOKING_METHOD_DATASET_META =
+  Object.freeze({
+    schemaVersion:
+      COOKING_METHOD_SCHEMA_VERSION,
+    datasetVersion:
+      "1.0.0",
+    total:
+      22
+  });
+
+export const COOKING_METHOD_ID_PATTERN =
+  /^[a-z][a-z0-9_]*$/;
+
+export const COOKING_EQUIPMENT_CAPABILITY =
+  Object.freeze({
+    RANGE: "range",
+    WOK: "wok",
+    STEAMER: "steamer",
+    POT: "pot",
+    STEW_POT: "stew_pot",
+    FRYER: "fryer",
+    FLAT_PAN: "flat_pan",
+    GRILL: "grill",
+    ROASTER: "roaster",
+    OVEN: "oven",
+    CLAYPOT: "claypot",
+    HOTPOT_BURNER: "hotpot_burner",
+    PRESSURE_COOKER: "pressure_cooker",
+    COLD_PREP: "cold_prep",
+    PICKLING: "pickling",
+    FERMENTATION: "fermentation",
+    SMOKER: "smoker",
+    SOUS_VIDE: "sous_vide"
+  });
+
+const VALID_EQUIPMENT_CAPABILITIES =
+  new Set(
+    Object.values(
+      COOKING_EQUIPMENT_CAPABILITY
+    )
+  );
+
 export const COOKING_METHODS_V1 =
   Object.freeze([
     {
@@ -325,4 +367,124 @@ export function cookingMethodRequiresExhaust(
       id
     )?.requiresExhaust
   );
+}
+
+
+export function validateCookingMethod(
+  method
+) {
+  if (
+    !method ||
+    typeof method !== "object"
+  ) {
+    throw new TypeError(
+      "Cooking method must be an object"
+    );
+  }
+
+  if (
+    method.schemaVersion !==
+      COOKING_METHOD_SCHEMA_VERSION
+  ) {
+    throw new Error(
+      "Cooking method has invalid schemaVersion"
+    );
+  }
+
+  if (
+    typeof method.id !== "string" ||
+    !COOKING_METHOD_ID_PATTERN.test(
+      method.id
+    )
+  ) {
+    throw new Error(
+      "Cooking method id must use stable snake_case lowercase format"
+    );
+  }
+
+  if (
+    typeof method.name !== "string" ||
+    !method.name.trim()
+  ) {
+    throw new Error(
+      `Cooking method "${method.id}" requires a name`
+    );
+  }
+
+  if (
+    !Number.isInteger(
+      method.baseMinutes
+    ) ||
+    method.baseMinutes < 1 ||
+    method.baseMinutes > 480
+  ) {
+    throw new Error(
+      `Cooking method "${method.id}" has invalid baseMinutes`
+    );
+  }
+
+  if (
+    !Number.isInteger(
+      method.difficultyBonus
+    ) ||
+    method.difficultyBonus < 0 ||
+    method.difficultyBonus > 100
+  ) {
+    throw new Error(
+      `Cooking method "${method.id}" has invalid difficultyBonus`
+    );
+  }
+
+  if (
+    !Number.isInteger(
+      method.techniqueScore
+    ) ||
+    method.techniqueScore < 1 ||
+    method.techniqueScore > 100
+  ) {
+    throw new Error(
+      `Cooking method "${method.id}" has invalid techniqueScore`
+    );
+  }
+
+  if (
+    !Object.values(
+      DISH_CATEGORY
+    ).includes(
+      method.defaultCategory
+    )
+  ) {
+    throw new Error(
+      `Cooking method "${method.id}" has invalid defaultCategory`
+    );
+  }
+
+  if (
+    typeof method.requiresExhaust !==
+      "boolean"
+  ) {
+    throw new Error(
+      `Cooking method "${method.id}" requires requiresExhaust`
+    );
+  }
+
+  if (
+    !Array.isArray(
+      method.equipmentCapabilities
+    ) ||
+    method.equipmentCapabilities.length ===
+      0 ||
+    method.equipmentCapabilities.some(
+      capability =>
+        !VALID_EQUIPMENT_CAPABILITIES.has(
+          capability
+        )
+    )
+  ) {
+    throw new Error(
+      `Cooking method "${method.id}" has invalid equipmentCapabilities`
+    );
+  }
+
+  return true;
 }
