@@ -22,6 +22,7 @@ import { marketInsightSystem } from "./MarketInsightSystem.js";
 import { renovationConstructionSystem } from "./RenovationConstructionSystem.js";
 import { equipmentMaintenanceSystem } from "./EquipmentMaintenanceSystem.js";
 import { awardSystem } from "./AwardSystem.js";
+import { customerLoyaltySystem } from "./CustomerLoyaltySystem.js";
 
 class OperatingCycleSystem {
   constructor() {
@@ -149,6 +150,11 @@ class OperatingCycleSystem {
                 restaurant.id
               );
           }
+
+          customerLoyaltySystem
+            .processDay(
+              current.day
+            );
 
           marketActionSystem
             .processDay(
