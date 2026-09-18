@@ -5,8 +5,8 @@ export const ECONOMIC_BASELINE = {
   regionModel: "virtual_city_cn_reference",
 
   sourcePolicy: {
-    mode: "snapshot",
-    description: "现实数据只作为基准锚点；游戏价格由基准值与城市、季节、供需、品质、事件、合同等系数组合计算。",
+    mode: "reality_1_to_1",
+    description: "所有金额使用现实人民币名义金额1:1，不做游戏化缩放；基准价来自可追溯现实公开数据快照。",
     pricingScale: 1,
     strictNominalRmb: true,
     refreshStrategy: "版本化现实价格快照。优先使用农业农村部、商务部、国家统计局及地方公开监测数据；无官方点价时使用可追溯市场样本，不允许业务页面写死或使用纯游戏化随机价格。",
