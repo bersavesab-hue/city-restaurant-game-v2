@@ -715,12 +715,17 @@ class RestaurantEquipmentSystem {
         progress -
         wearLoss;
 
+      const maxDurability =
+        unit.maxDurability ??
+        definition.baseDurability ??
+        100;
+
       const durability =
         clamp(
           unit.durability -
           wearLoss,
           0,
-          100
+          maxDurability
         );
 
       const status =
