@@ -196,10 +196,7 @@ class SupplierSystem {
   }
 
   upsertTemplate(
-    template,
-    {
-      offers = null
-    } = {}
+    template
   ) {
     validateSupplierTemplate(
       template
