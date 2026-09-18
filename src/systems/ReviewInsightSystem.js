@@ -9,7 +9,9 @@ const ISSUE_LABELS = Object.freeze({
   service_failed: "接待能力不足",
   good_quality: "菜品质量好",
   good_value: "性价比高",
-  good_service: "服务顺畅"
+  good_service: "服务顺畅",
+  environment_poor: "环境舒适度差",
+  good_environment: "环境体验好"
 });
 
 class ReviewInsightSystem {
@@ -54,6 +56,31 @@ class ReviewInsightSystem {
       (result.failedOrders ?? 0) > 0
     ) {
       issues.push("service_failed");
+    }
+
+    if (
+      experience.comfortScore < 55
+    ) {
+      issues.push(
+        "environment_poor"
+      );
+    } else if (
+      experience.comfortScore >= 82
+    ) {
+      positives.push(
+        "good_environment"
+      );
+    }
+
+    if (
+      experience.waitScore < 55 &&
+      !issues.includes(
+        "queue_long"
+      )
+    ) {
+      issues.push(
+        "queue_long"
+      );
     }
 
     if (
