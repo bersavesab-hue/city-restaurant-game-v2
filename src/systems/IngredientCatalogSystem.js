@@ -56,6 +56,17 @@ function validateIngredient(item) {
     );
   }
 
+  if (
+    Object.prototype.hasOwnProperty.call(
+      item,
+      "baseQuality"
+    )
+  ) {
+    throw new Error(
+      `Ingredient "${item.id}" must not define baseQuality; quality belongs to inventory batches`
+    );
+  }
+
   if (!validStorageTypes.has(item.storageType)) {
     throw new Error(
       `Ingredient "${item.id}" has invalid storageType`
