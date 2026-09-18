@@ -32,6 +32,10 @@ import {
 
 import { app } from "../src/main.js";
 
+import {
+  employeeManagementPageSystem
+} from "../src/ui/pages/employees/EmployeeManagementPageSystem.js";
+
 const {
   restaurantSystem,
   financeSystem,
@@ -385,6 +389,77 @@ test(
     assert.deepEqual(
       hired.traits,
       target.traits
+    );
+  }
+);
+
+
+test(
+  "招聘页面直接暴露正式人才池而不是岗位占位",
+  () => {
+    gameState.reset();
+
+    const restaurant =
+      restaurantSystem.create({
+        name:
+          "招聘页面人才池测试店"
+      });
+
+    entitySystem.update(
+      "restaurant",
+      restaurant.id,
+      {
+        level: 10
+      }
+    );
+
+    financeSystem.createAccount(
+      restaurant.id,
+      500000
+    );
+
+    const page =
+      employeeManagementPageSystem
+        .getRecruitmentPage(
+          restaurant.id
+        );
+
+    assert.equal(
+      page.pageId,
+      "employee_recruitment"
+    );
+
+    assert.ok(
+      page.candidates.length >
+      0
+    );
+
+    assert.ok(
+      page.candidates.every(
+        candidate =>
+          typeof candidate.name ===
+            "string" &&
+          candidate.age >= 18 &&
+          candidate.age <= 55 &&
+          candidate.potential >= 1 &&
+          candidate.potential <= 5 &&
+          typeof candidate.profileName ===
+            "string" &&
+          Number.isInteger(
+            candidate.expectedSalary
+          )
+      )
+    );
+
+    assert.equal(
+      page.candidates.some(
+        candidate =>
+          EMPLOYEE_NAMES_V1
+            .includes(
+              candidate.name
+            )
+      ),
+      true
     );
   }
 );
