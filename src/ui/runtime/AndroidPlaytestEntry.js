@@ -5,6 +5,22 @@ import {
 } from "../../core/SaveSystem.js";
 
 import {
+  gameState
+} from "../../core/GameState.js";
+
+import {
+  gameFoundationSystem
+} from "../../systems/GameFoundationSystem.js";
+
+import {
+  gameRuntimeLoop
+} from "./GameRuntimeLoop.js";
+
+import {
+  cityMapViewportRuntime
+} from "./CityMapViewportRuntime.js";
+
+import {
   restaurantSystem
 } from "../../systems/RestaurantSystem.js";
 
@@ -87,427 +103,6 @@ let restaurantId =
 
 let currentView =
   null;
-
-
-function seedDistricts() {
-  if (
-    districtSystem
-      .getAll()
-      .length >
-    0
-  ) {
-    return;
-  }
-
-  districtSystem.load(
-    [
-      {
-        id:
-          "east_gate",
-
-        name:
-          "东城商圈",
-
-        trafficIndex:
-          82,
-
-        rentMultiplier:
-          1.15,
-
-        spendingPower:
-          76,
-
-        competition:
-          63,
-
-        customerMix: {
-          office:
-            45,
-
-          family:
-            30,
-
-          student:
-            15,
-
-          tourist:
-            10
-        },
-
-        mapPosition: {
-          x:
-            30,
-
-          y:
-            34
-        }
-      },
-
-      {
-        id:
-          "university",
-
-        name:
-          "学府商圈",
-
-        trafficIndex:
-          78,
-
-        rentMultiplier:
-          0.88,
-
-        spendingPower:
-          58,
-
-        competition:
-          52,
-
-        customerMix: {
-          student:
-            62,
-
-          office:
-            18,
-
-          family:
-            12,
-
-          tourist:
-            8
-        },
-
-        mapPosition: {
-          x:
-            68,
-
-          y:
-            28
-        }
-      },
-
-      {
-        id:
-          "residential",
-
-        name:
-          "新城社区",
-
-        trafficIndex:
-          64,
-
-        rentMultiplier:
-          0.78,
-
-        spendingPower:
-          66,
-
-        competition:
-          38,
-
-        customerMix: {
-          family:
-            61,
-
-          office:
-            19,
-
-          student:
-            12,
-
-          tourist:
-            8
-        },
-
-        mapPosition: {
-          x:
-            38,
-
-          y:
-            72
-        }
-      },
-
-      {
-        id:
-          "commercial",
-
-        name:
-          "中央商业街",
-
-        trafficIndex:
-          92,
-
-        rentMultiplier:
-          1.42,
-
-        spendingPower:
-          88,
-
-        competition:
-          82,
-
-        customerMix: {
-          office:
-            35,
-
-          tourist:
-            30,
-
-          family:
-            20,
-
-          student:
-            15
-        },
-
-        mapPosition: {
-          x:
-            74,
-
-          y:
-            68
-        }
-      }
-    ],
-    {
-      overwrite:
-        true
-    }
-  );
-}
-
-
-function seedProperties() {
-  if (
-    propertySystem
-      .list()
-      .length >
-    0
-  ) {
-    return;
-  }
-
-  const properties = [
-    [
-      "east_gate",
-      "东城临街小铺",
-      86,
-      78,
-      6800
-    ],
-
-    [
-      "east_gate",
-      "东城十字路口铺",
-      142,
-      128,
-      10500
-    ],
-
-    [
-      "university",
-      "学府路餐饮铺",
-      96,
-      90,
-      5200
-    ],
-
-    [
-      "university",
-      "大学城二层商铺",
-      180,
-      162,
-      7600
-    ],
-
-    [
-      "residential",
-      "新城社区入口铺",
-      118,
-      108,
-      4800
-    ],
-
-    [
-      "residential",
-      "社区中心餐饮铺",
-      165,
-      150,
-      6500
-    ],
-
-    [
-      "commercial",
-      "中央商业街旺铺",
-      128,
-      116,
-      13800
-    ],
-
-    [
-      "commercial",
-      "商业街旗舰店",
-      260,
-      235,
-      22800
-    ]
-  ];
-
-  for (
-    const [
-      districtId,
-      name,
-      area,
-      usableArea,
-      rent
-    ]
-    of properties
-  ) {
-    propertySystem.create({
-      districtId,
-      name,
-      area,
-      usableArea,
-
-      baseMonthlyRent:
-        rent,
-
-      seats:
-        Math.max(
-          10,
-          Math.floor(
-            usableArea /
-            4
-          )
-        ),
-
-      depositMonths:
-        2,
-
-      frontageMeters:
-        Math.max(
-          4,
-          Math.round(
-            area /
-            20
-          )
-        ),
-
-      ceilingHeight:
-        3.6,
-
-      parkingSpaces:
-        districtId ===
-        "residential"
-          ? 8
-          : 3,
-
-      foodServiceAllowed:
-        true,
-
-      exhaustAllowed:
-        true,
-
-      floors: [
-        {
-          id:
-            "floor_1",
-
-          label:
-            "1F",
-
-          area,
-          usableArea,
-
-          width:
-            16,
-
-          height:
-            10,
-
-          entrances: [
-            {
-              x:
-                1,
-
-              y:
-                9
-            }
-          ],
-
-          windows: [
-            {
-              x:
-                4,
-
-              y:
-                0
-            },
-
-            {
-              x:
-                9,
-
-              y:
-                0
-            }
-          ],
-
-          columns: [
-            {
-              x:
-                7,
-
-              y:
-                5,
-
-              width:
-                1,
-
-              height:
-                1
-            }
-          ],
-
-          utilityPoints: [
-            {
-              type:
-                "water",
-
-              x:
-                14,
-
-              y:
-                8
-            },
-
-            {
-              type:
-                "power",
-
-              x:
-                13,
-
-              y:
-                8
-            },
-
-            {
-              type:
-                "exhaust",
-
-              x:
-                15,
-
-              y:
-                4
-            }
-          ]
-        }
-      ]
-    });
-  }
-}
 
 
 function seedIngredients() {
@@ -932,8 +527,14 @@ function firstLaunch() {
     );
   }
 
-  seedDistricts();
-  seedProperties();
+  gameFoundationSystem.initialize({
+    seedProperties:
+      true,
+
+    overwriteReferenceData:
+      true
+  });
+
   seedIngredients();
   seedSupplier();
 
@@ -947,6 +548,96 @@ function firstLaunch() {
       );
     } catch {}
   }
+}
+
+
+function updateVisibleClock() {
+  const clock =
+    gameRuntimeLoop.getClockText();
+
+  const clockNode =
+    root.querySelector(
+      ".rg-topbar__clock strong"
+    );
+
+  if (clockNode) {
+    clockNode.textContent =
+      clock.clockText;
+  }
+
+  const dayNode =
+    root.querySelector(
+      ".rg-topbar__clock small"
+    );
+
+  if (dayNode) {
+    dayNode.textContent =
+      clock.dayText;
+  }
+
+  const runtime =
+    gameState.getSection(
+      "runtime"
+    );
+
+  root
+    .querySelectorAll(
+      '[data-action="speed"]'
+    )
+    .forEach(
+      button => {
+        button.classList.toggle(
+          "is-active",
+          !runtime.paused &&
+          Number(
+            button.dataset.speed
+          ) ===
+            runtime.speed
+        );
+      }
+    );
+
+  const pauseButton =
+    root.querySelector(
+      '[data-action="pause"]'
+    );
+
+  if (pauseButton) {
+    pauseButton.textContent =
+      runtime.paused
+        ? "▶"
+        : "Ⅱ";
+  }
+}
+
+
+function startRuntimeSystems() {
+  gameRuntimeLoop.resume();
+
+  gameRuntimeLoop.start({
+    onMinute() {
+      updateVisibleClock();
+    },
+
+    onHour() {
+      updateVisibleClock();
+    },
+
+    onDay() {
+      saveNow();
+    },
+
+    onError(error) {
+      console.error(
+        "经营模拟循环错误",
+        error
+      );
+    }
+  });
+
+  cityMapViewportRuntime.start(
+    root
+  );
 }
 
 
@@ -1421,6 +1112,42 @@ function navigate(
 }
 
 
+root.addEventListener(
+  "click",
+  event => {
+    const button =
+      event.target.closest?.(
+        '[data-action="pause"], [data-action="speed"]'
+      );
+
+    if (!button) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (
+      button.dataset.action ===
+      "pause"
+    ) {
+      gameRuntimeLoop.togglePause();
+    } else {
+      gameRuntimeLoop.setSpeed(
+        Number(
+          button.dataset.speed
+        )
+      );
+    }
+
+    updateVisibleClock();
+  },
+  true
+);
+
+/* data-runtime-control-listener */
+
+
 window.addEventListener(
   "error",
   event => {
@@ -1457,3 +1184,6 @@ firstLaunch();
 navigate(
   "opening-setup"
 );
+
+startRuntimeSystems();
+updateVisibleClock();
