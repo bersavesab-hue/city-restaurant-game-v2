@@ -74,6 +74,8 @@ class StoreProgressView {
 
             <h1>
               Lv.${page.restaurant.level}
+              ${page.progress.title ?? ""}
+              ·
               ${page.restaurant.name}
             </h1>
           </div>
@@ -130,6 +132,20 @@ class StoreProgressView {
                   .join("") ??
                   ""
                 }
+
+                ${page.nextReward
+                  ?.limitIncrease
+                  ? `
+                    <span>
+                      升级容量：
+                      员工+${page.nextReward.limitIncrease.employees}
+                      · 菜品+${page.nextReward.limitIncrease.menuItems}
+                      · 餐桌+${page.nextReward.limitIncrease.tables}
+                      · 厨房工位+${page.nextReward.limitIncrease.kitchenStations}
+                    </span>
+                  `
+                  : ""
+                }
               </div>
             `
           }
@@ -176,6 +192,24 @@ class StoreProgressView {
         </section>
 
 
+        <section class="store-progress__experience">
+          <h2>
+            经验来源
+          </h2>
+
+          <p>
+            每完成1单获得
+            ${page.experiencePolicy.orderExperience}
+            经验；
+            每
+            ${page.experiencePolicy.revenueUnit}
+            营业额获得
+            ${page.experiencePolicy.revenueExperience}
+            经验。
+          </p>
+        </section>
+
+
         <section class="store-progress__unlocks">
 
           <h2>
@@ -213,6 +247,8 @@ class StoreProgressView {
                   <header>
                     <strong>
                       Lv.${level.level}
+                      ·
+                      ${level.title ?? ""}
                     </strong>
 
                     <span>
@@ -265,6 +301,34 @@ class StoreProgressView {
             )
             .join("")}
 
+        </section>
+
+
+        <section class="store-progress__milestones">
+          <h2>
+            升级记录
+          </h2>
+
+          ${page.milestones.length
+            ? page.milestones
+                .map(
+                  item => `
+                    <article>
+                      <strong>
+                        Lv.${item.level}
+                        ·
+                        ${item.title}
+                      </strong>
+
+                      <span>
+                        第${item.reachedDay}天达成
+                      </span>
+                    </article>
+                  `
+                )
+                .join("")
+            : "<p>尚无升级记录。</p>"
+          }
         </section>
 
 
