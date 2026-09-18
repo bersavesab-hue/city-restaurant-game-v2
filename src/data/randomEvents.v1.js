@@ -43,6 +43,8 @@ function buildModifiers(
     equipmentFailureMultiplier: 1,
     operatingCostMultiplier: 1,
     competitorPressureMultiplier: 1,
+    employeeSatisfactionMultiplier: 1,
+    reputationChangeMultiplier: 1,
     segmentMultipliers:
       freezeMap(
         segmentMultipliers
@@ -435,6 +437,7 @@ const FAMILIES = [
     districtWeights: DISTRICTS.labor,
     channels: {
       payrollCostMultiplier: 0.025,
+      employeeSatisfactionMultiplier: 0.025,
       demandMultiplier: 0.006
     },
     items: [
@@ -495,6 +498,7 @@ const FAMILIES = [
     districtWeights: DISTRICTS.reputation,
     channels: {
       playerAppealMultiplier: 0.035,
+      reputationChangeMultiplier: 0.04,
       demandMultiplier: 0.018
     },
     items: [
