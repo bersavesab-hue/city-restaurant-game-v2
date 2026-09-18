@@ -66,6 +66,41 @@ test(
       opened.drawer.categories.length >= 5
     );
 
+    assert.equal(
+      opened.drawer.items.every(
+        item =>
+          item.unlocked
+      ),
+      true
+    );
+
+    assert.ok(
+      opened.drawer.lockedCount >
+      0
+    );
+
+    assert.equal(
+      opened.drawer.nextUnlockLevel,
+      2
+    );
+
+    const diningCategory =
+      opened.drawer.categories
+        .find(
+          item =>
+            item.id ===
+            "dining"
+        );
+
+    assert.ok(
+      diningCategory
+    );
+
+    assert.ok(
+      diningCategory.total >
+      diningCategory.count
+    );
+
     renovationMobilePageSystem.selectFurniture(
       restaurant.id,
       "table_4"
