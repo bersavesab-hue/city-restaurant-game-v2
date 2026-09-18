@@ -33,6 +33,7 @@ import { staffingRecommendationSystem } from "./systems/StaffingRecommendationSy
 import { storeProgressSystem } from "./systems/StoreProgressSystem.js";
 
 import { ingredientCatalogSystem } from "./systems/IngredientCatalogSystem.js";
+import { dishRecipeBootstrapSystem } from "./systems/DishRecipeBootstrapSystem.js";
 import { inventorySystem } from "./systems/InventorySystem.js";
 import { supplierSystem } from "./systems/SupplierSystem.js";
 import { supplierTradingSystem } from "./systems/SupplierTradingSystem.js";
@@ -145,6 +146,7 @@ function bootstrap() {
       storeProgressSystem,
 
       ingredientCatalogSystem,
+      dishRecipeBootstrapSystem,
       inventorySystem,
       supplierSystem,
       supplierTradingSystem,
