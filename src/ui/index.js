@@ -238,3 +238,12 @@ export {
   awardCeremonyView,
   AwardCeremonyView
 } from "./pages/award-ceremony/index.js";
+
+
+export {
+  moreHubPageSystem,
+  MoreHubPageSystem,
+  MORE_GROUPS,
+  moreHubView,
+  MoreHubView
+} from "./pages/more/index.js";

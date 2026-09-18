@@ -21,7 +21,7 @@ const MAIN_LANDINGS =
       "employee_roster",
 
     more:
-      "settings"
+      "more-home"
   });
 
 const ACTION_TARGETS =

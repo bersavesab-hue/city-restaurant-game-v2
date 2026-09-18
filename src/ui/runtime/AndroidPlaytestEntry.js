@@ -1044,6 +1044,15 @@ function navigate(
 
     if (
       pageId ===
+      "more"
+    ) {
+      pageId =
+        "more-home";
+    }
+
+
+    if (
+      pageId ===
       "dishes"
     ) {
       currentView =
@@ -1116,19 +1125,6 @@ function navigate(
           onNavigate:
             navigate
         });
-
-      return;
-    }
-
-
-    if (
-      pageId ===
-      "more"
-    ) {
-      placeholderPage(
-        "更多功能",
-        "当前APK主要用于测试选址、房源、装修、开店、员工、菜品和统一UI。"
-      );
 
       return;
     }

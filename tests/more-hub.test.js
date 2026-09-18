@@ -1,0 +1,109 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+import {
+  gameState
+} from "../src/core/GameState.js";
+
+import {
+  restaurantSystem
+} from "../src/systems/RestaurantSystem.js";
+
+import {
+  financeSystem
+} from "../src/systems/FinanceSystem.js";
+
+import {
+  moreHubPageSystem
+} from "../src/ui/pages/more/MoreHubPageSystem.js";
+
+import {
+  formalPageRuntime
+} from "../src/ui/runtime/FormalPageRuntime.js";
+
+import {
+  gameplayNavigationSystem
+} from "../src/ui/navigation/GameplayNavigationSystem.js";
+
+
+test("更多主入口落到正式more-home", () => {
+  assert.equal(
+    gameplayNavigationSystem
+      .getLandingPage("more"),
+    "more-home"
+  );
+
+  assert.equal(
+    formalPageRuntime.has(
+      "more-home"
+    ),
+    true
+  );
+});
+
+
+test("更多主页收拢完成页面和保留占位入口", () => {
+  gameState.reset();
+
+  const restaurant=
+    restaurantSystem.create({
+      name:"更多页测试店"
+    });
+
+  financeSystem.createAccount(
+    restaurant.id,
+    10000
+  );
+
+  const page=
+    moreHubPageSystem.getPage(
+      restaurant.id
+    );
+
+  const targets=
+    page.groups
+      .flatMap(
+        group =>
+          group.entries
+      )
+      .map(
+        item =>
+          item.target
+      );
+
+  for(const target of [
+    "member-marketing",
+    "honor-hall",
+    "awards-center",
+    "chain",
+    "settings"
+  ]){
+    assert.ok(
+      targets.includes(target),
+      target
+    );
+  }
+});
+
+
+test("Android运行时不再把more渲染为占位页", () => {
+  const source=
+    fs.readFileSync(
+      new URL(
+        "../src/ui/runtime/AndroidPlaytestEntry.js",
+        import.meta.url
+      ),
+      "utf8"
+    );
+
+  assert.match(
+    source,
+    /pageId =\s*"more-home"/
+  );
+
+  assert.doesNotMatch(
+    source,
+    /当前APK主要用于测试选址、房源、装修、开店、员工、菜品和统一UI/
+  );
+});
