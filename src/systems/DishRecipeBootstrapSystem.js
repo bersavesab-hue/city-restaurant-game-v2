@@ -28,6 +28,9 @@ class DishRecipeBootstrapSystem {
         overwrite: false
       });
 
+    let effectiveOverwrite =
+      overwrite;
+
     if (!overwrite) {
       const dishesReady =
         DISHES_V1.every(
@@ -57,19 +60,24 @@ class DishRecipeBootstrapSystem {
             RECIPES_V1.length
         };
       }
+
+      effectiveOverwrite =
+        true;
     }
 
     dishCatalogSystem.load(
       DISHES_V1,
       {
-        overwrite
+        overwrite:
+          effectiveOverwrite
       }
     );
 
     recipeSystem.load(
       RECIPES_V1,
       {
-        overwrite
+        overwrite:
+          effectiveOverwrite
       }
     );
 
