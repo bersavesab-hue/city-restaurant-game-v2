@@ -60,6 +60,11 @@ test(
           "营业产能集成测试店"
       });
 
+    restaurantSystem.setLevel(
+      restaurant.id,
+      6
+    );
+
     serviceCapacitySystem
       .configure(
         restaurant.id,
