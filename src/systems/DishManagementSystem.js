@@ -10,14 +10,12 @@ import { recipeSystem } from "./RecipeSystem.js";
 import { menuSystem } from "./MenuSystem.js";
 import { restaurantSystem } from "./RestaurantSystem.js";
 
-const DISH_CATEGORIES = Object.freeze([
-  { id: "rice", name: "米饭主食" },
-  { id: "noodle", name: "面食" },
-  { id: "fast_food", name: "快餐" },
-  { id: "stir_fry", name: "炒菜" },
-  { id: "hotpot", name: "锅物" },
-  { id: "dessert", name: "甜品" }
-]);
+import {
+  DISH_CATEGORY_LIST
+} from "../data/dishCatalogRules.js";
+
+const DISH_CATEGORIES =
+  DISH_CATEGORY_LIST;
 
 const COOKING_METHODS = Object.freeze([
   { id: "stir_fry", name: "炒制" },
