@@ -14,6 +14,7 @@ import { renovationSystem } from "./RenovationSystem.js";
 import { wordOfMouthSystem } from "./WordOfMouthSystem.js";
 import { businessCausalitySystem } from "./BusinessCausalitySystem.js";
 import { salesChannelSystem } from "./SalesChannelSystem.js";
+import { venueTypeSystem } from "./VenueTypeSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -23,6 +24,121 @@ function clamp(value, min, max) {
 }
 
 class TrafficDemandSystem {
+  getVenueContext(
+    restaurantId
+  ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    if (!restaurant.locationId) {
+      const venueTypeId =
+        "street_shop";
+
+      return {
+        property: null,
+        venueTypeId,
+        venueType:
+          venueTypeSystem.get(
+            venueTypeId
+          )
+      };
+    }
+
+    try {
+      const property =
+        propertySystem.get(
+          restaurant.locationId
+        );
+
+      const venueTypeId =
+        property.venueTypeId ??
+        "street_shop";
+
+      return {
+        property,
+        venueTypeId,
+        venueType:
+          venueTypeSystem.get(
+            venueTypeId
+          )
+      };
+    } catch {
+      return {
+        property: null,
+        venueTypeId:
+          "street_shop",
+        venueType:
+          venueTypeSystem.get(
+            "street_shop"
+          )
+      };
+    }
+  }
+
+  getVenueChannelFactor(
+    restaurantId,
+    segment,
+    venueTypeId
+  ) {
+    const active =
+      salesChannelSystem
+        .getActiveChannels(
+          restaurantId
+        );
+
+    let weighted = 0;
+    let total = 0;
+
+    for (
+      const channel
+      of active
+    ) {
+      const preference =
+        Math.max(
+          0,
+          Number(
+            segment
+              .channelPreferences?.[
+                channel.id
+              ] ??
+            0
+          )
+        );
+
+      if (
+        preference <= 0
+      ) {
+        continue;
+      }
+
+      total +=
+        preference;
+
+      weighted +=
+        preference *
+        venueTypeSystem
+          .getChannelCapability(
+            venueTypeId,
+            channel.id
+          );
+    }
+
+    if (
+      total <= 0
+    ) {
+      return 1;
+    }
+
+    return clamp(
+      weighted /
+      total,
+      0.55,
+      1.35
+    );
+  }
+
   getDistrictForRestaurant(
     restaurantId
   ) {
@@ -629,6 +745,19 @@ class TrafficDemandSystem {
             .positioningId
         );
 
+    const venueContext =
+      this.getVenueContext(
+        restaurantId
+      );
+
+    const venueDistrictFactor =
+      venueTypeSystem
+        .getDistrictAffinity(
+          venueContext
+            .venueTypeId,
+          district
+        );
+
     const segments = [];
 
     let expectedVisitors = 0;
@@ -720,6 +849,22 @@ class TrafficDemandSystem {
           segment
         );
 
+      const venueSegmentFactor =
+        venueTypeSystem
+          .getSegmentMultiplier(
+            venueContext
+              .venueTypeId,
+            segment.id
+          );
+
+      const venueChannelFactor =
+        this.getVenueChannelFactor(
+          restaurantId,
+          segment,
+          venueContext
+            .venueTypeId
+        );
+
       const segmentRetentionFactor =
         businessCausalitySystem
           .getSegmentDemandMultiplier(
@@ -799,6 +944,9 @@ class TrafficDemandSystem {
         mealPeriodFactor *
         seasonalityFactor *
         districtPositioningFactor *
+        venueDistrictFactor *
+        venueSegmentFactor *
+        venueChannelFactor *
         positioningFactor *
         channelAccessFactor *
         districtAccessFactor *
@@ -844,6 +992,16 @@ class TrafficDemandSystem {
         positioningFactor,
 
         districtPositioningFactor,
+
+        venueTypeId:
+          venueContext
+            .venueTypeId,
+
+        venueDistrictFactor,
+
+        venueSegmentFactor,
+
+        venueChannelFactor,
 
         channelAccessFactor,
 
@@ -900,6 +1058,12 @@ class TrafficDemandSystem {
       seasonalityFactor,
 
       districtPositioningFactor,
+
+      venueTypeId:
+        venueContext
+          .venueTypeId,
+
+      venueDistrictFactor,
 
       calendar:
         businessCalendarSystem
