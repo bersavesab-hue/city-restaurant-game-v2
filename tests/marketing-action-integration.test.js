@@ -137,6 +137,11 @@ test(
       100000
     );
 
+    restaurantSystem.setLevel(
+      restaurant.id,
+      2
+    );
+
     marketActionSystem
       .startAction(
         restaurant.id,
@@ -189,6 +194,11 @@ test(
     financeSystem.createAccount(
       serviceRestaurant.id,
       100000
+    );
+
+    restaurantSystem.setLevel(
+      serviceRestaurant.id,
+      2
     );
 
     marketActionSystem
