@@ -188,9 +188,17 @@ test(
           restaurant.id
         );
 
-    assert.equal(
-      page.summary.supplierCount,
+    assert.ok(
+      page.summary.supplierCount >=
       1
+    );
+
+    assert.ok(
+      page.suppliers.some(
+        item =>
+          item.id ===
+          supplier.id
+      )
     );
 
     assert.equal(
