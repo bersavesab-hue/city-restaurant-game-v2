@@ -51,6 +51,44 @@ class CustomerSystem {
       spendingPower: segment?.spendingPower ?? null,
       qualitySensitivity: segment?.qualitySensitivity ?? null,
       speedSensitivity: segment?.speedSensitivity ?? null,
+
+      ageRange:
+        segment?.ageRange
+          ? structuredClone(
+              segment.ageRange
+            )
+          : null,
+
+      occupationTags:
+        segment?.occupationTags
+          ? [
+              ...segment
+                .occupationTags
+            ]
+          : [],
+
+      partySize:
+        segment?.partySize
+          ? structuredClone(
+              segment.partySize
+            )
+          : null,
+
+      repeatPreference:
+        segment?.repeatPreference ??
+        null,
+
+      reviewPropensity:
+        segment?.reviewPropensity ??
+        null,
+
+      channelPreferences:
+        segment
+          ?.channelPreferences
+          ? structuredClone(
+              segment.channelPreferences
+            )
+          : null,
       visits: 0,
       totalSpend: 0,
       averageSatisfaction: 0,
