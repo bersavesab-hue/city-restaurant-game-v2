@@ -1010,7 +1010,13 @@ class RestaurantEquipmentSystem {
         rows.filter(
           item =>
             item.durability > 0 &&
-            item.durability <= 30
+            item.durability /
+              Math.max(
+                1,
+                item.maxDurability ??
+                100
+              ) <=
+              0.3
         ).length,
 
       capacity:
