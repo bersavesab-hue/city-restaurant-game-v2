@@ -33,12 +33,37 @@ class PropertyRentIntegrationSystem {
       const calculation = this.calculate(property);
       if (!calculation) continue;
 
-      entitySystem.update("property", property.id, {
-        baseMonthlyRent: calculation.monthlyRent,
-        monthlyRent: calculation.monthlyRent,
-        rentReferencePerSquareMeter: calculation.referencePerSquareMeter,
-        rentModel: "reality_baseline_v1"
-      });
+      entitySystem.update(
+        "property",
+        property.id,
+        {
+          baseMonthlyRent:
+            calculation.monthlyRent,
+
+          monthlyRent:
+            calculation.monthlyRent,
+
+          rentReferencePerSquareMeter:
+            calculation
+              .referencePerSquareMeter,
+
+          rentMultiplier:
+            calculation.multiplier,
+
+          rentModel:
+            "reality_1_to_1_v2",
+
+          rentCurrency:
+            "CNY",
+
+          rentSource:
+            calculation.source
+              ? structuredClone(
+                  calculation.source
+                )
+              : null
+        }
+      );
       updated += 1;
     }
 
