@@ -104,6 +104,60 @@ function signedPercent(
   );
 }
 
+function absoluteDeltaText(
+  value,
+  suffix = ""
+) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return "数据不足";
+  }
+
+  const number =
+    Number(value) ||
+    0;
+
+  if (number === 0) {
+    return "持平";
+  }
+
+  return (
+    (number > 0 ? "+" : "") +
+    number +
+    suffix
+  );
+}
+
+function percentOrNew(
+  value
+) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return "新客流";
+  }
+
+  return signedPercent(
+    value
+  );
+}
+
+function confidenceText(
+  value
+) {
+  return {
+    strong:
+      "观察较完整",
+    early:
+      "初步观察",
+    collecting:
+      "数据积累中"
+  }[value] ?? "数据积累中";
+}
+
 function impactClass(
   value
 ) {
@@ -868,6 +922,12 @@ class BusinessAnalyticsView {
       </section>
 
 
+      ${this.renderPricingDecisions(
+        page.pricingDecisions ??
+        []
+      )}
+
+
       <section class="analytics-panel">
 
         <header>
@@ -1047,6 +1107,368 @@ class BusinessAnalyticsView {
         </div>
 
       </section>
+    `;
+  }
+
+
+  renderPricingDecisions(
+    decisions
+  ) {
+    return `
+      <section class="analytics-panel analytics-price-review">
+
+        <header>
+          <div>
+            <span>
+              调价复盘
+            </span>
+
+            <h2>
+              涨价或降价前后发生了什么
+            </h2>
+          </div>
+
+          <small>
+            每次调价前后最多比较6个营业小时
+          </small>
+        </header>
+
+
+        ${
+          decisions.length
+            ? decisions
+                .map(
+                  decision => `
+                    <article class="analytics-price-decision">
+
+                      <header>
+
+                        <div>
+                          <strong>
+                            ${escapeHtml(
+                              decision.dishName
+                            )}
+                          </strong>
+
+                          <span>
+                            第${decision.day}天
+                            ·
+                            ${money(
+                              decision.previousPrice
+                            )}
+                            →
+                            ${money(
+                              decision.nextPrice
+                            )}
+                          </span>
+                        </div>
+
+                        <div class="analytics-price-change">
+
+                          <b
+                            class="${impactClass(
+                              decision
+                                .priceChangePercent
+                            )}"
+                          >
+                            ${signedPercent(
+                              decision
+                                .priceChangePercent
+                            )}
+                          </b>
+
+                          <small>
+                            ${confidenceText(
+                              decision.confidence
+                            )}
+                          </small>
+
+                        </div>
+
+                      </header>
+
+
+                      ${
+                        decision.hasComparison
+                          ? `
+                            <div class="analytics-before-after-grid">
+
+                              ${this.renderBeforeAfterMetric(
+                                "订单",
+                                decision.before.orders,
+                                decision.after.orders,
+                                changeText(
+                                  decision.delta.orders
+                                ),
+                                decision.delta.orders
+                              )}
+
+                              ${this.renderBeforeAfterMetric(
+                                "营收",
+                                money(
+                                  decision.before.revenue
+                                ),
+                                money(
+                                  decision.after.revenue
+                                ),
+                                changeText(
+                                  decision.delta.revenue
+                                ),
+                                decision.delta.revenue
+                              )}
+
+                              ${this.renderBeforeAfterMetric(
+                                "订单毛利",
+                                money(
+                                  decision.before
+                                    .grossProfit
+                                ),
+                                money(
+                                  decision.after
+                                    .grossProfit
+                                ),
+                                changeText(
+                                  decision.delta
+                                    .grossProfit
+                                ),
+                                decision.delta
+                                  .grossProfit
+                              )}
+
+                              ${this.renderBeforeAfterMetric(
+                                "客单价",
+                                money(
+                                  decision.before
+                                    .averageSpend
+                                ),
+                                money(
+                                  decision.after
+                                    .averageSpend
+                                ),
+                                changeText(
+                                  decision.delta
+                                    .averageSpend
+                                ),
+                                decision.delta
+                                  .averageSpend
+                              )}
+
+                              ${this.renderBeforeAfterMetric(
+                                "平均等待",
+                                decision.before
+                                  .averageWaitMinutes +
+                                  "分钟",
+                                decision.after
+                                  .averageWaitMinutes +
+                                  "分钟",
+                                absoluteDeltaText(
+                                  decision.delta
+                                    .waitMinutes,
+                                  "分钟"
+                                ),
+                                -decision.delta
+                                  .waitMinutes
+                              )}
+
+                              ${this.renderBeforeAfterMetric(
+                                "满意度",
+                                decision.before
+                                  .satisfaction,
+                                decision.after
+                                  .satisfaction,
+                                absoluteDeltaText(
+                                  decision.delta
+                                    .satisfaction
+                                ),
+                                decision.delta
+                                  .satisfaction
+                              )}
+
+                              ${this.renderBeforeAfterMetric(
+                                "评价",
+                                decision.before
+                                  .reviewScore ??
+                                  "-",
+                                decision.after
+                                  .reviewScore ??
+                                  "-",
+                                absoluteDeltaText(
+                                  decision.delta
+                                    .reviewScore
+                                ),
+                                decision.delta
+                                  .reviewScore
+                              )}
+
+                              ${this.renderBeforeAfterMetric(
+                                "复购率",
+                                decision.before
+                                  .repeatRate ===
+                                  null
+                                  ? "-"
+                                  : decision.before
+                                      .repeatRate +
+                                    "%",
+                                decision.after
+                                  .repeatRate ===
+                                  null
+                                  ? "-"
+                                  : decision.after
+                                      .repeatRate +
+                                    "%",
+                                absoluteDeltaText(
+                                  decision.delta
+                                    .repeatRate,
+                                  "个百分点"
+                                ),
+                                decision.delta
+                                  .repeatRate
+                              )}
+
+                            </div>
+
+
+                            <div class="analytics-price-segments">
+
+                              <div class="analytics-price-segment-head">
+                                <span>
+                                  客群
+                                </span>
+
+                                <span>
+                                  实际客流变化
+                                </span>
+
+                                <span>
+                                  价格直接影响
+                                </span>
+
+                                <span>
+                                  客单价
+                                </span>
+                              </div>
+
+
+                              ${
+                                decision.segments
+                                  .slice(
+                                    0,
+                                    6
+                                  )
+                                  .map(
+                                    segment => `
+                                      <div class="analytics-price-segment-row">
+
+                                        <strong>
+                                          ${escapeHtml(
+                                            segment.segmentName
+                                          )}
+                                        </strong>
+
+                                        <span
+                                          class="${impactClass(
+                                            segment
+                                              .actualTrafficChange
+                                          )}"
+                                        >
+                                          ${percentOrNew(
+                                            segment
+                                              .actualTrafficChange
+                                          )}
+                                        </span>
+
+                                        <span
+                                          class="${impactClass(
+                                            segment
+                                              .directPriceImpact
+                                          )}"
+                                        >
+                                          ${signedPercent(
+                                            segment
+                                              .directPriceImpact
+                                          )}
+                                        </span>
+
+                                        <span>
+                                          ${money(
+                                            segment
+                                              .beforeAverageSpend
+                                          )}
+                                          →
+                                          ${money(
+                                            segment
+                                              .afterAverageSpend
+                                          )}
+                                        </span>
+
+                                      </div>
+                                    `
+                                  )
+                                  .join("")
+                              }
+
+                            </div>
+                          `
+                          : `
+                            <div class="analytics-price-collecting">
+                              这次调价后的营业样本还不够，继续营业后会自动生成前后对比。
+                            </div>
+                          `
+                      }
+
+                    </article>
+                  `
+                )
+                .join("")
+            : `
+              <div class="analytics-empty">
+                还没有调价记录。调整菜品售价后，这里会自动开始复盘。
+              </div>
+            `
+        }
+
+      </section>
+    `;
+  }
+
+
+  renderBeforeAfterMetric(
+    label,
+    before,
+    after,
+    deltaText,
+    deltaValue
+  ) {
+    return `
+      <article>
+
+        <span>
+          ${escapeHtml(
+            label
+          )}
+        </span>
+
+        <strong>
+          ${escapeHtml(
+            before
+          )}
+          →
+          ${escapeHtml(
+            after
+          )}
+        </strong>
+
+        <small
+          class="${impactClass(
+            deltaValue
+          )}"
+        >
+          ${escapeHtml(
+            deltaText
+          )}
+        </small>
+
+      </article>
     `;
   }
 
