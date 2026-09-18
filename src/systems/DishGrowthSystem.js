@@ -17,6 +17,12 @@ import {
   getDishRank
 } from "../data/dishRules.js";
 
+import {
+  DISH_IMPROVEMENT_ECONOMY,
+  calculateDishImprovementCost,
+  calculateDishImprovementSuccessChance
+} from "../data/economicBalanceRules.js";
+
 function clamp(value, min, max) {
   return Math.max(
     min,
@@ -26,26 +32,27 @@ function clamp(value, min, max) {
 
 const IMPROVEMENTS =
   Object.freeze({
-    quality: {
-      id: "quality",
-      name: "品质改良",
-      requiredLevel: 2,
-      baseCost: 1800
-    },
-
-    speed: {
-      id: "speed",
-      name: "流程优化",
-      requiredLevel: 3,
-      baseCost: 2200
-    },
-
-    cost: {
-      id: "cost",
-      name: "成本优化",
-      requiredLevel: 3,
-      baseCost: 2600
-    }
+    quality: Object.freeze({
+      ...DISH_IMPROVEMENT_ECONOMY.quality,
+      requiredLevel:
+        DISH_IMPROVEMENT_ECONOMY
+          .quality
+          .requiredMasteryLevel
+    }),
+    speed: Object.freeze({
+      ...DISH_IMPROVEMENT_ECONOMY.speed,
+      requiredLevel:
+        DISH_IMPROVEMENT_ECONOMY
+          .speed
+          .requiredMasteryLevel
+    }),
+    cost: Object.freeze({
+      ...DISH_IMPROVEMENT_ECONOMY.cost,
+      requiredLevel:
+        DISH_IMPROVEMENT_ECONOMY
+          .cost
+          .requiredMasteryLevel
+    })
   });
 
 class DishGrowthSystem {
@@ -331,18 +338,16 @@ class DishGrowthSystem {
       0;
 
     const cost =
-      Math.round(
-        definition.baseCost +
-        attempts * 250 +
-        (
+      calculateDishImprovementCost({
+        focus,
+        attempts,
+        rankOrder:
           progress.dishRankOrder ??
           this.getRank(
             masteryLevel,
             progress.recipeQualityScore ?? 60
           ).order
-        ) *
-          300
-      );
+      });
 
     if (
       financeSystem.getBalance(
@@ -366,14 +371,11 @@ class DishGrowthSystem {
       60;
 
     const successChance =
-      clamp(
-        0.72 +
-        masteryLevel * 0.04 -
-        recipeQualityScore / 350 -
-        attempts * 0.01,
-        0.25,
-        0.85
-      );
+      calculateDishImprovementSuccessChance({
+        masteryLevel,
+        recipeQualityScore,
+        attempts
+      });
 
     const success =
       randomSystem.chance(
