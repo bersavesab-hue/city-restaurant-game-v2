@@ -58,6 +58,7 @@ import { customerChoiceSystem } from "./systems/CustomerChoiceSystem.js";
 import { customerExperienceSystem } from "./systems/CustomerExperienceSystem.js";
 import { reviewInsightSystem } from "./systems/ReviewInsightSystem.js";
 import { orderSystem } from "./systems/OrderSystem.js";
+import { salesChannelSystem } from "./systems/SalesChannelSystem.js";
 
 import { operatingScheduleSystem } from "./systems/OperatingScheduleSystem.js";
 import { trafficSystem } from "./systems/TrafficSystem.js";
@@ -174,6 +175,7 @@ function bootstrap() {
       customerExperienceSystem,
       reviewInsightSystem,
       orderSystem,
+      salesChannelSystem,
 
       operatingScheduleSystem,
       trafficSystem,
