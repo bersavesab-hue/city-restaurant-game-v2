@@ -4,6 +4,19 @@ import { entitySystem } from "../core/EntitySystem.js";
 import { dishCatalogSystem } from "./DishCatalogSystem.js";
 import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 
+import {
+  COOKING_METHOD_MAP
+} from "../data/cookingMethods.v1.js";
+
+import {
+  RECIPE_SCHEMA_VERSION,
+  RECIPE_VARIANT_ID_PATTERN,
+  RECIPE_INGREDIENT_LIMITS,
+  RECIPE_DIFFICULTY_RANGE,
+  RECIPE_COOKING_MINUTES_RANGE,
+  getRecipeId
+} from "../data/recipeRules.js";
+
 const COLLECTION = "recipes";
 const CUSTOM_TYPE = "custom_recipe";
 
@@ -18,11 +31,45 @@ function validateRecipe(recipe) {
   }
 
   if (
-    typeof recipe.id !== "string" ||
-    !recipe.id.trim()
+    recipe.schemaVersion !==
+      RECIPE_SCHEMA_VERSION
   ) {
     throw new Error(
-      "Recipe id is required"
+      "Recipe has invalid schemaVersion"
+    );
+  }
+
+  if (
+    typeof recipe.variantId !==
+      "string" ||
+    !RECIPE_VARIANT_ID_PATTERN.test(
+      recipe.variantId
+    )
+  ) {
+    throw new Error(
+      "Recipe variantId must use stable snake_case lowercase format"
+    );
+  }
+
+  if (
+    typeof recipe.id !== "string" ||
+    recipe.id !==
+      getRecipeId(
+        recipe.dishId,
+        recipe.variantId
+      )
+  ) {
+    throw new Error(
+      "Recipe id does not match dishId and variantId"
+    );
+  }
+
+  if (
+    typeof recipe.name !== "string" ||
+    !recipe.name.trim()
+  ) {
+    throw new Error(
+      `Recipe "${recipe.id}" requires a name`
     );
   }
 
@@ -37,14 +84,26 @@ function validateRecipe(recipe) {
   }
 
   if (
+    !COOKING_METHOD_MAP[
+      recipe.method
+    ]
+  ) {
+    throw new Error(
+      `Recipe "${recipe.id}" references unknown cooking method "${recipe.method}"`
+    );
+  }
+
+  if (
     !Array.isArray(
       recipe.ingredients
     ) ||
-    recipe.ingredients.length ===
-      0
+    recipe.ingredients.length <
+      RECIPE_INGREDIENT_LIMITS.min ||
+    recipe.ingredients.length >
+      RECIPE_INGREDIENT_LIMITS.max
   ) {
     throw new Error(
-      `Recipe "${recipe.id}" requires ingredients`
+      `Recipe "${recipe.id}" requires ${RECIPE_INGREDIENT_LIMITS.min}-${RECIPE_INGREDIENT_LIMITS.max} ingredients`
     );
   }
 
@@ -99,11 +158,13 @@ function validateRecipe(recipe) {
     !Number.isInteger(
       recipe.difficulty
     ) ||
-    recipe.difficulty < 1 ||
-    recipe.difficulty > 100
+    recipe.difficulty <
+      RECIPE_DIFFICULTY_RANGE.min ||
+    recipe.difficulty >
+      RECIPE_DIFFICULTY_RANGE.max
   ) {
     throw new Error(
-      `Recipe "${recipe.id}" difficulty must be 1-100`
+      `Recipe "${recipe.id}" difficulty must be ${RECIPE_DIFFICULTY_RANGE.min}-${RECIPE_DIFFICULTY_RANGE.max}`
     );
   }
 
@@ -111,10 +172,32 @@ function validateRecipe(recipe) {
     !Number.isInteger(
       recipe.cookingMinutes
     ) ||
-    recipe.cookingMinutes <= 0
+    recipe.cookingMinutes <
+      RECIPE_COOKING_MINUTES_RANGE.min ||
+    recipe.cookingMinutes >
+      RECIPE_COOKING_MINUTES_RANGE.max
   ) {
     throw new Error(
       `Recipe "${recipe.id}" has invalid cookingMinutes`
+    );
+  }
+
+  if (
+    recipe.tags !== undefined &&
+    (
+      !Array.isArray(
+        recipe.tags
+      ) ||
+      recipe.tags.some(
+        tag =>
+          typeof tag !==
+            "string" ||
+          !tag.trim()
+      )
+    )
+  ) {
+    throw new Error(
+      `Recipe "${recipe.id}" has invalid tags`
     );
   }
 
