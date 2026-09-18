@@ -10,6 +10,10 @@ import {
 } from "../src/systems/RestaurantSystem.js";
 
 import {
+  financeSystem
+} from "../src/systems/FinanceSystem.js";
+
+import {
   storeProgressSystem
 } from "../src/systems/StoreProgressSystem.js";
 
@@ -179,6 +183,11 @@ test(
         name:
           "成长入口测试店"
       });
+
+    financeSystem.createAccount(
+      restaurant.id,
+      100000
+    );
 
     let page =
       moreHubPageSystem
