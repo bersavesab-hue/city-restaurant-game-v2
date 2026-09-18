@@ -1,84 +1,227 @@
 import {
-  AWARD_DEFINITIONS
-} from "../data/awardDefinitions.js";
+  restaurantSystem
+} from "./RestaurantSystem.js";
+
+import {
+  trafficDemandSystem
+} from "./TrafficDemandSystem.js";
 
 import {
   competitionMetricsSystem
 } from "./CompetitionMetricsSystem.js";
 
+import {
+  AWARD_DEFINITION_MAP
+} from "../data/awardDefinitions.js";
 
-const PERIOD_ALIAS =
-  Object.freeze({
-    monthly: "month",
-    quarterly: "quarter",
-    annual: "year"
-  });
+
+function scoreOf(
+  candidate,
+  metric
+) {
+  const value =
+    Number(
+      candidate?.[
+        metric
+      ]
+    );
+
+
+  return Number.isFinite(
+    value
+  )
+    ? value
+    : Number.NEGATIVE_INFINITY;
+}
 
 
 class AwardEvaluationSystem {
-  getDefinitions(
-    period = null
+  getDefinition(
+    awardId
   ) {
-    return AWARD_DEFINITIONS
-      .filter(
-        item =>
-          !period ||
-          item.period === period
-      )
-      .map(
-        item =>
-          structuredClone(
-            item
-          )
+    const definition =
+      AWARD_DEFINITION_MAP[
+        awardId
+      ];
+
+
+    if (!definition) {
+      throw new Error(
+        `Unknown award "${awardId}"`
       );
+    }
+
+
+    return structuredClone(
+      definition
+    );
+  }
+
+
+  getContexts(
+    definition
+  ) {
+    const restaurants =
+      restaurantSystem.list();
+
+
+    if (
+      restaurants.length ===
+      0
+    ) {
+      return [];
+    }
+
+
+    if (
+      definition.scope ===
+      "restaurant"
+    ) {
+      return restaurants.map(
+        restaurant => ({
+          scopeKey:
+            `restaurant:${restaurant.id}`,
+
+          anchorRestaurantId:
+            restaurant.id,
+
+          restaurantIds: [
+            restaurant.id
+          ]
+        })
+      );
+    }
+
+
+    if (
+      definition.scope ===
+      "player"
+    ) {
+      return [
+        {
+          scopeKey:
+            "player",
+
+          anchorRestaurantId:
+            restaurants[0].id,
+
+          restaurantIds:
+            restaurants.map(
+              item =>
+                item.id
+            )
+        }
+      ];
+    }
+
+
+    if (
+      definition.scope ===
+      "city"
+    ) {
+      return [
+        {
+          scopeKey:
+            "city",
+
+          anchorRestaurantId:
+            restaurants[0].id,
+
+          restaurantIds:
+            restaurants.map(
+              item =>
+                item.id
+            )
+        }
+      ];
+    }
+
+
+    if (
+      definition.scope ===
+      "district"
+    ) {
+      const groups =
+        new Map();
+
+
+      for (
+        const restaurant
+        of restaurants
+      ) {
+        let district =
+          null;
+
+
+        try {
+          district =
+            trafficDemandSystem
+              .getDistrictForRestaurant(
+                restaurant.id
+              );
+        } catch {
+          district =
+            null;
+        }
+
+
+        if (!district) {
+          continue;
+        }
+
+
+        const current =
+          groups.get(
+            district.id
+          ) ?? {
+            scopeKey:
+              `district:${district.id}`,
+
+            districtId:
+              district.id,
+
+            districtName:
+              district.name,
+
+            anchorRestaurantId:
+              restaurant.id,
+
+            restaurantIds:
+              []
+          };
+
+
+        current
+          .restaurantIds
+          .push(
+            restaurant.id
+          );
+
+
+        groups.set(
+          district.id,
+          current
+        );
+      }
+
+
+      return [
+        ...groups.values()
+      ];
+    }
+
+
+    return [];
   }
 
 
   getCandidates(
     definition,
-    restaurantId,
+    context,
     endDay
   ) {
     const period =
-      PERIOD_ALIAS[
-        definition.period
-      ];
-
-
-    if (
-      definition.subject ===
-      "restaurant"
-    ) {
-      switch (
-        definition.scope
-      ) {
-        case "district":
-          return competitionMetricsSystem
-            .getDistrictRestaurantCandidates(
-              restaurantId,
-              period,
-              endDay
-            );
-
-        case "city":
-          return competitionMetricsSystem
-            .getCityRestaurantCandidates(
-              restaurantId,
-              period,
-              endDay
-            );
-
-        case "player":
-          return competitionMetricsSystem
-            .getPlayerRestaurantCandidates(
-              period,
-              endDay
-            );
-
-        default:
-          return [];
-      }
-    }
+      definition.period;
 
 
     if (
@@ -87,7 +230,8 @@ class AwardEvaluationSystem {
     ) {
       return competitionMetricsSystem
         .getDishCandidates(
-          restaurantId,
+          context
+            .anchorRestaurantId,
           period,
           endDay
         );
@@ -100,8 +244,82 @@ class AwardEvaluationSystem {
     ) {
       return competitionMetricsSystem
         .getEmployeeCandidates(
-          restaurantId
+          context
+            .anchorRestaurantId
         );
+    }
+
+
+    if (
+      definition.scope ===
+      "player"
+    ) {
+      return competitionMetricsSystem
+        .getPlayerRestaurantCandidates(
+          period,
+          endDay
+        );
+    }
+
+
+    if (
+      definition.scope ===
+      "city"
+    ) {
+      return competitionMetricsSystem
+        .getCityRestaurantCandidates(
+          context
+            .anchorRestaurantId,
+          period,
+          endDay
+        );
+    }
+
+
+    if (
+      definition.scope ===
+      "district"
+    ) {
+      const merged =
+        new Map();
+
+
+      for (
+        const restaurantId
+        of context
+          .restaurantIds
+      ) {
+        const candidates =
+          competitionMetricsSystem
+            .getDistrictRestaurantCandidates(
+              restaurantId,
+              period,
+              endDay
+            );
+
+
+        for (
+          const candidate
+          of candidates
+        ) {
+          if (
+            candidate.isPlayer ||
+            !merged.has(
+              candidate.id
+            )
+          ) {
+            merged.set(
+              candidate.id,
+              candidate
+            );
+          }
+        }
+      }
+
+
+      return [
+        ...merged.values()
+      ];
     }
 
 
@@ -113,77 +331,75 @@ class AwardEvaluationSystem {
     candidate,
     definition
   ) {
-    const rule =
+    const rules =
       definition.eligibility ??
       {};
 
 
     if (
-      rule.minOperatingDays &&
+      rules.minOperatingDays &&
       (
         candidate
           .operatingDays ??
         0
       ) <
-      rule.minOperatingDays
+      rules.minOperatingDays
     ) {
       return false;
     }
 
 
     if (
-      rule.minOrders &&
+      rules.minOrders &&
       (
         candidate.orders ??
         0
       ) <
-      rule.minOrders
+      rules.minOrders
     ) {
       return false;
     }
 
 
     if (
-      rule.minQuantity &&
+      rules.minQuantity &&
       (
         candidate.quantity ??
         0
       ) <
-      rule.minQuantity
+      rules.minQuantity
     ) {
       return false;
     }
 
 
     if (
-      rule.minWorkMinutes &&
+      rules.minWorkMinutes &&
       (
         candidate
           .totalWorkMinutes ??
         0
       ) <
-      rule.minWorkMinutes
+      rules.minWorkMinutes
     ) {
       return false;
     }
 
 
     if (
-      Array.isArray(
-        rule.roleIds
-      ) &&
-      rule.roleIds.length >
-        0 &&
-      !rule.roleIds.includes(
-        candidate.roleId
-      )
+      rules.roleIds
+        ?.length &&
+      !rules.roleIds
+        .includes(
+          candidate.roleId
+        )
     ) {
       return false;
     }
 
 
     if (
-      rule.customOnly &&
+      rules.customOnly &&
       !candidate.custom
     ) {
       return false;
@@ -191,113 +407,44 @@ class AwardEvaluationSystem {
 
 
     if (
-      Number.isFinite(
-        rule.maxAgeDays
-      ) &&
+      rules.maxAgeDays !==
+        null &&
+      rules.maxAgeDays !==
+        undefined &&
       (
         candidate.ageDays ??
         Number.MAX_SAFE_INTEGER
       ) >
-      rule.maxAgeDays
+      rules.maxAgeDays
     ) {
       return false;
     }
 
 
-    return true;
-  }
-
-
-  getMetricScore(
-    candidate,
-    definition
-  ) {
-    const value =
-      candidate[
-        definition.metric
-      ];
-
-
     return Number.isFinite(
-      value
-    )
-      ? value
-      : null;
-  }
-
-
-  simplifyCandidate(
-    candidate,
-    definition,
-    rank,
-    stage
-  ) {
-    return {
-      rank,
-      stage,
-
-      id:
-        candidate.id,
-
-      subjectType:
-        candidate.subjectType ??
-        definition.subject,
-
-      name:
-        candidate.name,
-
-      isPlayer:
-        Boolean(
-          candidate.isPlayer
-        ),
-
-      restaurantId:
-        candidate.restaurantId ??
-        (
-          candidate
-            .subjectType ===
-            "restaurant" &&
-          candidate.isPlayer
-            ? candidate.id
-            : null
-        ),
-
-      districtId:
-        candidate.districtId ??
-        null,
-
-      districtName:
-        candidate.districtName ??
-        null,
-
-      roleId:
-        candidate.roleId ??
-        null,
-
-      roleName:
-        candidate.roleName ??
-        null,
-
-      score:
-        candidate[
-          definition.metric
-        ],
-
-      metric:
+      scoreOf(
+        candidate,
         definition.metric
-    };
+      )
+    );
   }
 
 
-  evaluateAward(
-    definition,
-    restaurantId,
+  evaluate(
+    awardId,
+    context,
     endDay
   ) {
+    const definition =
+      this.getDefinition(
+        awardId
+      );
+
+
     const eligible =
       this.getCandidates(
         definition,
-        restaurantId,
+        context,
         endDay
       )
         .filter(
@@ -307,33 +454,21 @@ class AwardEvaluationSystem {
               definition
             )
         )
-        .filter(
-          candidate =>
-            this.getMetricScore(
-              candidate,
-              definition
-            ) !==
-            null
-        )
         .sort(
-          (
-            a,
-            b
-          ) => {
-            const difference =
-              b[
+          (a, b) => {
+            const delta =
+              scoreOf(
+                b,
                 definition.metric
-              ] -
-              a[
+              ) -
+              scoreOf(
+                a,
                 definition.metric
-              ];
+              );
 
 
-            if (
-              difference !==
-              0
-            ) {
-              return difference;
+            if (delta !== 0) {
+              return delta;
             }
 
 
@@ -348,111 +483,114 @@ class AwardEvaluationSystem {
         );
 
 
-    const nominationCount =
+    const finalistCount =
+      Math.max(
+        1,
+        definition.finalistCount ??
+        3
+      );
+
+
+    const nomineeCount =
       Math.min(
         eligible.length,
         Math.max(
-          definition
-            .finalistCount *
-            2,
+          finalistCount * 2,
           5
         )
       );
 
 
-    const nominations =
+    const nominees =
       eligible
         .slice(
           0,
-          nominationCount
+          nomineeCount
         )
         .map(
           (
             candidate,
             index
-          ) => {
-            const rank =
-              index + 1;
+          ) => ({
+            ...candidate,
 
-            let stage =
-              "nominated";
+            rank:
+              index + 1,
 
+            stage:
+              index === 0
+                ? "winner"
+                : index <
+                  finalistCount
+                  ? "finalist"
+                  : "nominee",
 
-            if (
-              rank <=
-              definition
-                .finalistCount
-            ) {
-              stage =
-                "finalist";
-            }
-
-
-            if (
-              rank === 1
-            ) {
-              stage =
-                "winner";
-            }
-
-
-            return this
-              .simplifyCandidate(
+            awardScore:
+              scoreOf(
                 candidate,
-                definition,
-                rank,
-                stage
-              );
-          }
+                definition.metric
+              )
+          })
         );
 
 
     const finalists =
-      nominations.filter(
-        item =>
-          item.stage ===
-            "winner" ||
-          item.stage ===
-            "finalist"
-      );
+      nominees
+        .filter(
+          item =>
+            item.stage ===
+              "winner" ||
+            item.stage ===
+              "finalist"
+        );
 
 
     return {
-      definition:
+      definition,
+
+      context:
         structuredClone(
-          definition
+          context
         ),
 
       endDay,
 
+      metric:
+        definition.metric,
+
       eligibleCount:
         eligible.length,
 
-      nominations,
+      nominees,
 
       finalists,
 
       winner:
-        nominations[0] ??
+        nominees[0] ??
         null
     };
   }
 
 
-  evaluatePeriod(
-    period,
-    restaurantId,
+  evaluateAward(
+    awardId,
     endDay
   ) {
+    const definition =
+      this.getDefinition(
+        awardId
+      );
+
+
     return this
-      .getDefinitions(
-        period
+      .getContexts(
+        definition
       )
       .map(
-        definition =>
-          this.evaluateAward(
-            definition,
-            restaurantId,
+        context =>
+          this.evaluate(
+            awardId,
+            context,
             endDay
           )
       );
@@ -465,6 +603,5 @@ export const awardEvaluationSystem =
 
 
 export {
-  AwardEvaluationSystem,
-  PERIOD_ALIAS
+  AwardEvaluationSystem
 };

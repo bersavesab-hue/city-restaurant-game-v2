@@ -61,6 +61,11 @@ import { trafficDemandSystem } from "./systems/TrafficDemandSystem.js";
 import { marketCompetitionSystem } from "./systems/MarketCompetitionSystem.js";
 import { marketInsightSystem } from "./systems/MarketInsightSystem.js";
 import { marketRankingSystem } from "./systems/MarketRankingSystem.js";
+import { rankingCenterSystem } from "./systems/RankingCenterSystem.js";
+import { competitionMetricsSystem } from "./systems/CompetitionMetricsSystem.js";
+import { awardEvaluationSystem } from "./systems/AwardEvaluationSystem.js";
+import { awardSystem } from "./systems/AwardSystem.js";
+import { honorArchiveSystem } from "./systems/HonorArchiveSystem.js";
 import { marketActionSystem } from "./systems/MarketActionSystem.js";
 import { districtEventSystem } from "./systems/DistrictEventSystem.js";
 import { businessCalendarSystem } from "./systems/BusinessCalendarSystem.js";
@@ -167,6 +172,11 @@ function bootstrap() {
       marketCompetitionSystem,
       marketInsightSystem,
       marketRankingSystem,
+      rankingCenterSystem,
+      competitionMetricsSystem,
+      awardEvaluationSystem,
+      awardSystem,
+      honorArchiveSystem,
       marketActionSystem,
       districtEventSystem,
       businessCalendarSystem,

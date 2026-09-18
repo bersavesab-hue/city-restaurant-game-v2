@@ -21,6 +21,7 @@ import { districtEventSystem } from "./DistrictEventSystem.js";
 import { marketInsightSystem } from "./MarketInsightSystem.js";
 import { renovationConstructionSystem } from "./RenovationConstructionSystem.js";
 import { equipmentMaintenanceSystem } from "./EquipmentMaintenanceSystem.js";
+import { awardSystem } from "./AwardSystem.js";
 
 class OperatingCycleSystem {
   constructor() {
@@ -193,6 +194,11 @@ class OperatingCycleSystem {
 
           historyArchiveSystem
             .processAll(
+              current.day
+            );
+
+          awardSystem
+            .processDay(
               current.day
             );
 

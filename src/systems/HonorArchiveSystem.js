@@ -2,184 +2,281 @@ import {
   entitySystem
 } from "../core/EntitySystem.js";
 
-import {
-  AWARD_DIVISIONS,
-  AWARD_PERIODS
-} from "../data/awardDefinitions.js";
-
 
 class HonorArchiveSystem {
-  list(
-    restaurantId,
-    {
-      period = null,
-      division = null,
-      subjectType = null,
-      limit = 200
-    } = {}
+  listByRestaurant(
+    restaurantId
   ) {
     return entitySystem
       .filter(
         "honor_record",
         item =>
           item.restaurantId ===
-            restaurantId &&
-          (
-            !period ||
-            item.period ===
-              period
-          ) &&
-          (
-            !division ||
-            item.division ===
-              division
-          ) &&
-          (
-            !subjectType ||
-            item.subjectType ===
-              subjectType
-          )
+            restaurantId
       )
       .sort(
-        (
-          a,
-          b
-        ) =>
-          b.endDay -
-          a.endDay
-      )
-      .slice(
-        0,
-        limit
+        (a, b) =>
+          (
+            b.awardedDay ??
+            0
+          ) -
+          (
+            a.awardedDay ??
+            0
+          )
       );
   }
 
 
-  getSummary(
+  getJourney(
     restaurantId
   ) {
-    const honors =
-      this.list(
-        restaurantId,
-        {
-          limit: 1000
-        }
+    const results =
+      entitySystem.list(
+        "award_result"
       );
 
 
-    const byPeriod =
-      Object.fromEntries(
-        Object.keys(
-          AWARD_PERIODS
-        ).map(
-          id => [
-            id,
-            0
-          ]
-        )
-      );
-
-
-    const byDivision =
-      Object.fromEntries(
-        Object.keys(
-          AWARD_DIVISIONS
-        ).map(
-          id => [
-            id,
-            0
-          ]
-        )
-      );
-
-
-    let prestigePoints = 0;
-    let annualWins = 0;
+    let nominations = 0;
+    let finalistAppearances = 0;
+    let wins = 0;
 
 
     for (
-      const honor
-      of honors
+      const result
+      of results
     ) {
-      byPeriod[
-        honor.period
-      ] =
-        (
-          byPeriod[
-            honor.period
-          ] ??
-          0
-        ) + 1;
+      const nominees =
+        result.nominees ??
+        [];
 
-      byDivision[
-        honor.division
-      ] =
-        (
-          byDivision[
-            honor.division
-          ] ??
-          0
-        ) + 1;
+      const finalists =
+        result.finalists ??
+        [];
 
-      prestigePoints +=
-        honor.prestige ??
-        0;
+
+      nominations +=
+        nominees.filter(
+          item =>
+            item.restaurantId ===
+              restaurantId
+        ).length;
+
+
+      finalistAppearances +=
+        finalists.filter(
+          item =>
+            item.restaurantId ===
+              restaurantId
+        ).length;
+
 
       if (
-        honor.period ===
-        "annual"
+        result.winner
+          ?.restaurantId ===
+        restaurantId
       ) {
-        annualWins += 1;
+        wins += 1;
       }
     }
 
 
     return {
-      totalHonors:
-        honors.length,
+      nominations,
+      finalistAppearances,
+      wins
+    };
+  }
 
-      prestigePoints,
 
-      annualWins,
+  getHall(
+    restaurantId
+  ) {
+    const records =
+      this.listByRestaurant(
+        restaurantId
+      );
 
-      uniqueAwardCount:
+
+    const byPeriod = {
+      monthly: 0,
+      quarterly: 0,
+      annual: 0
+    };
+
+
+    const byDivision =
+      {};
+
+
+    const bySubject = {
+      restaurant: 0,
+      dish: 0,
+      employee: 0
+    };
+
+
+    const repeatMap =
+      new Map();
+
+
+    let prestigePoints = 0;
+
+
+    for (
+      const record
+      of records
+    ) {
+      if (
+        record.period in
+        byPeriod
+      ) {
+        byPeriod[
+          record.period
+        ] += 1;
+      }
+
+
+      byDivision[
+        record.division
+      ] =
+        (
+          byDivision[
+            record.division
+          ] ??
+          0
+        ) +
+        1;
+
+
+      if (
+        record.subjectType in
+        bySubject
+      ) {
+        bySubject[
+          record.subjectType
+        ] += 1;
+      }
+
+
+      prestigePoints +=
+        record.prestige ??
+        0;
+
+
+      const repeatKey =
+        [
+          record.awardId,
+          record.subjectId ??
+            record.restaurantId
+        ].join(
+          "::"
+        );
+
+
+      repeatMap.set(
+        repeatKey,
+        (
+          repeatMap.get(
+            repeatKey
+          ) ??
+          0
+        ) +
+        1
+      );
+    }
+
+
+    const repeatWins =
+      [
+        ...repeatMap.entries()
+      ]
+        .filter(
+          (
+            [
+              ,
+              count
+            ]
+          ) =>
+            count >= 2
+        )
+        .map(
+          (
+            [
+              key,
+              count
+            ]
+          ) => ({
+            key,
+            count
+          })
+        )
+        .sort(
+          (a, b) =>
+            b.count -
+            a.count
+        );
+
+
+    return {
+      restaurantId,
+
+      totalWins:
+        records.length,
+
+      uniqueAwards:
         new Set(
-          honors.map(
+          records.map(
             item =>
               item.awardId
           )
         ).size,
 
+      prestigePoints,
+
       byPeriod,
 
       byDivision,
 
-      latest:
-        honors.slice(
-          0,
-          6
-        )
+      bySubject,
+
+      repeatWins,
+
+      journey:
+        this.getJourney(
+          restaurantId
+        ),
+
+      highestPrestige:
+        records.reduce(
+          (
+            max,
+            item
+          ) =>
+            Math.max(
+              max,
+              item.prestige ??
+                0
+            ),
+          0
+        ),
+
+      records
     };
   }
 
 
-  getSubjectHonors(
+  getRecent(
     restaurantId,
-    subjectType,
-    subjectId
+    limit = 12
   ) {
     return this
-      .list(
-        restaurantId,
-        {
-          subjectType,
-          limit: 1000
-        }
+      .listByRestaurant(
+        restaurantId
       )
-      .filter(
-        item =>
-          item.subjectId ===
-            subjectId
+      .slice(
+        0,
+        limit
       );
   }
 }
