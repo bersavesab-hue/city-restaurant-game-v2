@@ -20,7 +20,9 @@ import {
 } from "../src/data/competitorNames.v1.js";
 
 import {
-  validateCompetitorTemplate
+  validateCompetitorTemplate,
+  getCompetitorBaseTarget,
+  getCompetitorActiveLimit
 } from "../src/data/competitorRules.js";
 
 import {
@@ -363,6 +365,128 @@ test(
     assert.equal(
       branch.active,
       true
+    );
+  }
+);
+
+
+test(
+  "竞争店基础数量和扩张上限随商圈竞争度增长且存在硬上限",
+  () => {
+    assert.equal(
+      getCompetitorBaseTarget(12),
+      1
+    );
+
+    assert.equal(
+      getCompetitorActiveLimit(12),
+      3
+    );
+
+    assert.equal(
+      getCompetitorBaseTarget(50),
+      2
+    );
+
+    assert.equal(
+      getCompetitorActiveLimit(50),
+      5
+    );
+
+    assert.equal(
+      getCompetitorBaseTarget(100),
+      4
+    );
+
+    assert.equal(
+      getCompetitorActiveLimit(100),
+      8
+    );
+  }
+);
+
+test(
+  "达到商圈活跃竞争店上限后强势品牌也不能继续复制分店",
+  () => {
+    gameState.reset();
+
+    const district =
+      districtSystem.get(
+        "old_town"
+      );
+
+    const limit =
+      marketCompetitionSystem
+        .getMaxActiveCount(
+          district
+        );
+
+    assert.ok(
+      limit >= 1
+    );
+
+    const parent =
+      marketCompetitionSystem
+        .create({
+          districtId:
+            "old_town",
+          name:
+            "容量测试总店",
+          priceIndex: 1,
+          qualityScore: 90,
+          reputation: 90,
+          serviceScore: 90,
+          strengthTier: 5,
+          expansionTendency: 100,
+          resilience: 90,
+          brandName:
+            "容量测试总店"
+        });
+
+    for (
+      let index = 1;
+      index < limit;
+      index += 1
+    ) {
+      marketCompetitionSystem
+        .create({
+          districtId:
+            "old_town",
+          name:
+            `容量占位店${index}`,
+          priceIndex: 1,
+          qualityScore: 70,
+          reputation: 70,
+          serviceScore: 70,
+          strengthTier: 3,
+          expansionTendency: 50,
+          resilience: 50
+        });
+    }
+
+    assert.equal(
+      competitorDynamicsSystem
+        .getDistrictActiveCount(
+          "old_town"
+        ),
+      limit
+    );
+
+    assert.equal(
+      competitorDynamicsSystem
+        .createExpansion(
+          parent,
+          180
+        ),
+      null
+    );
+
+    assert.equal(
+      competitorDynamicsSystem
+        .getDistrictActiveCount(
+          "old_town"
+        ),
+      limit
     );
   }
 );
