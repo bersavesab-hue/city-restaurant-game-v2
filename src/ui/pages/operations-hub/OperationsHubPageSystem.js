@@ -81,6 +81,23 @@ const PRIMARY_ENTRIES =
     },
 
     {
+      id: "market",
+      title: "市场与竞争",
+      description:
+        "门店定位、市场份额、竞争店、商圈事件和营销动作",
+      target: "market-strategy",
+
+      secondary: [
+        {
+          title: "排行榜",
+          target:
+            "ranking-center"
+        }
+      ]
+    },
+
+
+    {
       id: "competition",
       title: "榜单与荣誉",
       description:
