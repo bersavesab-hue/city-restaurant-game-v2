@@ -9,6 +9,7 @@ import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 import { recipeSystem } from "./RecipeSystem.js";
 import { menuSystem } from "./MenuSystem.js";
 import { restaurantSystem } from "./RestaurantSystem.js";
+import { restaurantDishSystem } from "./RestaurantDishSystem.js";
 
 import {
   DISH_CATEGORY_LIST
@@ -50,13 +51,28 @@ function requireOwnedDish(
       dishId
     );
 
+  const progress =
+    restaurantDishSystem.get(
+      restaurantId,
+      dishId
+    );
+
   if (
     !dish ||
+    !progress
+  ) {
+    throw new Error(
+      "Dish does not belong to restaurant"
+    );
+  }
+
+  if (
+    dish.custom &&
     dish.ownerRestaurantId !==
       restaurantId
   ) {
     throw new Error(
-      "Dish does not belong to restaurant"
+      "Custom dish does not belong to restaurant"
     );
   }
 
@@ -123,7 +139,7 @@ class DishManagementSystem {
   getPage(
     restaurantId,
     {
-      tierId = null,
+      rankId = null,
       menuOnly = false
     } = {}
   ) {
@@ -194,12 +210,12 @@ class DishManagementSystem {
           }
         );
 
-    if (tierId !== null) {
+    if (rankId !== null) {
       dishes =
         dishes.filter(
           dish =>
-            dish.tier.id ===
-            tierId
+            dish.rank.id ===
+            rankId
         );
     }
 
@@ -246,7 +262,7 @@ class DishManagementSystem {
       },
 
       filters: {
-        tierId,
+        rankId,
         menuOnly
       },
 
@@ -267,15 +283,27 @@ class DishManagementSystem {
     const status =
       dishLifecycleSystem
         .getStatus(
+          restaurantId,
           dishId
         );
 
+    const recipeId =
+      dish.recipeId ??
+      dish.defaultRecipeId ??
+      null;
+
     const recipe =
-      dish.recipeId
+      recipeId
         ? recipeSystem.get(
-            dish.recipeId
+            recipeId
           )
         : null;
+
+    const progress =
+      restaurantDishSystem.get(
+        restaurantId,
+        dishId
+      );
 
     const menuItem =
       getMenuItem(
@@ -292,7 +320,8 @@ class DishManagementSystem {
 
             unlocked:
               (
-                dish.masteryLevel ??
+                progress
+                  ?.masteryLevel ??
                 1
               ) >=
               item.requiredLevel
@@ -314,7 +343,9 @@ class DishManagementSystem {
           dish.category,
 
         qualityScore:
-          dish.qualityScore,
+          progress
+            ?.qualityScore ??
+          null,
 
         basePrice:
           dish.basePrice,
@@ -331,17 +362,28 @@ class DishManagementSystem {
           dish.createdDay,
 
         dishRankId:
-          dish.dishRankId,
+          progress
+            ?.dishRankId ??
+          null,
 
         dishRankName:
-          dish.dishRankName,
+          progress
+            ?.dishRankName ??
+          null,
 
         dishRankOrder:
-          dish.dishRankOrder,
+          progress
+            ?.dishRankOrder ??
+          null,
+
+        masteryLevel:
+          progress
+            ?.masteryLevel ??
+          0,
 
         improvementAttempts:
-          dish
-            .improvementAttempts ??
+          progress
+            ?.improvementAttempts ??
           0
       },
 
@@ -636,6 +678,12 @@ class DishManagementSystem {
         restaurantId,
         dishId
       );
+
+    if (!dish.custom) {
+      throw new Error(
+        "Catalog dish names cannot be changed"
+      );
+    }
 
     const value =
       String(
