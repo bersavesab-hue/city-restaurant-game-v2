@@ -670,7 +670,7 @@ class RestaurantPositioningSystem {
 
     const competitors =
       marketCompetitionSystem
-        .listByDistrict(
+        .ensureDistrict(
           district.id
         );
 
