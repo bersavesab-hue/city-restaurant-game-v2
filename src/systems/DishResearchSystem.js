@@ -190,7 +190,7 @@ class DishResearchSystem {
         100
       );
 
-    const qualityScore =
+    const researchScore =
       Math.round(
         ingredientScore *
           0.45 +
@@ -243,7 +243,7 @@ class DishResearchSystem {
 
     const markup =
       2.1 +
-      qualityScore *
+      researchScore *
         0.009;
 
     const suggestedPrice =
@@ -256,7 +256,7 @@ class DishResearchSystem {
       );
 
     return {
-      qualityScore,
+      researchScore,
 
       ingredientScore:
         Math.round(
@@ -389,9 +389,9 @@ class DishResearchSystem {
 
           custom: true,
 
-          researchQualityScore:
+          researchScore:
             analysis
-              .qualityScore,
+              .researchScore,
 
           researchCost:
             analysis
@@ -435,9 +435,9 @@ class DishResearchSystem {
 
           method,
 
-          researchQuality:
+          researchScore:
             analysis
-              .qualityScore,
+              .researchScore,
 
           ingredientEfficiency: 1,
           improvementAttempts: 0,
@@ -464,7 +464,7 @@ class DishResearchSystem {
           dishId:
             dish.id,
           initialQualityScore:
-            analysis.qualityScore
+            analysis.researchScore
         });
 
     const history = [
@@ -490,7 +490,7 @@ class DishResearchSystem {
           dishProgress.dishRankName,
 
         score:
-          dishProgress.qualityScore,
+          dishProgress.recipeQualityScore,
 
         cost:
           analysis
@@ -752,12 +752,12 @@ class DishResearchSystem {
           (a, b) =>
             (
               b.progress
-                ?.qualityScore ??
+                ?.recipeQualityScore ??
               0
             ) -
             (
               a.progress
-                ?.qualityScore ??
+                ?.recipeQualityScore ??
               0
             )
         )[0]
