@@ -748,6 +748,115 @@ function buildFloor({
 }
 
 class PropertyMarketSystem {
+  getTemplates() {
+    return structuredClone(
+      PROPERTY_TEMPLATES_V1
+    );
+  }
+
+  getTemplate(
+    templateId
+  ) {
+    const template =
+      PROPERTY_TEMPLATES_V1
+        .find(
+          item =>
+            item.id ===
+            templateId
+        );
+
+    return template
+      ? structuredClone(
+          template
+        )
+      : null;
+  }
+
+  getTemplateWeight(
+    templateId,
+    districtId
+  ) {
+    const template =
+      PROPERTY_TEMPLATES_V1
+        .find(
+          item =>
+            item.id ===
+            templateId
+        );
+
+    if (!template) {
+      return 0;
+    }
+
+    return (
+      template.baseWeight *
+      (
+        template
+          .districtWeights?.[
+            districtId
+          ] ??
+        1
+      )
+    );
+  }
+
+  getTemplateDistribution(
+    districtId
+  ) {
+    const weighted =
+      PROPERTY_TEMPLATES_V1
+        .map(
+          template => ({
+            templateId:
+              template.id,
+
+            name:
+              template.name,
+
+            weight:
+              this.getTemplateWeight(
+                template.id,
+                districtId
+              )
+          })
+        )
+        .filter(
+          item =>
+            item.weight >
+            0
+        );
+
+    const total =
+      weighted.reduce(
+        (
+          sum,
+          item
+        ) =>
+          sum +
+          item.weight,
+        0
+      );
+
+    return weighted
+      .map(
+        item => ({
+          ...item,
+
+          share:
+            total >
+            0
+              ? item.weight /
+                total
+              : 0
+        })
+      )
+      .sort(
+        (a, b) =>
+          b.share -
+          a.share
+      );
+  }
+
   getState(districtId) {
     return entitySystem
       .list("property_market")
@@ -1571,18 +1680,75 @@ class PropertyMarketSystem {
       item => item.status === PROPERTY_STATUS.AVAILABLE
     );
 
+    const templateCounts =
+      {};
+
+    for (
+      const property
+      of available
+    ) {
+      const templateId =
+        property
+          .marketMeta
+          ?.templateId ??
+        property.propertyType ??
+        "unknown";
+
+      templateCounts[
+        templateId
+      ] =
+        (
+          templateCounts[
+            templateId
+          ] ??
+          0
+        ) +
+        1;
+    }
+
     return {
       districtId,
-      active: Boolean(state),
-      target: state?.target ?? 0,
-      totalGenerated: generated.length,
-      availableGenerated: available.length,
-      nextRefreshDay: state?.nextRefreshDay ?? null,
+      active:
+        Boolean(
+          state
+        ),
+      target:
+        state?.target ??
+        0,
+      totalGenerated:
+        generated.length,
+      availableGenerated:
+        available.length,
+      nextRefreshDay:
+        state
+          ?.nextRefreshDay ??
+        null,
+
+      templateCounts,
+
+      templateDistribution:
+        this.getTemplateDistribution(
+          districtId
+        ),
+
       areaRange:
-        available.length > 0
+        available.length >
+        0
           ? {
-              min: Math.min(...available.map(item => item.area)),
-              max: Math.max(...available.map(item => item.area))
+              min:
+                Math.min(
+                  ...available.map(
+                    item =>
+                      item.area
+                  )
+                ),
+              max:
+                Math.max(
+                  ...available.map(
+                    item =>
+                      item.area
+                  )
+                )
             }
           : null
     };
