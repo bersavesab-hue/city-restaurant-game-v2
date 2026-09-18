@@ -182,7 +182,7 @@ test(
       storeA.id,
       dishId,
       {
-        qualityScore:
+        recipeQualityScore:
           72
       }
     );
