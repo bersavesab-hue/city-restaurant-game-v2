@@ -26,6 +26,10 @@ import {
   recipeSystem
 } from "./RecipeSystem.js";
 
+import {
+  cookingMethodRequiresExhaust
+} from "../data/cookingMethods.v1.js";
+
 
 const PERMIT_DEFINITIONS =
   Object.freeze([
@@ -72,15 +76,6 @@ const PERMIT_DEFINITIONS =
       description:
         "涉及热厨菜品时检查房源排烟条件"
     }
-  ]);
-
-
-const EXHAUST_METHODS =
-  new Set([
-    "stir_fry",
-    "fry",
-    "bake",
-    "stew"
   ]);
 
 
@@ -248,7 +243,7 @@ class OpeningPermitSystem {
 
         return (
           recipe &&
-          EXHAUST_METHODS.has(
+          cookingMethodRequiresExhaust(
             recipe.method
           )
         );
