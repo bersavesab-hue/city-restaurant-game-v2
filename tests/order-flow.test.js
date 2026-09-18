@@ -13,6 +13,15 @@ import { menuSystem } from "../src/systems/MenuSystem.js";
 import { customerSystem } from "../src/systems/CustomerSystem.js";
 import { orderSystem } from "../src/systems/OrderSystem.js";
 
+import {
+  DISH_SCHEMA_VERSION,
+  getDefaultRecipeId
+} from "../src/data/dishCatalogRules.js";
+
+import {
+  RECIPE_SCHEMA_VERSION
+} from "../src/data/recipeRules.js";
+
 test("营业完整链路", () => {
   gameState.reset();
 
@@ -22,7 +31,6 @@ test("营业完整链路", () => {
       name: "大米",
       category: "grain",
       unit: "kg",
-      baseQuality: 3,
       storageType: "dry",
       basePurchasePrice: 500,
       shelfLifeDays: 30,
@@ -33,17 +41,33 @@ test("营业完整链路", () => {
 
   dishCatalogSystem.load([
     {
+      schemaVersion:
+        DISH_SCHEMA_VERSION,
       id: "rice_bowl",
       name: "米饭",
       category: "rice",
-      basePrice: 3000
+      basePrice: 3000,
+      unlockLevel: 1,
+      baseDifficulty: 10,
+      defaultRecipeId:
+        getDefaultRecipeId(
+          "rice_bowl"
+        )
     }
   ], { overwrite: true });
 
   recipeSystem.load([
     {
-      id: "rice_recipe",
+      schemaVersion:
+        RECIPE_SCHEMA_VERSION,
+      id:
+        getDefaultRecipeId(
+          "rice_bowl"
+        ),
       dishId: "rice_bowl",
+      variantId: "standard",
+      name: "标准做法",
+      method: "boil",
       difficulty: 10,
       cookingMinutes: 5,
       ingredients: [
@@ -89,7 +113,10 @@ test("营业完整链路", () => {
     menuSystem.addItem({
       restaurantId: restaurant.id,
       dishId: "rice_bowl",
-      recipeId: "rice_recipe",
+      recipeId:
+        getDefaultRecipeId(
+          "rice_bowl"
+        ),
       price: 3000
     });
 
