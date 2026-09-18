@@ -45,6 +45,74 @@ class CustomerExperienceSystem {
       : 70;
   }
 
+  getWaitScore(
+    demand,
+    result
+  ) {
+    const waitMinutes =
+      Math.max(
+        0,
+        Number(
+          result
+            ?.estimatedWaitMinutes ??
+          0
+        )
+      );
+
+    const patience =
+      Math.max(
+        1,
+        Number(
+          result
+            ?.queuePatienceMinutes ??
+          12
+        )
+      );
+
+    const incoming =
+      Math.max(
+        1,
+        Number(
+          result
+            ?.incomingVisitors ??
+          result
+            ?.visitors ??
+          1
+        )
+      );
+
+    const rejectedRate =
+      Math.max(
+        0,
+        Number(
+          result
+            ?.rejectedVisitors ??
+          0
+        )
+      ) /
+      incoming;
+
+    const waitPressure =
+      waitMinutes /
+      patience;
+
+    return Math.round(
+      clamp(
+        100 -
+        Math.max(
+          0,
+          waitPressure -
+          0.35
+        ) *
+          55 -
+        rejectedRate *
+          45,
+        0,
+        100
+      )
+    );
+  }
+
   recordHour({
     restaurantId,
     demand,
@@ -145,12 +213,19 @@ class CustomerExperienceSystem {
         100
       );
 
+    const waitScore =
+      this.getWaitScore(
+        demand,
+        result
+      );
+
     const satisfaction =
       Math.round(
-        qualityScore * 0.5 +
+        qualityScore * 0.42 +
         priceScore * 0.18 +
-        serviceScore * 0.22 +
-        comfortScore * 0.1
+        serviceScore * 0.16 +
+        comfortScore * 0.12 +
+        waitScore * 0.12
       );
 
     const repeatRate =
@@ -293,6 +368,29 @@ class CustomerExperienceSystem {
         Math.round(priceScore),
       serviceScore:
         Math.round(serviceScore),
+
+      waitScore,
+
+      estimatedWaitMinutes:
+        Math.max(
+          0,
+          Math.round(
+            result
+              .estimatedWaitMinutes ??
+            0
+          )
+        ),
+
+      queuePatienceMinutes:
+        Math.max(
+          0,
+          Math.round(
+            result
+              .queuePatienceMinutes ??
+            0
+          )
+        ),
+
       comfortScore,
       layoutFlowScore:
         layout.flowScore,
