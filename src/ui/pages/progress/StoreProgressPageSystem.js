@@ -6,6 +6,10 @@ import {
   storeProgressSystem
 } from "../../../systems/StoreProgressSystem.js";
 
+import {
+  STORE_EXPERIENCE_POLICY
+} from "../../../data/storeProgressionRules.js";
+
 
 const FEATURE_NAMES =
   Object.freeze({
@@ -99,35 +103,64 @@ class StoreProgressPageSystem {
       this.progress
         .getAllLevelConfigs()
         .map(
-          config => ({
-            ...config,
-
-            state:
-              config.level <
-                restaurant.level
-                ? "completed"
-                : config.level ===
-                    restaurant.level
-                  ? "current"
-                  : "future",
-
-            unlockItems:
-              config.unlocks
-                .map(
-                  id => ({
-                    id,
-                    name:
-                      featureName(
-                        id
+          config => {
+            const reward =
+              typeof this.progress
+                .getLevelReward ===
+                "function"
+                ? this.progress
+                    .getLevelReward(
+                      config.level
+                    )
+                : {
+                    level:
+                      config.level,
+                    title:
+                      config.title ??
+                      `Lv.${config.level}`,
+                    unlocks: [
+                      ...config.unlocks
+                    ],
+                    limits:
+                      structuredClone(
+                        config.limits
                       ),
+                    limitIncrease:
+                      null
+                  };
 
-                    unlocked:
-                      unlocked.has(
-                        id
-                      )
-                  })
-                )
-          })
+            return {
+              ...config,
+
+              reward,
+
+              state:
+                config.level <
+                  restaurant.level
+                  ? "completed"
+                  : config.level ===
+                      restaurant.level
+                    ? "current"
+                    : "future",
+
+              unlockItems:
+                config.unlocks
+                  .map(
+                    id => ({
+                      id,
+                      name:
+                        featureName(
+                          id
+                        ),
+
+                      unlocked:
+                        unlocked.has(
+                          id
+                        )
+                    })
+                  )
+            };
+          }
         );
 
 
@@ -195,7 +228,26 @@ class StoreProgressPageSystem {
 
       current,
       next,
-      levels
+      levels,
+
+      nextReward:
+        next?.reward ??
+        null,
+
+      experiencePolicy:
+        structuredClone(
+          STORE_EXPERIENCE_POLICY
+        ),
+
+      milestones:
+        typeof this.progress
+          .getMilestones ===
+          "function"
+          ? this.progress
+              .getMilestones(
+                restaurantId
+              )
+          : []
     };
   }
 }
