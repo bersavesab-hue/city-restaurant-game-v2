@@ -6,6 +6,20 @@ import {
   salesChannelSystem
 } from "../../../systems/SalesChannelSystem.js";
 
+function clamp(
+  value,
+  min,
+  max
+) {
+  return Math.max(
+    min,
+    Math.min(
+      max,
+      value
+    )
+  );
+}
+
 class ChannelManagementPageSystem {
   getPage(
     restaurantId
@@ -45,6 +59,102 @@ class ChannelManagementPageSystem {
 
       ...dashboard
     };
+  }
+
+  unlockChannel(
+    restaurantId,
+    channelId
+  ) {
+    return salesChannelSystem
+      .unlock(
+        restaurantId,
+        channelId
+      );
+  }
+
+  setChannelActive(
+    restaurantId,
+    channelId,
+    active
+  ) {
+    return salesChannelSystem
+      .setActive(
+        restaurantId,
+        channelId,
+        active
+      );
+  }
+
+  adjustPriority(
+    restaurantId,
+    channelId,
+    delta
+  ) {
+    const channel =
+      salesChannelSystem
+        .getEffectiveChannel(
+          restaurantId,
+          channelId
+        );
+
+    const next =
+      Number(
+        clamp(
+          channel
+            .priorityMultiplier +
+          delta,
+          0.5,
+          1.5
+        ).toFixed(2)
+      );
+
+    salesChannelSystem
+      .configure(
+        restaurantId,
+        channelId,
+        {
+          priorityMultiplier:
+            next
+        }
+      );
+
+    return next;
+  }
+
+  adjustHourlyLimit(
+    restaurantId,
+    channelId,
+    delta
+  ) {
+    const channel =
+      salesChannelSystem
+        .getEffectiveChannel(
+          restaurantId,
+          channelId
+        );
+
+    const next =
+      Math.round(
+        clamp(
+          channel
+            .orderLimitPerHour +
+          delta,
+          1,
+          500
+        )
+      );
+
+    salesChannelSystem
+      .configure(
+        restaurantId,
+        channelId,
+        {
+          orderLimitPerHour:
+            next
+        }
+      );
+
+    return next;
   }
 }
 
