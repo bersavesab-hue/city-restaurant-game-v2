@@ -33,7 +33,12 @@ const result =
     ],
     {
       stdio:
-        "inherit"
+        "inherit",
+      env: {
+        ...process.env,
+        PHASE3_BALANCE_DAYS:
+          "90"
+      }
     }
   );
 
