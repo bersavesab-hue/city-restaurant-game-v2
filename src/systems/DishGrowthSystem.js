@@ -9,6 +9,8 @@ import {
 } from "./FinanceSystem.js";
 
 import { restaurantSystem } from "./RestaurantSystem.js";
+import { dishCatalogSystem } from "./DishCatalogSystem.js";
+import { restaurantDishSystem } from "./RestaurantDishSystem.js";
 
 import {
   getDishMasteryLevel,
@@ -103,22 +105,21 @@ class DishGrowthSystem {
       return null;
     }
 
-    const dish =
-      entitySystem.get(
-        "custom_dish",
-        menuItem.dishId
-      );
-
-    if (!dish) {
-      return null;
-    }
+    const progress =
+      restaurantDishSystem
+        .ensureOwned({
+          restaurantId:
+            menuItem.restaurantId,
+          dishId:
+            menuItem.dishId
+        });
 
     const oldLevel =
-      dish.masteryLevel ??
+      progress.masteryLevel ??
       1;
 
     const masteryXp =
-      (dish.masteryXp ?? 0) +
+      (progress.masteryXp ?? 0) +
       quantity;
 
     const masteryLevel =
@@ -129,46 +130,55 @@ class DishGrowthSystem {
     const rank =
       this.getRank(
         masteryLevel,
-        dish.qualityScore ?? 50
+        progress.qualityScore ?? 60
       );
 
     const updated =
-      entitySystem.update(
-        "custom_dish",
-        dish.id,
-        {
-          masteryXp,
+      restaurantDishSystem
+        .update(
+          menuItem.restaurantId,
+          menuItem.dishId,
+          {
+            masteryXp,
 
-          masteryLevel,
+            masteryLevel,
 
-          masteryQualityBonus:
-            this.getMasteryQualityBonus(
-              masteryLevel
-            ),
+            masteryQualityBonus:
+              this.getMasteryQualityBonus(
+                masteryLevel
+              ),
 
-          dishRankId:
-            rank.id,
+            dishRankId:
+              rank.id,
 
-          dishRankName:
-            rank.name,
+            dishRankName:
+              rank.name,
 
-          dishRankOrder:
-            rank.order,
+            dishRankOrder:
+              rank.order,
 
-          lifetimeSold:
-            (dish.lifetimeSold ?? 0) +
-            quantity,
+            lifetimeSold:
+              (
+                progress
+                  .lifetimeSold ??
+                0
+              ) +
+              quantity,
 
-          lifetimeRevenue:
-            (dish.lifetimeRevenue ?? 0) +
-            (revenue ?? 0),
+            lifetimeRevenue:
+              (
+                progress
+                  .lifetimeRevenue ??
+                0
+              ) +
+              (revenue ?? 0),
 
-          lastSoldDay:
-            gameState.getSection(
-              "time"
-            ).day
-        }
-      );
+            lastSoldDay:
+              gameState.getSection(
+                "time"
+              ).day
+          }
+        );
 
     if (
       masteryLevel >
@@ -178,11 +188,10 @@ class DishGrowthSystem {
         "dish:masteryLeveled",
         {
           dishId:
-            dish.id,
+            menuItem.dishId,
 
           restaurantId:
-            dish
-              .ownerRestaurantId,
+            menuItem.restaurantId,
 
           oldLevel,
           masteryLevel,
@@ -206,12 +215,10 @@ class DishGrowthSystem {
     restaurantId
   ) {
     const dishes =
-      entitySystem.filter(
-        "custom_dish",
-        item =>
-          item.ownerRestaurantId ===
+      restaurantDishSystem
+        .listByRestaurant(
           restaurantId
-      );
+        );
 
     let multiplier = 1;
 
@@ -220,7 +227,7 @@ class DishGrowthSystem {
         dish.dishRankOrder ??
         this.getRank(
           dish.masteryLevel ?? 1,
-          dish.qualityScore ?? 50
+          dish.qualityScore ?? 60
         ).order;
 
       if (rankOrder >= 5) {
@@ -272,23 +279,30 @@ class DishGrowthSystem {
     }
 
     const dish =
-      entitySystem.get(
-        "custom_dish",
+      dishCatalogSystem.get(
         dishId
       );
 
     if (
       !dish ||
+      !dish.custom ||
       dish.ownerRestaurantId !==
         restaurantId
     ) {
       throw new Error(
-        "Custom dish does not belong to restaurant"
+        "Recipe improvement currently requires an owned custom dish"
       );
     }
 
+    const progress =
+      restaurantDishSystem
+        .ensureOwned({
+          restaurantId,
+          dishId
+        });
+
     const masteryLevel =
-      dish.masteryLevel ??
+      progress.masteryLevel ??
       1;
 
     if (
@@ -313,7 +327,7 @@ class DishGrowthSystem {
     }
 
     const attempts =
-      dish.improvementAttempts ??
+      progress.improvementAttempts ??
       0;
 
     const cost =
@@ -321,10 +335,10 @@ class DishGrowthSystem {
         definition.baseCost +
         attempts * 250 +
         (
-          dish.dishRankOrder ??
+          progress.dishRankOrder ??
           this.getRank(
             masteryLevel,
-            dish.qualityScore ?? 50
+            progress.qualityScore ?? 60
           ).order
         ) *
           300
@@ -348,8 +362,8 @@ class DishGrowthSystem {
     );
 
     const qualityScore =
-      dish.qualityScore ??
-      50;
+      progress.qualityScore ??
+      60;
 
     const successChance =
       clamp(
@@ -449,7 +463,7 @@ class DishGrowthSystem {
 
     const history = [
       ...(
-        dish
+        progress
           .improvementHistory ??
         []
       ),
@@ -481,41 +495,42 @@ class DishGrowthSystem {
     }
 
     const updatedDish =
-      entitySystem.update(
-        "custom_dish",
-        dish.id,
-        {
-          qualityScore:
-            nextQuality,
+      restaurantDishSystem
+        .update(
+          restaurantId,
+          dishId,
+          {
+            qualityScore:
+              nextQuality,
 
-          dishRankId:
-            rank.id,
+            dishRankId:
+              rank.id,
 
-          dishRankName:
-            rank.name,
+            dishRankName:
+              rank.name,
 
-          dishRankOrder:
-            rank.order,
+            dishRankOrder:
+              rank.order,
 
-          improvementAttempts:
-            attempts + 1,
+            improvementAttempts:
+              attempts + 1,
 
-          successfulImprovements:
-            (
-              dish
-                .successfulImprovements ??
-              0
-            ) +
-            (
-              success
-                ? 1
-                : 0
-            ),
+            successfulImprovements:
+              (
+                progress
+                  .successfulImprovements ??
+                0
+              ) +
+              (
+                success
+                  ? 1
+                  : 0
+              ),
 
-          improvementHistory:
-            history
-        }
-      );
+            improvementHistory:
+              history
+          }
+        );
 
     const updatedRecipe =
       entitySystem.update(
@@ -568,11 +583,21 @@ class DishGrowthSystem {
   }
 
   getStatus(
+    restaurantId,
     dishId
   ) {
+    const progress =
+      restaurantDishSystem.get(
+        restaurantId,
+        dishId
+      );
+
+    if (!progress) {
+      return null;
+    }
+
     const dish =
-      entitySystem.get(
-        "custom_dish",
+      dishCatalogSystem.get(
         dishId
       );
 
@@ -581,70 +606,50 @@ class DishGrowthSystem {
     }
 
     return {
-      dishId:
-        dish.id,
-
+      dishId,
       name:
         dish.name,
 
       masteryXp:
-        dish.masteryXp ??
+        progress.masteryXp ??
         0,
 
       masteryLevel:
-        dish.masteryLevel ??
+        progress.masteryLevel ??
         1,
 
       dishRankId:
-        (
-          dish.dishRankId ??
-          this.getRank(
-            dish.masteryLevel ?? 1,
-            dish.qualityScore ?? 50
-          ).id
-        ),
+        progress.dishRankId,
 
       dishRankName:
-        (
-          dish.dishRankName ??
-          this.getRank(
-            dish.masteryLevel ?? 1,
-            dish.qualityScore ?? 50
-          ).name
-        ),
+        progress.dishRankName,
 
       dishRankOrder:
-        (
-          dish.dishRankOrder ??
-          this.getRank(
-            dish.masteryLevel ?? 1,
-            dish.qualityScore ?? 50
-          ).order
-        ),
+        progress.dishRankOrder,
 
       masteryQualityBonus:
-        dish
+        progress
           .masteryQualityBonus ??
         0,
 
       qualityScore:
-        dish.qualityScore,
+        progress.qualityScore,
 
       lifetimeSold:
-        dish.lifetimeSold ??
+        progress.lifetimeSold ??
         0,
 
       lifetimeRevenue:
-        dish.lifetimeRevenue ??
+        progress.lifetimeRevenue ??
         0,
 
       improvementAttempts:
-        dish
+        progress
           .improvementAttempts ??
         0,
 
       improvementHistory:
-        dish
+        progress
           .improvementHistory ??
         []
     };
