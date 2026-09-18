@@ -696,6 +696,22 @@ class BusinessAnalyticsView {
       causality.latest;
 
     return `
+      <section class="analytics-causality-intro">
+        <div>
+          <span>
+            经营因果
+          </span>
+
+          <strong>
+            看清楚每次调价、排队、品质和竞争变化带来的结果
+          </strong>
+        </div>
+
+        <small>
+          数据按营业小时累计
+        </small>
+      </section>
+
       <section class="analytics-impact-kpis">
 
         <article>
