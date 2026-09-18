@@ -6,21 +6,15 @@ import { restaurantSystem } from "./RestaurantSystem.js";
 import { employeeSystem, EMPLOYEE_STATUS } from "./EmployeeSystem.js";
 import { employeeCareerSystem } from "./EmployeeCareerSystem.js";
 import { financeSystem, FINANCE_CATEGORY } from "./FinanceSystem.js";
+import {
+  employeeGenerationSystem,
+  hashString
+} from "./EmployeeGenerationSystem.js";
 
 const CANDIDATE_LIFE_DAYS = 14;
 const PAYROLL_INTERVAL_DAYS = 30;
 
-const SURNAMES = Object.freeze([
-  "张", "李", "王", "赵", "陈", "刘",
-  "杨", "黄", "周", "吴", "徐", "孙",
-  "胡", "朱", "高", "林", "何", "郭"
-]);
 
-const GIVEN_NAMES = Object.freeze([
-  "明远", "志强", "海峰", "建华", "文博", "子轩",
-  "雅琴", "晓梅", "雨桐", "欣怡", "嘉豪", "思远",
-  "晨曦", "俊杰", "安然", "佳宁", "瑞阳", "雪晴"
-]);
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -28,36 +22,6 @@ function clamp(value, min, max) {
 
 function currentDay() {
   return gameState.getSection("time")?.day ?? 1;
-}
-
-function hashString(value) {
-  let hash = 2166136261;
-
-  for (const char of String(value)) {
-    hash ^= char.charCodeAt(0);
-    hash = Math.imul(hash, 16777619);
-  }
-
-  return hash >>> 0;
-}
-
-function random01(seed, salt = 0) {
-  let value =
-    (seed + Math.imul(salt + 1, 0x9e3779b1)) >>> 0;
-
-  value ^= value >>> 16;
-  value = Math.imul(value, 0x7feb352d);
-  value ^= value >>> 15;
-  value = Math.imul(value, 0x846ca68b);
-  value ^= value >>> 16;
-
-  return (value >>> 0) / 4294967296;
-}
-
-function randomInt(seed, salt, min, max) {
-  return Math.floor(
-    random01(seed, salt) * (max - min + 1)
-  ) + min;
 }
 
 function requireEmployee(employeeId) {
@@ -143,10 +107,14 @@ class EmployeeStaffingSystem {
       replace = true
     } = {}
   ) {
-    restaurantSystem.get(restaurantId);
+    restaurantSystem.get(
+      restaurantId
+    );
 
     if (
-      !Number.isInteger(count) ||
+      !Number.isInteger(
+        count
+      ) ||
       count <= 0
     ) {
       throw new RangeError(
@@ -155,7 +123,9 @@ class EmployeeStaffingSystem {
     }
 
     if (
-      !Number.isInteger(lifeDays) ||
+      !Number.isInteger(
+        lifeDays
+      ) ||
       lifeDays <= 0
     ) {
       throw new RangeError(
@@ -163,7 +133,8 @@ class EmployeeStaffingSystem {
       );
     }
 
-    const day = currentDay();
+    const day =
+      currentDay();
 
     if (replace) {
       for (
@@ -178,7 +149,8 @@ class EmployeeStaffingSystem {
           {
             status: "expired",
             expiredDay: day,
-            expiredReason: "pool_refresh"
+            expiredReason:
+              "pool_refresh"
           }
         );
       }
@@ -187,14 +159,46 @@ class EmployeeStaffingSystem {
     const roles =
       employeeSystem.getRoles();
 
-    const batchNumber =
+    const existingCandidates =
       entitySystem
-        .list("employee_candidate")
+        .list(
+          "employee_candidate"
+        )
         .filter(
           item =>
             item.restaurantId ===
             restaurantId
-        ).length + 1;
+        );
+
+    const batchNumber =
+      existingCandidates.length +
+      1;
+
+    const usedNames =
+      new Set([
+        ...employeeSystem
+          .listByRestaurant(
+            restaurantId,
+            {
+              includeFired: true
+            }
+          )
+          .map(
+            item =>
+              item.name
+          ),
+
+        ...existingCandidates
+          .filter(
+            item =>
+              item.status ===
+              "available"
+          )
+          .map(
+            item =>
+              item.name
+          )
+      ]);
 
     const created = [];
 
@@ -203,127 +207,33 @@ class EmployeeStaffingSystem {
       index < count;
       index += 1
     ) {
-      const seed = hashString(
-        `${restaurantId}:${day}:${batchNumber}:${index}`
-      );
+      const seed =
+        hashString(
+          `${restaurantId}:${day}:${batchNumber}:${index}`
+        );
 
       const role =
         roles[
           (
             index +
-            hashString(restaurantId)
+            hashString(
+              restaurantId
+            )
           ) %
           roles.length
         ];
 
-      const surname =
-        SURNAMES[
-          randomInt(
+      const generated =
+        employeeGenerationSystem
+          .generateCandidate({
             seed,
-            1,
-            0,
-            SURNAMES.length - 1
-          )
-        ];
+            role,
+            usedNames
+          });
 
-      const givenName =
-        GIVEN_NAMES[
-          randomInt(
-            seed,
-            2,
-            0,
-            GIVEN_NAMES.length - 1
-          )
-        ];
-
-      const salaryRate =
-        0.9 +
-        random01(seed, 3) *
-          0.32;
-
-      const expectedSalary =
-        Math.max(
-          1000,
-          Math.round(
-            role.baseSalary *
-            salaryRate /
-            100
-          ) * 100
-        );
-
-      const skillProfile =
-        role.skillProfile ??
-        [role.primarySkill];
-
-      const skills = {};
-
-      for (
-        let skillIndex = 0;
-        skillIndex <
-          skillProfile.length;
-        skillIndex += 1
-      ) {
-        const skill =
-          skillProfile[skillIndex];
-
-        const base =
-          randomInt(
-            seed,
-            10 + skillIndex,
-            18,
-            48
-          );
-
-        skills[skill] =
-          clamp(
-            base +
-            (
-              skill ===
-              role.primarySkill
-                ? randomInt(
-                    seed,
-                    20 + skillIndex,
-                    4,
-                    16
-                  )
-                : 0
-            ),
-            1,
-            70
-          );
-      }
-
-      const potential =
-        randomInt(
-          seed,
-          30,
-          40,
-          92
-        );
-
-      const stability =
-        randomInt(
-          seed,
-          31,
-          35,
-          95
-        );
-
-      const loyaltyStart =
-        randomInt(
-          seed,
-          32,
-          42,
-          68
-        );
-
-      const moodStart =
-        randomInt(
-          seed,
-          33,
-          58,
-          82
-        );
+      usedNames.add(
+        generated.name
+      );
 
       const candidate =
         entitySystem.create(
@@ -331,34 +241,26 @@ class EmployeeStaffingSystem {
           {
             restaurantId,
 
-            name:
-              `${surname}${givenName}`,
+            ...generated,
 
-            roleId: role.id,
-            roleName: role.name,
+            status:
+              "available",
 
-            expectedSalary,
-            skills,
-
-            potential,
-            stability,
-
-            loyaltyStart,
-            moodStart,
-
-            status: "available",
-
-            createdDay: day,
+            createdDay:
+              day,
 
             expiresDay:
-              day + lifeDays,
+              day +
+              lifeDays,
 
             source:
               "talent_market"
           }
         );
 
-      created.push(candidate);
+      created.push(
+        candidate
+      );
     }
 
     eventBus.emit(
@@ -366,7 +268,8 @@ class EmployeeStaffingSystem {
       {
         restaurantId,
         day,
-        count: created.length
+        count:
+          created.length
       }
     );
 
@@ -450,8 +353,55 @@ class EmployeeStaffingSystem {
           potential:
             candidate.potential,
 
+          potentialName:
+            candidate.potentialName,
+
+          growthMultiplier:
+            candidate.growthMultiplier,
+
           stability:
             candidate.stability,
+
+          age:
+            candidate.age,
+
+          industryExperienceMonths:
+            candidate.experienceMonths,
+
+          employeeProfileId:
+            candidate.profileId,
+
+          employeeProfileName:
+            candidate.profileName,
+
+          archetype:
+            candidate.archetype,
+
+          growthOrientation:
+            candidate.orientation,
+
+          traits: [
+            ...(
+              candidate.traits ??
+              []
+            )
+          ],
+
+          learning:
+            candidate.learning,
+
+          stressTolerance:
+            candidate.stressTolerance,
+
+          teamwork:
+            candidate.teamwork,
+
+          initiative:
+            candidate.initiative,
+
+          salaryExpectationRate:
+            candidate
+              .salaryExpectationRate,
 
           recruitmentSource:
             "talent_market",
