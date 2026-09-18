@@ -1,4 +1,8 @@
 import { dataRegistry } from "../core/DataRegistry.js";
+import {
+  DISTRICT_SCHEMA_VERSION,
+  validateFormalDistrict
+} from "../data/districtRules.js";
 
 const COLLECTION = "districts";
 
@@ -90,6 +94,15 @@ function validateDistrict(item) {
     }
   }
 
+  if (
+    item.schemaVersion ===
+      DISTRICT_SCHEMA_VERSION
+  ) {
+    validateFormalDistrict(
+      item
+    );
+  }
+
   return true;
 }
 
@@ -117,7 +130,169 @@ class DistrictSystem {
   }
 
   exists(id) {
-    return dataRegistry.has(COLLECTION, id);
+    return dataRegistry.has(
+      COLLECTION,
+      id
+    );
+  }
+
+  getMealPeriod(
+    hour
+  ) {
+    if (
+      hour >= 5 &&
+      hour <= 9
+    ) {
+      return "breakfast";
+    }
+
+    if (
+      hour >= 10 &&
+      hour <= 13
+    ) {
+      return "lunch";
+    }
+
+    if (
+      hour >= 14 &&
+      hour <= 16
+    ) {
+      return "afternoon";
+    }
+
+    if (
+      hour >= 17 &&
+      hour <= 21
+    ) {
+      return "dinner";
+    }
+
+    return "late_night";
+  }
+
+  getMealPeriodMultiplier(
+    districtOrId,
+    hour
+  ) {
+    const district =
+      typeof districtOrId ===
+        "string"
+        ? this.get(
+            districtOrId
+          )
+        : districtOrId;
+
+    if (!district) {
+      return 1;
+    }
+
+    const period =
+      this.getMealPeriod(
+        hour
+      );
+
+    return Number(
+      district
+        .mealPeriodWeights?.[
+          period
+        ] ??
+      1
+    );
+  }
+
+  getPositioningAffinity(
+    districtOrId,
+    positioningId
+  ) {
+    const district =
+      typeof districtOrId ===
+        "string"
+        ? this.get(
+            districtOrId
+          )
+        : districtOrId;
+
+    if (
+      !district ||
+      !positioningId
+    ) {
+      return 1;
+    }
+
+    return Number(
+      district
+        .positioningAffinity?.[
+          positioningId
+        ] ??
+      1
+    );
+  }
+
+  getOpportunityScore(
+    districtOrId
+  ) {
+    const district =
+      typeof districtOrId ===
+        "string"
+        ? this.get(
+            districtOrId
+          )
+        : districtOrId;
+
+    if (!district) {
+      return 0;
+    }
+
+    const traffic =
+      district.trafficIndex ??
+      50;
+
+    const spending =
+      district.spendingPower ??
+      50;
+
+    const competitionRelief =
+      100 -
+      (
+        district.competition ??
+        50
+      );
+
+    const transit =
+      district.transitAccess ??
+      50;
+
+    const parking =
+      district.parkingConvenience ??
+      50;
+
+    const delivery =
+      district.deliveryDemand ??
+      50;
+
+    const rentRelief =
+      Math.max(
+        0,
+        Math.min(
+          100,
+          120 -
+          (
+            district.rentMultiplier ??
+            1
+          ) *
+          60
+        )
+      );
+
+    return Math.round(
+      traffic * 0.24 +
+      spending * 0.2 +
+      competitionRelief * 0.14 +
+      transit * 0.1 +
+      parking * 0.08 +
+      delivery * 0.1 +
+      rentRelief * 0.14
+    );
   }
 }
 
