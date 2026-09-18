@@ -583,6 +583,9 @@ class EmployeeManagementPageSystem {
       training:
         dynamic.training,
 
+      trainingPrograms:
+        career.trainingPrograms,
+
       trainingCount:
         current.trainingCount ??
         0,
