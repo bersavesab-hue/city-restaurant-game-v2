@@ -43,8 +43,8 @@ import {
 } from "../../../systems/EconomicBaselineSystem.js";
 
 import {
-  getDishRank
-} from "../../../data/dishRules.js";
+  restaurantDishSystem
+} from "../../../systems/RestaurantDishSystem.js";
 
 import {
   DISH_CATEGORY_LABELS
@@ -202,7 +202,8 @@ class DishCenterPageSystem {
   getDishView(
     dish,
     menuItem = null,
-    storeLevel = null
+    storeLevel = null,
+    progress = null
   ) {
     const recipes =
       recipeSystem
@@ -239,16 +240,6 @@ class DishCenterPageSystem {
           )
         : null;
 
-    const rank =
-      dish.custom
-        ? getDishRank({
-            masteryLevel:
-              dish.masteryLevel ?? 1,
-            qualityScore:
-              dish.qualityScore ?? 0
-          })
-        : null;
-
     const unlockLevel =
       dish.unlockLevel ?? 1;
 
@@ -275,23 +266,29 @@ class DishCenterPageSystem {
           dish.custom
         ),
 
+      owned:
+        Boolean(
+          progress
+        ),
+
       qualityScore:
-        dish.qualityScore ??
+        progress
+          ?.qualityScore ??
         null,
 
       dishRankId:
-        dish.dishRankId ??
-        rank?.id ??
+        progress
+          ?.dishRankId ??
         null,
 
       dishRankName:
-        dish.dishRankName ??
-        rank?.name ??
+        progress
+          ?.dishRankName ??
         null,
 
       dishRankOrder:
-        dish.dishRankOrder ??
-        rank?.order ??
+        progress
+          ?.dishRankOrder ??
         null,
 
       unlockLevel,
@@ -303,20 +300,24 @@ class DishCenterPageSystem {
           unlockLevel,
 
       masteryLevel:
-        dish.masteryLevel ??
-        1,
+        progress
+          ?.masteryLevel ??
+        0,
 
       masteryXp:
-        dish.masteryXp ??
+        progress
+          ?.masteryXp ??
         0,
 
       lifetimeSold:
-        dish.lifetimeSold ??
+        progress
+          ?.lifetimeSold ??
         menuItem?.soldCount ??
         0,
 
       lifetimeRevenue:
-        dish.lifetimeRevenue ??
+        progress
+          ?.lifetimeRevenue ??
         menuItem?.totalRevenue ??
         0,
 
@@ -461,6 +462,20 @@ class DishCenterPageSystem {
       dishCatalogSystem
         .getAll();
 
+    const progressMap =
+      new Map(
+        restaurantDishSystem
+          .listByRestaurant(
+            restaurantId
+          )
+          .map(
+            progress => [
+              progress.dishId,
+              progress
+            ]
+          )
+      );
+
     const customDishes =
       dishCatalogSystem
         .getCustomByRestaurant(
@@ -478,7 +493,11 @@ class DishCenterPageSystem {
           return this.getDishView(
             dish,
             item,
-            restaurant.level
+            restaurant.level,
+            progressMap.get(
+              dish.id
+            ) ??
+            null
           );
         }
       );
@@ -500,7 +519,11 @@ class DishCenterPageSystem {
                 dish.id
               ) ??
               null,
-              restaurant.level
+              restaurant.level,
+              progressMap.get(
+                dish.id
+              ) ??
+              null
             )
         );
 
@@ -738,7 +761,11 @@ class DishCenterPageSystem {
                 dish.id
               ) ??
               null,
-              restaurant.level
+              restaurant.level,
+              progressMap.get(
+                dish.id
+              ) ??
+              null
             )
         ),
 
