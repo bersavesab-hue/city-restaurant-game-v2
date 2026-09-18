@@ -6,6 +6,22 @@ import { supplierSystem } from "../../../systems/SupplierSystem.js";
 import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
 import { getIngredientVisual } from "../../../data/ingredientVisuals.js";
 
+function safeIngredientVisual(
+  ingredientId
+) {
+  try {
+    return getIngredientVisual(
+      ingredientId
+    );
+  } catch {
+    return {
+      index: null,
+      code: ingredientId,
+      image: null
+    };
+  }
+}
+
 function safeBalance(
   restaurantId
 ) {
@@ -41,7 +57,7 @@ class SupplyManagementPageSystem {
               supplier.offers.map(
                 offer => {
                   const visual =
-                    getIngredientVisual(
+                    safeIngredientVisual(
                       offer.ingredientId
                     );
 
@@ -67,7 +83,7 @@ class SupplyManagementPageSystem {
         .map(
           item => {
             const visual =
-              getIngredientVisual(
+              safeIngredientVisual(
                 item.ingredientId
               );
 
