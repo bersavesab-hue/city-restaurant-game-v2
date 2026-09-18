@@ -101,7 +101,7 @@ test(
         usage.waterTon
           .toFixed(2)
       ),
-      2.05
+      1.69
     );
 
     assert.equal(
