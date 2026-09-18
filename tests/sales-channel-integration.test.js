@@ -49,6 +49,10 @@ import {
   marketActionSystem
 } from "../src/systems/MarketActionSystem.js";
 
+import {
+  dishLifecycleSystem
+} from "../src/systems/DishLifecycleSystem.js";
+
 function createRestaurant(
   name = "渠道联动测试店"
 ) {
@@ -107,6 +111,10 @@ function stubSingleDish(
       priceMultiplier: 1,
       channelMultipliers: {}
     });
+
+  dishLifecycleSystem
+    .recordService =
+    () => null;
 
   menuSystem.get =
     () => ({
