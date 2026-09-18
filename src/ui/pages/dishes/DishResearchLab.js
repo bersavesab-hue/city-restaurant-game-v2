@@ -43,20 +43,6 @@ function money(
 }
 
 
-function gradeClass(
-  grade
-) {
-  return (
-    "dish-preview-grade-" +
-    String(
-      grade ??
-      "C"
-    ).toLowerCase()
-  );
-}
-
-
-
 function normalizeIngredientQuantityRule(ingredient) {
   const raw = ingredient?.quantityRule ?? {};
 
@@ -281,30 +267,6 @@ class DishResearchLab {
           </div>
 
 
-          <div class="dish-preview-quality__grade">
-
-            <span
-              class="${gradeClass(
-                preview.gradeRange.min
-              )}"
-            >
-              ${preview.gradeRange.min}
-            </span>
-
-            <i>
-              →
-            </i>
-
-            <span
-              class="${gradeClass(
-                preview.gradeRange.max
-              )}"
-            >
-              ${preview.gradeRange.max}
-            </span>
-
-          </div>
-
         </div>
 
 
@@ -356,7 +318,7 @@ class DishResearchLab {
 
           <article>
             <span>
-              食材品质
+              配料结构
             </span>
 
             <strong>
@@ -622,9 +584,6 @@ class DishResearchLab {
                               </strong>
 
                               <small>
-                                品质
-                                ${ingredient.quality}
-                                ·
                                 ${money(
                                   ingredient.purchasePrice
                                 )}
@@ -746,40 +705,28 @@ class DishResearchLab {
 
             <header class="dish-panel-title">
               <strong>
-                品质规则
+                菜品成长规则
               </strong>
             </header>
 
             <div class="dish-grade-list">
 
-              <article class="grade-ss">
-                <b>SS</b>
-                <span>90–100</span>
-                <strong>珍稀品质</strong>
+              <article>
+                <b>品阶</b>
+                <span>家常 → 优选 → 招牌 → 名菜 → 镇店</span>
+                <strong>长期经营成长</strong>
               </article>
 
-              <article class="grade-s">
-                <b>S</b>
-                <span>80–89</span>
-                <strong>卓越品质</strong>
+              <article>
+                <b>熟练度</b>
+                <span>1–5级</span>
+                <strong>销量与练习累积</strong>
               </article>
 
-              <article class="grade-a">
-                <b>A</b>
-                <span>68–79</span>
-                <strong>优质</strong>
-              </article>
-
-              <article class="grade-b">
-                <b>B</b>
-                <span>55–67</span>
-                <strong>良好</strong>
-              </article>
-
-              <article class="grade-c">
-                <b>C</b>
-                <span>55以下</span>
-                <strong>普通</strong>
+              <article>
+                <b>单次出品</b>
+                <span>C / B / A / S</span>
+                <strong>由批次食材、厨师和菜谱共同决定</strong>
               </article>
 
             </div>
