@@ -82,6 +82,16 @@ import {
 } from "../src/systems/SalesChannelSystem.js";
 
 import {
+  customerIdentitySystem
+} from "../src/systems/CustomerIdentitySystem.js";
+
+import {
+  customerLoyaltySystem
+} from "../src/systems/CustomerLoyaltySystem.js";
+
+import "../src/systems/CustomerLoyaltyIntegrationSystem.js";
+
+import {
   financeCenterPageSystem
 } from "../src/ui/pages/finance/FinanceCenterPageSystem.js";
 
@@ -837,6 +847,18 @@ function getCheckpoint(
       )
     );
 
+  const identity =
+    customerIdentitySystem
+      .getSummary(
+        restaurantId
+      );
+
+  const loyalty =
+    customerLoyaltySystem
+      .getDashboard(
+        restaurantId
+      );
+
   const checkpoint = {
     elapsedDays,
     day:
@@ -930,6 +952,16 @@ function getCheckpoint(
       restaurant.wordOfMouthScore ?? 0,
     wordOfMouthFactor:
       restaurant.wordOfMouthFactor ?? 1,
+    recognizedCustomers:
+      identity.recognizedCustomers,
+    recognizedVisits:
+      identity.recognizedVisits,
+    members:
+      loyalty.members,
+    memberVisits:
+      loyalty.memberVisits,
+    memberRepeatRate:
+      loyalty.memberRepeatRate,
     complianceSuspended:
       Boolean(
         restaurant
@@ -1202,6 +1234,30 @@ test(
       day365
         .openComplianceViolations,
       0
+    );
+
+    assert.ok(
+      day365.recognizedCustomers >
+      0,
+      "Lv7后长期经营应形成识别熟客"
+    );
+
+    assert.ok(
+      day365.members >
+      0,
+      "Lv7后长期经营应形成真实会员"
+    );
+
+    assert.ok(
+      day365.memberVisits >
+      0,
+      "长期会员必须产生实际访问"
+    );
+
+    assert.ok(
+      day365.memberRepeatRate >
+      0,
+      "长期会员必须形成复购"
     );
 
     assert.ok(
