@@ -107,6 +107,92 @@ class FinanceCenterView {
           </p>
         </section>
 
+        <section class="finance-health">
+          <h2>经营健康</h2>
+
+          <p>
+            状态
+            <strong>
+              ${
+                page.health.status === "healthy"
+                  ? "健康"
+                  : page.health.status === "watch"
+                    ? "观察"
+                    : page.health.status === "warning"
+                      ? "预警"
+                      : "危险"
+              }
+            </strong>
+          </p>
+
+          <p>
+            日均经营支出
+            ${money(
+              page.health
+                .averageDailyExpense
+            )}
+          </p>
+
+          <p>
+            现金跑道
+            ${
+              page.health.cashRunwayDays === null
+                ? "暂无支出基数"
+                : `${page.health.cashRunwayDays}天`
+            }
+          </p>
+
+          <p>
+            食材成本率
+            ${(
+              page.health
+                .costRatios
+                .ingredient *
+              100
+            ).toFixed(1)}%
+          </p>
+
+          <p>
+            人工成本率
+            ${(
+              page.health
+                .costRatios
+                .salary *
+              100
+            ).toFixed(1)}%
+          </p>
+
+          <p>
+            租金成本率
+            ${(
+              page.health
+                .costRatios
+                .rent *
+              100
+            ).toFixed(1)}%
+          </p>
+
+          <p>
+            渠道费用率
+            ${(
+              page.health
+                .costRatios
+                .channel *
+              100
+            ).toFixed(1)}%
+          </p>
+
+          <p>
+            营销费用率
+            ${(
+              page.health
+                .costRatios
+                .marketing *
+              100
+            ).toFixed(1)}%
+          </p>
+        </section>
+
         <section>
           <h2>收支结构</h2>
 
