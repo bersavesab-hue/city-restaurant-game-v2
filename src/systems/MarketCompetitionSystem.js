@@ -5,7 +5,11 @@ import { districtSystem } from "./DistrictSystem.js";
 import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
 import { COMPETITOR_TEMPLATES_V1 } from "../data/competitorTemplates.v1.js";
 import { COMPETITOR_NAME_POOL_V1 } from "../data/competitorNames.v1.js";
-import { COMPETITOR_STRATEGIES } from "../data/competitorRules.js";
+import {
+  COMPETITOR_STRATEGIES,
+  getCompetitorBaseTarget,
+  getCompetitorActiveLimit
+} from "../data/competitorRules.js";
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -477,11 +481,14 @@ class MarketCompetitionSystem {
   }
 
   getTargetCount(district) {
-    return Math.min(
-      4,
-      Math.ceil(
-        district.competition / 25
-      )
+    return getCompetitorBaseTarget(
+      district?.competition
+    );
+  }
+
+  getMaxActiveCount(district) {
+    return getCompetitorActiveLimit(
+      district?.competition
     );
   }
 
