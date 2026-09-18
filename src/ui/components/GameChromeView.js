@@ -84,7 +84,7 @@ export function renderGameTopBar(
       null,
 
     showSpeedControls =
-      false
+      true
   } = {}
 ) {
   const clock =
