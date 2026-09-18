@@ -1,4 +1,8 @@
 import {
+  eventBus
+} from "../../core/EventBus.js";
+
+import {
   supplyManagementPageSystem
 } from "../pages/supply/SupplyManagementPageSystem.js";
 
@@ -182,7 +186,12 @@ const FORMAL_PAGE_DEFINITIONS =
         operatingCommandCenterView,
 
       bindDataTarget:
-        true
+        true,
+
+      refreshEvents: [
+        "traffic:hourCompleted",
+        "settlement:completed"
+      ]
     },
 
 
@@ -331,7 +340,9 @@ class FormalPageRuntime {
     }
 
 
-    let cleanup =
+    const cleanups = [];
+
+    let renderPage =
       null;
 
 
@@ -350,19 +361,28 @@ class FormalPageRuntime {
         }
       );
     } else {
-      const page =
-        definition.pageSystem
-          .getPage(
-            restaurantId,
-            params
-          );
+      renderPage =
+        () => {
+          const page =
+            definition.pageSystem
+              .getPage(
+                restaurantId,
+                params
+              );
 
 
-      root.innerHTML =
-        definition.view
-          .renderMarkup(
-            page
-          );
+          root.innerHTML =
+            definition.view
+              .renderMarkup(
+                page
+              );
+
+
+          return page;
+        };
+
+
+      renderPage();
 
 
       if (
@@ -422,13 +442,57 @@ class FormalPageRuntime {
         );
 
 
-        cleanup =
+        cleanups.push(
           () => {
             root.removeEventListener(
               "click",
               handler
             );
-          };
+          }
+        );
+      }
+
+
+      for (
+        const eventName
+        of definition
+          .refreshEvents ??
+        []
+      ) {
+        const unsubscribe =
+          eventBus.on(
+            eventName,
+            payload => {
+              const changedRestaurantId =
+                payload
+                  ?.restaurantId ??
+                payload
+                  ?.settlement
+                  ?.restaurantId ??
+                payload
+                  ?.order
+                  ?.restaurantId ??
+                null;
+
+
+              if (
+                changedRestaurantId !==
+                  null &&
+                changedRestaurantId !==
+                  restaurantId
+              ) {
+                return;
+              }
+
+
+              renderPage();
+            }
+          );
+
+
+        cleanups.push(
+          unsubscribe
+        );
       }
     }
 
@@ -436,8 +500,22 @@ class FormalPageRuntime {
     return {
       pageId,
 
+      refresh() {
+        return renderPage
+          ? renderPage()
+          : null;
+      },
+
       destroy() {
-        cleanup?.();
+        for (
+          const cleanup
+          of cleanups.splice(
+            0
+          )
+        ) {
+          cleanup?.();
+        }
+
 
         if (
           definition.mode ===
@@ -451,7 +529,7 @@ class FormalPageRuntime {
         }
       }
     };
-  }
+
 }
 
 
