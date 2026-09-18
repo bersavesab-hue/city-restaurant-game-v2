@@ -256,7 +256,7 @@ class WordOfMouthSystem {
 
       const quality =
         Number(
-          line.qualityScore ??
+          line.outputQualityScore ??
           order.averageQuality ??
           60
         );
