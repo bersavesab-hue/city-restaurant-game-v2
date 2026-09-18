@@ -343,6 +343,36 @@ class DailySettlementSystem {
         1440
       ) + 1;
 
+    const openedDay =
+      Number.isFinite(
+        restaurant.openedAt
+      )
+        ? Math.floor(
+            restaurant.openedAt /
+            1440
+          ) + 1
+        : (
+            (
+              restaurant
+                .totalOperatingDays ??
+              0
+            ) > 0
+              ? createdDay
+              : null
+          );
+
+    if (
+      openedDay === null
+    ) {
+      return [];
+    }
+
+    const firstEligibleDay =
+      Math.max(
+        createdDay,
+        openedDay
+      );
+
     const settlements =
       entitySystem
         .list(
@@ -362,14 +392,14 @@ class DailySettlementSystem {
                 item.day
             )
           )
-        : createdDay - 1;
+        : firstEligibleDay - 1;
 
     const results = [];
 
     for (
       let day =
         Math.max(
-          createdDay,
+          firstEligibleDay,
           lastDay + 1
         );
       day <= throughDay;
