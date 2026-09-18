@@ -1012,8 +1012,9 @@ test(
     );
 
     assert.ok(
-      day30.level >= 2 &&
-      day30.level <= 7
+      day30.level >= 3 &&
+      day30.level <= 4,
+      `30天等级节奏异常：Lv.${day30.level}`
     );
 
     advanceManagedDays(
@@ -1048,8 +1049,9 @@ test(
     );
 
     assert.ok(
-      day90.level >=
-      day30.level
+      day90.level >= 5 &&
+      day90.level <= 7,
+      `90天等级节奏异常：Lv.${day90.level}`
     );
 
     assert.ok(
@@ -1106,12 +1108,9 @@ test(
     );
 
     assert.ok(
-      day365.level >=
-      day90.level
-    );
-
-    assert.ok(
-      day365.level >= 7
+      day365.level >= 8 &&
+      day365.level <= 9,
+      `长期等级节奏异常：Lv.${day365.level}`
     );
 
     assert.ok(
