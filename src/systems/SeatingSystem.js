@@ -3,48 +3,75 @@ import { propertySystem } from "./PropertySystem.js";
 import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
 import { renovationSystem } from "./RenovationSystem.js";
 import { layoutFlowSystem } from "./LayoutFlowSystem.js";
+import { venueTypeSystem } from "./VenueTypeSystem.js";
 
 class SeatingSystem {
   getSeatCount(
     restaurantId
   ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
     const renovation =
       renovationSystem
         .getOperationalModifiers(
           restaurantId
         );
 
-    if (
+    let baseSeats =
       renovation.active &&
       Number.isInteger(
         renovation.seats
       )
+        ? Math.max(
+            0,
+            renovation.seats
+          )
+        : 10;
+
+    let seatCapMultiplier = 1;
+
+    if (
+      restaurant.locationId
     ) {
-      return Math.max(
-        0,
-        renovation.seats
-      );
+      try {
+        const property =
+          propertySystem.get(
+            restaurant.locationId
+          );
+
+        if (
+          !renovation.active
+        ) {
+          baseSeats =
+            property.seats ??
+            10;
+        }
+
+        const venue =
+          venueTypeSystem.get(
+            property.venueTypeId ??
+            "street_shop"
+          );
+
+        seatCapMultiplier =
+          venue
+            ?.seatCapMultiplier ??
+          1;
+      } catch {
+        seatCapMultiplier = 1;
+      }
     }
 
-    const restaurant =
-      restaurantSystem.get(
-        restaurantId
-      );
-
-    if (!restaurant.locationId) {
-      return 10;
-    }
-
-    try {
-      const property =
-        propertySystem.get(
-          restaurant.locationId
-        );
-
-      return property.seats ?? 10;
-    } catch {
-      return 10;
-    }
+    return Math.max(
+      0,
+      Math.floor(
+        baseSeats *
+        seatCapMultiplier
+      )
+    );
   }
 
   getCustomerBehavior(
