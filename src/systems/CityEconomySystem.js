@@ -18,11 +18,45 @@ class CityEconomySystem {
     const district = districtId ? districtSystem.get(districtId) : null;
     const snapshot = economicBaselineSystem.getSnapshot();
 
-    const foodSeason = 1 + seasonalWave(day, 0.08) * 0.045;
-    const energySeason = 1 + Math.abs(seasonalWave(day, 0.25)) * 0.035;
-    const tourismSeason = district?.zoneType === "tourist_scenic" || district?.zoneType === "suburban_resort"
-      ? 1 + seasonalWave(day, 0.18) * 0.16
-      : 1;
+    const strictRealityPricing =
+      snapshot.sourcePolicy
+        ?.strictNominalRmb ===
+      true;
+
+    const foodSeason =
+      strictRealityPricing
+        ? 1
+        : 1 +
+          seasonalWave(
+            day,
+            0.08
+          ) *
+          0.045;
+
+    const energySeason =
+      strictRealityPricing
+        ? 1
+        : 1 +
+          Math.abs(
+            seasonalWave(
+              day,
+              0.25
+            )
+          ) *
+          0.035;
+
+    const tourismSeason =
+      district?.zoneType ===
+        "tourist_scenic" ||
+      district?.zoneType ===
+        "suburban_resort"
+        ? 1 +
+          seasonalWave(
+            day,
+            0.18
+          ) *
+          0.16
+        : 1;
 
     const districtDemand = clamp(
       0.82 + (district?.spendingPower ?? 50) / 280 + (district?.trafficIndex ?? 50) / 500,
