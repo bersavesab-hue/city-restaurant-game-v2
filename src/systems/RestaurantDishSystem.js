@@ -6,8 +6,7 @@ import { dishCatalogSystem } from "./DishCatalogSystem.js";
 
 import {
   DISH_MASTERY_NAMES,
-  getDishRank,
-  getCookOutputLevel
+  getDishRank
 } from "../data/dishRules.js";
 
 const ENTITY_TYPE =
@@ -206,7 +205,7 @@ class RestaurantDishSystem {
           grossMargin: 0,
           averageSalePrice: 0,
           averageOutputQuality:
-            qualityScore,
+            null,
           popularityScore: 20,
           reputationScore: 50,
           serviceCount: 0,
@@ -214,9 +213,7 @@ class RestaurantDishSystem {
         },
 
         outputQuality:
-          getCookOutputLevel(
-            recipeQualityScore
-          )
+          null
       },
       {
         id:
