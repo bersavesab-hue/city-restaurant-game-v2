@@ -65,6 +65,10 @@ class RestaurantEquipmentSystem {
       );
     }
 
+    validateEquipmentDefinition(
+      definition
+    );
+
     return {
       ...definition
     };
