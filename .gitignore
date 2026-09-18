@@ -1,2 +1,15 @@
 *.backup*.js
 android/app/build/
+# Dependencies
+node_modules/
+# Local backups
+*.bak
+*.backup
+.backup/
+# Temporary / profiling
+*.cpuprofile
+*.log
+*.tmp
+*.temp
+# Local architecture scan output
+reports/architecture/
