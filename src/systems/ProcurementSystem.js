@@ -9,6 +9,9 @@ import {
 } from "./FinanceSystem.js";
 import { supplierSystem } from "./SupplierSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
+import { restaurantSystem } from "./RestaurantSystem.js";
+import { propertySystem } from "./PropertySystem.js";
+import { districtEventSystem } from "./DistrictEventSystem.js";
 
 const ORDER_STATUS = Object.freeze({
   PENDING: "pending",
@@ -33,6 +36,37 @@ function requireOrder(orderId) {
 }
 
 class ProcurementSystem {
+  getEventModifiers(restaurantId) {
+    try {
+      const restaurant =
+        restaurantSystem.get(
+          restaurantId
+        );
+
+      if (!restaurant.locationId) {
+        return {
+          supplyPriceMultiplier: 1,
+          deliveryTimeMultiplier: 1
+        };
+      }
+
+      const property =
+        propertySystem.get(
+          restaurant.locationId
+        );
+
+      return districtEventSystem
+        .getModifiers(
+          property.districtId
+        );
+    } catch {
+      return {
+        supplyPriceMultiplier: 1,
+        deliveryTimeMultiplier: 1
+      };
+    }
+  }
+
   constructor() {
     eventBus.on(
       "scheduler:triggered",
@@ -139,7 +173,7 @@ class ProcurementSystem {
       );
     }
 
-    const quote =
+    const baseQuote =
       quoteOverride ??
       supplierSystem.getQuote(
         supplierId,
@@ -148,14 +182,75 @@ class ProcurementSystem {
       );
 
     if (
-      quote.supplierId !== supplierId ||
-      quote.ingredientId !== ingredientId ||
-      quote.quantity !== quantity
+      baseQuote.supplierId !== supplierId ||
+      baseQuote.ingredientId !== ingredientId ||
+      baseQuote.quantity !== quantity
     ) {
       throw new Error(
         "Procurement quote does not match order"
       );
     }
+
+    const eventModifiers =
+      this.getEventModifiers(
+        restaurantId
+      );
+
+    const supplyPriceMultiplier =
+      Math.max(
+        0.35,
+        Number(
+          eventModifiers
+            .supplyPriceMultiplier ??
+          1
+        )
+      );
+
+    const deliveryTimeMultiplier =
+      Math.max(
+        0.5,
+        Number(
+          eventModifiers
+            .deliveryTimeMultiplier ??
+          1
+        )
+      );
+
+    const quote = {
+      ...baseQuote,
+
+      unitPrice:
+        Number(
+          (
+            baseQuote.unitPrice *
+            supplyPriceMultiplier
+          ).toFixed(4)
+        ),
+
+      totalPrice:
+        Math.max(
+          1,
+          Math.round(
+            baseQuote.totalPrice *
+            supplyPriceMultiplier
+          )
+        ),
+
+      deliveryMinutes:
+        Math.max(
+          1,
+          Math.round(
+            baseQuote.deliveryMinutes *
+            deliveryTimeMultiplier
+          )
+        ),
+
+      eventPriceMultiplier:
+        supplyPriceMultiplier,
+
+      eventDeliveryMultiplier:
+        deliveryTimeMultiplier
+    };
 
     const delivery =
       this.calculateDeliveryMinutes(
@@ -252,7 +347,7 @@ class ProcurementSystem {
             quote.reliability,
 
           baseDeliveryMinutes:
-            delivery.deliveryMinutes,
+            quote.deliveryMinutes,
 
           deliveryMinutes:
             delivery.deliveryMinutes,
@@ -274,7 +369,7 @@ class ProcurementSystem {
 
           expectedAt:
             time.totalMinutes +
-            quote.deliveryMinutes,
+            delivery.deliveryMinutes,
 
           deliveredAt: null,
 
@@ -303,7 +398,7 @@ class ProcurementSystem {
 
     const task =
       schedulerSystem.scheduleAfter(
-        quote.deliveryMinutes,
+        delivery.deliveryMinutes,
         "procurement:deliver",
         {
           orderId:
