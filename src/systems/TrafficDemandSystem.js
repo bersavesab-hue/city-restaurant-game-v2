@@ -107,6 +107,8 @@ class TrafficDemandSystem {
     }
 
     const zoneType =
+      district
+        ?.customerProfileType ??
       district?.zoneType ??
       district?.id ??
       null;
@@ -292,6 +294,124 @@ class TrafficDemandSystem {
       coverage *
       0.48,
       0.72,
+      1.2
+    );
+  }
+
+  getDistrictAccessFactor(
+    district,
+    segment
+  ) {
+    const partySize =
+      Math.max(
+        1,
+        Number(
+          segment.partySize
+            ?.average ??
+          1.8
+        )
+      );
+
+    const parkingWeight =
+      clamp(
+        0.18 +
+        (
+          partySize -
+          1
+        ) *
+        0.13,
+        0.18,
+        0.75
+      );
+
+    const transitWeight =
+      1 -
+      parkingWeight;
+
+    const accessScore =
+      (
+        (
+          district
+            .parkingConvenience ??
+          50
+        ) *
+        parkingWeight +
+        (
+          district
+            .transitAccess ??
+          50
+        ) *
+        transitWeight
+      );
+
+    return clamp(
+      0.75 +
+      accessScore /
+      100 *
+      0.45,
+      0.75,
+      1.2
+    );
+  }
+
+  getDistrictDeliveryFactor(
+    district,
+    segment
+  ) {
+    const preferences =
+      segment
+        .channelPreferences ??
+      {};
+
+    const total =
+      Object.values(
+        preferences
+      ).reduce(
+        (
+          sum,
+          value
+        ) =>
+          sum +
+          Math.max(
+            0,
+            Number(
+              value
+            ) ||
+            0
+          ),
+        0
+      );
+
+    if (
+      total <= 0
+    ) {
+      return 1;
+    }
+
+    const deliveryShare =
+      Math.max(
+        0,
+        Number(
+          preferences.delivery ??
+          0
+        )
+      ) /
+      total;
+
+    const deliveryDemand =
+      district.deliveryDemand ??
+      50;
+
+    return clamp(
+      1 +
+      (
+        deliveryDemand -
+        50
+      ) /
+      100 *
+      deliveryShare *
+      0.5,
+      0.8,
       1.2
     );
   }
@@ -486,6 +606,29 @@ class TrafficDemandSystem {
           restaurantId
         );
 
+    const mealPeriodFactor =
+      districtSystem
+        .getMealPeriodMultiplier(
+          district,
+          hour
+        );
+
+    const seasonalityFactor =
+      clamp(
+        district.seasonality ??
+        1,
+        0.75,
+        1.35
+      );
+
+    const districtPositioningFactor =
+      districtSystem
+        .getPositioningAffinity(
+          district,
+          positioningContext
+            .positioningId
+        );
+
     const segments = [];
 
     let expectedVisitors = 0;
@@ -585,6 +728,18 @@ class TrafficDemandSystem {
             7
           );
 
+      const districtAccessFactor =
+        this.getDistrictAccessFactor(
+          district,
+          segment
+        );
+
+      const districtDeliveryFactor =
+        this.getDistrictDeliveryFactor(
+          district,
+          segment
+        );
+
       const playerAppeal =
         clamp(
           priceFactor *
@@ -641,8 +796,13 @@ class TrafficDemandSystem {
         environment
           .demandMultiplier *
         calendarFactor *
+        mealPeriodFactor *
+        seasonalityFactor *
+        districtPositioningFactor *
         positioningFactor *
         channelAccessFactor *
+        districtAccessFactor *
+        districtDeliveryFactor *
         segmentRetentionFactor *
         dishPrestigeFactor *
         renovationAppealFactor *
@@ -683,7 +843,17 @@ class TrafficDemandSystem {
 
         positioningFactor,
 
+        districtPositioningFactor,
+
         channelAccessFactor,
+
+        districtAccessFactor,
+
+        districtDeliveryFactor,
+
+        mealPeriodFactor,
+
+        seasonalityFactor,
 
         segmentRetentionFactor,
 
@@ -724,6 +894,12 @@ class TrafficDemandSystem {
           : 1,
 
       districtSpendFactor,
+
+      mealPeriodFactor,
+
+      seasonalityFactor,
+
+      districtPositioningFactor,
 
       calendar:
         businessCalendarSystem
