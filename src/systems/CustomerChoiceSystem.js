@@ -25,6 +25,43 @@ class CustomerChoiceSystem {
     );
   }
 
+  getTastePreference(
+    segment,
+    dish
+  ) {
+    const preferences =
+      segment.tastePreferences ??
+      {};
+
+    const tags =
+      dish.tags ??
+      [];
+
+    let best = 1;
+
+    for (
+      const tag
+      of tags
+    ) {
+      const weight =
+        preferences[tag];
+
+      if (
+        Number.isFinite(
+          weight
+        )
+      ) {
+        best =
+          Math.max(
+            best,
+            weight
+          );
+      }
+    }
+
+    return best;
+  }
+
   getPriceFactor(
     segment,
     menuItem,
@@ -104,9 +141,16 @@ class CustomerChoiceSystem {
         dish
       );
 
+    const tasteFactor =
+      this.getTastePreference(
+        segment,
+        dish
+      );
+
     return Math.max(
       0,
       categoryFactor *
+      tasteFactor *
       priceFactor
     );
   }
