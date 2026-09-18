@@ -5,6 +5,7 @@ import { recipeSystem } from "./RecipeSystem.js";
 import { storeProgressSystem } from "./StoreProgressSystem.js";
 import { dishGrowthSystem } from "./DishGrowthSystem.js";
 import { priceHistorySystem } from "./PriceHistorySystem.js";
+import { restaurantDishSystem } from "./RestaurantDishSystem.js";
 
 function requireRestaurant(id) {
   const restaurant = entitySystem.get("restaurant", id);
@@ -91,6 +92,12 @@ class MenuSystem {
         "Menu price must be positive"
       );
     }
+
+    restaurantDishSystem
+      .ensureOwned({
+        restaurantId,
+        dishId
+      });
 
     const item = entitySystem.create("menu_item", {
       restaurantId,
