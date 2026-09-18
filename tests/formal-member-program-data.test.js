@@ -66,7 +66,7 @@ test(
 
     assert.equal(
       MEMBER_POINT_POLICY.pointValue,
-      10
+      1
     );
 
     assert.equal(
