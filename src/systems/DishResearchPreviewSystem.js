@@ -34,15 +34,6 @@ function clamp(value, min, max) {
 }
 
 
-function getGrade(score) {
-  if (score >= 90) return { grade: "SS", level: 5 };
-  if (score >= 80) return { grade: "S", level: 4 };
-  if (score >= 68) return { grade: "A", level: 3 };
-  if (score >= 55) return { grade: "B", level: 2 };
-  return { grade: "C", level: 1 };
-}
-
-
 function getIngredientUnitCost(ingredient) {
   const reference = ingredient?.id
     ? economicBaselineSystem.getIngredientReference(ingredient.id)
@@ -64,7 +55,6 @@ function calculateResolvedPreview({ ingredients, method }) {
   }
 
   let totalQuantity = 0;
-  let qualityTotal = 0;
   let estimatedCost = 0;
   const categories = new Set();
 
@@ -75,18 +65,20 @@ function calculateResolvedPreview({ ingredients, method }) {
 
     const ingredient = item.ingredient;
     totalQuantity += item.quantity;
-    qualityTotal += ingredient.baseQuality * item.quantity;
     estimatedCost += getIngredientUnitCost(ingredient) * item.quantity;
     categories.add(ingredient.category);
   }
 
-  const averageQuality = qualityTotal / totalQuantity;
-  const ingredientScore = clamp(30 + (averageQuality / 5) * 70, 30, 100);
+  const ingredientScore = clamp(
+    45 + ingredients.length * 5 + categories.size * 10,
+    45,
+    95
+  );
   const diversityScore = clamp(40 + categories.size * 15, 40, 100);
   const fixedQualityPart =
-    ingredientScore * 0.5 +
+    ingredientScore * 0.45 +
     diversityScore * 0.2 +
-    methodRule.techniqueScore * 0.15;
+    methodRule.techniqueScore * 0.2;
 
   const minQuality = clamp(Math.round(fixedQualityPart + 35 * 0.15), 1, 100);
   const maxQuality = clamp(Math.round(fixedQualityPart + 100 * 0.15), 1, 100);
@@ -103,23 +95,20 @@ function calculateResolvedPreview({ ingredients, method }) {
     Math.round(700 + ingredients.length * 250 + difficulty * 12)
   );
 
-  const minGrade = getGrade(minQuality);
-  const maxGrade = getGrade(maxQuality);
   const roundedCost = Number(estimatedCost.toFixed(2));
   const minSuggestedPrice = Math.max(
     1,
-    Math.round(estimatedCost * (2.1 + minGrade.level * 0.28))
+    Math.round(estimatedCost * (2.1 + minQuality * 0.009))
   );
   const maxSuggestedPrice = Math.max(
     1,
-    Math.round(estimatedCost * (2.1 + maxGrade.level * 0.28))
+    Math.round(estimatedCost * (2.1 + maxQuality * 0.009))
   );
 
   return {
     ingredientCount: ingredients.length,
     categoryCount: categories.size,
     totalQuantity,
-    averageQuality: Number(averageQuality.toFixed(2)),
     ingredientScore: Math.round(ingredientScore),
     diversityScore: Math.round(diversityScore),
     difficulty,
@@ -127,7 +116,6 @@ function calculateResolvedPreview({ ingredients, method }) {
     estimatedCost: roundedCost,
     researchCost,
     qualityRange: { min: minQuality, max: maxQuality },
-    gradeRange: { min: minGrade.grade, max: maxGrade.grade },
     suggestedPriceRange: { min: minSuggestedPrice, max: maxSuggestedPrice },
     priceModel: "reality_baseline_v1"
   };
