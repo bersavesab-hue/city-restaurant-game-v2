@@ -11,6 +11,7 @@ import {
 } from "./RestaurantSystem.js";
 import { workforceCapacitySystem } from "./WorkforceCapacitySystem.js";
 import { restaurantEquipmentSystem } from "./RestaurantEquipmentSystem.js";
+import { renovationSystem } from "./RenovationSystem.js";
 
 const DEFAULT_CONFIG = Object.freeze({
   seats: 16,
@@ -241,6 +242,40 @@ class ServiceCapacitySystem {
         )
       );
 
+    const renovation =
+      renovationSystem
+        .getOperationalModifiers(
+          restaurantId
+        );
+
+    const renovationKitchenGuests =
+      Math.max(
+        1,
+        Math.floor(
+          baseKitchenGuests *
+          (
+            renovation.active
+              ? renovation
+                  .kitchenEfficiency
+              : 1
+          )
+        )
+      );
+
+    const renovationServiceGuests =
+      Math.max(
+        1,
+        Math.floor(
+          baseServiceGuests *
+          (
+            renovation.active
+              ? renovation
+                  .serviceEfficiency
+              : 1
+          )
+        )
+      );
+
     // -----------------------------------------
     // 员工产能
     // -----------------------------------------
@@ -257,12 +292,12 @@ class ServiceCapacitySystem {
     const workforceKitchenGuests =
       workforce.hasStaffData
         ? workforce.kitchenGuests
-        : baseKitchenGuests;
+        : renovationKitchenGuests;
 
     const workforceServiceGuests =
       workforce.hasStaffData
         ? workforce.serviceGuests
-        : baseServiceGuests;
+        : renovationServiceGuests;
 
     const workforceCheckoutGuests =
       workforce.hasStaffData
@@ -279,13 +314,13 @@ class ServiceCapacitySystem {
 
     const employeeLimitedKitchen =
       Math.min(
-        baseKitchenGuests,
+        renovationKitchenGuests,
         workforceKitchenGuests
       );
 
     const employeeLimitedService =
       Math.min(
-        baseServiceGuests,
+        renovationServiceGuests,
         workforceServiceGuests
       );
 
@@ -366,6 +401,12 @@ class ServiceCapacitySystem {
       baseKitchenGuests,
 
       baseServiceGuests,
+
+      renovationKitchenGuests,
+
+      renovationServiceGuests,
+
+      renovation,
 
       workforce,
 
