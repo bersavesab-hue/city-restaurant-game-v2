@@ -1,0 +1,3 @@
+APK test build trigger
+version=0.8.66
+reason=sdkmanager-path-fixed
