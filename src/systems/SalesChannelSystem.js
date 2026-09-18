@@ -7,6 +7,10 @@ import {
 } from "../core/GameState.js";
 
 import {
+  eventBus
+} from "../core/EventBus.js";
+
+import {
   restaurantSystem
 } from "./RestaurantSystem.js";
 
@@ -248,15 +252,30 @@ class SalesChannelSystem {
       );
     }
 
-    return entitySystem.update(
-      "sales_channel_state",
-      state.id,
+    const updated =
+      entitySystem.update(
+        "sales_channel_state",
+        state.id,
+        {
+          unlocked: true,
+          active:
+            channel.defaultActive
+        }
+      );
+
+    eventBus.emit(
+      "salesChannel:unlocked",
       {
-        unlocked: true,
-        active:
-          channel.defaultActive
+        restaurantId,
+        channelId,
+        state:
+          structuredClone(
+            updated
+          )
       }
     );
+
+    return updated;
   }
 
   setActive(
@@ -301,13 +320,29 @@ class SalesChannelSystem {
       );
     }
 
-    return entitySystem.update(
-      "sales_channel_state",
-      state.id,
+    const updated =
+      entitySystem.update(
+        "sales_channel_state",
+        state.id,
+        {
+          active
+        }
+      );
+
+    eventBus.emit(
+      "salesChannel:changed",
       {
-        active
+        restaurantId,
+        channelId,
+        active,
+        state:
+          structuredClone(
+            updated
+          )
       }
     );
+
+    return updated;
   }
 
   configure(
@@ -425,11 +460,30 @@ class SalesChannelSystem {
         priorityMultiplier;
     }
 
-    return entitySystem.update(
-      "sales_channel_state",
-      state.id,
-      patch
+    const updated =
+      entitySystem.update(
+        "sales_channel_state",
+        state.id,
+        patch
+      );
+
+    eventBus.emit(
+      "salesChannel:configured",
+      {
+        restaurantId,
+        channelId,
+        changes:
+          structuredClone(
+            patch
+          ),
+        state:
+          structuredClone(
+            updated
+          )
+      }
     );
+
+    return updated;
   }
 
   getEffectiveChannel(
