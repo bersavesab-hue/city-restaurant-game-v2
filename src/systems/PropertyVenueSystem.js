@@ -33,9 +33,22 @@ class PropertyVenueSystem {
     }
 
     const property = propertySystem.get(propertyId);
+    const district = districtSystem.get(property.districtId);
+    const rentMultiplier =
+      economicBaselineSystem.getVenueRentMultiplier(
+        venue,
+        district
+      );
 
     return entitySystem.update("property", property.id, {
-      venueTypeId
+      venueTypeId,
+      monthlyRent: Math.max(
+        1,
+        Math.round(
+          property.baseMonthlyRent *
+          rentMultiplier
+        )
+      )
     });
   }
 }
