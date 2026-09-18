@@ -50,7 +50,8 @@ const tests = [
   "tests/award-feedback-command-center.test.js",
   "tests/more-hub.test.js",
   "tests/market-strategy-ui.test.js",
-  "tests/store-progress-ui.test.js"
+  "tests/store-progress-ui.test.js",
+  "tests/ingredient-data-v1.test.js"
 ];
 
 
