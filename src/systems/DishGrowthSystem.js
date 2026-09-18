@@ -10,60 +10,17 @@ import {
 
 import { restaurantSystem } from "./RestaurantSystem.js";
 
+import {
+  getDishMasteryLevel,
+  getDishRank
+} from "../data/dishRules.js";
+
 function clamp(value, min, max) {
   return Math.max(
     min,
     Math.min(max, value)
   );
 }
-
-function getGrade(score) {
-  if (score >= 90) {
-    return {
-      grade: "SS",
-      level: 5,
-      rarity: "rare"
-    };
-  }
-
-  if (score >= 80) {
-    return {
-      grade: "S",
-      level: 4,
-      rarity: "superior"
-    };
-  }
-
-  if (score >= 68) {
-    return {
-      grade: "A",
-      level: 3,
-      rarity: "premium"
-    };
-  }
-
-  if (score >= 55) {
-    return {
-      grade: "B",
-      level: 2,
-      rarity: "good"
-    };
-  }
-
-  return {
-    grade: "C",
-    level: 1,
-    rarity: "common"
-  };
-}
-
-const MASTERY_THRESHOLDS = [
-  0,
-  25,
-  80,
-  180,
-  360
-];
 
 const IMPROVEMENTS =
   Object.freeze({
@@ -91,59 +48,19 @@ const IMPROVEMENTS =
 
 class DishGrowthSystem {
   getMasteryLevel(xp) {
-    let level = 1;
-
-    for (
-      let index = 1;
-      index <
-        MASTERY_THRESHOLDS.length;
-      index += 1
-    ) {
-      if (
-        xp >=
-        MASTERY_THRESHOLDS[
-          index
-        ]
-      ) {
-        level =
-          index + 1;
-      }
-    }
-
-    return level;
+    return getDishMasteryLevel(
+      xp
+    );
   }
 
-  getPrestigeTitle(
+  getRank(
     masteryLevel,
     qualityScore
   ) {
-    if (
-      masteryLevel >= 5 &&
-      qualityScore >= 80
-    ) {
-      return "镇店菜";
-    }
-
-    if (
-      masteryLevel >= 4 &&
-      qualityScore >= 68
-    ) {
-      return "招牌菜";
-    }
-
-    if (
-      masteryLevel >= 3
-    ) {
-      return "人气菜";
-    }
-
-    if (
-      masteryLevel >= 2
-    ) {
-      return "熟练菜";
-    }
-
-    return "新研发";
+    return getDishRank({
+      masteryLevel,
+      qualityScore
+    });
   }
 
   getMasteryQualityBonus(
@@ -209,8 +126,8 @@ class DishGrowthSystem {
         masteryXp
       );
 
-    const prestigeTitle =
-      this.getPrestigeTitle(
+    const rank =
+      this.getRank(
         masteryLevel,
         dish.qualityScore ?? 50
       );
@@ -229,7 +146,14 @@ class DishGrowthSystem {
               masteryLevel
             ),
 
-          prestigeTitle,
+          dishRankId:
+            rank.id,
+
+          dishRankName:
+            rank.name,
+
+          dishRankOrder:
+            rank.order,
 
           lifetimeSold:
             (dish.lifetimeSold ?? 0) +
@@ -263,7 +187,14 @@ class DishGrowthSystem {
           oldLevel,
           masteryLevel,
 
-          prestigeTitle
+          dishRankId:
+            rank.id,
+
+          dishRankName:
+            rank.name,
+
+          dishRankOrder:
+            rank.order
         }
       );
     }
@@ -285,18 +216,21 @@ class DishGrowthSystem {
     let multiplier = 1;
 
     for (const dish of dishes) {
-      if (
-        dish.prestigeTitle ===
-        "镇店菜"
-      ) {
+      const rankOrder =
+        dish.dishRankOrder ??
+        this.getRank(
+          dish.masteryLevel ?? 1,
+          dish.qualityScore ?? 50
+        ).order;
+
+      if (rankOrder >= 5) {
         multiplier =
           Math.max(
             multiplier,
             1.08
           );
       } else if (
-        dish.prestigeTitle ===
-        "招牌菜"
+        rankOrder >= 4
       ) {
         multiplier =
           Math.max(
@@ -304,8 +238,7 @@ class DishGrowthSystem {
             1.04
           );
       } else if (
-        dish.prestigeTitle ===
-        "人气菜"
+        rankOrder >= 3
       ) {
         multiplier =
           Math.max(
@@ -387,7 +320,13 @@ class DishGrowthSystem {
       Math.round(
         definition.baseCost +
         attempts * 250 +
-        (dish.qualityLevel ?? 1) *
+        (
+          dish.dishRankOrder ??
+          this.getRank(
+            masteryLevel,
+            dish.qualityScore ?? 50
+          ).order
+        ) *
           300
       );
 
@@ -497,8 +436,9 @@ class DishGrowthSystem {
         );
     }
 
-    const grade =
-      getGrade(
+    const rank =
+      this.getRank(
+        masteryLevel,
         nextQuality
       );
 
@@ -540,12 +480,6 @@ class DishGrowthSystem {
       );
     }
 
-    const nextTitle =
-      this.getPrestigeTitle(
-        masteryLevel,
-        nextQuality
-      );
-
     const updatedDish =
       entitySystem.update(
         "custom_dish",
@@ -554,17 +488,14 @@ class DishGrowthSystem {
           qualityScore:
             nextQuality,
 
-          qualityGrade:
-            grade.grade,
+          dishRankId:
+            rank.id,
 
-          qualityLevel:
-            grade.level,
+          dishRankName:
+            rank.name,
 
-          rarity:
-            grade.rarity,
-
-          prestigeTitle:
-            nextTitle,
+          dishRankOrder:
+            rank.order,
 
           improvementAttempts:
             attempts + 1,
@@ -664,9 +595,32 @@ class DishGrowthSystem {
         dish.masteryLevel ??
         1,
 
-      prestigeTitle:
-        dish.prestigeTitle ??
-        "新研发",
+      dishRankId:
+        (
+          dish.dishRankId ??
+          this.getRank(
+            dish.masteryLevel ?? 1,
+            dish.qualityScore ?? 50
+          ).id
+        ),
+
+      dishRankName:
+        (
+          dish.dishRankName ??
+          this.getRank(
+            dish.masteryLevel ?? 1,
+            dish.qualityScore ?? 50
+          ).name
+        ),
+
+      dishRankOrder:
+        (
+          dish.dishRankOrder ??
+          this.getRank(
+            dish.masteryLevel ?? 1,
+            dish.qualityScore ?? 50
+          ).order
+        ),
 
       masteryQualityBonus:
         dish
@@ -675,9 +629,6 @@ class DishGrowthSystem {
 
       qualityScore:
         dish.qualityScore,
-
-      qualityGrade:
-        dish.qualityGrade,
 
       lifetimeSold:
         dish.lifetimeSold ??
