@@ -50,6 +50,8 @@ const tests = [
   "tests/dish-research-preview.test.js",
   "tests/formal-supplier-data.test.js",
   "tests/supply-management.test.js",
+  "tests/formal-equipment-data.test.js",
+  "tests/equipment-maintenance.test.js",
   "tests/employee-management-ui.test.js",
   "tests/existing-page-entry-points.test.js",
   "tests/ranking-awards-catalog.test.js",
