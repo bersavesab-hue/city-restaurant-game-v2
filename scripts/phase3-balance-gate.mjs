@@ -9,6 +9,7 @@ const tests = [
   "tests/store-progression-integration.test.js",
   "tests/sales-channel-integration.test.js",
   "tests/member-lifecycle-integration.test.js",
+  "tests/customer-identity-membership-integration.test.js",
   "tests/marketing-action-integration.test.js"
 ];
 
