@@ -9,7 +9,8 @@ const {
   financeSystem,
   dishCatalogSystem,
   recipeSystem,
-  dishResearchSystem
+  dishResearchSystem,
+  restaurantDishSystem
 } = app.systems;
 
 test(
@@ -132,14 +133,40 @@ test(
       result.dish.id
     );
 
+    const progress =
+      restaurantDishSystem.get(
+        restaurant.id,
+        result.dish.id
+      );
+
+    assert.ok(
+      progress
+    );
+
     assert.equal(
-      result.dish.masteryLevel,
+      progress.masteryLevel,
       1
     );
 
     assert.equal(
-      result.dish.dishRankName,
+      progress.dishRankName,
       "家常"
+    );
+
+    assert.equal(
+      Object.prototype.hasOwnProperty.call(
+        result.dish,
+        "masteryLevel"
+      ),
+      false
+    );
+
+    assert.equal(
+      Object.prototype.hasOwnProperty.call(
+        result.dish,
+        "dishRankName"
+      ),
+      false
     );
 
     assert.equal(
