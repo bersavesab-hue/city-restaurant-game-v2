@@ -537,8 +537,10 @@ const FORMAL_PAGE_DEFINITIONS =
       view:
         storeProgressView,
 
-      mode:
-        "mount"
+      refreshEvents: [
+        "store:experienceGained",
+        "store:levelUp"
+      ]
     }
   });
 
