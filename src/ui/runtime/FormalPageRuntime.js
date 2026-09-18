@@ -173,6 +173,15 @@ import {
 } from "../pages/award-ceremony/AwardCeremonyView.js";
 
 
+import {
+  moreHubPageSystem
+} from "../pages/more/MoreHubPageSystem.js";
+
+import {
+  moreHubView
+} from "../pages/more/MoreHubView.js";
+
+
 const FORMAL_PAGE_DEFINITIONS =
   Object.freeze({
     supply: {
@@ -364,6 +373,18 @@ const FORMAL_PAGE_DEFINITIONS =
 
       view:
         awardCeremonyView,
+
+      mode:
+        "mount"
+    },
+
+
+    "more-home": {
+      pageSystem:
+        moreHubPageSystem,
+
+      view:
+        moreHubView,
 
       mode:
         "mount"

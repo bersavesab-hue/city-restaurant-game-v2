@@ -334,6 +334,32 @@ const GAMEPLAY_PAGES = [
       "dashboard"
   },
 
+
+  {
+    id:
+      "more-home",
+
+    title:
+      "更多",
+
+    parent:
+      "more",
+
+    order:
+      501,
+
+    layout:
+      "management",
+
+    metadata: {
+      hiddenFromMenu:
+        true,
+
+      landingFor:
+        "more"
+    }
+  },
+
 ];
 
 
