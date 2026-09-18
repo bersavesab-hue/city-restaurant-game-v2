@@ -32,6 +32,7 @@ import {
 
 import {
   MEMBER_POINT_POLICY,
+  MEMBER_IDENTITY_POLICY,
   getMemberEnrollmentPropensity
 } from "../data/memberProgramRules.js";
 
@@ -1378,6 +1379,98 @@ class CustomerLoyaltySystem {
       })
     );
   }
+
+  getSegmentRetentionMultiplier(
+    restaurantId,
+    segmentId
+  ) {
+    const members =
+      entitySystem
+        .filter(
+          "member_profile",
+          item =>
+            item.restaurantId ===
+              restaurantId &&
+            item.segmentId ===
+              segmentId
+        );
+
+    if (
+      members.length === 0
+    ) {
+      return 1;
+    }
+
+    const day =
+      currentDay();
+
+    const activeMembers =
+      members.filter(
+        item =>
+          item.lastVisitDay !==
+            null &&
+          day -
+            item.lastVisitDay <=
+            30
+      );
+
+    const visits =
+      members.reduce(
+        (
+          sum,
+          item
+        ) =>
+          sum +
+          (
+            item.visits ??
+            0
+          ),
+        0
+      );
+
+    const repeatVisits =
+      members.reduce(
+        (
+          sum,
+          item
+        ) =>
+          sum +
+          (
+            item.repeatVisits ??
+            0
+          ),
+        0
+      );
+
+    const repeatRate =
+      visits > 0
+        ? repeatVisits /
+          visits
+        : 0;
+
+    const activeRate =
+      activeMembers.length /
+      members.length;
+
+    const memberScale =
+      Math.min(
+        1,
+        members.length /
+        MEMBER_IDENTITY_POLICY
+          .maxRecognizedCustomersPerSegment
+      );
+
+    return clamp(
+      1 +
+      memberScale * 0.04 +
+      repeatRate * 0.04 +
+      activeRate * 0.02,
+      1,
+      MEMBER_IDENTITY_POLICY
+        .maxSegmentRetentionMultiplier
+    );
+  }
+
 
   getDashboard(
     restaurantId
