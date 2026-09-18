@@ -104,9 +104,6 @@ class RenovationPlanningSystem {
   }
 
   getZoneId(geometry) {
-    const id =
-      geometry.placement.furnitureId;
-
     if (
       geometry.definition.type ===
       "table"
@@ -123,7 +120,13 @@ class RenovationPlanningSystem {
       return "kitchen";
     }
 
-    if (id === "waiting_bench") {
+    if (
+      renovationSystem
+        .hasFurnitureRole(
+          geometry.definition,
+          "waiting"
+        )
+    ) {
       return "waiting";
     }
 
@@ -493,15 +496,21 @@ class RenovationPlanningSystem {
     const hasCashier =
       geometries.some(
         item =>
-          item.placement.furnitureId ===
-          "cashier_counter"
+          renovationSystem
+            .hasFurnitureRole(
+              item.definition,
+              "cashier"
+            )
       );
 
     const hasWaiting =
       geometries.some(
         item =>
-          item.placement.furnitureId ===
-          "waiting_bench"
+          renovationSystem
+            .hasFurnitureRole(
+              item.definition,
+              "waiting"
+            )
       );
 
     let score = 100;
@@ -754,14 +763,20 @@ class RenovationPlanningSystem {
       push(right, 0);
       push(right, 2);
     } else if (
-      furnitureId ===
-      "waiting_bench"
+      renovationSystem
+        .hasFurnitureRole(
+          definition,
+          "waiting"
+        )
     ) {
       push(right, bottom);
       push(0, bottom);
     } else if (
-      furnitureId ===
-      "cashier_counter"
+      renovationSystem
+        .hasFurnitureRole(
+          definition,
+          "cashier"
+        )
     ) {
       push(right, 2);
       push(
@@ -928,8 +943,14 @@ class RenovationPlanningSystem {
     const hasCashier =
       planned.some(
         item =>
-          item.furnitureId ===
-          "cashier_counter"
+          renovationSystem
+            .hasFurnitureRole(
+              renovationSystem
+                .getFurnitureDefinition(
+                  item.furnitureId
+                ),
+              "cashier"
+            )
       );
 
     return {
