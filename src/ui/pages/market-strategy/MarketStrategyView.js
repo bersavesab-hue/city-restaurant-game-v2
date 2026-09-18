@@ -60,6 +60,30 @@ function alertName(
 }
 
 
+function eventCategoryName(
+  value
+) {
+  return {
+    weather: "天气",
+    infrastructure: "交通施工",
+    community: "社区",
+    commercial: "商业活动",
+    education: "校园",
+    office_cycle: "办公周期",
+    competition: "竞争",
+    supply: "供应链",
+    labor: "用工",
+    equipment: "设备环境",
+    compliance: "合规",
+    reputation: "口碑",
+    cost: "经营成本",
+    delivery: "外卖配送",
+    opportunity: "经营机会"
+  }[value] ??
+  "商圈";
+}
+
+
 class MarketStrategyView {
   constructor({
     pageSystem =
@@ -398,12 +422,27 @@ class MarketStrategyView {
                       </strong>
 
                       <span>
+                        ${eventCategoryName(
+                          item.category
+                        )}
+                        ·
+                        强度
+                        ${item.severity ??
+                          1
+                        }
+                        ·
                         第
                         ${item.startDay}
                         —
                         ${item.endDay}
                         天
                       </span>
+
+                      <small>
+                        ${item.description ??
+                          "商圈经营环境发生变化"
+                        }
+                      </small>
                     </article>
                   `
                 )
