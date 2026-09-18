@@ -424,10 +424,24 @@ class MemberBenefitSystem {
       afterLevel = subtotal;
     }
 
+    const maxCombinedDiscount =
+      Math.floor(
+        subtotal *
+        MEMBER_POINT_POLICY
+          .maxCombinedDiscountRate
+      );
+
     const couponDiscount =
-      this.getCouponDiscount(
-        coupon,
-        afterLevel
+      Math.min(
+        this.getCouponDiscount(
+          coupon,
+          afterLevel
+        ),
+        Math.max(
+          0,
+          maxCombinedDiscount -
+          levelDiscount
+        )
       );
 
     const afterCoupon =
@@ -449,13 +463,6 @@ class MemberBenefitSystem {
         afterCoupon *
         MEMBER_POINT_POLICY
           .maxRedemptionRate
-      );
-
-    const maxCombinedDiscount =
-      Math.floor(
-        subtotal *
-        MEMBER_POINT_POLICY
-          .maxCombinedDiscountRate
       );
 
     const remainingDiscountRoom =
