@@ -26,7 +26,6 @@ test(
           name: "供应链测试肉",
           category: "meat",
           unit: "kg",
-          baseQuality: 3,
           storageType: "chilled",
           basePurchasePrice: 40,
           shelfLifeDays: 5,
