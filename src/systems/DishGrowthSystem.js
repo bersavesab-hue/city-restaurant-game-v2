@@ -362,7 +362,7 @@ class DishGrowthSystem {
     financeSystem.expense(
       restaurantId,
       cost,
-      FINANCE_CATEGORY.OTHER,
+      FINANCE_CATEGORY.RESEARCH,
       `${definition.name}：${dish.name}`
     );
 
