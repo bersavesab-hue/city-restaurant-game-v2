@@ -7,6 +7,11 @@ import {
 } from "../core/EventBus.js";
 
 import {
+  financeSystem,
+  FINANCE_CATEGORY
+} from "./FinanceSystem.js";
+
+import {
   customerSystem
 } from "./CustomerSystem.js";
 
@@ -17,6 +22,10 @@ import {
 import {
   customerLoyaltySystem
 } from "./CustomerLoyaltySystem.js";
+
+import {
+  memberBenefitSystem
+} from "./MemberBenefitSystem.js";
 
 
 class CustomerLoyaltyIntegrationSystem {
@@ -223,6 +232,8 @@ class CustomerLoyaltyIntegrationSystem {
 
     let memberVisits = 0;
     let memberRevenue = 0;
+    let memberGrossRevenue = 0;
+    let memberDiscountCost = 0;
 
     for (
       let index = 0;
@@ -248,6 +259,13 @@ class CustomerLoyaltyIntegrationSystem {
         satisfaction
       });
 
+      const existingMember =
+        customerLoyaltySystem
+          .findMember(
+            order.restaurantId,
+            customer.id
+          );
+
       const member =
         this.resolveMember({
           restaurantId:
@@ -264,6 +282,28 @@ class CustomerLoyaltyIntegrationSystem {
         continue;
       }
 
+      const checkout =
+        existingMember
+          ? memberBenefitSystem
+              .previewCheckout({
+                restaurantId:
+                  order.restaurantId,
+                customerId:
+                  customer.id,
+                subtotal:
+                  spendPerVisit,
+                couponId:
+                  null,
+                redeemPoints:
+                  0
+              })
+          : null;
+
+      const paidSpend =
+        checkout
+          ?.finalAmount ??
+        spendPerVisit;
+
       customerLoyaltySystem
         .recordMemberVisit({
           restaurantId:
@@ -271,7 +311,7 @@ class CustomerLoyaltyIntegrationSystem {
           customerId:
             customer.id,
           spend:
-            spendPerVisit,
+            paidSpend,
           satisfaction,
           orderId:
             syntheticOrderId,
@@ -281,7 +321,24 @@ class CustomerLoyaltyIntegrationSystem {
 
       memberVisits += 1;
       memberRevenue +=
+        paidSpend;
+      memberGrossRevenue +=
         spendPerVisit;
+      memberDiscountCost +=
+        checkout
+          ?.levelDiscount ??
+        0;
+    }
+
+    if (
+      memberDiscountCost > 0
+    ) {
+      financeSystem.expense(
+        order.restaurantId,
+        memberDiscountCost,
+        FINANCE_CATEGORY.MARKETING,
+        "长期模拟会员等级优惠"
+      );
     }
 
     const anonymousVisitors =
@@ -307,7 +364,7 @@ class CustomerLoyaltyIntegrationSystem {
             Math.max(
               0,
               revenue -
-              memberRevenue
+              memberGrossRevenue
             ),
           satisfaction
         });
@@ -332,6 +389,8 @@ class CustomerLoyaltyIntegrationSystem {
       recognizedVisits:
         recognized.length,
       memberVisits,
+      memberRevenue,
+      memberDiscountCost,
       anonymousVisitors
     };
   }
