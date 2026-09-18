@@ -1,6 +1,7 @@
 import { entitySystem } from "../core/EntitySystem.js";
 import { gameState } from "../core/GameState.js";
 import { eventBus } from "../core/EventBus.js";
+import { districtEventSystem } from "./DistrictEventSystem.js";
 
 const STATUS = Object.freeze({
   CLOSED: "closed",
@@ -351,11 +352,33 @@ class RestaurantSystem {
     const restaurant =
       requireRestaurant(id);
 
+    let eventMultiplier =
+      1;
+
+    if (restaurant.locationId) {
+      const property =
+        entitySystem.get(
+          "property",
+          restaurant.locationId
+        );
+
+      if (property) {
+        eventMultiplier =
+          districtEventSystem
+            .getModifiers(
+              property.districtId
+            )
+            .reputationChangeMultiplier ??
+          1;
+      }
+    }
+
     const reputation =
       Math.max(
         0,
         restaurant.reputation +
-        amount
+        amount *
+        eventMultiplier
       );
 
     return entitySystem.update(
