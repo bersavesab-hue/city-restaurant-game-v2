@@ -69,27 +69,40 @@ class EquipmentMaintenanceSystem {
       return 0;
     }
 
-    const durability =
-      clamp(
-        unit.durability,
-        0,
+    const maxDurability =
+      Math.max(
+        1,
+        unit.maxDurability ??
+        restaurantEquipmentSystem
+          .getDefinition(
+            unit.equipmentId
+          )
+          .baseDurability ??
         100
+      );
+
+    const durabilityRatio =
+      clamp(
+        unit.durability /
+        maxDurability,
+        0,
+        1
       );
 
     let risk = 0.002;
 
-    if (durability <= 20) {
+    if (durabilityRatio <= 0.2) {
       risk += 0.16;
     } else if (
-      durability <= 35
+      durabilityRatio <= 0.35
     ) {
       risk += 0.08;
     } else if (
-      durability <= 50
+      durabilityRatio <= 0.5
     ) {
       risk += 0.035;
     } else if (
-      durability <= 70
+      durabilityRatio <= 0.7
     ) {
       risk += 0.012;
     }
@@ -395,9 +408,14 @@ class EquipmentMaintenanceSystem {
       this.getCurrentDay();
 
     const downtimeDays =
-      unit.durability <= 20
-        ? 2
-        : 1;
+      unit.durability /
+        Math.max(
+          1,
+          maxDurability
+        ) <=
+        0.2
+          ? 2
+          : 1;
 
     const updated =
       entitySystem.update(
