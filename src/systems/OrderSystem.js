@@ -299,7 +299,7 @@ class OrderSystem {
         financeSystem.expense(
           restaurantId,
           channelSettlement.commission,
-          FINANCE_CATEGORY.OTHER,
+          FINANCE_CATEGORY.CHANNEL,
           `渠道佣金：${channelId}`
         );
     }
@@ -312,7 +312,7 @@ class OrderSystem {
         financeSystem.expense(
           restaurantId,
           channelSettlement.packagingCost,
-          FINANCE_CATEGORY.OTHER,
+          FINANCE_CATEGORY.CHANNEL,
           `渠道包装费：${channelId}`
         );
     }
@@ -642,7 +642,7 @@ class OrderSystem {
         financeSystem.expense(
           restaurantId,
           channelSettlement.commission,
-          FINANCE_CATEGORY.OTHER,
+          FINANCE_CATEGORY.CHANNEL,
           `渠道佣金：${channelId}`
         );
     }
@@ -655,7 +655,7 @@ class OrderSystem {
         financeSystem.expense(
           restaurantId,
           channelSettlement.packagingCost,
-          FINANCE_CATEGORY.OTHER,
+          FINANCE_CATEGORY.CHANNEL,
           `渠道包装费：${channelId}`
         );
     }
