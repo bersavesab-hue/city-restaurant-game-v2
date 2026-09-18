@@ -105,6 +105,10 @@ const tests = [
   "tests/more-hub.test.js",
   "tests/market-strategy-ui.test.js",
   "tests/store-progress-ui.test.js",
+  "tests/formal-store-progression-data.test.js",
+  "tests/store-progression-integration.test.js",
+  "tests/service-capacity.test.js",
+  "tests/service-capacity-integration.test.js",
   "tests/ingredient-data-v1.test.js"
 ];
 
