@@ -2,7 +2,10 @@ import { entitySystem } from "../core/EntitySystem.js";
 import { gameState } from "../core/GameState.js";
 import { eventBus } from "../core/EventBus.js";
 import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
-import { getFreshnessState } from "../data/ingredientRules.js";
+import {
+  getFreshnessState,
+  DEFAULT_INGREDIENT_BATCH_QUALITY
+} from "../data/ingredientRules.js";
 
 const BATCH_STATUS = Object.freeze({
   ACTIVE: "active",
@@ -117,7 +120,7 @@ class InventorySystem {
 
     const finalQuality =
       quality ??
-      ingredient.baseQuality;
+      DEFAULT_INGREDIENT_BATCH_QUALITY;
 
     if (
       !Number.isInteger(finalQuality) ||
