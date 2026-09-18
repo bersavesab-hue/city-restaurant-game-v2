@@ -272,7 +272,7 @@ class DishResearchLab {
             </strong>
 
             <span>
-              随机灵感尚未抽取，因此品质只显示可能区间
+              随机灵感尚未抽取，因此研发评分只显示可能区间
             </span>
           </div>
 
@@ -300,13 +300,13 @@ class DishResearchLab {
           <div class="dish-preview-quality__score">
 
             <span>
-              品质区间
+              研发评分区间
             </span>
 
             <strong>
-              ${preview.qualityRange.min}
+              ${preview.researchScoreRange.min}
               –
-              ${preview.qualityRange.max}
+              ${preview.researchScoreRange.max}
             </strong>
 
           </div>
@@ -401,7 +401,7 @@ class DishResearchLab {
           </strong>
 
           <small>
-            最终建议售价会根据实际研发品质确定
+            最终建议售价会根据实际研发评分确定
           </small>
 
         </section>
