@@ -22,7 +22,6 @@ test(
           name: "成长米",
           category: "grain",
           unit: "portion",
-          baseQuality: 3,
           storageType: "dry",
           basePurchasePrice: 5,
           shelfLifeDays: 30,
@@ -35,7 +34,6 @@ test(
           name: "成长肉",
           category: "meat",
           unit: "portion",
-          baseQuality: 4,
           storageType: "chilled",
           basePurchasePrice: 12,
           shelfLifeDays: 5,
@@ -126,11 +124,12 @@ test(
 
     assert.ok(
       [
-        "人气菜",
-        "招牌菜",
-        "镇店菜"
+        "优选",
+        "招牌",
+        "名菜",
+        "镇店"
       ].includes(
-        status.prestigeTitle
+        status.dishRankName
       )
     );
 
