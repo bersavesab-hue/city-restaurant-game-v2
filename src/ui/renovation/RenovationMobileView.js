@@ -410,7 +410,17 @@ class RenovationMobileView {
           ${page.templates.items
             .map(template => `
               <div class="renovation-template-row">
-                <span>${escapeHtml(template.name)}</span>
+                <span>
+                  ${template.id === page.templates.recommendedTemplateId
+                    ? "推荐 · "
+                    : ""
+                  }
+                  ${escapeHtml(template.name)}
+                  ·
+                  匹配${escapeHtml(template.fitScore)}
+                  ·
+                  约¥${formatMoney(template.estimatedTotalCost)}
+                </span>
                 <div>
                   <button type="button" data-action="preview-template" data-template-id="${escapeHtml(template.id)}">预览</button>
                   <button type="button" data-action="apply-template" data-template-id="${escapeHtml(template.id)}">套用</button>
