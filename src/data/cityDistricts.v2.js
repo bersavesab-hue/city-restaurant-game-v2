@@ -113,7 +113,7 @@ export const CITY_DISTRICTS_V2 =
         foodie: 8,
         student: 6,
         local_regular: 12,
-        small_business_owner: 10
+        local_regular: 10
       },
       venueAffinity: {
         street_shop: 1.18,
@@ -215,7 +215,7 @@ export const CITY_DISTRICTS_V2 =
         young_professional: 6,
         freelancer: 8,
         delivery_heavy: 9,
-        value_hunter: 10,
+        budget_family: 10,
         social_group: 8,
         nightlife: 6,
         foodie: 5
@@ -269,7 +269,7 @@ export const CITY_DISTRICTS_V2 =
         family_with_children: 14,
         premium_foodie: 12,
         health_conscious: 10,
-        reservation_diner: 8,
+        business_guest: 8,
         business_guest: 8,
         young_couple: 7
       },
@@ -426,7 +426,7 @@ export const CITY_DISTRICTS_V2 =
         office_worker: 14,
         late_shift_worker: 14,
         gig_worker: 8,
-        value_hunter: 8,
+        budget_family: 8,
         budget_family: 7,
         takeaway_commuter: 7,
         resident: 8
@@ -476,7 +476,7 @@ export const CITY_DISTRICTS_V2 =
         nightlife: 26,
         social_group: 18,
         young_couple: 12,
-        trend_seeker: 12,
+        foodie: 12,
         student: 8,
         foodie: 9,
         young_professional: 8,
@@ -528,7 +528,7 @@ export const CITY_DISTRICTS_V2 =
       customerMix: {
         tourist: 34,
         foodie: 13,
-        trend_seeker: 11,
+        foodie: 11,
         weekend_leisure: 12,
         premium_foodie: 8,
         young_couple: 8,
@@ -585,7 +585,7 @@ export const CITY_DISTRICTS_V2 =
         foodie: 12,
         weekend_leisure: 18,
         family_with_children: 12,
-        reservation_diner: 10,
+        business_guest: 10,
         premium_foodie: 10
       },
       venueAffinity: {
@@ -634,7 +634,7 @@ export const CITY_DISTRICTS_V2 =
         mall_shopper: 18,
         young_professional: 16,
         office_worker: 12,
-        trend_seeker: 10,
+        foodie: 10,
         young_couple: 10,
         high_income: 8,
         foodie: 10,
@@ -837,7 +837,7 @@ export const CITY_DISTRICTS_V2 =
       parkingConvenience: 36,
       transitAccess: 74,
       customerMix: {
-        trend_seeker: 20,
+        foodie: 20,
         foodie: 15,
         freelancer: 13,
         young_couple: 12,
@@ -893,7 +893,7 @@ export const CITY_DISTRICTS_V2 =
         tourist: 16,
         office_worker: 15,
         high_income: 11,
-        reservation_diner: 12,
+        business_guest: 12,
         premium_foodie: 8,
         young_professional: 10,
         foodie: 8
@@ -947,7 +947,7 @@ export const CITY_DISTRICTS_V2 =
         nightlife: 14,
         mall_shopper: 10,
         young_couple: 10,
-        trend_seeker: 10,
+        foodie: 10,
         weekend_leisure: 10
       },
       venueAffinity: {
@@ -997,9 +997,9 @@ export const CITY_DISTRICTS_V2 =
         gig_worker: 15,
         takeaway_commuter: 14,
         breakfast_commuter: 13,
-        value_hunter: 12,
+        budget_family: 12,
         local_regular: 8,
-        small_business_owner: 8,
+        local_regular: 8,
         solo_diner: 6
       },
       venueAffinity: {
