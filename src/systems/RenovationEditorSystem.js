@@ -121,6 +121,10 @@ class RenovationEditorSystem {
       placements:
         clone(layout.placements ?? []),
       nextDraftNumber: 1,
+
+      templateRecommendations:
+        null,
+
       openedAt:
         gameState.getSection("time")
           .totalMinutes
@@ -990,10 +994,14 @@ class RenovationEditorSystem {
       );
 
     const templateRecommendations =
+      session.templateRecommendations ??
       renovationPlanningSystem
         .getTemplateRecommendations(
           restaurantId
         );
+
+    session.templateRecommendations =
+      templateRecommendations;
 
     return {
       restaurantId,
