@@ -45,6 +45,10 @@ const tests = [
   "tests/operating-live-visualization.test.js",
   "tests/operating-live-snapshot.test.js",
   "tests/operating-analytics.test.js",
+  "tests/finance-settlement.test.js",
+  "tests/finance-center-ui.test.js",
+  "tests/formal-economic-balance-data.test.js",
+  "tests/economic-balance-integration.test.js",
   "tests/business-analytics-ui.test.js",
 
   "tests/dish-center-ui.test.js",
