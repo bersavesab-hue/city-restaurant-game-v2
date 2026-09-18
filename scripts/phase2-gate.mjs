@@ -61,6 +61,7 @@ const tests = [
   "tests/customer-segment.test.js",
   "tests/customer-experience.test.js",
   "tests/formal-district-data.test.js",
+  "tests/formal-venue-type-data.test.js",
   "tests/existing-page-entry-points.test.js",
   "tests/ranking-awards-catalog.test.js",
   "tests/award-cycle.test.js",
