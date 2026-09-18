@@ -56,6 +56,15 @@ export const DISH_MASTERY_THRESHOLDS =
     360
   ]);
 
+export const DISH_MASTERY_NAMES =
+  Object.freeze({
+    1: "生疏",
+    2: "熟练",
+    3: "精通",
+    4: "拿手",
+    5: "炉火纯青"
+  });
+
 export const COOK_OUTPUT_GRADE =
   Object.freeze({
     C: "C",
@@ -63,6 +72,34 @@ export const COOK_OUTPUT_GRADE =
     A: "A",
     S: "S"
   });
+
+export const COOK_OUTPUT_LEVELS =
+  Object.freeze([
+    Object.freeze({
+      id: "c",
+      grade: "C",
+      name: "普通",
+      min: 0
+    }),
+    Object.freeze({
+      id: "b",
+      grade: "B",
+      name: "良好",
+      min: 60
+    }),
+    Object.freeze({
+      id: "a",
+      grade: "A",
+      name: "精致",
+      min: 75
+    }),
+    Object.freeze({
+      id: "s",
+      grade: "S",
+      name: "完美",
+      min: 90
+    })
+  ]);
 
 export function getDishMasteryLevel(
   masteryXp
@@ -175,4 +212,23 @@ export function getCookOutputGrade(
   }
 
   return COOK_OUTPUT_GRADE.C;
+}
+
+
+export function getCookOutputLevel(
+  qualityScore
+) {
+  const grade =
+    getCookOutputGrade(
+      qualityScore
+    );
+
+  return (
+    COOK_OUTPUT_LEVELS.find(
+      item =>
+        item.grade ===
+        grade
+    ) ??
+    COOK_OUTPUT_LEVELS[0]
+  );
 }
