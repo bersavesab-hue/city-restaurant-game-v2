@@ -12,6 +12,11 @@ import {
   getPotentialGrowthMultiplier
 } from "../data/employeeGenerationRules.js";
 
+import {
+  validateCareerRank,
+  validateTrainingProgram
+} from "../data/employeeCareerRules.js";
+
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
@@ -23,6 +28,10 @@ function requireRank(rankId) {
     throw new Error(`Unknown employee career rank "${rankId}"`);
   }
 
+  validateCareerRank(
+    rank
+  );
+
   return rank;
 }
 
@@ -32,6 +41,10 @@ function requireTraining(programId) {
   if (!program) {
     throw new Error(`Unknown training program "${programId}"`);
   }
+
+  validateTrainingProgram(
+    program
+  );
 
   return program;
 }
@@ -208,24 +221,79 @@ class EmployeeCareerSystem {
     return updated;
   }
 
-  getTrainingPrograms(employeeId) {
-    const employee = employeeSystem.get(employeeId);
-    const currentRank = this.getRank(employee);
+  getTrainingPrograms(
+    employeeId
+  ) {
+    const employee =
+      employeeSystem.get(
+        employeeId
+      );
 
-    return Object.values(EMPLOYEE_TRAINING_PROGRAMS).map(program => {
-      const minRank = requireRank(program.minRank);
-      return {
-        ...structuredClone(program),
-        unlocked: currentRank.order >= minRank.order
-      };
-    });
+    const currentRank =
+      this.getRank(
+        employee
+      );
+
+    return Object.values(
+      EMPLOYEE_TRAINING_PROGRAMS
+    )
+      .filter(
+        program =>
+          program.roleIds.length ===
+            0 ||
+          program.roleIds.includes(
+            employee.roleId
+          )
+      )
+      .map(
+        program => {
+          const minRank =
+            requireRank(
+              program.minRank
+            );
+
+          return {
+            ...structuredClone(
+              program
+            ),
+
+            roleEligible:
+              true,
+
+            unlocked:
+              currentRank.order >=
+              minRank.order,
+
+            unlockRank:
+              structuredClone(
+                minRank
+              )
+          };
+        }
+      );
   }
 
   train(employeeId, programId) {
     const employee = employeeSystem.get(employeeId);
     const program = requireTraining(programId);
     const currentRank = this.getRank(employee);
-    const minRank = requireRank(program.minRank);
+    const minRank =
+      requireRank(
+        program.minRank
+      );
+
+    const roleEligible =
+      program.roleIds.length ===
+        0 ||
+      program.roleIds.includes(
+        employee.roleId
+      );
+
+    if (!roleEligible) {
+      throw new Error(
+        `Training "${program.name}" is not available for role "${employee.roleId}"`
+      );
+    }
 
     if (currentRank.order < minRank.order) {
       throw new Error(`Training requires rank ${minRank.name}`);
@@ -290,6 +358,41 @@ class EmployeeCareerSystem {
         clamp(
           (skills[skill] ?? 0) +
           gain,
+          0,
+          100
+        );
+    }
+
+    for (
+      const [
+        skill,
+        bonus
+      ]
+      of Object.entries(
+        program.focusSkillGains ??
+        {}
+      )
+    ) {
+      if (
+        !Object.prototype
+          .hasOwnProperty.call(
+            skills,
+            skill
+          )
+      ) {
+        continue;
+      }
+
+      skills[skill] =
+        clamp(
+          skills[skill] +
+          Math.max(
+            1,
+            Math.round(
+              bonus *
+              growthMultiplier
+            )
+          ),
           0,
           100
         );
