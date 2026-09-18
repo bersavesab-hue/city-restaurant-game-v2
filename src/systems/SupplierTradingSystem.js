@@ -7,40 +7,10 @@ import { autoProcurementSystem } from "./AutoProcurementSystem.js";
 import { inventorySystem } from "./InventorySystem.js";
 import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
 
-const SUPPLIER_TIERS = Object.freeze([
-  {
-    id: "standard",
-    name: "普通供应商",
-    level: 1,
-    minRelationship: 0,
-    minReliability: 0,
-    creditDays: 0
-  },
-  {
-    id: "preferred",
-    name: "优选供应商",
-    level: 2,
-    minRelationship: 55,
-    minReliability: 75,
-    creditDays: 7
-  },
-  {
-    id: "key",
-    name: "核心供应商",
-    level: 3,
-    minRelationship: 70,
-    minReliability: 85,
-    creditDays: 15
-  },
-  {
-    id: "strategic",
-    name: "战略供应商",
-    level: 4,
-    minRelationship: 85,
-    minReliability: 90,
-    creditDays: 30
-  }
-]);
+import {
+  SUPPLIER_PARTNERSHIP_STAGES,
+  getSupplierCapabilityTier
+} from "../data/supplierRules.js";
 
 function currentDay() {
   return gameState.getSection("time")?.day ?? 1;
@@ -98,7 +68,9 @@ function random01(seed, salt = 0) {
 }
 
 class SupplierTradingSystem {
-  getTier(supplierOrId) {
+  getPartnershipStage(
+    supplierOrId
+  ) {
     const supplier =
       typeof supplierOrId === "string"
         ? supplierSystem.get(
@@ -106,27 +78,24 @@ class SupplierTradingSystem {
           )
         : supplierOrId;
 
-    let tier =
-      SUPPLIER_TIERS[0];
+    let stage =
+      SUPPLIER_PARTNERSHIP_STAGES[0];
 
     for (
       const candidate
-      of SUPPLIER_TIERS
+      of SUPPLIER_PARTNERSHIP_STAGES
     ) {
       if (
         supplier.relationship >=
           candidate
-            .minRelationship &&
-        supplier.reliability >=
-          candidate
-            .minReliability
+            .minRelationship
       ) {
-        tier = candidate;
+        stage = candidate;
       }
     }
 
     return {
-      ...tier
+      ...stage
     };
   }
 
@@ -136,9 +105,22 @@ class SupplierTradingSystem {
         supplierId
       );
 
-    const tier =
-      this.getTier(
+    const capabilityTier =
+      getSupplierCapabilityTier(
+        supplier.capabilityTier ??
+        "T1"
+      );
+
+    const partnership =
+      this.getPartnershipStage(
         supplier
+      );
+
+    const creditDays =
+      Math.min(
+        supplier.maxCreditDays ??
+          0,
+        partnership.creditDays
       );
 
     const offers =
@@ -193,10 +175,33 @@ class SupplierTradingSystem {
       reliability:
         supplier.reliability,
 
-      tier,
+      capabilityTier,
 
-      creditDays:
-        tier.creditDays,
+      supplierType:
+        supplier.supplierType,
+
+      supplyGroups: [
+        ...(
+          supplier.supplyGroups ??
+          []
+        )
+      ],
+
+      unlockLevel:
+        supplier.unlockLevel ??
+        1,
+
+      priceIndex:
+        supplier.priceIndex ??
+        1,
+
+      partnership,
+
+      maxCreditDays:
+        supplier.maxCreditDays ??
+        0,
+
+      creditDays,
 
       offerCount:
         offers.length,
@@ -229,12 +234,22 @@ class SupplierTradingSystem {
   }
 
   listProfiles({
-    activeOnly = true
+    activeOnly = true,
+    storeLevel = null
   } = {}) {
     return supplierSystem
       .list({
         activeOnly
       })
+      .filter(
+        supplier =>
+          storeLevel === null ||
+          (
+            supplier.unlockLevel ??
+            1
+          ) <=
+            storeLevel
+      )
       .map(
         supplier =>
           this.getProfile(
@@ -243,8 +258,8 @@ class SupplierTradingSystem {
       )
       .sort(
         (a, b) =>
-          b.tier.level -
-            a.tier.level ||
+          a.capabilityTier.level -
+            b.capabilityTier.level ||
           b.serviceScore -
             a.serviceScore
       );
@@ -419,9 +434,16 @@ class SupplierTradingSystem {
         qualityRange
       );
 
-    const tier =
-      this.getTier(
+    const partnership =
+      this.getPartnershipStage(
         supplier
+      );
+
+    const creditDays =
+      Math.min(
+        supplier.maxCreditDays ??
+          0,
+        partnership.creditDays
       );
 
     return {
@@ -476,11 +498,14 @@ class SupplierTradingSystem {
 
       day,
 
-      tier:
-        tier.id,
+      capabilityTier:
+        supplier.capabilityTier ??
+        "T1",
 
-      creditDays:
-        tier.creditDays
+      partnership:
+        partnership.id,
+
+      creditDays
     };
   }
 
@@ -789,6 +814,5 @@ export const supplierTradingSystem =
   new SupplierTradingSystem();
 
 export {
-  SupplierTradingSystem,
-  SUPPLIER_TIERS
+  SupplierTradingSystem
 };
