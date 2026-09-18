@@ -235,9 +235,10 @@ test(
               supplierIds.has(
                 supplier.id
               ) &&
-              supplier.offers[
+              supplierSystem.getOffer(
+                supplier.id,
                 ingredient.id
-              ]
+              )
           );
 
       const startingSources =
