@@ -16,7 +16,8 @@
     "test:phase2:opening": "node --test tests/opening-journey-e2e.test.js tests/opening-live-refresh.test.js tests/opening-journey-routing.test.js tests/opening-route-contract.test.js tests/opening-flow-ui.test.js tests/opening-readiness.test.js tests/lease-flow.test.js tests/renovation-construction-ui.test.js",
     "test:phase2:operations": "node --test tests/operating-day-e2e.test.js tests/formal-runtime-live-refresh.test.js tests/operating-feedback-ui.test.js tests/operating-live-snapshot.test.js tests/operating-live-visualization.test.js tests/analytics-live-refresh.test.js tests/formal-runtime-navigation-params.test.js tests/operating-cycle.test.js tests/order-flow.test.js tests/customer-experience.test.js tests/finance-settlement.test.js tests/operating-report.test.js tests/operating-command-center.test.js tests/business-analytics-ui.test.js",
     "test:phase2:entries": "node --test tests/existing-page-entry-points.test.js tests/runtime-route-coverage.test.js tests/android-runtime-routing.test.js tests/gameplay-navigation.test.js",
-    "test:phase2:awards": "node --test tests/ranking-awards-catalog.test.js tests/award-cycle.test.js tests/ranking-awards-pages.test.js tests/award-feedback.test.js tests/award-ceremony.test.js tests/award-feedback-command-center.test.js tests/market-ranking.test.js"
+    "test:phase2:awards": "node --test tests/ranking-awards-catalog.test.js tests/award-cycle.test.js tests/ranking-awards-pages.test.js tests/award-feedback.test.js tests/award-ceremony.test.js tests/award-feedback-command-center.test.js tests/market-ranking.test.js",
+    "test:phase2:structure": "node --test tests/more-hub.test.js tests/existing-page-entry-points.test.js tests/runtime-route-coverage.test.js tests/android-runtime-routing.test.js tests/gameplay-navigation.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
