@@ -291,7 +291,9 @@ class SupplyManagementView {
 
                   <span>
                     ${escapeHtml(
-                      supplier.tier.name
+                      supplier.capabilityTier.id +
+                      " · " +
+                      supplier.capabilityTier.name
                     )}
                   </span>
                 </div>
@@ -307,6 +309,17 @@ class SupplyManagementView {
                   <strong>
                     ${Math.round(
                       supplier.relationship
+                    )}
+                  </strong>
+                </span>
+
+                <span>
+                  合作
+                  <strong>
+                    ${escapeHtml(
+                      supplier
+                        .partnership
+                        .name
                     )}
                   </strong>
                 </span>
@@ -441,7 +454,9 @@ class SupplyManagementView {
   renderAuto(page) {
     const options =
       this.pageSystem
-        .getAutoPolicyOptions();
+        .getAutoPolicyOptions(
+          this.restaurantId
+        );
 
     return `
       <section class="auto-form">
