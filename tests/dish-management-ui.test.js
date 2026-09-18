@@ -10,8 +10,8 @@ const {
 } = app.systems;
 
 const {
-  dishManagementPageSystem
-} = app.ui;
+  dishManagementSystem
+} = app.systems;
 
 test(
   "菜品正式页面支持研发菜单成长调价和上下架",
@@ -71,7 +71,7 @@ test(
     );
 
     const random =
-      dishManagementPageSystem
+      dishManagementSystem
         .randomResearch({
           restaurantId:
             restaurant.id,
@@ -84,7 +84,7 @@ test(
     );
 
     let page =
-      dishManagementPageSystem
+      dishManagementSystem
         .getPage(
           restaurant.id
         );
@@ -100,7 +100,7 @@ test(
     );
 
     let detail =
-      dishManagementPageSystem
+      dishManagementSystem
         .getDishDetail(
           restaurant.id,
           random.dish.id
@@ -118,7 +118,7 @@ test(
     );
 
     const menuItem =
-      dishManagementPageSystem
+      dishManagementSystem
         .addToMenu({
           restaurantId:
             restaurant.id,
@@ -132,7 +132,7 @@ test(
       68
     );
 
-    dishManagementPageSystem
+    dishManagementSystem
       .setMenuPrice(
         restaurant.id,
         random.dish.id,
@@ -140,7 +140,7 @@ test(
       );
 
     detail =
-      dishManagementPageSystem
+      dishManagementSystem
         .getDishDetail(
           restaurant.id,
           random.dish.id
@@ -156,7 +156,7 @@ test(
       true
     );
 
-    dishManagementPageSystem
+    dishManagementSystem
       .setMenuActive(
         restaurant.id,
         random.dish.id,
@@ -164,7 +164,7 @@ test(
       );
 
     detail =
-      dishManagementPageSystem
+      dishManagementSystem
         .getDishDetail(
           restaurant.id,
           random.dish.id
@@ -176,7 +176,7 @@ test(
     );
 
     const manual =
-      dishManagementPageSystem
+      dishManagementSystem
         .manualResearch({
           restaurantId:
             restaurant.id,
@@ -205,7 +205,7 @@ test(
     );
 
     page =
-      dishManagementPageSystem
+      dishManagementSystem
         .getPage(
           restaurant.id
         );
@@ -221,7 +221,7 @@ test(
     );
 
     const lab =
-      dishManagementPageSystem
+      dishManagementSystem
         .getResearchLab(
           restaurant.id
         );

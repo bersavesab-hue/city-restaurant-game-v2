@@ -79,7 +79,7 @@ import { cityPropertyPageSystem } from "./ui/pages/city/CityPropertyPageSystem.j
 import { dishCenterPageSystem } from "./ui/pages/dishes/DishCenterPageSystem.js";
 import { businessAnalyticsPageSystem } from "./ui/pages/analytics/BusinessAnalyticsPageSystem.js";
 import { supplyManagementPageSystem } from "./ui/pages/supply/SupplyManagementPageSystem.js";
-import { dishManagementPageSystem } from "./ui/pages/dishes/DishManagementPageSystem.js";
+import { dishManagementSystem } from "./systems/DishManagementSystem.js";
 import { employeeManagementPageSystem } from "./ui/pages/employees/EmployeeManagementPageSystem.js";
 import { pageRegistry } from "./ui/registry/PageRegistry.js";
 import "./ui/registry/defaultPages.js";
@@ -151,6 +151,7 @@ function bootstrap() {
       dishResearchPreviewSystem,
       dishGrowthSystem,
       dishLifecycleSystem,
+      dishManagementSystem,
 
       menuSystem,
       customerSystem,
@@ -198,7 +199,6 @@ function bootstrap() {
       openingSetupPageSystem,
       cityPropertyPageSystem,
       employeeManagementPageSystem,
-      dishManagementPageSystem,
       supplyManagementPageSystem,
       businessAnalyticsPageSystem
     }

@@ -46,13 +46,6 @@ export {
 } from "./pages/employees/index.js";
 
 export {
-  dishManagementPageSystem,
-  DishManagementPageSystem,
-  dishManagementView,
-  DishManagementView
-} from "./pages/dishes/index.js";
-
-export {
   supplyManagementPageSystem,
   SupplyManagementPageSystem,
   supplyManagementView,

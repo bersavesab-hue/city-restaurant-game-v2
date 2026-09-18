@@ -1,14 +1,14 @@
-import { entitySystem } from "../../../core/EntitySystem.js";
+import { entitySystem } from "../core/EntitySystem.js";
 
-import { financeSystem } from "../../../systems/FinanceSystem.js";
-import { dishCatalogSystem } from "../../../systems/DishCatalogSystem.js";
-import { dishResearchSystem } from "../../../systems/DishResearchSystem.js";
-import { dishGrowthSystem } from "../../../systems/DishGrowthSystem.js";
-import { dishLifecycleSystem } from "../../../systems/DishLifecycleSystem.js";
-import { ingredientCatalogSystem } from "../../../systems/IngredientCatalogSystem.js";
-import { recipeSystem } from "../../../systems/RecipeSystem.js";
-import { menuSystem } from "../../../systems/MenuSystem.js";
-import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
+import { financeSystem } from "./FinanceSystem.js";
+import { dishCatalogSystem } from "./DishCatalogSystem.js";
+import { dishResearchSystem } from "./DishResearchSystem.js";
+import { dishGrowthSystem } from "./DishGrowthSystem.js";
+import { dishLifecycleSystem } from "./DishLifecycleSystem.js";
+import { ingredientCatalogSystem } from "./IngredientCatalogSystem.js";
+import { recipeSystem } from "./RecipeSystem.js";
+import { menuSystem } from "./MenuSystem.js";
+import { restaurantSystem } from "./RestaurantSystem.js";
 
 const DISH_CATEGORIES = Object.freeze([
   { id: "rice", name: "米饭主食" },
@@ -126,7 +126,7 @@ function getIngredientInfo(
   );
 }
 
-class DishManagementPageSystem {
+class DishManagementSystem {
   getPage(
     restaurantId,
     {
@@ -674,11 +674,11 @@ class DishManagementPageSystem {
   }
 }
 
-export const dishManagementPageSystem =
-  new DishManagementPageSystem();
+export const dishManagementSystem =
+  new DishManagementSystem();
 
 export {
-  DishManagementPageSystem,
+  DishManagementSystem,
   DISH_CATEGORIES,
   COOKING_METHODS
 };
