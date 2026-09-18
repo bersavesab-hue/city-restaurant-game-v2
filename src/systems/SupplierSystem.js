@@ -360,15 +360,20 @@ class SupplierSystem {
       ) *
         volatility;
 
+    const rawUnitPrice =
+      ingredient
+        .basePurchasePrice *
+      offer.priceMultiplier *
+      relationshipDiscount *
+      priceFactor;
+
+
     const unitPrice =
       Math.max(
-        1,
-        Math.round(
-          ingredient
-            .basePurchasePrice *
-            offer.priceMultiplier *
-            relationshipDiscount *
-            priceFactor
+        0.0001,
+        Number(
+          rawUnitPrice
+            .toFixed(4)
         )
       );
 
@@ -379,8 +384,12 @@ class SupplierSystem {
       );
 
     const totalPrice =
-      Math.round(
-        unitPrice * quantity
+      Math.max(
+        1,
+        Math.round(
+          unitPrice *
+          quantity
+        )
       );
 
     const quote = {
