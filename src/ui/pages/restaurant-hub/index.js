@@ -1,9 +1,0 @@
-export {
-  restaurantHubPageSystem,
-  RestaurantHubPageSystem,
-} from "./RestaurantHubPageSystem.js";
-
-export {
-  restaurantHubView,
-  RestaurantHubView
-} from "./RestaurantHubView.js";

@@ -1,11 +1,10 @@
-import "../registry/employeePages.js";
+
 import {
   pageRegistry
 } from "../registry/PageRegistry.js";
 
 import "../registry/defaultPages.js";
 import "../registry/gameplayPages.js";
-
 
 const MAIN_LANDINGS =
   Object.freeze({
@@ -24,7 +23,6 @@ const MAIN_LANDINGS =
     more:
       "settings"
   });
-
 
 const ACTION_TARGETS =
   Object.freeze({
@@ -77,7 +75,6 @@ const ACTION_TARGETS =
       "operating-command-center"
   });
 
-
 class GameplayNavigationSystem {
   constructor() {
     this.currentPageId =
@@ -87,7 +84,6 @@ class GameplayNavigationSystem {
       this.currentPageId
     ];
   }
-
 
   getLandingPage(
     mainPageId
@@ -99,7 +95,6 @@ class GameplayNavigationSystem {
       mainPageId
     );
   }
-
 
   resolveActionTarget(
     target
@@ -134,7 +129,6 @@ class GameplayNavigationSystem {
     );
   }
 
-
   resolveNavigationTarget(
     pageId
   ) {
@@ -154,7 +148,6 @@ class GameplayNavigationSystem {
       )
     );
   }
-
 
   navigate(
     pageId,
@@ -239,7 +232,6 @@ class GameplayNavigationSystem {
     };
   }
 
-
   navigateAction(
     actionTarget,
     options = {}
@@ -251,7 +243,6 @@ class GameplayNavigationSystem {
       options
     );
   }
-
 
   back() {
     if (
@@ -287,13 +278,11 @@ class GameplayNavigationSystem {
     };
   }
 
-
   getCurrentPage() {
     return pageRegistry.get(
       this.currentPageId
     );
   }
-
 
   getMainNavigation() {
     return pageRegistry
@@ -315,7 +304,6 @@ class GameplayNavigationSystem {
       );
   }
 
-
   isMainPageActive(
     mainPageId
   ) {
@@ -336,7 +324,6 @@ class GameplayNavigationSystem {
       mainPageId
     );
   }
-
 
   bind(
     root,
@@ -422,7 +409,6 @@ class GameplayNavigationSystem {
     };
   }
 
-
   reset() {
     this.currentPageId =
       "operating-command-center";
@@ -432,7 +418,6 @@ class GameplayNavigationSystem {
     ];
   }
 }
-
 
 export const gameplayNavigationSystem =
   new GameplayNavigationSystem();

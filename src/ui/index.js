@@ -161,13 +161,6 @@ export {
 } from "./pages/operations-hub/index.js";
 
 export {
-  restaurantHubPageSystem,
-  RestaurantHubPageSystem,
-  restaurantHubView,
-  RestaurantHubView,
-} from "./pages/restaurant-hub/index.js";
-
-export {
   renderGameTopBar,
   renderNoticeTicker,
   renderPageTitle,

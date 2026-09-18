@@ -14,7 +14,7 @@ const {
 } = app.systems;
 
 test(
-  "菜品正式页面支持研发菜单成长调价和上下架",
+  "菜品管理系统支持研发菜单成长调价和上下架",
   () => {
     ingredientCatalogSystem.load(
       [
