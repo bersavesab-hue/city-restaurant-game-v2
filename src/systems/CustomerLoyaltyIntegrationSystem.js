@@ -7,8 +7,17 @@ import {
 } from "../core/EventBus.js";
 
 import {
+  customerSystem
+} from "./CustomerSystem.js";
+
+import {
+  customerIdentitySystem
+} from "./CustomerIdentitySystem.js";
+
+import {
   customerLoyaltySystem
 } from "./CustomerLoyaltySystem.js";
+
 
 class CustomerLoyaltyIntegrationSystem {
   constructor() {
@@ -17,6 +26,7 @@ class CustomerLoyaltyIntegrationSystem {
 
     this.start();
   }
+
 
   start() {
     if (this.started) {
@@ -45,6 +55,7 @@ class CustomerLoyaltyIntegrationSystem {
     return true;
   }
 
+
   isProcessed(orderId) {
     return entitySystem
       .filter(
@@ -55,6 +66,7 @@ class CustomerLoyaltyIntegrationSystem {
       )
       .length > 0;
   }
+
 
   markProcessed(
     order,
@@ -77,6 +89,7 @@ class CustomerLoyaltyIntegrationSystem {
       }
     );
   }
+
 
   getDishIds(order) {
     const result = [];
@@ -108,6 +121,221 @@ class CustomerLoyaltyIntegrationSystem {
 
     return result;
   }
+
+
+  canAutoEnroll(
+    restaurantId
+  ) {
+    return customerIdentitySystem
+      .isMembershipEnabled(
+        restaurantId
+      );
+  }
+
+
+  resolveMember({
+    restaurantId,
+    customerId,
+    segmentId,
+    satisfaction,
+    spend
+  }) {
+    let member =
+      customerLoyaltySystem
+        .findMember(
+          restaurantId,
+          customerId
+        );
+
+    if (
+      !member &&
+      segmentId &&
+      this.canAutoEnroll(
+        restaurantId
+      ) &&
+      customerLoyaltySystem
+        .shouldAutoEnroll({
+          segmentId,
+          satisfaction,
+          spend
+        })
+    ) {
+      member =
+        customerLoyaltySystem
+          .enrollMember({
+            restaurantId,
+            customerId,
+            segmentId,
+            source:
+              "behavioral_auto"
+          });
+    }
+
+    return member;
+  }
+
+
+  processAggregateOrder({
+    order,
+    satisfaction,
+    revenue
+  }) {
+    const visitors =
+      Math.max(
+        1,
+        Math.round(
+          order.orderCount ??
+          1
+        )
+      );
+
+    const segmentId =
+      order.customerSegmentId ??
+      order.segmentId ??
+      "general";
+
+    const recognized =
+      customerIdentitySystem
+        .resolveAggregateVisits({
+          restaurantId:
+            order.restaurantId,
+          segmentId,
+          visitors
+        });
+
+    const spendPerVisit =
+      Math.max(
+        0,
+        Math.round(
+          revenue /
+          visitors
+        )
+      );
+
+    const dishIds =
+      [
+        ...new Set(
+          this.getDishIds(
+            order
+          )
+        )
+      ];
+
+    let memberVisits = 0;
+    let memberRevenue = 0;
+
+    for (
+      let index = 0;
+      index < recognized.length;
+      index += 1
+    ) {
+      const customer =
+        recognized[index]
+          .customer;
+
+      const syntheticOrderId =
+        `${order.id}:recognized:${index}`;
+
+      customerSystem.recordVisit({
+        customerId:
+          customer.id,
+        restaurantId:
+          order.restaurantId,
+        orderId:
+          syntheticOrderId,
+        spend:
+          spendPerVisit,
+        satisfaction
+      });
+
+      const member =
+        this.resolveMember({
+          restaurantId:
+            order.restaurantId,
+          customerId:
+            customer.id,
+          segmentId,
+          satisfaction,
+          spend:
+            spendPerVisit
+        });
+
+      if (!member) {
+        continue;
+      }
+
+      customerLoyaltySystem
+        .recordMemberVisit({
+          restaurantId:
+            order.restaurantId,
+          customerId:
+            customer.id,
+          spend:
+            spendPerVisit,
+          satisfaction,
+          orderId:
+            syntheticOrderId,
+          dishIds,
+          segmentId
+        });
+
+      memberVisits += 1;
+      memberRevenue +=
+        spendPerVisit;
+    }
+
+    const anonymousVisitors =
+      Math.max(
+        0,
+        visitors -
+        memberVisits
+      );
+
+    if (
+      anonymousVisitors > 0
+    ) {
+      customerLoyaltySystem
+        .recordAnonymousTraffic({
+          restaurantId:
+            order.restaurantId,
+          segmentId,
+          visitors:
+            anonymousVisitors,
+          served:
+            anonymousVisitors,
+          revenue:
+            Math.max(
+              0,
+              revenue -
+              memberRevenue
+            ),
+          satisfaction
+        });
+    }
+
+    this.markProcessed(
+      order,
+      memberVisits > 0
+        ? "aggregate_mixed"
+        : "cohort"
+    );
+
+    return {
+      processed: true,
+
+      mode:
+        memberVisits > 0
+          ? "aggregate_mixed"
+          : "cohort",
+
+      visitors,
+      recognizedVisits:
+        recognized.length,
+      memberVisits,
+      anonymousVisitors
+    };
+  }
+
 
   processOrder(order) {
     if (
@@ -147,71 +375,49 @@ class CustomerLoyaltyIntegrationSystem {
         )
       );
 
+    if (order.aggregate) {
+      return this
+        .processAggregateOrder({
+          order,
+          satisfaction,
+          revenue
+        });
+    }
+
     if (order.customerId) {
-      const member =
-        customerLoyaltySystem
-          .findMember(
-            order.restaurantId,
-            order.customerId
-          );
-
-      let resolvedMember =
-        member;
-
       const segmentId =
         order.customerSegmentId ??
         order.segmentId ??
         null;
 
-      if (
-        !resolvedMember &&
-        segmentId &&
-        customerLoyaltySystem
-          .shouldAutoEnroll({
-            segmentId,
-            satisfaction,
-            spend:
-              revenue
-          })
-      ) {
-        resolvedMember =
-          customerLoyaltySystem
-            .enrollMember({
-              restaurantId:
-                order.restaurantId,
-
-              customerId:
-                order.customerId,
-
-              segmentId,
-
-              source:
-                "behavioral_auto"
-            });
-      }
+      const resolvedMember =
+        this.resolveMember({
+          restaurantId:
+            order.restaurantId,
+          customerId:
+            order.customerId,
+          segmentId,
+          satisfaction,
+          spend:
+            revenue
+        });
 
       if (resolvedMember) {
         customerLoyaltySystem
           .recordMemberVisit({
             restaurantId:
               order.restaurantId,
-
             customerId:
               order.customerId,
-
             spend:
               revenue,
-
             satisfaction,
-
             orderId:
               order.id,
-
             dishIds:
               this.getDishIds(
                 order
               ),
-
             segmentId
           });
 
@@ -227,17 +433,6 @@ class CustomerLoyaltyIntegrationSystem {
       }
     }
 
-    const visitors =
-      order.aggregate
-        ? Math.max(
-            1,
-            Math.round(
-              order.orderCount ??
-              1
-            )
-          )
-        : 1;
-
     customerLoyaltySystem
       .recordAnonymousTraffic({
         restaurantId:
@@ -248,13 +443,9 @@ class CustomerLoyaltyIntegrationSystem {
           order.segmentId ??
           "general",
 
-        visitors,
-
-        served:
-          visitors,
-
+        visitors: 1,
+        served: 1,
         revenue,
-
         satisfaction
       });
 
@@ -270,8 +461,10 @@ class CustomerLoyaltyIntegrationSystem {
   }
 }
 
+
 export const customerLoyaltyIntegrationSystem =
   new CustomerLoyaltyIntegrationSystem();
+
 
 export {
   CustomerLoyaltyIntegrationSystem
