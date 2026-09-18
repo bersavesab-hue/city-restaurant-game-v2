@@ -339,6 +339,16 @@ class MarketStrategyView {
                       </strong>
 
                       <span>
+                        ${item.templateName ??
+                          "独立经营店"
+                        }
+                        ·
+                        实力 T${item.strengthTier ??
+                          3
+                        }
+                      </span>
+
+                      <span>
                         口碑
                         ${item.reputation}
                       </span>
