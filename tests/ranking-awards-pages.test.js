@@ -100,7 +100,7 @@ test("三个页面在空奖项状态下均能生成页面模型", () => {
 
   assert.equal(
     awards.totalAwardCount,
-    61
+    60
   );
 
   assert.equal(

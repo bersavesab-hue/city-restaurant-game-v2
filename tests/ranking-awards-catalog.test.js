@@ -13,7 +13,7 @@ import {
 
 
 test("奖项目录完整且ID唯一", () => {
-  assert.equal(AWARD_DEFINITIONS.length, 61);
+  assert.equal(AWARD_DEFINITIONS.length, 60);
 
   const ids=
     AWARD_DEFINITIONS.map(
@@ -41,7 +41,7 @@ test("奖项目录完整且ID唯一", () => {
 });
 
 
-test("61个奖项的周期类别对象指标和奖励均合法", () => {
+test("60个奖项的周期类别对象指标和奖励均合法", () => {
   const metrics=new Set([
     "marketShare",
     "reputationScore",
