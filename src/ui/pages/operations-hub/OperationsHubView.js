@@ -32,6 +32,11 @@ class OperationsHubView {
                       type="button"
                       class="operations-hub__primary"
                       data-page-target="${entry.target}"
+                      ${entry.state ===
+                        "locked"
+                          ? "disabled"
+                          : ""
+                      }
                     >
                       <strong>
                         ${entry.title}
@@ -42,7 +47,11 @@ class OperationsHubView {
                       </span>
 
                       <b>
-                        进入 →
+                        ${entry.state ===
+                          "locked"
+                            ? `Lv.${entry.unlockLevel} 解锁`
+                            : "进入 →"
+                        }
                       </b>
                     </button>
 
