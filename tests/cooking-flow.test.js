@@ -11,7 +11,7 @@ import { recipeSystem } from "../src/systems/RecipeSystem.js";
 import { cookingSystem } from "../src/systems/CookingSystem.js";
 
 test(
-  "菜品完整链路：配方 -> 扣原料 -> 成本 -> 品质 -> 出品记录",
+  "菜品完整链路：配方 -> 扣原料 -> 成本 -> 单次出品质量 -> 出品记录",
   () => {
     gameState.reset();
 
@@ -144,14 +144,14 @@ test(
     );
 
     assert.ok(
-      result.qualityScore >= 0 &&
-      result.qualityScore <= 100
+      result.outputQualityScore >= 0 &&
+      result.outputQualityScore <= 100
     );
 
     assert.ok(
       ["C", "B", "A", "S"]
         .includes(
-          result.qualityGrade
+          result.outputGrade
         )
     );
 
