@@ -2,7 +2,6 @@ import { dataRegistry } from "../core/DataRegistry.js";
 import {
   INGREDIENT_CATEGORY,
   INGREDIENT_UNIT,
-  INGREDIENT_QUALITY,
   STORAGE_TYPE
 } from "../data/ingredientRules.js";
 
@@ -14,10 +13,6 @@ const validCategories = new Set(
 
 const validUnits = new Set(
   Object.values(INGREDIENT_UNIT)
-);
-
-const validQualities = new Set(
-  Object.values(INGREDIENT_QUALITY)
 );
 
 const validStorageTypes = new Set(
@@ -58,12 +53,6 @@ function validateIngredient(item) {
   if (!validUnits.has(item.unit)) {
     throw new Error(
       `Ingredient "${item.id}" has invalid unit`
-    );
-  }
-
-  if (!validQualities.has(item.baseQuality)) {
-    throw new Error(
-      `Ingredient "${item.id}" has invalid baseQuality`
     );
   }
 
