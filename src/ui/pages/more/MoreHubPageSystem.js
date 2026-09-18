@@ -60,6 +60,14 @@ const MORE_GROUPS =
         },
 
         {
+          id: "compliance-center",
+          title: "合规中心",
+          description: "证照申请、续期、抽查、整改与处罚管理",
+          target: "compliance-center",
+          state: "ready"
+        },
+
+        {
           id: "chain",
           title: "连锁管理",
           description: "多门店、品牌扩张与连锁经营",
