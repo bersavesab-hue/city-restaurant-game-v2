@@ -136,27 +136,33 @@ class CustomerLoyaltySystem {
       return 50;
     }
 
+    let segment = null;
+
     try {
-      return getMemberEnrollmentPropensity(
+      segment =
         customerSegmentSystem.get(
           segmentId
-        )
-      );
+        );
     } catch {
-      const fallback =
+      segment = null;
+    }
+
+    if (!segment) {
+      segment =
         CUSTOMER_SEGMENTS_V3
           .find(
             item =>
               item.id ===
               segmentId
-          );
-
-      return fallback
-        ? getMemberEnrollmentPropensity(
-            fallback
-          )
-        : 50;
+          ) ??
+        null;
     }
+
+    return segment
+      ? getMemberEnrollmentPropensity(
+          segment
+        )
+      : 50;
   }
 
   shouldAutoEnroll({
