@@ -4,6 +4,7 @@ import { restaurantSystem } from "./RestaurantSystem.js";
 import { reviewInsightSystem } from "./ReviewInsightSystem.js";
 import { layoutFlowSystem } from "./LayoutFlowSystem.js";
 import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
+import { marketActionSystem } from "./MarketActionSystem.js";
 
 function clamp(value, min, max) {
   return Math.max(
@@ -180,6 +181,12 @@ class CustomerExperienceSystem {
         restaurantId
       );
 
+    const marketing =
+      marketActionSystem
+        .getModifiers(
+          restaurantId
+        );
+
     const served =
       result.completedOrders ?? 0;
 
@@ -245,7 +252,15 @@ class CustomerExperienceSystem {
     const qualityScore =
       served > 0
         ? clamp(
-            result.averageQuality ?? 60,
+            (
+              result.averageQuality ??
+              60
+            ) +
+            (
+              marketing
+                .qualityBonus ??
+              0
+            ),
             0,
             100
           )
@@ -263,9 +278,16 @@ class CustomerExperienceSystem {
 
     const serviceScore =
       clamp(
-        100 -
-        queueRate * 30 -
-        failureRate * 55,
+        (
+          100 -
+          queueRate * 30 -
+          failureRate * 55
+        ) *
+        (
+          marketing
+            .serviceCapacityMultiplier ??
+          1
+        ),
         0,
         100
       );
@@ -313,7 +335,12 @@ class CustomerExperienceSystem {
         clamp(
           (satisfaction - 30) *
             1.35 *
-            repeatPreferenceFactor,
+            repeatPreferenceFactor *
+            (
+              marketing
+                .repeatIntentMultiplier ??
+              1
+            ),
           0,
           90
         )
@@ -345,12 +372,19 @@ class CustomerExperienceSystem {
 
     const reviewRate =
       clamp(
-        0.04 +
-        reviewPropensity /
-        100 *
-        0.14,
+        (
+          0.04 +
+          reviewPropensity /
+          100 *
+          0.14
+        ) *
+        (
+          marketing
+            .reviewPropensityMultiplier ??
+          1
+        ),
         0.04,
-        0.18
+        0.3
       );
 
     const reviewCount =
@@ -504,6 +538,28 @@ class CustomerExperienceSystem {
             3
           )
         ),
+
+      marketingEffects: {
+        qualityBonus:
+          marketing
+            .qualityBonus ??
+          0,
+
+        serviceCapacityMultiplier:
+          marketing
+            .serviceCapacityMultiplier ??
+          1,
+
+        repeatIntentMultiplier:
+          marketing
+            .repeatIntentMultiplier ??
+          1,
+
+        reviewPropensityMultiplier:
+          marketing
+            .reviewPropensityMultiplier ??
+          1
+      },
 
       reviewScore:
         updated.reviewScore,
