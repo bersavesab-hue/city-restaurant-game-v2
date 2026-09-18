@@ -156,6 +156,15 @@ import {
 
 
 import {
+  complianceCenterPageSystem
+} from "../pages/compliance/ComplianceCenterPageSystem.js";
+
+import {
+  complianceCenterView
+} from "../pages/compliance/ComplianceCenterView.js";
+
+
+import {
   operationsHubPageSystem
 } from "../pages/operations-hub/OperationsHubPageSystem.js";
 
@@ -414,6 +423,28 @@ const FORMAL_PAGE_DEFINITIONS =
         "member:levelChanged",
         "member:pointsExpired",
         "member:pointsRedeemed"
+      ]
+    },
+
+
+    "compliance-center": {
+      pageSystem:
+        complianceCenterPageSystem,
+
+      view:
+        complianceCenterView,
+
+      mode:
+        "mount",
+
+      refreshEvents: [
+        "compliance:applicationSubmitted",
+        "compliance:permitIssued",
+        "compliance:permitRenewed",
+        "compliance:permitExpired",
+        "compliance:inspectionCompleted",
+        "compliance:violationCreated",
+        "compliance:violationResolved"
       ]
     },
 
