@@ -8,6 +8,20 @@ import { leaseSystem } from "../../../systems/LeaseSystem.js";
 import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
 import { pageRegistry } from "../../registry/PageRegistry.js";
 
+function clamp(
+  value,
+  min,
+  max
+) {
+  return Math.max(
+    min,
+    Math.min(
+      max,
+      value
+    )
+  );
+}
+
 function safeBalance(restaurantId) {
   if (!restaurantId) {
     return null;
@@ -72,7 +86,73 @@ class CityPropertyPageSystem {
         enriched.leaseTerms?.maxMonths ?? defaultMonths
       )
     );
-    const day = gameState.getSection("time")?.day ?? 1;
+    const day =
+      gameState.getSection(
+        "time"
+      )?.day ??
+      1;
+
+    const qualityScore =
+      enriched
+        .marketMeta
+        ?.qualityScore ??
+      50;
+
+    const districtOpportunityScore =
+      district
+        ? districtSystem
+            .getOpportunityScore(
+              district
+            )
+        : 0;
+
+    let positioningAffinity = 1;
+
+    if (
+      restaurantId &&
+      district
+    ) {
+      try {
+        const restaurant =
+          restaurantSystem.get(
+            restaurantId
+          );
+
+        positioningAffinity =
+          districtSystem
+            .getPositioningAffinity(
+              district,
+              restaurant
+                .positioningId
+            );
+      } catch {
+        positioningAffinity = 1;
+      }
+    }
+
+    const positioningScore =
+      Math.round(
+        clamp(
+          60 +
+          (
+            positioningAffinity -
+            1
+          ) *
+          80,
+          30,
+          100
+        )
+      );
+
+    const recommendationScore =
+      Math.round(
+        districtOpportunityScore *
+          0.55 +
+        qualityScore *
+          0.3 +
+        positioningScore *
+          0.15
+      );
 
     return {
       id: enriched.id,
@@ -96,7 +176,22 @@ class CityPropertyPageSystem {
       floors: buildFloorSummary(enriched),
       source: enriched.source ?? "manual",
       propertyType: enriched.propertyType ?? null,
-      qualityScore: enriched.marketMeta?.qualityScore ?? null,
+      qualityScore,
+
+      recommendation: {
+        score:
+          recommendationScore,
+
+        districtOpportunityScore,
+
+        positioningAffinity:
+          Number(
+            positioningAffinity
+              .toFixed(2)
+          ),
+
+        positioningScore
+      },
       landlord: structuredClone(enriched.landlord ?? null),
       leaseTerms: structuredClone(enriched.leaseTerms ?? null),
       competition: {
@@ -121,10 +216,39 @@ class CityPropertyPageSystem {
       quote,
       district: district
         ? {
-            trafficIndex: district.trafficIndex,
-            spendingPower: district.spendingPower,
-            competition: district.competition,
-            customerMix: district.customerMix ?? null
+            trafficIndex:
+              district.trafficIndex,
+            spendingPower:
+              district.spendingPower,
+            competition:
+              district.competition,
+            rentMultiplier:
+              district.rentMultiplier,
+            deliveryDemand:
+              district.deliveryDemand ??
+              50,
+            parkingConvenience:
+              district
+                .parkingConvenience ??
+              50,
+            transitAccess:
+              district
+                .transitAccess ??
+              50,
+            seasonality:
+              district.seasonality ??
+              1,
+            positioningAffinity:
+              district
+                .positioningAffinity ??
+              null,
+            mealPeriodWeights:
+              district
+                .mealPeriodWeights ??
+              null,
+            customerMix:
+              district.customerMix ??
+              null
           }
         : null
     };
@@ -174,16 +298,52 @@ class CityPropertyPageSystem {
           !exhaustRequired || item.exhaustAllowed !== false
       )
       .map(item => this.buildPropertyCard(item, restaurantId))
-      .sort((a, b) => {
-        const qualityA = a.qualityScore ?? 50;
-        const qualityB = b.qualityScore ?? 50;
+      .sort(
+        (a, b) => {
+          const scoreA =
+            a.recommendation
+              ?.score ??
+            0;
 
-        if (qualityA !== qualityB) {
-          return qualityB - qualityA;
+          const scoreB =
+            b.recommendation
+              ?.score ??
+            0;
+
+          if (
+            scoreA !==
+            scoreB
+          ) {
+            return (
+              scoreB -
+              scoreA
+            );
+          }
+
+          const qualityA =
+            a.qualityScore ??
+            50;
+
+          const qualityB =
+            b.qualityScore ??
+            50;
+
+          if (
+            qualityA !==
+            qualityB
+          ) {
+            return (
+              qualityB -
+              qualityA
+            );
+          }
+
+          return (
+            a.monthlyRent -
+            b.monthlyRent
+          );
         }
-
-        return a.monthlyRent - b.monthlyRent;
-      });
+      );
 
     const activeLease = restaurantId
       ? leaseSystem.getByRestaurant(restaurantId) ?? null
@@ -201,8 +361,49 @@ class CityPropertyPageSystem {
         name: item.name,
         trafficIndex: item.trafficIndex,
         spendingPower: item.spendingPower,
-        competition: item.competition,
-        customerMix: item.customerMix ?? null,
+        competition:
+          item.competition,
+
+        rentMultiplier:
+          item.rentMultiplier,
+
+        deliveryDemand:
+          item.deliveryDemand ??
+          50,
+
+        parkingConvenience:
+          item
+            .parkingConvenience ??
+          50,
+
+        transitAccess:
+          item.transitAccess ??
+          50,
+
+        seasonality:
+          item.seasonality ??
+          1,
+
+        opportunityScore:
+          districtSystem
+            .getOpportunityScore(
+              item
+            ),
+
+        positioningAffinity:
+          item
+            .positioningAffinity ??
+          null,
+
+        mealPeriodWeights:
+          item
+            .mealPeriodWeights ??
+          null,
+
+        customerMix:
+          item.customerMix ??
+          null,
+
         propertyCount: properties.filter(
           property => property.districtId === item.id
         ).length
