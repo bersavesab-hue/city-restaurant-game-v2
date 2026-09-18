@@ -7,60 +7,48 @@ import {
   FINANCE_CATEGORY
 } from "./FinanceSystem.js";
 
-import { restaurantSystem } from "./RestaurantSystem.js";
+import {
+  restaurantSystem
+} from "./RestaurantSystem.js";
 
-const ACTIONS = Object.freeze({
-  local_ads: {
-    id: "local_ads",
-    name: "本地广告",
-    cost: 2000,
-    durationDays: 5,
+import {
+  salesChannelSystem
+} from "./SalesChannelSystem.js";
 
-    modifiers: {
-      demandMultiplier: 1.12,
-      marketAppealMultiplier: 1.08
-    }
-  },
+import {
+  MARKETING_ACTIONS_V1
+} from "../data/marketingActions.v1.js";
 
-  flash_coupon: {
-    id: "flash_coupon",
-    name: "限时优惠",
-    cost: 1000,
-    durationDays: 3,
+const ACTIONS = Object.freeze(
+  Object.fromEntries(
+    MARKETING_ACTIONS_V1.map(
+      item => [
+        item.id,
+        item
+      ]
+    )
+  )
+);
 
-    modifiers: {
-      priceMultiplier: 0.9,
-      demandMultiplier: 1.08,
-      marketAppealMultiplier: 1.1
-    }
-  },
-
-  quality_campaign: {
-    id: "quality_campaign",
-    name: "品质强化",
-    cost: 3500,
-    durationDays: 7,
-
-    modifiers: {
-      qualityBonus: 8,
-      marketAppealMultiplier: 1.07
-    }
-  },
-
-  service_campaign: {
-    id: "service_campaign",
-    name: "服务强化",
-    cost: 2500,
-    durationDays: 7,
-
-    modifiers: {
-      serviceCapacityMultiplier: 1.2,
-      marketAppealMultiplier: 1.05
-    }
-  }
-});
+function clamp(
+  value,
+  min,
+  max
+) {
+  return Math.max(
+    min,
+    Math.min(
+      max,
+      value
+    )
+  );
+}
 
 class MarketActionSystem {
+  getDefinitions() {
+    return MARKETING_ACTIONS_V1;
+  }
+
   getDefinition(type) {
     const action =
       ACTIONS[type];
@@ -101,6 +89,38 @@ class MarketActionSystem {
     );
   }
 
+  getHistory(
+    restaurantId
+  ) {
+    return (
+      restaurantSystem.get(
+        restaurantId
+      ).marketActionHistory ??
+      []
+    );
+  }
+
+  getLastRun(
+    restaurantId,
+    type
+  ) {
+    return this
+      .getHistory(
+        restaurantId
+      )
+      .filter(
+        item =>
+          item.type ===
+          type
+      )
+      .sort(
+        (a, b) =>
+          b.startDay -
+          a.startDay
+      )[0] ??
+      null;
+  }
+
   getModifiers(
     restaurantId
   ) {
@@ -114,10 +134,17 @@ class MarketActionSystem {
       priceMultiplier: 1,
       qualityBonus: 0,
       serviceCapacityMultiplier: 1,
-      marketAppealMultiplier: 1
+      marketAppealMultiplier: 1,
+      repeatIntentMultiplier: 1,
+      reviewPropensityMultiplier: 1,
+      segmentMultipliers: {},
+      channelMultipliers: {}
     };
 
-    for (const action of actions) {
+    for (
+      const action
+      of actions
+    ) {
       const definition =
         ACTIONS[action.type];
 
@@ -151,9 +178,302 @@ class MarketActionSystem {
         modifiers
           .marketAppealMultiplier ??
         1;
+
+      result
+        .repeatIntentMultiplier *=
+        modifiers
+          .repeatIntentMultiplier ??
+        1;
+
+      result
+        .reviewPropensityMultiplier *=
+        modifiers
+          .reviewPropensityMultiplier ??
+        1;
+
+      for (
+        const [
+          segmentId,
+          multiplier
+        ]
+        of Object.entries(
+          modifiers.segmentMultipliers ??
+          {}
+        )
+      ) {
+        result.segmentMultipliers[
+          segmentId
+        ] =
+          (
+            result.segmentMultipliers[
+              segmentId
+            ] ??
+            1
+          ) *
+          multiplier;
+      }
+
+      for (
+        const [
+          channelId,
+          multiplier
+        ]
+        of Object.entries(
+          modifiers.channelMultipliers ??
+          {}
+        )
+      ) {
+        result.channelMultipliers[
+          channelId
+        ] =
+          (
+            result.channelMultipliers[
+              channelId
+            ] ??
+            1
+          ) *
+          multiplier;
+      }
     }
 
+    result.demandMultiplier =
+      clamp(
+        result.demandMultiplier,
+        0.5,
+        2
+      );
+
+    result.priceMultiplier =
+      clamp(
+        result.priceMultiplier,
+        0.5,
+        1.5
+      );
+
+    result.marketAppealMultiplier =
+      clamp(
+        result.marketAppealMultiplier,
+        0.5,
+        2
+      );
+
+    result.repeatIntentMultiplier =
+      clamp(
+        result.repeatIntentMultiplier,
+        0.5,
+        2
+      );
+
+    result.reviewPropensityMultiplier =
+      clamp(
+        result.reviewPropensityMultiplier,
+        0.5,
+        2
+      );
+
     return result;
+  }
+
+  getChannelMultiplier(
+    restaurantId,
+    channelId
+  ) {
+    return (
+      this.getModifiers(
+        restaurantId
+      )
+      .channelMultipliers[
+        channelId
+      ] ??
+      1
+    );
+  }
+
+  getSegmentMultiplier(
+    restaurantId,
+    segmentId
+  ) {
+    return (
+      this.getModifiers(
+        restaurantId
+      )
+      .segmentMultipliers[
+        segmentId
+      ] ??
+      1
+    );
+  }
+
+  getAvailability(
+    restaurantId,
+    type,
+    day = null
+  ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    const definition =
+      this.getDefinition(
+        type
+      );
+
+    const currentDay =
+      day ??
+      gameState.getSection(
+        "time"
+      ).day;
+
+    const active =
+      this.getActiveActions(
+        restaurantId,
+        currentDay
+      );
+
+    const balance =
+      financeSystem.getBalance(
+        restaurantId
+      );
+
+    const reasons = [];
+
+    if (
+      (
+        restaurant.level ??
+        1
+      ) <
+      definition
+        .minRestaurantLevel
+    ) {
+      reasons.push(
+        "restaurant_level"
+      );
+    }
+
+    if (
+      balance <
+      definition.cost
+    ) {
+      reasons.push(
+        "insufficient_funds"
+      );
+    }
+
+    if (
+      active.length >=
+      2
+    ) {
+      reasons.push(
+        "active_limit"
+      );
+    }
+
+    if (
+      active.some(
+        item =>
+          item.type ===
+          type
+      )
+    ) {
+      reasons.push(
+        "already_active"
+      );
+    }
+
+    if (
+      active.some(
+        item =>
+          (
+            ACTIONS[item.type]
+              ?.exclusiveGroup ??
+            null
+          ) ===
+          definition
+            .exclusiveGroup
+      )
+    ) {
+      reasons.push(
+        "exclusive_group"
+      );
+    }
+
+    const activeChannels =
+      new Set(
+        salesChannelSystem
+          .getActiveChannels(
+            restaurantId
+          )
+          .map(
+            item =>
+              item.id
+          )
+      );
+
+    const missingChannels =
+      definition
+        .requiredChannels
+        .filter(
+          channelId =>
+            !activeChannels.has(
+              channelId
+            )
+        );
+
+    if (
+      missingChannels.length >
+      0
+    ) {
+      reasons.push(
+        "required_channel"
+      );
+    }
+
+    const last =
+      this.getLastRun(
+        restaurantId,
+        type
+      );
+
+    const availableDay =
+      last
+        ? (
+            last.endDay +
+            definition
+              .cooldownDays +
+            1
+          )
+        : currentDay;
+
+    if (
+      last &&
+      currentDay <
+      availableDay
+    ) {
+      reasons.push(
+        "cooldown"
+      );
+    }
+
+    return {
+      canStart:
+        reasons.length ===
+        0,
+
+      reasons,
+
+      missingChannels,
+
+      availableDay,
+
+      currentDay,
+
+      balance,
+
+      restaurantLevel:
+        restaurant.level ??
+        1
+    };
   }
 
   startAction(
@@ -175,37 +495,18 @@ class MarketActionSystem {
         "time"
       );
 
-    const current =
-      this.getActiveActions(
+    const availability =
+      this.getAvailability(
         restaurantId,
+        type,
         time.day
       );
 
     if (
-      current.some(
-        item =>
-          item.type === type
-      )
+      !availability.canStart
     ) {
       throw new Error(
-        "Same market action is already active"
-      );
-    }
-
-    if (current.length >= 2) {
-      throw new Error(
-        "Maximum two market actions can run together"
-      );
-    }
-
-    if (
-      financeSystem.getBalance(
-        restaurantId
-      ) <
-      definition.cost
-    ) {
-      throw new Error(
-        "Insufficient funds for market action"
+        `Market action unavailable: ${availability.reasons.join(",")}`
       );
     }
 
@@ -225,6 +526,9 @@ class MarketActionSystem {
       name:
         definition.name,
 
+      category:
+        definition.category,
+
       cost:
         definition.cost,
 
@@ -236,6 +540,12 @@ class MarketActionSystem {
         definition.durationDays -
         1
     };
+
+    const current =
+      this.getActiveActions(
+        restaurantId,
+        time.day
+      );
 
     const active = [
       ...current,
@@ -255,10 +565,14 @@ class MarketActionSystem {
       }
     ];
 
-    if (history.length > 20) {
+    if (
+      history.length >
+      80
+    ) {
       history.splice(
         0,
-        history.length - 20
+        history.length -
+        80
       );
     }
 
@@ -278,7 +592,11 @@ class MarketActionSystem {
       "market:actionStarted",
       {
         restaurantId,
-        action
+        action,
+        definition:
+          structuredClone(
+            definition
+          )
       }
     );
 
@@ -320,16 +638,48 @@ class MarketActionSystem {
           item.endDay
       );
 
+    const expiredIds =
+      new Set(
+        expired.map(
+          item =>
+            item.id
+        )
+      );
+
+    const history =
+      (
+        restaurant
+          .marketActionHistory ??
+        []
+      ).map(
+        item =>
+          expiredIds.has(
+            item.id
+          )
+            ? {
+                ...item,
+                status: "ended",
+                endedDay:
+                  currentDay
+              }
+            : item
+      );
+
     entitySystem.update(
       "restaurant",
       restaurantId,
       {
         activeMarketActions:
-          active
+          active,
+        marketActionHistory:
+          history
       }
     );
 
-    for (const action of expired) {
+    for (
+      const action
+      of expired
+    ) {
       eventBus.emit(
         "market:actionEnded",
         {
@@ -344,7 +694,9 @@ class MarketActionSystem {
     return expired.length;
   }
 
-  processDay(currentDay) {
+  processDay(
+    currentDay
+  ) {
     let expired = 0;
 
     for (
@@ -366,11 +718,13 @@ class MarketActionSystem {
   getStatus(
     restaurantId
   ) {
+    const active =
+      this.getActiveActions(
+        restaurantId
+      );
+
     return {
-      active:
-        this.getActiveActions(
-          restaurantId
-        ),
+      active,
 
       modifiers:
         this.getModifiers(
@@ -378,9 +732,17 @@ class MarketActionSystem {
         ),
 
       available:
-        Object.values(
-          ACTIONS
-        )
+        MARKETING_ACTIONS_V1
+          .map(
+            item => ({
+              ...item,
+              availability:
+                this.getAvailability(
+                  restaurantId,
+                  item.id
+                )
+            })
+          )
     };
   }
 }
