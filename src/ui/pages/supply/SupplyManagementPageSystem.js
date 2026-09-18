@@ -3,6 +3,7 @@ import { supplierTradingSystem } from "../../../systems/SupplierTradingSystem.js
 import { procurementSystem } from "../../../systems/ProcurementSystem.js";
 import { ingredientCatalogSystem } from "../../../systems/IngredientCatalogSystem.js";
 import { supplierSystem } from "../../../systems/SupplierSystem.js";
+import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
 
 function safeBalance(
   restaurantId
@@ -21,9 +22,17 @@ class SupplyManagementPageSystem {
   getPage(
     restaurantId
   ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
     const suppliers =
       supplierTradingSystem
-        .listProfiles();
+        .listProfiles({
+          storeLevel:
+            restaurant.level
+        });
 
     const inventory =
       supplierTradingSystem
@@ -223,10 +232,20 @@ class SupplyManagementPageSystem {
     );
   }
 
-  getAutoPolicyOptions() {
+  getAutoPolicyOptions(
+    restaurantId
+  ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
     const suppliers =
       supplierTradingSystem
-        .listProfiles();
+        .listProfiles({
+          storeLevel:
+            restaurant.level
+        });
 
     return {
       suppliers:
