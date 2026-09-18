@@ -32,24 +32,94 @@ class PropertyVenueSystem {
       throw new Error(`Unknown venue type "${venueTypeId}"`);
     }
 
-    const property = propertySystem.get(propertyId);
-    const district = districtSystem.get(property.districtId);
-    const rentMultiplier =
-      economicBaselineSystem.getVenueRentMultiplier(
-        venue,
-        district
+    const property =
+      propertySystem.get(
+        propertyId
       );
 
-    return entitySystem.update("property", property.id, {
-      venueTypeId,
-      monthlyRent: Math.max(
-        1,
-        Math.round(
-          property.baseMonthlyRent *
-          rentMultiplier
-        )
-      )
-    });
+    const district =
+      districtSystem.get(
+        property.districtId
+      );
+
+    const frontageFactor =
+      property.frontageMeters
+        ? Math.max(
+            0.88,
+            Math.min(
+              1.18,
+              0.94 +
+              property.frontageMeters /
+                80
+            )
+          )
+        : 1;
+
+    const floorFactor =
+      (
+        property.floorCount ??
+        1
+      ) >
+      1
+        ? 0.92
+        : 1;
+
+    const rent =
+      economicBaselineSystem
+        .calculateMonthlyRent({
+          districtId:
+            district.id,
+
+          area:
+            property.usableArea ??
+            property.area,
+
+          venueType:
+            venue,
+
+          frontageFactor,
+
+          floorFactor
+        });
+
+    if (!rent) {
+      throw new Error(
+        "Reality rent reference is unavailable for this property"
+      );
+    }
+
+    return entitySystem.update(
+      "property",
+      property.id,
+      {
+        venueTypeId,
+
+        baseMonthlyRent:
+          rent.monthlyRent,
+
+        monthlyRent:
+          rent.monthlyRent,
+
+        rentReferencePerSquareMeter:
+          rent.referencePerSquareMeter,
+
+        rentMultiplier:
+          rent.multiplier,
+
+        rentModel:
+          "reality_1_to_1_v2",
+
+        rentCurrency:
+          "CNY",
+
+        rentSource:
+          rent.source
+            ? structuredClone(
+                rent.source
+              )
+            : null
+      }
+    );
   }
 }
 
