@@ -242,7 +242,7 @@ class OpeningSetupView {
             </strong>
 
             <span>
-              根据房源、装修与菜单自动判断必要项目
+              根据房源、装修与菜单判断申请条件，提交后按办理天数自动审核
             </span>
           </div>
 
@@ -278,9 +278,11 @@ class OpeningSetupView {
                       ${
                         permit.issued
                           ? "✓"
-                          : permit.required
-                            ? "•"
-                            : "—"
+                          : permit.applicationPending
+                            ? "…"
+                            : permit.required
+                              ? "•"
+                              : "—"
                       }
                     </span>
 
@@ -295,6 +297,17 @@ class OpeningSetupView {
                         ${escapeHtml(
                           permit.reason
                         )}
+                      </small>
+
+                      <small>
+                        ${permit.issued
+                          ? `有效至第${permit.record?.expiresDay ?? "-"}天`
+                          : permit.applicationPending
+                            ? `审核中 · 预计第${permit.record?.reviewReadyDay ?? "-"}天完成`
+                            : permit.required
+                              ? `申请费¥${permit.applicationFee} · 办理${permit.processingDays}天`
+                              : "当前无需申请"
+                        }
                       </small>
                     </div>
 
@@ -313,6 +326,7 @@ class OpeningSetupView {
           data-opening-action="permits"
           ${
             page.permits.complete ||
+            page.permits.pendingCount > 0 ||
             !page.permits
               .allRequirementsReady
               ? "disabled"
@@ -321,8 +335,10 @@ class OpeningSetupView {
         >
           ${
             page.permits.complete
-              ? "许可检查已完成"
-              : "完成开业许可检查"
+              ? "必要许可已签发"
+              : page.permits.pendingCount > 0
+                ? `审核中（${page.permits.pendingCount}项）`
+                : "提交全部必要许可申请"
           }
         </button>
 
@@ -634,12 +650,19 @@ class OpeningSetupView {
                   data-opening-action="permits"
                   ${
                     page.permits
-                      .allRequirementsReady
+                      .allRequirementsReady &&
+                    page.permits
+                      .pendingCount === 0
                       ? ""
                       : "disabled"
                   }
                 >
-                  完成许可检查
+                  ${
+                    page.permits
+                      .pendingCount > 0
+                      ? "许可审核中"
+                      : "提交许可申请"
+                  }
                 </button>
               `
               : next.id ===
@@ -789,8 +812,18 @@ class OpeningSetupView {
                     this.restaurantId
                   );
 
+                const pending =
+                  this.pageSystem
+                    .getPage(
+                      this.restaurantId
+                    )
+                    .permits
+                    .pendingCount;
+
                 this.message =
-                  "开业许可检查已经完成";
+                  pending > 0
+                    ? `已提交${pending}项许可申请，推进游戏日期等待审核`
+                    : "必要许可已经完成";
 
                 this.render();
               } catch (
