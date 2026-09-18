@@ -54,6 +54,10 @@ import {
 } from "../pages/city/CityMapView.js";
 
 import {
+  CityPropertyView
+} from "../pages/city/CityPropertyView.js";
+
+import {
   PropertyDetailView
 } from "../pages/city/PropertyDetailView.js";
 
@@ -507,15 +511,6 @@ function navigate(
   try {
     if (
       pageId ===
-      "properties"
-    ) {
-      pageId =
-        "city";
-    }
-
-
-    if (
-      pageId ===
       "employees"
     ) {
       pageId =
@@ -553,6 +548,29 @@ function navigate(
         });
 
       currentView.mount();
+
+      return;
+    }
+
+
+    if (
+      pageId ===
+      "properties"
+    ) {
+      currentView =
+        new CityPropertyView({
+          onNavigate:
+            navigate
+        });
+
+      currentView.mount(
+        root,
+        {
+          restaurantId,
+          filters:
+            params
+        }
+      );
 
       return;
     }
