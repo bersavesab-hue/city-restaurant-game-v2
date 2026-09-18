@@ -52,7 +52,170 @@ function safeKey(
 }
 
 
+const PERIOD_REWARD_CAPS =
+  Object.freeze({
+    monthly: Object.freeze({
+      reputation: 2,
+      experience: 300
+    }),
+    quarterly: Object.freeze({
+      reputation: 4,
+      experience: 800
+    }),
+    annual: Object.freeze({
+      reputation: 10,
+      experience: 2000
+    })
+  });
+
+
 class AwardSystem {
+  getRewardGrantId(
+    restaurantId,
+    periodKey
+  ) {
+    return [
+      "award_period_reward",
+      safeKey(
+        restaurantId
+      ),
+      safeKey(
+        periodKey
+      )
+    ].join("__");
+  }
+
+
+  allocateStoreReward(
+    definition,
+    winner,
+    periodKey
+  ) {
+    const zero = {
+      reputation: 0,
+      experience: 0
+    };
+
+
+    if (
+      definition.subject !==
+        "restaurant" ||
+      !winner?.restaurantId
+    ) {
+      return zero;
+    }
+
+
+    const caps =
+      PERIOD_REWARD_CAPS[
+        definition.period
+      ] ??
+      zero;
+
+
+    const id =
+      this.getRewardGrantId(
+        winner.restaurantId,
+        periodKey
+      );
+
+
+    const existing =
+      entitySystem.get(
+        "award_period_reward",
+        id
+      );
+
+
+    const reputationUsed =
+      existing
+        ?.reputation ??
+      0;
+
+
+    const experienceUsed =
+      existing
+        ?.experience ??
+      0;
+
+
+    const reputation =
+      Math.max(
+        0,
+        Math.min(
+          Math.max(
+            0,
+            caps.reputation -
+            reputationUsed
+          ),
+          Math.max(
+            0,
+            definition.reward
+              .reputation ??
+            0
+          )
+        )
+      );
+
+
+    const experience =
+      Math.max(
+        0,
+        Math.min(
+          Math.max(
+            0,
+            caps.experience -
+            experienceUsed
+          ),
+          Math.max(
+            0,
+            definition.reward
+              .experience ??
+            0
+          )
+        )
+      );
+
+
+    const next = {
+      restaurantId:
+        winner.restaurantId,
+      period:
+        definition.period,
+      periodKey,
+      reputation:
+        reputationUsed +
+        reputation,
+      experience:
+        experienceUsed +
+        experience
+    };
+
+
+    if (existing) {
+      entitySystem.update(
+        "award_period_reward",
+        id,
+        next
+      );
+    } else {
+      entitySystem.create(
+        "award_period_reward",
+        next,
+        {
+          id
+        }
+      );
+    }
+
+
+    return {
+      reputation,
+      experience
+    };
+  }
+
+
   getPeriodKey(
     period,
     endDay
@@ -304,6 +467,14 @@ class AwardSystem {
           honorId
         )
       ) {
+        const appliedReward =
+          this.allocateStoreReward(
+            definition,
+            winner,
+            periodKey
+          );
+
+
         entitySystem.create(
           "honor_record",
           {
@@ -347,6 +518,11 @@ class AwardSystem {
 
             reward:
               structuredClone(
+                appliedReward
+              ),
+
+            nominalReward:
+              structuredClone(
                 definition.reward
               ),
 
@@ -361,7 +537,7 @@ class AwardSystem {
 
 
         if (
-          definition.reward
+          appliedReward
             .reputation >
           0
         ) {
@@ -369,14 +545,14 @@ class AwardSystem {
             .changeReputation(
               winner
                 .restaurantId,
-              definition.reward
+              appliedReward
                 .reputation
             );
         }
 
 
         if (
-          definition.reward
+          appliedReward
             .experience >
           0
         ) {
@@ -384,7 +560,7 @@ class AwardSystem {
             .addExperience(
               winner
                 .restaurantId,
-              definition.reward
+              appliedReward
                 .experience
             );
         }
@@ -407,6 +583,11 @@ class AwardSystem {
               ),
 
             reward:
+              structuredClone(
+                appliedReward
+              ),
+
+            nominalReward:
               structuredClone(
                 definition.reward
               )
