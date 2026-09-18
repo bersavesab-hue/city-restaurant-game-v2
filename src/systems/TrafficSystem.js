@@ -17,6 +17,7 @@ import { serviceCapacitySystem } from "./ServiceCapacitySystem.js";
 import { marketActionSystem } from "./MarketActionSystem.js";
 import { salesChannelSystem } from "./SalesChannelSystem.js";
 import { customerSegmentSystem } from "./CustomerSegmentSystem.js";
+import { customerIdentitySystem } from "./CustomerIdentitySystem.js";
 
 import { eventBus } from "../core/EventBus.js";
 import { restaurantEquipmentSystem } from "./RestaurantEquipmentSystem.js";
@@ -227,6 +228,11 @@ class TrafficSystem {
           schedule.closeHour
         );
 
+    const aggregateDemand =
+      this.aggregateDailyDemand(
+        dailyDemand
+      );
+
     const seatingCapacity =
       dailyDemand.hours.reduce(
         (sum, demand) =>
@@ -333,6 +339,28 @@ class TrafficSystem {
       }
 
       try {
+        const segmentId =
+          aggregateDemand
+            .segments
+            .length > 0
+            ? randomSystem
+                .weightedPick(
+                  aggregateDemand
+                    .segments
+                    .map(
+                      item => ({
+                        value:
+                          item.segmentId,
+                        weight:
+                          Math.max(
+                            0,
+                            item.expectedVisitors
+                          )
+                      })
+                    )
+                )
+            : null;
+
         const order =
           orderSystem.placeBulk({
             restaurantId,
@@ -340,7 +368,9 @@ class TrafficSystem {
               menuItem.id,
             portions,
             orderCount:
-              successful
+              successful,
+            customerSegmentId:
+              segmentId
           });
 
         completedOrders +=
@@ -404,9 +434,7 @@ class TrafficSystem {
           restaurantId,
 
           demand:
-            this.aggregateDailyDemand(
-              dailyDemand
-            ),
+            aggregateDemand,
 
           result
         });
@@ -642,6 +670,9 @@ class TrafficSystem {
             )
         );
 
+      let recognizedCustomer =
+        null;
+
       const segmentStat =
         segmentStats.get(
           segmentId
@@ -684,6 +715,13 @@ class TrafficSystem {
         );
 
       try {
+        recognizedCustomer =
+          customerIdentitySystem
+            .resolveVisit({
+              restaurantId,
+              segmentId
+            });
+
         const segment =
           customerSegmentSystem.get(
             segmentId
@@ -733,7 +771,11 @@ class TrafficSystem {
           orderSystem.place({
             restaurantId,
 
-            customerId: null,
+            customerId:
+              recognizedCustomer
+                ?.customer
+                ?.id ??
+              null,
 
             customerSegmentId:
               segmentId,
@@ -795,7 +837,11 @@ class TrafficSystem {
           "traffic:orderFailed",
           {
             restaurantId,
-            customerId: null,
+            customerId:
+              recognizedCustomer
+                ?.customer
+                ?.id ??
+              null,
 
             error: {
               name:
