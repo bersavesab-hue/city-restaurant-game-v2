@@ -111,7 +111,7 @@ class MemberMarketingView {
         </section>
 
         <section>
-          <h2>会员等级</h2>
+          <h2>会员权益与等级</h2>
 
           ${page.levels.map(
             level => `
