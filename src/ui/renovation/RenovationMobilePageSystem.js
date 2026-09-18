@@ -86,9 +86,42 @@ class RenovationMobilePageSystem {
       editorState ?? renovationEditorSystem.getPageState(restaurantId);
 
     const category =
-      editor.catalog.find(item => item.id === ui.activeCategory) ??
+      editor.catalog.find(
+        item =>
+          item.id ===
+          ui.activeCategory
+      ) ??
       editor.catalog[0] ??
       null;
+
+    const unlockedItems =
+      category
+        ?.items
+        ?.filter(
+          item =>
+            item.unlocked
+        ) ??
+      [];
+
+    const lockedItems =
+      category
+        ?.items
+        ?.filter(
+          item =>
+            !item.unlocked
+        ) ??
+      [];
+
+    const nextUnlockLevel =
+      lockedItems.length > 0
+        ? Math.min(
+            ...lockedItems.map(
+              item =>
+                item.unlockLevel ??
+                10
+            )
+          )
+        : null;
 
     const selectedPlacement = ui.selectedPlacementId
       ? editor.layout.placements.find(
@@ -220,16 +253,43 @@ class RenovationMobilePageSystem {
         }
       },
       drawer: {
-        expanded: ui.drawerExpanded,
-        activeCategory: category?.id ?? null,
-        categories: editor.catalog.map(item => ({
-          id: item.id,
-          name: item.name,
-          count: item.items.length
-        })),
-        items: category?.items ?? [],
-        selectedFurnitureId: ui.selectedFurnitureId,
-        pendingRotation: ui.pendingRotation
+        expanded:
+          ui.drawerExpanded,
+
+        activeCategory:
+          category?.id ??
+          null,
+
+        categories:
+          editor.catalog.map(
+            item => ({
+              id:
+                item.id,
+              name:
+                item.name,
+              count:
+                item.items.filter(
+                  entry =>
+                    entry.unlocked
+                ).length,
+              total:
+                item.items.length
+            })
+          ),
+
+        items:
+          unlockedItems,
+
+        lockedCount:
+          lockedItems.length,
+
+        nextUnlockLevel,
+
+        selectedFurnitureId:
+          ui.selectedFurnitureId,
+
+        pendingRotation:
+          ui.pendingRotation
       },
       selection: {
         placement: selectedPlacement
