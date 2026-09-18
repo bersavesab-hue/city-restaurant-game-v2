@@ -160,13 +160,47 @@ export const ECONOMIC_BASELINE = {
   },
 
   laborReference: {
-    chef: { monthlySalary: 6500, scarcity: 0.2 },
-    server: { monthlySalary: 4200, scarcity: 0.12 },
-    cashier: { monthlySalary: 4300, scarcity: 0.1 },
-    kitchen_assistant: { monthlySalary: 4500, scarcity: 0.12 },
-    cleaner: { monthlySalary: 3600, scarcity: 0.08 },
-    delivery: { monthlySalary: 5200, scarcity: 0.15 },
-    manager: { monthlySalary: 8500, scarcity: 0.25 }
+    chef: {
+      monthlySalary: 6530,
+      roleFactor: 1.45,
+      sourceKind: "derived_from_real_anchor"
+    },
+
+    server: {
+      monthlySalary: 4143,
+      roleFactor: 0.92,
+      sourceKind: "derived_from_real_anchor"
+    },
+
+    cashier: {
+      monthlySalary: 4278,
+      roleFactor: 0.95,
+      sourceKind: "derived_from_real_anchor"
+    },
+
+    kitchen_assistant: {
+      monthlySalary: 4504,
+      roleFactor: 1,
+      sourceKind: "derived_from_real_anchor"
+    },
+
+    cleaner: {
+      monthlySalary: 3693,
+      roleFactor: 0.82,
+      sourceKind: "derived_from_real_anchor"
+    },
+
+    delivery: {
+      monthlySalary: 5179,
+      roleFactor: 1.15,
+      sourceKind: "derived_from_real_anchor"
+    },
+
+    manager: {
+      monthlySalary: 8557,
+      roleFactor: 1.9,
+      sourceKind: "derived_from_real_anchor"
+    }
   },
 
   commercialRentReference: {
