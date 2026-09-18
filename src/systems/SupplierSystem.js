@@ -7,6 +7,7 @@ import {
   SUPPLIER_CAPABILITY_TIER,
   SUPPLIER_TYPE,
   SUPPLIER_PROCUREMENT_GROUPS,
+  getSupplierCapabilityTier,
   validateSupplierTemplate
 } from "../data/supplierRules.js";
 
@@ -17,6 +18,19 @@ const SUPPLIER_STATUS = Object.freeze({
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function scaledInteger(
+  value,
+  factor
+) {
+  return Math.max(
+    1,
+    Math.round(
+      value *
+      factor
+    )
+  );
 }
 
 function requireSupplier(id) {
@@ -231,13 +245,6 @@ class SupplierSystem {
         template.reliability
     };
 
-    if (offers) {
-      staticFields.offers =
-        structuredClone(
-          offers
-        );
-    }
-
     if (existing) {
       return entitySystem.update(
         "supplier",
@@ -274,17 +281,7 @@ class SupplierSystem {
     return entitySystem.update(
       "supplier",
       created.id,
-      {
-        ...staticFields,
-        ...(offers
-          ? {
-              offers:
-                structuredClone(
-                  offers
-                )
-            }
-          : {})
-      }
+      staticFields
     );
   }
 
@@ -457,21 +454,191 @@ class SupplierSystem {
     return true;
   }
 
+  buildTemplateOffer(
+    supplier,
+    ingredient
+  ) {
+    if (
+      !supplier.templateId ||
+      !supplier.supplyGroups
+        ?.includes(
+          ingredient
+            .procurementGroup
+        )
+    ) {
+      return undefined;
+    }
+
+    const tier =
+      getSupplierCapabilityTier(
+        supplier.capabilityTier
+      );
+
+    if (!tier) {
+      return undefined;
+    }
+
+    const pieceBased =
+      ingredient.unit ===
+      "piece";
+
+    const minimumOrder =
+      scaledInteger(
+        pieceBased
+          ? tier.pieceMinimumOrder
+          : tier.gramMinimumOrder,
+        supplier
+          .minimumOrderFactor ??
+        1
+      );
+
+    const capacityPerDay =
+      Math.max(
+        minimumOrder,
+        scaledInteger(
+          pieceBased
+            ? tier.pieceCapacityPerDay
+            : tier.gramCapacityPerDay,
+          supplier
+            .capacityFactor ??
+          1
+        )
+      );
+
+    return {
+      ingredientId:
+        ingredient.id,
+
+      supplyGroup:
+        ingredient
+          .procurementGroup,
+
+      generated:
+        true,
+
+      priceMultiplier:
+        supplier.priceIndex ??
+        1,
+
+      priceVolatility:
+        supplier.priceVolatility ??
+        0.1,
+
+      qualityMin:
+        supplier.qualityMin ??
+        1,
+
+      qualityMax:
+        supplier.qualityMax ??
+        2,
+
+      deliveryMinutes:
+        supplier.deliveryMinutes ??
+        180,
+
+      capacityPerDay,
+
+      minimumOrder
+    };
+  }
+
   getOffer(
     supplierId,
     ingredientId
   ) {
     const supplier =
-      requireSupplier(supplierId);
+      requireSupplier(
+        supplierId
+      );
 
-    const offer =
-      supplier.offers[
+    const manualOffer =
+      supplier.offers?.[
         ingredientId
       ];
 
-    return offer
-      ? structuredClone(offer)
+    if (manualOffer) {
+      return structuredClone(
+        manualOffer
+      );
+    }
+
+    const ingredient =
+      ingredientCatalogSystem.get(
+        ingredientId
+      );
+
+    if (!ingredient) {
+      return undefined;
+    }
+
+    const generated =
+      this.buildTemplateOffer(
+        supplier,
+        ingredient
+      );
+
+    return generated
+      ? structuredClone(
+          generated
+        )
       : undefined;
+  }
+
+  listOffers(
+    supplierId
+  ) {
+    const supplier =
+      requireSupplier(
+        supplierId
+      );
+
+    const offers =
+      new Map(
+        Object.values(
+          supplier.offers ??
+          {}
+        ).map(
+          offer => [
+            offer.ingredientId,
+            structuredClone(
+              offer
+            )
+          ]
+        )
+      );
+
+    if (supplier.templateId) {
+      for (
+        const ingredient
+        of ingredientCatalogSystem
+          .getAll()
+      ) {
+        if (
+          offers.has(
+            ingredient.id
+          )
+        ) {
+          continue;
+        }
+
+        const generated =
+          this.buildTemplateOffer(
+            supplier,
+            ingredient
+          );
+
+        if (generated) {
+          offers.set(
+            ingredient.id,
+            generated
+          );
+        }
+      }
+    }
+
+    return [
+      ...offers.values()
+    ];
   }
 
   getQuote(
@@ -512,9 +679,10 @@ class SupplierSystem {
     }
 
     const offer =
-      supplier.offers[
+      this.getOffer(
+        supplierId,
         ingredientId
-      ];
+      );
 
     if (!offer) {
       throw new Error(
