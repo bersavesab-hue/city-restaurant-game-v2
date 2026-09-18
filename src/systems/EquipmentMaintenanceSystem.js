@@ -20,6 +20,14 @@ import {
 } from "./RestaurantSystem.js";
 
 import {
+  propertySystem
+} from "./PropertySystem.js";
+
+import {
+  districtEventSystem
+} from "./DistrictEventSystem.js";
+
+import {
   restaurantEquipmentSystem
 } from "./RestaurantEquipmentSystem.js";
 
@@ -40,6 +48,38 @@ function clamp(
 
 
 class EquipmentMaintenanceSystem {
+  getEventFailureMultiplier(
+    unit
+  ) {
+    try {
+      const restaurant =
+        restaurantSystem.get(
+          unit.restaurantId
+        );
+
+      if (!restaurant.locationId) {
+        return 1;
+      }
+
+      const property =
+        propertySystem.get(
+          restaurant.locationId
+        );
+
+      return (
+        districtEventSystem
+          .getModifiers(
+            property.districtId
+          )
+          .equipmentFailureMultiplier ??
+        1
+      );
+    } catch {
+      return 1;
+    }
+  }
+
+
   getCurrentDay() {
     return gameState
       .getSection(
@@ -128,10 +168,15 @@ class EquipmentMaintenanceSystem {
         0.002
       );
 
+    risk *=
+      this.getEventFailureMultiplier(
+        unit
+      );
+
     return clamp(
       risk,
       0,
-      0.25
+      0.5
     );
   }
 
