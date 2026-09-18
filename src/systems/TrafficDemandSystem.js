@@ -758,6 +758,13 @@ class TrafficDemandSystem {
           district
         );
 
+    const venuePriceTolerance =
+      venueTypeSystem
+        .getPriceToleranceMultiplier(
+          venueContext
+            .venueTypeId
+        );
+
     const segments = [];
 
     let expectedVisitors = 0;
@@ -805,7 +812,11 @@ class TrafficDemandSystem {
                 .priceSensitivity /
               100
             ) *
-            0.9 +
+            0.9 /
+            Math.max(
+              0.5,
+              venuePriceTolerance
+            ) +
           discount *
             (
               segment
@@ -1064,6 +1075,8 @@ class TrafficDemandSystem {
           .venueTypeId,
 
       venueDistrictFactor,
+
+      venuePriceTolerance,
 
       calendar:
         businessCalendarSystem
