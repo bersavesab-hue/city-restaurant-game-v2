@@ -74,7 +74,7 @@ function validateIngredient(item) {
   }
 
   if (
-    !Number.isInteger(item.basePurchasePrice) ||
+    !Number.isFinite(item.basePurchasePrice) ||
     item.basePurchasePrice < 0
   ) {
     throw new Error(
@@ -110,6 +110,45 @@ function validateIngredient(item) {
       `Ingredient "${item.id}" has invalid baseWasteRate`
     );
   }
+
+
+  if (
+    item.procurementGroup !== undefined &&
+    (
+      typeof item.procurementGroup !== "string" ||
+      !item.procurementGroup.trim()
+    )
+  ) {
+    throw new Error(
+      `Ingredient "${item.id}" has invalid procurementGroup`
+    );
+  }
+
+
+  for (
+    const field
+    of [
+      "allergenTags",
+      "culinaryTags"
+    ]
+  ) {
+    if (
+      item[field] !== undefined &&
+      (
+        !Array.isArray(item[field]) ||
+        item[field].some(
+          value =>
+            typeof value !== "string" ||
+            !value.trim()
+        )
+      )
+    ) {
+      throw new Error(
+        `Ingredient "${item.id}" has invalid ${field}`
+      );
+    }
+  }
+
 
   return true;
 }
