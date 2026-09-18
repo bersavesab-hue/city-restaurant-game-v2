@@ -28,7 +28,8 @@ import { app } from "../src/main.js";
 
 const {
   ingredientCatalogSystem,
-  dishCatalogSystem
+  dishCatalogSystem,
+  recipeSystem
 } = app.systems;
 
 test(
@@ -257,6 +258,37 @@ test(
         recipe
       ),
       true
+    );
+
+    recipeSystem.load(
+      [
+        recipe
+      ],
+      {
+        overwrite:
+          true
+      }
+    );
+
+    const requirements =
+      recipeSystem
+        .getOperationalRequirements(
+          recipe.id
+        );
+
+    assert.equal(
+      requirements
+        .requiresExhaust,
+      true
+    );
+
+    assert.deepEqual(
+      requirements
+        .equipmentCapabilities,
+      [
+        "range",
+        "wok"
+      ]
     );
 
     assert.equal(
