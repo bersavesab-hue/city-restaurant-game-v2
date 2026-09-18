@@ -46,6 +46,38 @@ function random01(seed, salt = 0) {
   return (value >>> 0) / 4294967296;
 }
 
+function sampleRange(
+  seed,
+  salt,
+  range
+) {
+  return (
+    range.min +
+    random01(
+      seed,
+      salt
+    ) *
+    (
+      range.max -
+      range.min
+    )
+  );
+}
+
+function sampleIntegerRange(
+  seed,
+  salt,
+  range
+) {
+  return Math.round(
+    sampleRange(
+      seed,
+      salt,
+      range
+    )
+  );
+}
+
 function safeBalance(restaurantId) {
   if (!restaurantId) {
     return null;
@@ -59,73 +91,345 @@ function safeBalance(restaurantId) {
 }
 
 class PropertyLeaseMarketSystem {
-  buildGeneratedTerms(property) {
-    const district = districtSystem.get(property.districtId);
-    const seed = property.marketMeta?.seed ?? hashString(property.id);
-    const quality = property.marketMeta?.qualityScore ?? 55;
-    const listedDay = property.listedDay ?? currentDay();
-    const landlordIsCompany = random01(seed, 1) > 0.72;
-    const landlordName = landlordIsCompany
-      ? `${district?.name ?? "城市"}置业${1 + Math.floor(random01(seed, 2) * 9)}号业主`
-      : `${SURNAMES[Math.floor(random01(seed, 3) * SURNAMES.length)]}${GIVEN_NAMES[Math.floor(random01(seed, 4) * GIVEN_NAMES.length)]}`;
-    const maxDiscountRate = Number(
-      (0.03 + random01(seed, 5) * 0.07).toFixed(3)
-    );
+  buildGeneratedTerms(
+    property
+  ) {
+    const district =
+      districtSystem.get(
+        property.districtId
+      );
+
+    const seed =
+      property
+        .marketMeta
+        ?.seed ??
+      hashString(
+        property.id
+      );
+
+    const quality =
+      property
+        .marketMeta
+        ?.qualityScore ??
+      55;
+
+    const listedDay =
+      property.listedDay ??
+      currentDay();
+
+    const leaseProfile =
+      property
+        .marketMeta
+        ?.leaseProfile ??
+      null;
+
+    const landlordIsCompany =
+      random01(
+        seed,
+        1
+      ) >
+      (
+        property.area >=
+        800
+          ? 0.48
+          : 0.72
+      );
+
+    const landlordName =
+      landlordIsCompany
+        ? `${district?.name ?? "城市"}置业${1 + Math.floor(
+            random01(
+              seed,
+              2
+            ) *
+            9
+          )}号业主`
+        : `${SURNAMES[
+            Math.floor(
+              random01(
+                seed,
+                3
+              ) *
+              SURNAMES.length
+            )
+          ]}${GIVEN_NAMES[
+            Math.floor(
+              random01(
+                seed,
+                4
+              ) *
+              GIVEN_NAMES.length
+            )
+          ]}`;
+
+    const maxDiscountRate =
+      leaseProfile
+        ? Number(
+            sampleRange(
+              seed,
+              5,
+              leaseProfile
+                .maxDiscountRateRange
+            ).toFixed(
+              3
+            )
+          )
+        : Number(
+            (
+              0.03 +
+              random01(
+                seed,
+                5
+              ) *
+              0.07
+            ).toFixed(
+              3
+            )
+          );
+
     const rentFreeMaxDays =
-      property.area >= 1200
-        ? 7 + Math.floor(random01(seed, 6) * 24)
-        : property.area >= 300
-          ? Math.floor(random01(seed, 6) * 16)
-          : Math.floor(random01(seed, 6) * 8);
-    const propertyFeeMonthly = Math.max(
-      0,
-      Math.round(
-        property.area *
-          (0.8 + random01(seed, 7) * 2.6)
-      )
-    );
+      leaseProfile
+        ? sampleIntegerRange(
+            seed,
+            6,
+            leaseProfile
+              .rentFreeDaysRange
+          )
+        : (
+            property.area >=
+            1200
+              ? 7 +
+                Math.floor(
+                  random01(
+                    seed,
+                    6
+                  ) *
+                  24
+                )
+              : property.area >=
+                  300
+                ? Math.floor(
+                    random01(
+                      seed,
+                      6
+                    ) *
+                    16
+                  )
+                : Math.floor(
+                    random01(
+                      seed,
+                      6
+                    ) *
+                    8
+                  )
+          );
+
+    const propertyFeePerSqm =
+      leaseProfile
+        ? sampleRange(
+            seed,
+            7,
+            leaseProfile
+              .propertyFeePerSqmRange
+          )
+        : (
+            0.8 +
+            random01(
+              seed,
+              7
+            ) *
+            2.6
+          );
+
+    const propertyFeeMonthly =
+      Math.max(
+        0,
+        Math.round(
+          property.area *
+          propertyFeePerSqm
+        )
+      );
+
+    const hasTransferFee =
+      leaseProfile
+        ? random01(
+            seed,
+            8
+          ) <
+          leaseProfile
+            .transferFeeProbability
+        : random01(
+            seed,
+            8
+          ) >
+          0.58;
+
+    const transferMultiple =
+      leaseProfile
+        ? sampleRange(
+            seed,
+            9,
+            leaseProfile
+              .transferFeeRentMultipleRange
+          )
+        : (
+            0.4 +
+            random01(
+              seed,
+              9
+            ) *
+            1.6
+          );
+
     const transferFee =
-      random01(seed, 8) > 0.58
+      hasTransferFee
         ? Math.round(
             property.monthlyRent *
-              (0.4 + random01(seed, 9) * 1.6)
+            transferMultiple
           )
         : 0;
-    const renewalIncreaseRate = Number(
-      (0.03 + random01(seed, 10) * 0.07).toFixed(3)
-    );
-    const competitorDemand = clamp(
-      Math.round(
-        22 +
-          quality * 0.55 +
-          (district?.competition ?? 50) * 0.23 +
-          (property.exhaustAllowed ? 5 : 0) +
-          Math.min(7, (property.frontageMeters ?? 0) * 0.35)
-      ),
-      15,
-      98
-    );
+
+    const renewalIncreaseRate =
+      leaseProfile
+        ? Number(
+            sampleRange(
+              seed,
+              10,
+              leaseProfile
+                .renewalIncreaseRateRange
+            ).toFixed(
+              3
+            )
+          )
+        : Number(
+            (
+              0.03 +
+              random01(
+                seed,
+                10
+              ) *
+              0.07
+            ).toFixed(
+              3
+            )
+          );
+
+    const competitorDemand =
+      clamp(
+        Math.round(
+          22 +
+          quality *
+            0.55 +
+          (
+            district
+              ?.competition ??
+            50
+          ) *
+            0.23 +
+          (
+            property
+              .exhaustAllowed
+              ? 5
+              : 0
+          ) +
+          Math.min(
+            7,
+            (
+              property
+                .frontageMeters ??
+              0
+            ) *
+            0.35
+          )
+        ),
+        15,
+        98
+      );
+
     const competitorClaimDay =
-      quality >= 76 && competitorDemand >= 62
-        ? listedDay + 5 + Math.floor(random01(seed, 11) * 18)
+      quality >= 76 &&
+      competitorDemand >= 62
+        ? listedDay +
+          5 +
+          Math.floor(
+            random01(
+              seed,
+              11
+            ) *
+            18
+          )
         : null;
 
     return {
       landlord: {
-        type: landlordIsCompany ? "company" : "individual",
-        name: landlordName
+        type:
+          landlordIsCompany
+            ? "company"
+            : "individual",
+
+        name:
+          landlordName
       },
+
       leaseTerms: {
-        minMonths: property.area >= 3000 ? 24 : 6,
-        maxMonths: property.area >= 1200 ? 60 : 36,
+        minMonths:
+          leaseProfile
+            ? leaseProfile
+                .monthsRange
+                .min
+            : (
+                property.area >=
+                3000
+                  ? 24
+                  : 6
+              ),
+
+        maxMonths:
+          leaseProfile
+            ? leaseProfile
+                .monthsRange
+                .max
+            : (
+                property.area >=
+                1200
+                  ? 60
+                  : 36
+              ),
+
         propertyFeeMonthly,
+
+        propertyFeePerSqm:
+          Number(
+            propertyFeePerSqm
+              .toFixed(
+                2
+              )
+          ),
+
         transferFee,
+
+        transferFeeRentMultiple:
+          hasTransferFee
+            ? Number(
+                transferMultiple
+                  .toFixed(
+                    2
+                  )
+              )
+            : 0,
+
         rentFreeMaxDays,
         maxDiscountRate,
         renewalIncreaseRate,
         negotiable: true,
         competitorDemand,
-        competitorClaimDay
+        competitorClaimDay,
+
+        templateId:
+          property
+            .marketMeta
+            ?.templateId ??
+          null
       }
     };
   }
