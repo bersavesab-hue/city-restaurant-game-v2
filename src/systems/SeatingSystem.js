@@ -68,12 +68,14 @@ class SeatingSystem {
     if (totalWeight <= 0) {
       return {
         averageDiningMinutes: 40,
-        queuePatienceMinutes: 12
+        queuePatienceMinutes: 12,
+        averagePartySize: 1.8
       };
     }
 
     let dining = 0;
     let patience = 0;
+    let partySize = 0;
 
     for (const item of records) {
       const segment =
@@ -96,6 +98,14 @@ class SeatingSystem {
       patience +=
         segment.queuePatienceMinutes *
         weight;
+
+      partySize +=
+        (
+          segment.partySize
+            ?.average ??
+          1.8
+        ) *
+        weight;
     }
 
     return {
@@ -103,7 +113,13 @@ class SeatingSystem {
         Math.max(1, dining),
 
       queuePatienceMinutes:
-        Math.max(0, patience)
+        Math.max(0, patience),
+
+      averagePartySize:
+        Math.max(
+          1,
+          partySize
+        )
     };
   }
 
@@ -166,6 +182,21 @@ class SeatingSystem {
         behavior.averageDiningMinutes
       );
 
+    const partyPressure =
+      Math.max(
+        1,
+        Math.min(
+          1.35,
+          1 +
+          Math.max(
+            0,
+            behavior.averagePartySize -
+            1
+          ) *
+          0.08
+        )
+      );
+
     const theoreticalCapacity =
       Math.max(
         seats,
@@ -185,7 +216,8 @@ class SeatingSystem {
             behavior.averageDiningMinutes
           ) *
           turnsPerHour *
-          queueEfficiency
+          queueEfficiency /
+          partyPressure
         ) +
         queueCapacityBonus
       );
@@ -216,6 +248,11 @@ class SeatingSystem {
 
       queueEfficiency,
       queueCapacityBonus,
+
+      averagePartySize:
+        behavior.averagePartySize,
+
+      partyPressure,
 
       turnsPerHour,
 
