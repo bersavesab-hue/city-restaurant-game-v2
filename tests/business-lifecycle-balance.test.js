@@ -697,6 +697,63 @@ function getCheckpoint(
             restaurantId
       );
 
+  const employees =
+    employeeSystem
+      .listByRestaurant(
+        restaurantId
+      );
+
+  const monthlyPayroll =
+    employeeSystem.getPayroll(
+      restaurantId
+    );
+
+  const recentSettlements =
+    entitySystem
+      .filter(
+        "daily_settlement",
+        item =>
+          item.restaurantId ===
+            restaurantId
+      )
+      .sort(
+        (a, b) =>
+          a.day - b.day
+      )
+      .slice(-30);
+
+  const recentOrders =
+    recentSettlements.reduce(
+      (
+        sum,
+        item
+      ) =>
+        sum +
+        (item.orders ?? 0),
+      0
+    );
+
+  const recentRevenue =
+    recentSettlements.reduce(
+      (
+        sum,
+        item
+      ) =>
+        sum +
+        (item.revenue ?? 0),
+      0
+    );
+
+  const categoryExpense =
+    Object.fromEntries(
+      financePage.categories.map(
+        item => [
+          item.category,
+          item.expense ?? 0
+        ]
+      )
+    );
+
   const checkpoint = {
     elapsedDays,
     day:
@@ -713,6 +770,14 @@ function getCheckpoint(
       account.lifetimeIncome,
     lifetimeExpense:
       account.lifetimeExpense,
+    monthlyIncome:
+      financePage
+        .summary
+        .income,
+    monthlyExpense:
+      financePage
+        .summary
+        .expense,
     monthlyProfit:
       financePage
         .summary
@@ -721,16 +786,59 @@ function getCheckpoint(
       financePage
         .summary
         .profitMargin,
+    monthlyCategoryExpense:
+      categoryExpense,
     health:
       financePage
         .health
         .status,
+    healthCostRatios:
+      financePage
+        .health
+        .costRatios,
+    healthAlerts:
+      financePage
+        .health
+        .alerts,
     cashRunwayDays:
       financePage
         .health
         .cashRunwayDays,
     activeOrderRecords:
       orders.length,
+    recent30DayOrders:
+      recentOrders,
+    recent30DayRevenue:
+      recentRevenue,
+    monthlyPayroll,
+    employeeCount:
+      employees.length,
+    employees:
+      employees.map(
+        item => ({
+          roleId:
+            item.roleId,
+          salary:
+            item.salary,
+          level:
+            item.level,
+          careerRankId:
+            item.careerRankId,
+          fatigue:
+            item.fatigue,
+          mood:
+            item.mood
+        })
+      ),
+    reputation:
+      restaurant.reputation,
+    satisfaction:
+      restaurant
+        .customerSatisfaction,
+    repeatRate:
+      restaurant.repeatRate,
+    reviewScore:
+      restaurant.reviewScore,
     payrollArrears:
       payrollArrears.length,
     operatingArrears:
