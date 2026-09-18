@@ -144,6 +144,301 @@ class BusinessCausalitySystem {
     };
   }
 
+  recordSegmentFeedback({
+    restaurantId,
+    day,
+    experience,
+    segmentOutcomes
+  }) {
+    const overallQuality =
+      experience?.qualityScore ??
+      60;
+
+    const rows = [];
+
+    for (
+      const outcome
+      of segmentOutcomes ?? []
+    ) {
+      const served =
+        Math.max(
+          0,
+          Number(
+            outcome.served
+          ) || 0
+        );
+
+      const rejected =
+        Math.max(
+          0,
+          Number(
+            outcome.rejected
+          ) || 0
+        );
+
+      const arrivals =
+        Math.max(
+          served + rejected,
+          Number(
+            outcome.arrivals
+          ) || 0
+        );
+
+      if (
+        arrivals <= 0 &&
+        served <= 0
+      ) {
+        continue;
+      }
+
+      const qualityAdjustment =
+        (
+          (
+            outcome.averageQuality ||
+            overallQuality
+          ) -
+          overallQuality
+        ) *
+        0.25;
+
+      const priceAdjustment =
+        (
+          (
+            outcome.priceFactor ??
+            1
+          ) -
+          1
+        ) *
+        22;
+
+      const rejectionPenalty =
+        arrivals > 0
+          ? rejected /
+            arrivals *
+            28
+          : 0;
+
+      const satisfaction =
+        Math.round(
+          clamp(
+            (
+              experience?.satisfaction ??
+              65
+            ) +
+            qualityAdjustment +
+            priceAdjustment -
+            rejectionPenalty,
+            0,
+            100
+          )
+        );
+
+      const existing =
+        entitySystem
+          .filter(
+            "segment_experience_daily",
+            item =>
+              item.restaurantId ===
+                restaurantId &&
+              item.day === day &&
+              item.segmentId ===
+                outcome.segmentId
+          )[0];
+
+      if (!existing) {
+        rows.push(
+          entitySystem.create(
+            "segment_experience_daily",
+            {
+              restaurantId,
+              day,
+              segmentId:
+                outcome.segmentId,
+
+              arrivals,
+              served,
+              rejected,
+
+              revenue:
+                outcome.revenue ??
+                0,
+
+              satisfactionTotal:
+                satisfaction *
+                Math.max(
+                  1,
+                  served
+                ),
+
+              satisfactionCount:
+                Math.max(
+                  1,
+                  served
+                )
+            }
+          )
+        );
+
+        continue;
+      }
+
+      rows.push(
+        entitySystem.update(
+          "segment_experience_daily",
+          existing.id,
+          {
+            arrivals:
+              existing.arrivals +
+              arrivals,
+
+            served:
+              existing.served +
+              served,
+
+            rejected:
+              existing.rejected +
+              rejected,
+
+            revenue:
+              existing.revenue +
+              (
+                outcome.revenue ??
+                0
+              ),
+
+            satisfactionTotal:
+              existing
+                .satisfactionTotal +
+              satisfaction *
+                Math.max(
+                  1,
+                  served
+                ),
+
+            satisfactionCount:
+              existing
+                .satisfactionCount +
+              Math.max(
+                1,
+                served
+              )
+          }
+        )
+      );
+    }
+
+    return rows;
+  }
+
+  getSegmentRecent(
+    restaurantId,
+    segmentId,
+    days = 7
+  ) {
+    const today =
+      gameState
+        .getSection(
+          "time"
+        )
+        .day;
+
+    const startDay =
+      Math.max(
+        1,
+        today - days + 1
+      );
+
+    return entitySystem
+      .filter(
+        "segment_experience_daily",
+        item =>
+          item.restaurantId ===
+            restaurantId &&
+          item.segmentId ===
+            segmentId &&
+          item.day >=
+            startDay &&
+          item.day <=
+            today
+      );
+  }
+
+  getSegmentDemandMultiplier(
+    restaurantId,
+    segmentId,
+    days = 7
+  ) {
+    const rows =
+      this.getSegmentRecent(
+        restaurantId,
+        segmentId,
+        days
+      );
+
+    if (
+      rows.length === 0
+    ) {
+      return 1;
+    }
+
+    const totals =
+      rows.reduce(
+        (sum, item) => {
+          sum.arrivals +=
+            item.arrivals ?? 0;
+
+          sum.served +=
+            item.served ?? 0;
+
+          sum.satisfactionTotal +=
+            item.satisfactionTotal ??
+            0;
+
+          sum.satisfactionCount +=
+            item.satisfactionCount ??
+            0;
+
+          return sum;
+        },
+        {
+          arrivals: 0,
+          served: 0,
+          satisfactionTotal: 0,
+          satisfactionCount: 0
+        }
+      );
+
+    const satisfaction =
+      totals.satisfactionCount > 0
+        ? totals.satisfactionTotal /
+          totals.satisfactionCount
+        : 65;
+
+    const serviceRate =
+      totals.arrivals > 0
+        ? totals.served /
+          totals.arrivals
+        : 1;
+
+    return Number(
+      clamp(
+        1 +
+        (
+          satisfaction -
+          65
+        ) /
+          260 +
+        (
+          serviceRate -
+          0.82
+        ) *
+          0.18,
+        0.78,
+        1.18
+      ).toFixed(3)
+    );
+  }
+
   recordHour({
     restaurantId,
     demand,
@@ -205,6 +500,16 @@ class BusinessCausalitySystem {
           0
         )
       );
+
+    this.recordSegmentFeedback({
+      restaurantId,
+      day:
+        time.day,
+      experience,
+      segmentOutcomes:
+        result.segmentOutcomes ??
+        []
+    });
 
     const row =
       entitySystem.create(
@@ -528,11 +833,120 @@ class BusinessCausalitySystem {
             a.count
         );
 
+    const segmentRows =
+      entitySystem.filter(
+        "segment_experience_daily",
+        item =>
+          item.restaurantId ===
+            restaurantId &&
+          item.day >=
+            Math.max(
+              1,
+              gameState
+                .getSection(
+                  "time"
+                )
+                .day -
+              days +
+              1
+            )
+      );
+
+    const segmentMap =
+      new Map();
+
+    for (
+      const item
+      of segmentRows
+    ) {
+      const current =
+        segmentMap.get(
+          item.segmentId
+        ) ?? {
+          segmentId:
+            item.segmentId,
+          arrivals: 0,
+          served: 0,
+          revenue: 0,
+          satisfactionTotal: 0,
+          satisfactionCount: 0
+        };
+
+      current.arrivals +=
+        item.arrivals ?? 0;
+
+      current.served +=
+        item.served ?? 0;
+
+      current.revenue +=
+        item.revenue ?? 0;
+
+      current.satisfactionTotal +=
+        item.satisfactionTotal ??
+        0;
+
+      current.satisfactionCount +=
+        item.satisfactionCount ??
+        0;
+
+      segmentMap.set(
+        item.segmentId,
+        current
+      );
+    }
+
+    const segmentSummary =
+      [
+        ...segmentMap.values()
+      ]
+        .map(
+          item => ({
+            ...item,
+
+            satisfaction:
+              item.satisfactionCount >
+              0
+                ? Math.round(
+                    item
+                      .satisfactionTotal /
+                    item
+                      .satisfactionCount
+                  )
+                : 0,
+
+            serviceRate:
+              item.arrivals > 0
+                ? Number(
+                    (
+                      item.served /
+                      item.arrivals *
+                      100
+                    ).toFixed(1)
+                  )
+                : 0,
+
+            demandMultiplier:
+              this
+                .getSegmentDemandMultiplier(
+                  restaurantId,
+                  item.segmentId,
+                  days
+                )
+          })
+        )
+        .sort(
+          (a, b) =>
+            b.revenue -
+            a.revenue
+        );
+
     return {
       restaurantId,
       days,
       hours:
         rows.length,
+
+      segmentSummary,
 
       arrivals,
       served,
