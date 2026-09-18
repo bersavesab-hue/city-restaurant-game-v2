@@ -210,29 +210,65 @@ class DistrictEventSystem {
       const modifiers =
         definition.modifiers;
 
+      const district =
+        districtSystem.get(
+          districtId
+        );
+
+      const sensitivity =
+        Math.max(
+          0.5,
+          Math.min(
+            1.7,
+            Number(
+              district
+                ?.eventSensitivity?.[
+                  event.type
+                ] ??
+              1
+            )
+          )
+        );
+
+      const scale =
+        multiplier =>
+          1 +
+          (
+            (
+              multiplier ??
+              1
+            ) -
+            1
+          ) *
+          sensitivity;
+
       result.demandMultiplier *=
-        modifiers
-          .demandMultiplier ??
-        1;
+        scale(
+          modifiers
+            .demandMultiplier
+        );
 
       result.spendingMultiplier *=
-        modifiers
-          .spendingMultiplier ??
-        1;
+        scale(
+          modifiers
+            .spendingMultiplier
+        );
 
       result
         .playerAppealMultiplier *=
-        modifiers
-          .playerAppealMultiplier ??
-        1;
+        scale(
+          modifiers
+            .playerAppealMultiplier
+        );
 
       if (segmentId) {
         result.demandMultiplier *=
-          modifiers
-            .segmentMultipliers?.[
-              segmentId
-            ] ??
-          1;
+          scale(
+            modifiers
+              .segmentMultipliers?.[
+                segmentId
+              ]
+          );
       }
     }
 
