@@ -17,6 +17,22 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
+function relationshipStageName(
+  stage
+) {
+  return {
+    new:
+      "初识",
+    regular:
+      "常客",
+    familiar:
+      "熟客",
+    core:
+      "核心熟客"
+  }[stage] ??
+    "已识别";
+}
+
 class CustomerManagementView {
   constructor() {
     this.section =
@@ -69,10 +85,27 @@ class CustomerManagementView {
               )}
             </strong>
           </article>
+
+          <article>
+            <span>可识别熟客</span>
+            <strong>
+              ${page.identitySummary
+                .recognizedCustomers}
+            </strong>
+          </article>
+
+          <article>
+            <span>熟客识别率</span>
+            <strong>
+              ${page.identitySummary
+                .recognitionRate}%
+            </strong>
+          </article>
         </section>
 
         <nav>
           <span>总览</span>
+          <span>熟客</span>
           <span>会员</span>
           <span>客群</span>
           <span>流失预警</span>
@@ -100,6 +133,77 @@ class CustomerManagementView {
             口碑
             ${page.overview.reputation}
           </p>
+        </section>
+
+        <section>
+          <h2>可识别熟客</h2>
+
+          <p>
+            每个客群最多维护
+            ${page.identitySummary.maxPerSegment}
+            人；当前累计识别
+            ${page.identitySummary.recognizedVisits}
+            次。
+          </p>
+
+          ${
+            page.recognizedCustomers.length
+              ? page.recognizedCustomers.map(
+                  customer => `
+                    <article>
+                      <strong>
+                        ${escapeHtml(
+                          customer.customerName
+                        )}
+                      </strong>
+
+                      <span>
+                        ${relationshipStageName(
+                          customer.relationshipStage
+                        )}
+                      </span>
+
+                      <span>
+                        ${escapeHtml(
+                          customer.segmentName
+                        )}
+                      </span>
+
+                      <span>
+                        ${customer.recognizedVisits ?? 0}次识别
+                      </span>
+
+                      <span>
+                        累计
+                        ${money(
+                          customer.totalSpend ?? 0
+                        )}
+                      </span>
+
+                      <span>
+                        满意度
+                        ${customer.averageSatisfaction ?? 0}
+                      </span>
+
+                      <span>
+                        ${customer.member
+                          ? "已成为会员"
+                          : "非会员熟客"
+                        }
+                      </span>
+
+                      <small>
+                        ${customer.daysSinceSeen}天未到店
+                        ${customer.atRisk
+                          ? " · 流失风险"
+                          : ""
+                        }
+                      </small>
+                    </article>
+                  `
+                ).join("")
+              : "<p>Lv.7会员能力解锁后，真实重复到店顾客会逐步形成可识别熟客档案。</p>"
+          }
         </section>
 
         <section>
