@@ -246,7 +246,7 @@ class FinanceCenterView {
               )}
             </strong>
             <small>
-              跑道
+              现金跑道
               ${
                 page.health
                   .cashRunwayDays ===
