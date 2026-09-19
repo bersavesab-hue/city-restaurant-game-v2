@@ -54,11 +54,33 @@ export function buildFormalPageChrome(
       null
   } = {}
 ) {
-  const restaurant =
-    restaurantOverride ??
-    restaurantSystem.get(
-      restaurantId
-    );
+  let restaurant =
+    restaurantOverride;
+
+  if (
+    !restaurant
+  ) {
+    try {
+      restaurant =
+        restaurantSystem.get(
+          restaurantId
+        );
+    } catch {
+      restaurant = {
+        id:
+          restaurantId,
+
+        name:
+          "餐厅",
+
+        level:
+          1,
+
+        reputation:
+          0
+      };
+    }
+  }
 
   const balance =
     Number.isFinite(
