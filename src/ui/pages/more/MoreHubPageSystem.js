@@ -22,6 +22,10 @@ import {
   chainSystem
 } from "../../../systems/ChainSystem.js";
 
+import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
 
 const MORE_GROUPS =
   Object.freeze([
@@ -145,9 +149,59 @@ class MoreHubPageSystem {
           restaurantId
         );
 
+    const notices =
+      [];
+
+    const unreadAwards =
+      awardFeedbackSystem
+        .getUnreadCount(
+          restaurantId
+        );
+
+    if (
+      unreadAwards >
+      0
+    ) {
+      notices.push({
+        id:
+          "more_awards",
+
+        type:
+          "success",
+
+        title:
+          "奖项消息",
+
+        message:
+          `有${unreadAwards}条新的奖项反馈`,
+
+        priority:
+          70
+      });
+    }
+
+    const chrome =
+      buildFormalPageChrome(
+        restaurantId,
+        {
+          notices,
+          restaurant,
+          balance:
+            financeSystem.getBalance(
+              restaurantId
+            )
+        }
+      );
+
     return {
       pageId:
         "more-home",
+
+      topBar:
+        chrome.topBar,
+
+      noticeTicker:
+        chrome.noticeTicker,
 
       title:
         "更多",
@@ -177,10 +231,7 @@ class MoreHubPageSystem {
 
       badges: {
         awards:
-          awardFeedbackSystem
-            .getUnreadCount(
-              restaurantId
-            ),
+          unreadAwards,
 
         honors:
           honor.totalHonors,
