@@ -251,9 +251,14 @@ class OperationsHubPageSystem {
             restaurant.name,
 
           balance:
-            financeSystem.getBalance(
+            financeSystem.findAccount(
               restaurantId
-            ),
+            )
+              ? financeSystem
+                  .getBalance(
+                    restaurantId
+                  )
+              : 0,
 
           storeLevel:
             restaurant.level ??
