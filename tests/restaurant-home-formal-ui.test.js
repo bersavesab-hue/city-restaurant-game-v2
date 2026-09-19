@@ -306,8 +306,11 @@ test(
 
       topDishes: [
         {
+          dishId:
+            "green_pepper_beef",
+
           name:
-            "招牌红烧肉",
+            "青椒牛肉",
 
           sold:
             50,
@@ -316,7 +319,13 @@ test(
             3000,
 
           quality:
-            88
+            88,
+
+          imageSlot:
+            "dish-green_pepper_beef",
+
+          image:
+            "assets/images/dishes/official/green_pepper_beef.webp"
         }
       ],
 
@@ -442,7 +451,13 @@ test(
 
     assert.ok(
       html.includes(
-        'data-image-slot="signature-dish-1"'
+        "按近7日真实销量动态变化"
+      )
+    );
+
+    assert.ok(
+      html.includes(
+        'data-image-slot="dish-green_pepper_beef"'
       )
     );
   }
