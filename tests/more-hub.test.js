@@ -43,7 +43,7 @@ test("更多主入口落到正式more-home", () => {
 });
 
 
-test("更多主页收拢完成页面和保留占位入口", () => {
+test("更多主页只保留已经接入的正式功能入口", () => {
   gameState.reset();
 
   const restaurant=
@@ -76,14 +76,20 @@ test("更多主页收拢完成页面和保留占位入口", () => {
     "member-marketing",
     "honor-hall",
     "awards-center",
-    "chain",
-    "settings"
+    "chain"
   ]){
     assert.ok(
       targets.includes(target),
       target
     );
   }
+  assert.equal(
+    targets.includes(
+      "settings"
+    ),
+    false
+  );
+
 });
 
 
