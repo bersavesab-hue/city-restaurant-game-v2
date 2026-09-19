@@ -39,5 +39,19 @@ test(
           text
       );
     }
+
+    assert.equal(
+      source.includes(
+        "图片槽位"
+      ),
+      false
+    );
+
+    assert.equal(
+      source.includes(
+        "门店经营场景图片槽位"
+      ),
+      false
+    );
   }
 );
