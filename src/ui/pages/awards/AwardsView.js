@@ -6,6 +6,17 @@ import {
   awardFeedbackSystem
 } from "../../../systems/AwardFeedbackSystem.js";
 
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 
 const STAGE_NAME =
   Object.freeze({
@@ -201,43 +212,49 @@ class AwardsView {
     page
   ) {
     return `
-      <main class="awards-center">
+      <main class="rg-screen awards-center-page">
 
-        <header class="awards-center__header">
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "提名 · 入围 · 获奖 · 蝉联"
+          }
+        )}
 
-          <div>
-            <span>
-              提名 · 入围 · 获奖 · 蝉联
-            </span>
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
 
-            <h1>
-              奖项中心
-            </h1>
+        ${renderPageTitle({
+          title:
+            "奖项中心",
 
-            <p>
-              共
-              ${page.totalAwardCount}
-              个正式奖项，按月度、季度、年度和不同评审类别独立结算。
-            </p>
-          </div>
+          subtitle:
+            `共${page.totalAwardCount}个正式奖项 · 周期独立结算`,
 
-          <nav>
-            <button
-              type="button"
-              data-page-target="ranking-center"
-            >
-              排行榜
-            </button>
+          backTarget:
+            "ranking-center",
 
-            <button
-              type="button"
-              data-page-target="honor-hall"
-            >
-              荣誉馆
-            </button>
-          </nav>
+          rightHtml:
+            `
+              <div class="competition-suite-links">
+                <button
+                  type="button"
+                  data-page-target="ranking-center"
+                >
+                  排行榜
+                </button>
 
-        </header>
+                <button
+                  type="button"
+                  data-page-target="honor-hall"
+                >
+                  荣誉馆
+                </button>
+              </div>
+            `
+        })}
 
 
         <section class="awards-center__progress">
@@ -535,6 +552,18 @@ class AwardsView {
           }
 
         </section>
+
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "operations"
+            })
+        )}
 
       </main>
     `;
