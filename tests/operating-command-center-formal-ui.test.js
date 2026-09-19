@@ -30,7 +30,9 @@ test(
         "market-strategy",
         "command-center__store-strip",
         "data-restaurant-id",
-        "集团经营范围"
+        "集团经营范围",
+        "is-group-scope",
+        "command-center__identity-meta"
       ]
     ) {
       assert.equal(
