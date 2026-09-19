@@ -839,9 +839,14 @@ class FormalPageRuntime {
             }
 
 
+            const nextRestaurantId =
+              element.dataset
+                .restaurantId ??
+              restaurantId;
+
             onNavigate(
               target,
-              restaurantId,
+              nextRestaurantId,
               navigationParams
             );
           };
