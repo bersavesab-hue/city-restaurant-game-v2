@@ -1,3 +1,15 @@
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+
 function money(value) {
   return (
     "¥" +
@@ -64,11 +76,32 @@ class EquipmentManagementView {
       page.dashboard;
 
     return `
-      <section class="equipment-page">
-        <header>
-          <span>门店硬件能力</span>
-          <h1>设备与工位</h1>
-        </header>
+      <main class="rg-screen equipment-management-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "门店硬件能力 · 工位产能"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "设备与工位",
+
+          subtitle:
+            "门店硬件能力 · 工位产能",
+
+          backTarget:
+            "restaurant"
+        })}
+
+        <section class="equipment-page">
 
         <section>
           <article>
@@ -249,6 +282,19 @@ class EquipmentManagementView {
           }
         </section>
       </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "restaurant"
+            })
+        )}
+
+      </main>
     `;
   }
 }
