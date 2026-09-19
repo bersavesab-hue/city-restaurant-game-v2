@@ -70,15 +70,20 @@ function renderAvatar(
           employee.roleId
         )}
       "
+      role="img"
+      aria-label="${escapeHtml(
+        employee.name
+      )}头像"
       data-image-slot="employee-avatar-${escapeHtml(
         employee.avatarId
       )}"
       data-avatar-id="${escapeHtml(
         employee.avatarId
       )}"
+      data-image-fit="cover"
+      data-image-position="center top"
     >
-
-      <span>
+      <span aria-hidden="true">
         ${escapeHtml(
           employee.name
             .slice(
@@ -87,11 +92,6 @@ function renderAvatar(
             )
         )}
       </span>
-
-      <small>
-        头像槽位
-      </small>
-
     </div>
   `;
 }
