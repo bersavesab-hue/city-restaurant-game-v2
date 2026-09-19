@@ -181,7 +181,25 @@ class OnboardingSystem {
         restaurant.status ===
           "open" ||
         restaurant.status ===
-          "paused",
+          "paused" ||
+        Number.isFinite(
+          restaurant.firstOpenedAt
+        ) ||
+        Number.isFinite(
+          restaurant.openedAt
+        ) ||
+        (
+          restaurant
+            .totalOperatingMinutes ??
+          0
+        ) >
+          0 ||
+        (
+          restaurant
+            .totalOperatingDays ??
+          0
+        ) >
+          0,
 
       first_order:
         completedOrders >
