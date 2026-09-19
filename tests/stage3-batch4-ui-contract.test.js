@@ -129,7 +129,7 @@ test(
 
     const editor =
       read(
-        "../src/ui/renovation/RenovationMobileView.js"
+        "../src/ui/renovation/RenovationGameView.js"
       );
 
     assert.match(
@@ -144,13 +144,13 @@ test(
 
     assert.ok(
       editor.includes(
-        'data-action="close"'
+        '"[data-page-target]"'
       )
     );
 
     assert.ok(
       editor.includes(
-        'action === "close"'
+        "this.commit("
       )
     );
 
