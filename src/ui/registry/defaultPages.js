@@ -23,7 +23,7 @@ const CORE_PAGES = [
   { id: "employee_training", title: "培训", parent: "employees", order: 420, layout: "management" },
   { id: "employee_promotion", title: "员工晋升", parent: "employees", order: 430, layout: "management", unlock: "employee_promotion" },
 
-  { id: "members", title: "会员", parent: "more", order: 510, layout: "management", unlock: "membership" },
+  { id: "member-marketing", title: "会员营销", parent: "more", order: 510, layout: "management", unlock: "membership" },
   { id: "compliance-center", title: "合规中心", parent: "more", order: 515, layout: "management" },
   { id: "chain", title: "连锁管理", parent: "more", order: 520, layout: "management", unlock: "chain_management" },
   { id: "settings", title: "设置", parent: "more", order: 590, layout: "management" }
