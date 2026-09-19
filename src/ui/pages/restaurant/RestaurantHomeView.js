@@ -139,6 +139,10 @@ function renderImageSlot({
         restaurant-image-slot
         ${className}
       "
+      role="img"
+      aria-label="${escapeHtml(
+        label
+      )}"
       data-image-slot="${escapeHtml(
         id
       )}"
@@ -160,27 +164,7 @@ function renderImageSlot({
       data-image-fit="${escapeHtml(
         fit
       )}"
-    >
-
-      <div class="restaurant-image-slot__placeholder">
-
-        <span class="restaurant-image-slot__icon">
-          ▣
-        </span>
-
-        <strong>
-          ${escapeHtml(
-            label
-          )}
-        </strong>
-
-        <small>
-          图片槽位
-        </small>
-
-      </div>
-
-    </div>
+    ></div>
   `;
 }
 
@@ -842,7 +826,7 @@ class RestaurantHomeView {
               </strong>
 
               <span>
-                后续接入动态门店场景图
+                实时展示当前门店营业状态
               </span>
             </div>
           </header>
