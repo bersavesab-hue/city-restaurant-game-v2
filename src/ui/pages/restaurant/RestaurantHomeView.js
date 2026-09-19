@@ -811,6 +811,124 @@ class RestaurantHomeView {
   }
 
 
+  renderOnboarding(
+    page
+  ) {
+    const onboarding =
+      page.onboarding;
+
+    if (
+      !onboarding ||
+      onboarding.completed
+    ) {
+      return "";
+    }
+
+    const next =
+      onboarding.nextStep;
+
+    return `
+      <section class="store-panel store-onboarding">
+
+        <header class="store-panel__title">
+          <div>
+            <strong>
+              开店引导
+            </strong>
+
+            <span>
+              ${onboarding.completedCount}/${onboarding.totalSteps}
+              ·
+              ${onboarding.progress}%
+            </span>
+          </div>
+        </header>
+
+        <div class="store-onboarding__progress">
+          <i
+            style="width:${Math.max(
+              0,
+              Math.min(
+                100,
+                onboarding.progress
+              )
+            )}%"
+          ></i>
+        </div>
+
+        <div class="store-onboarding__steps">
+          ${onboarding.steps
+            .map(
+              step => `
+                <button
+                  type="button"
+                  class="
+                    store-onboarding__step
+                    ${step.completed
+                      ? "is-complete"
+                      : step.id ===
+                        next?.id
+                        ? "is-current"
+                        : ""
+                    }
+                  "
+                  ${step.completed
+                    ? "disabled"
+                    : `data-action="navigate" data-page-id="${escapeHtml(
+                        step.pageId
+                      )}"`
+                  }
+                >
+                  <b>
+                    ${step.order}
+                  </b>
+
+                  <span>
+                    ${escapeHtml(
+                      step.title
+                    )}
+                  </span>
+                </button>
+              `
+            )
+            .join("")}
+        </div>
+
+        ${next
+          ? `
+            <button
+              type="button"
+              class="store-onboarding__next"
+              data-action="navigate"
+              data-page-id="${escapeHtml(
+                next.pageId
+              )}"
+            >
+              <span>
+                下一步
+              </span>
+
+              <strong>
+                ${escapeHtml(
+                  next.title
+                )}
+              </strong>
+
+              <small>
+                ${escapeHtml(
+                  next.description
+                )}
+              </small>
+            </button>
+          `
+          : ""
+        }
+
+      </section>
+    `;
+  }
+
+
   renderLiveAndReminders(
     page
   ) {
@@ -898,11 +1016,11 @@ class RestaurantHomeView {
           <header class="store-panel__title">
             <div>
               <strong>
-                今日经营提醒
+                经营建议
               </strong>
 
               <span>
-                风险和待办实时变化
+                根据门店真实状态动态生成
               </span>
             </div>
           </header>
@@ -1244,6 +1362,10 @@ class RestaurantHomeView {
         )}
 
         ${this.renderTrend(
+          page
+        )}
+
+        ${this.renderOnboarding(
           page
         )}
 
