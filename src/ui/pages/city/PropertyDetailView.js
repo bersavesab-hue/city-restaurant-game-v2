@@ -2,6 +2,17 @@ import {
   propertyDetailDashboardSystem
 } from "./PropertyDetailDashboardSystem.js";
 
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 
 function escapeHtml(
   value
@@ -64,24 +75,15 @@ function renderSlot(
   return `
     <div
       class="property-media-slot"
+      role="img"
+      aria-label="${escapeHtml(
+        label
+      )}"
       data-image-slot="${escapeHtml(
         id
       )}"
-    >
-      <div>
-        <span>▣</span>
-
-        <strong>
-          ${escapeHtml(
-            label
-          )}
-        </strong>
-
-        <small>
-          图片槽位
-        </small>
-      </div>
-    </div>
+      data-image-fit="cover"
+    ></div>
   `;
 }
 
@@ -585,12 +587,15 @@ class PropertyDetailView {
 
           <div
             class="property-floor-overlay-slot"
+            role="img"
+            aria-label="${escapeHtml(
+              floor.label
+            )}户型装饰层"
             data-image-slot="property-floorplan-overlay-${escapeHtml(
               floor.id
             )}"
-          >
-            户型装饰覆盖层槽位
-          </div>
+            data-image-fit="contain"
+          ></div>
 
         </div>
 
@@ -1354,15 +1359,30 @@ class PropertyDetailView {
     page
   ) {
     return `
-      <main class="property-detail-game">
+      <main class="rg-screen property-detail-game">
 
-        ${this.renderTopbar(
-          page
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "房源考察中心"
+          }
         )}
 
-        ${this.renderTitle(
-          page
+        ${renderNoticeTicker(
+          page.noticeTicker
         )}
+
+        ${renderPageTitle({
+          title:
+            page.property.name,
+
+          subtitle:
+            page.property.districtName,
+
+          backTarget:
+            "properties"
+        })}
 
 
         ${
@@ -1416,6 +1436,17 @@ class PropertyDetailView {
 
         </section>
 
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                this.restaurantId,
+
+              activePageId:
+                "city"
+            })
+        )}
+
       </main>
     `;
   }
@@ -1438,7 +1469,7 @@ class PropertyDetailView {
   ) {
     const target =
       event.target.closest?.(
-        "[data-action]"
+        "[data-action], [data-page-target]"
       );
 
     if (
@@ -1447,6 +1478,22 @@ class PropertyDetailView {
         target
       )
     ) {
+      return;
+    }
+
+
+    const pageTarget =
+      target.dataset
+        .pageTarget;
+
+    if (
+      pageTarget
+    ) {
+      this.onNavigate?.(
+        pageTarget,
+        this.restaurantId
+      );
+
       return;
     }
 
