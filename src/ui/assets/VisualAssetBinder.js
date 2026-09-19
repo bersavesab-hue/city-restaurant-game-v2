@@ -2,6 +2,10 @@ import {
   getIngredientVisual
 } from "../../data/ingredientVisuals.js";
 
+import {
+  getCustomDishVisualUrl
+} from "./CustomDishVisualService.js";
+
 
 const SUCCESS_CACHE =
   new Map();
@@ -508,6 +512,45 @@ export async function bindVisualAsset(
     "pending";
 
   try {
+    if (
+      element.dataset
+        .customDishId
+    ) {
+      const generated =
+        await getCustomDishVisualUrl(
+          element.dataset
+            .customDishId
+        );
+
+      if (
+        generated?.url
+      ) {
+        applyImage(
+          element,
+          generated.url,
+          {
+            fit:
+              element.dataset
+                .imageFit ??
+              "cover",
+
+            position:
+              element.dataset
+                .imagePosition ??
+              "center"
+          }
+        );
+
+        element.dataset
+          .dishVisualKey =
+          generated.plan
+            ?.cacheKey ??
+          "";
+
+        return generated.url;
+      }
+    }
+
     if (
       element.dataset
         .ingredientId
