@@ -19,6 +19,7 @@ on:
       - "scripts/save-compatibility-gate.mjs"
       - "scripts/chain-expansion-gate.mjs"
       - "scripts/phase6-lifecycle-gate.mjs"
+      - "scripts/phase7-ux-gate.mjs"
       - "scripts/stress-20year.mjs"
       - "scripts/aging-performance.mjs"
       - "tests/**"
@@ -58,6 +59,9 @@ jobs:
 
       - name: Run phase6 lifecycle gate
         run: npm run test:phase6:lifecycle
+
+      - name: Run phase7 ux gate
+        run: npm run test:phase7:ux
 
       - name: Run phase3 performance gate
         run: npm run test:phase3:performance
