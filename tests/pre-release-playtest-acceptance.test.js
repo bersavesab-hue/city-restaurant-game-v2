@@ -364,3 +364,64 @@ test(
     );
   }
 );
+
+
+test(
+  "Android返回键优先回到上一个游戏页面而不是直接退出",
+  () => {
+    const runtime =
+      read(
+        "src/ui/runtime/AndroidPlaytestEntry.js"
+      );
+
+    const activity =
+      read(
+        "android/app/src/main/java/com/cityrestaurant/game/MainActivity.java"
+      );
+
+    assert.match(
+      runtime,
+      /const navigationHistory\s*=/
+    );
+
+    assert.match(
+      runtime,
+      /window\.restaurantGameBack\s*=/
+    );
+
+    assert.match(
+      runtime,
+      /navigationHistory\.pop\(\)/
+    );
+
+    assert.match(
+      runtime,
+      /handlingBackNavigation/
+    );
+
+    assert.match(
+      runtime,
+      /navigationHistory\.length\s*>\s*50/
+    );
+
+    assert.match(
+      activity,
+      /public void onBackPressed\(\)/
+    );
+
+    assert.match(
+      activity,
+      /evaluateJavascript\(/
+    );
+
+    assert.match(
+      activity,
+      /window\.restaurantGameBack/
+    );
+
+    assert.match(
+      activity,
+      /MainActivity\.super\.onBackPressed\(\)/
+    );
+  }
+);
