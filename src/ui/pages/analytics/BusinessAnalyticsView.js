@@ -376,7 +376,7 @@ class BusinessAnalyticsView {
             "经营分析",
 
           subtitle:
-            `第${page.range.startDay}天—第${page.range.endDay}天`,
+            `经营数据 · 第${page.range.startDay}天—第${page.range.endDay}天`,
 
           backTarget:
             "operations"
