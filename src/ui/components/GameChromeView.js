@@ -1,3 +1,7 @@
+import {
+  renderUiIcon
+} from "./UiIconView.js";
+
 function escapeHtml(
   value
 ) {
@@ -43,36 +47,6 @@ function money(
 }
 
 
-function iconText(
-  icon
-) {
-  const map = {
-    city:
-      "城",
-
-    store:
-      "店",
-
-    restaurant:
-      "店",
-
-    operations:
-      "营",
-
-    employees:
-      "员",
-
-    more:
-      "···"
-  };
-
-
-  return (
-    map[icon] ??
-    "□"
-  );
-}
-
 
 export function renderGameTopBar(
   model,
@@ -117,9 +91,12 @@ export function renderGameTopBar(
 <section class="rg-topbar__identity">
 <div
           class="rg-topbar__avatar"
-          data-image-slot="restaurant-avatar"
+          aria-hidden="true"
         >
-          店
+          ${renderUiIcon(
+            "store",
+            "rg-topbar__avatar-icon"
+          )}
         </div>
 
         <div class="rg-topbar__identity-copy">
@@ -597,11 +574,10 @@ export function renderBottomNavigation(
               >
 
                 <span class="rg-bottom-nav__icon">
-                  ${escapeHtml(
-                    iconText(
-                      item.icon ??
-                      target
-                    )
+                  ${renderUiIcon(
+                    item.icon ??
+                    target,
+                    "rg-bottom-nav__svg"
                   )}
 
                   ${
