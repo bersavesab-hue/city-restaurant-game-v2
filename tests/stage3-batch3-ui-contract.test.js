@@ -207,3 +207,32 @@ test(
     }
   }
 );
+
+
+test(
+  "荣誉馆提供周期类别与对象三维筛选",
+  () => {
+    const source =
+      read(
+        "../src/ui/pages/honors/HonorHallView.js"
+      );
+
+    assert.ok(
+      source.includes(
+        "data-honor-period"
+      )
+    );
+
+    assert.ok(
+      source.includes(
+        "data-honor-division"
+      )
+    );
+
+    assert.ok(
+      source.includes(
+        "data-honor-subject"
+      )
+    );
+  }
+);
