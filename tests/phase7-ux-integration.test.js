@@ -54,8 +54,8 @@ import {
 } from "../src/ui/pages/restaurant/RestaurantHomeView.js";
 
 import {
-  RenovationMobileView
-} from "../src/ui/renovation/RenovationMobileView.js";
+  RenovationEditorBaseView
+} from "../src/ui/renovation/RenovationEditorBaseView.js";
 
 import {
   getSlotAssetCandidates
@@ -306,7 +306,7 @@ test(
   "装修家具使用程序化视觉家族和规格层级而不是纯文字方块",
   () => {
     const view =
-      new RenovationMobileView({
+      new RenovationEditorBaseView({
         root: {
           addEventListener() {},
           removeEventListener() {},
