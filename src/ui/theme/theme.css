@@ -1,3 +1,8 @@
+@import url("../pages/operations-hub/operations-hub.css");
+@import url("../pages/supply/supply-management.css");
+@import url("../pages/customers/customer-management.css");
+@import url("../pages/channels/channel-management.css");
+@import url("../pages/finance/finance-center.css");
 @import url("../pages/analytics/business-analytics.css");
 @import url("../renovation/renovation-construction.css");
 @import url("../pages/city/property-detail.css");
