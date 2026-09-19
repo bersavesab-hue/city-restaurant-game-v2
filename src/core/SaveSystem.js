@@ -3,6 +3,11 @@ import { eventBus } from "./EventBus.js";
 import { dataRegistry } from "./DataRegistry.js";
 import { migrationSystem } from "./MigrationSystem.js";
 
+import {
+  CURRENT_SAVE_FORMAT_VERSION,
+  SUPPORTED_SAVE_FORMAT_VERSIONS
+} from "./SaveSchema.js";
+
 class MemoryStorage {
   constructor() {
     this.data = new Map();
@@ -40,6 +45,48 @@ function resolveDefaultStorage() {
   return new MemoryStorage();
 }
 
+function prepareStateForMigration(
+  record
+) {
+  const state =
+    structuredClone(
+      record.state
+    );
+
+  if (
+    record.formatVersion ===
+      1 &&
+    !Number.isInteger(
+      state?.meta
+        ?.schemaVersion
+    )
+  ) {
+    if (
+      state.meta !==
+        undefined &&
+      (
+        state.meta === null ||
+        typeof state.meta !==
+          "object" ||
+        Array.isArray(
+          state.meta
+        )
+      )
+    ) {
+      throw new Error(
+        "Legacy save state meta is invalid"
+      );
+    }
+
+    state.meta = {
+      ...(state.meta ?? {}),
+      schemaVersion: 1
+    };
+  }
+
+  return state;
+}
+
 class SaveSystem {
   constructor({
     storage =
@@ -56,11 +103,17 @@ class SaveSystem {
   }
 
   save(slot = "auto") {
+    const state =
+      migrationSystem
+        .migrateState(
+          gameState.snapshot()
+        );
+
     const record = {
-      formatVersion: 2,
+      formatVersion:
+        CURRENT_SAVE_FORMAT_VERSION,
       savedAt: Date.now(),
-      state:
-        gameState.snapshot(),
+      state,
       registry:
         dataRegistry.snapshot()
     };
@@ -75,7 +128,12 @@ class SaveSystem {
       {
         slot,
         savedAt:
-          record.savedAt
+          record.savedAt,
+        formatVersion:
+          record.formatVersion,
+        schemaVersion:
+          state.meta
+            ?.schemaVersion
       }
     );
 
@@ -106,36 +164,76 @@ class SaveSystem {
 
     if (
       !record ||
-      ![1, 2].includes(
-        record.formatVersion
-      ) ||
+      !SUPPORTED_SAVE_FORMAT_VERSIONS
+        .includes(
+          record.formatVersion
+        ) ||
       !record.state ||
       typeof record.state !==
-        "object"
+        "object" ||
+      Array.isArray(
+        record.state
+      )
     ) {
       throw new Error(
         `Save slot "${slot}" has an invalid format`
       );
     }
 
+    const stateForMigration =
+      prepareStateForMigration(
+        record
+      );
+
     const migratedState =
       migrationSystem.migrateState(
-        record.state
+        stateForMigration
       );
 
-    if (
-      record.formatVersion >= 2 &&
-      record.registry
-    ) {
-      dataRegistry.replace(
-        record.registry
+    const previousState =
+      gameState.snapshot();
+
+    const previousRegistry =
+      dataRegistry.snapshot();
+
+    try {
+      if (
+        record.formatVersion >=
+          2 &&
+        record.registry !==
+          undefined &&
+        record.registry !==
+          null
+      ) {
+        dataRegistry.replace(
+          record.registry
+        );
+      }
+
+      gameState.replace(
+        migratedState,
+        "save:load"
       );
+    } catch (error) {
+      try {
+        dataRegistry.replace(
+          previousRegistry
+        );
+      } catch {
+        // Preserve the original load error.
+      }
+
+      try {
+        gameState.replace(
+          previousState,
+          "save:loadRollback"
+        );
+      } catch {
+        // Preserve the original load error.
+      }
+
+      throw error;
     }
-
-    gameState.replace(
-      migratedState,
-      "save:load"
-    );
 
     eventBus.emit(
       "save:loaded",
@@ -143,6 +241,8 @@ class SaveSystem {
         slot,
         savedAt:
           record.savedAt,
+        formatVersion:
+          record.formatVersion,
         schemaVersion:
           migratedState.meta
             ?.schemaVersion
