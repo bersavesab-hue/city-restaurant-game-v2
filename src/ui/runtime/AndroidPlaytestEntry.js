@@ -966,23 +966,6 @@ function navigate(
     }
 
 
-    if (
-      [
-
-        "lease",
-      ].includes(
-        pageId
-      )
-    ) {
-      placeholderPage(
-        "测试入口",
-        `页面 ${pageId} 的正式运行入口还在整合，本次先测试已经完成的核心页面。`
-      );
-
-      return;
-    }
-
-
     placeholderPage(
       "页面尚未接入",
       `当前测试APK暂未接入：${pageId}`
