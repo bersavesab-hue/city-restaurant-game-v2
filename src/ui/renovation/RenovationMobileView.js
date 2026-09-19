@@ -175,9 +175,24 @@ class RenovationMobileView {
           viewport.y
         )}"
         data-placement-id="${escapeHtml(item.id)}"
+        data-furniture-family="${escapeHtml(
+          item.familyId ??
+          item.type
+        )}"
+        data-furniture-tier="${escapeHtml(
+          item.specTier ??
+          "basic"
+        )}"
         aria-label="${escapeHtml(item.name)}"
       >
-        <span>${escapeHtml(item.name)}</span>
+        <i
+          class="renovation-furniture-visual"
+          aria-hidden="true"
+        ></i>
+
+        <span class="renovation-item__label">
+          ${escapeHtml(item.name)}
+        </span>
       </button>
     `;
   }
@@ -514,8 +529,21 @@ class RenovationMobileView {
                     class="renovation-furniture-card ${item.unlocked ? "" : "is-locked"} ${item.affordable ? "" : "is-unaffordable"} ${item.id === page.drawer.selectedFurnitureId ? "is-selected" : ""}"
                     data-action="furniture"
                     data-furniture-id="${escapeHtml(item.id)}"
+                    data-furniture-family="${escapeHtml(
+                      item.familyId ??
+                      item.type
+                    )}"
+                    data-furniture-tier="${escapeHtml(
+                      item.specTier ??
+                      "basic"
+                    )}"
                     ${item.unlocked ? "" : "disabled"}
                   >
+                    <i
+                      class="renovation-furniture-card__visual renovation-furniture-visual"
+                      aria-hidden="true"
+                    ></i>
+
                     <b>${escapeHtml(item.name)}</b>
                     <span>
                       ${escapeHtml(
