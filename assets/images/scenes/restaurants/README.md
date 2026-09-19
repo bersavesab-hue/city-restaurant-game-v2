@@ -2,12 +2,11 @@
 
 正式门店场景横图统一规格：**1600 × 900 px**。
 
-经营总控默认主图文件名：
+固定文件名：
 
-`command-center-hero.webp`
+- `command-center-hero.webp`：经营总控主场景
+- `restaurant-home-hero.webp`：门店主页主场景
+- `restaurant-live.webp`：营业现场场景
+- `default.webp`：最终通用兜底
 
-可选兜底图：
-
-`default.webp`
-
-运行时由 `VisualAssetBinder` 自动识别，无需修改页面代码。
+运行时由 `VisualAssetBinder` 自动识别。某个专用场景未制作时，会按顺序自动回退到可用场景，不需要修改页面代码。
