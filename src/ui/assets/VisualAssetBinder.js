@@ -449,6 +449,11 @@ export async function bindVisualAsset(
       .imageSrc ??
     null;
 
+  const explicitFallback =
+    element.dataset
+      .imageFallback ??
+    null;
+
   element.dataset
     .imageBinding =
     "pending";
@@ -473,10 +478,20 @@ export async function bindVisualAsset(
     }
 
     const candidates =
-      getSlotAssetCandidates(
-        slot,
-        explicitSource
-      );
+      [
+        ...getSlotAssetCandidates(
+          slot,
+          explicitSource
+        ),
+
+        ...(
+          explicitFallback
+            ? [
+                explicitFallback
+              ]
+            : []
+        )
+      ];
 
     const source =
       await firstAvailable(
