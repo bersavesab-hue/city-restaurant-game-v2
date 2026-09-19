@@ -16,6 +16,15 @@ import { recipeSystem } from "../src/systems/RecipeSystem.js";
 import { menuSystem } from "../src/systems/MenuSystem.js";
 import { operatingScheduleSystem } from "../src/systems/OperatingScheduleSystem.js";
 
+import {
+  DISH_SCHEMA_VERSION,
+  getDefaultRecipeId
+} from "../src/data/dishCatalogRules.js";
+
+import {
+  RECIPE_SCHEMA_VERSION
+} from "../src/data/recipeRules.js";
+
 const {
   gameState,
   entitySystem,
@@ -55,15 +64,35 @@ ingredientCatalogSystem.load([
 ], { overwrite: true });
 
 dishCatalogSystem.load([{
+  schemaVersion:
+    DISH_SCHEMA_VERSION,
   id: "stress_dish",
   name: "猪肉盖饭",
   category: "rice",
-  basePrice: 3000
+  basePrice: 3000,
+  unlockLevel: 1,
+  baseDifficulty: 30,
+  defaultRecipeId:
+    getDefaultRecipeId(
+      "stress_dish"
+    ),
+  tags: [
+    "rice",
+    "stir_fry"
+  ]
 }], { overwrite: true });
 
 recipeSystem.load([{
-  id: "stress_recipe",
+  schemaVersion:
+    RECIPE_SCHEMA_VERSION,
+  id:
+    getDefaultRecipeId(
+      "stress_dish"
+    ),
   dishId: "stress_dish",
+  variantId: "standard",
+  name: "压力测试标准做法",
+  method: "stir_fry",
   difficulty: 30,
   cookingMinutes: 10,
   ingredients: [
@@ -147,7 +176,10 @@ for (const ingredientId of [
 menuSystem.addItem({
   restaurantId: restaurant.id,
   dishId: "stress_dish",
-  recipeId: "stress_recipe",
+  recipeId:
+    getDefaultRecipeId(
+      "stress_dish"
+    ),
   price: 3000
 });
 
