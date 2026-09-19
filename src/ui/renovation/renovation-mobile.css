@@ -526,3 +526,411 @@
     border-top: 0;
   }
 }
+
+
+/* Phase 7: formal renovation visual language */
+.renovation-page {
+  color: #154c78;
+  background:
+    linear-gradient(
+      180deg,
+      #d9f0fc,
+      #f6fcff 34%,
+      #e5f6ff
+    );
+}
+
+.renovation-topbar {
+  border-bottom:
+    2px solid #4dcaff;
+  background:
+    linear-gradient(
+      180deg,
+      #087bc9,
+      #034a8d
+    );
+  color: #fff;
+}
+
+.renovation-category-tab.is-active,
+.renovation-floor-tab.is-active,
+.renovation-zone-tab.is-active,
+.renovation-primary-button {
+  border-color: #0875bd;
+  background:
+    linear-gradient(
+      #159fe2,
+      #07529a
+    );
+  color: #fff;
+}
+
+.renovation-bottom-sheet,
+.renovation-collapsible-panel,
+.renovation-floating-tools {
+  border-color:
+    rgba(88,202,255,.36);
+  background:
+    rgba(255,255,255,.98);
+}
+
+.renovation-furniture-card {
+  position: relative;
+  display: grid;
+  grid-template-rows:
+    34px auto auto auto;
+  gap: 2px;
+  align-content: start;
+  min-height: 116px;
+  border-color: #b9dff1;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff,
+      #eef9ff
+    );
+  text-align: left;
+}
+
+.renovation-furniture-card.is-selected {
+  border-color: #0b7fc3;
+  box-shadow:
+    inset 0 0 0 1px #0b7fc3,
+    0 4px 14px rgba(0,83,145,.12);
+}
+
+.renovation-furniture-card__visual {
+  width: 100%;
+  height: 32px;
+  border-radius: 7px;
+}
+
+.renovation-item {
+  border-color:
+    rgba(6,75,142,.42);
+  background:
+    linear-gradient(
+      145deg,
+      #f7fcff,
+      #ddecf5
+    );
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(255,255,255,.58);
+}
+
+.renovation-item__label {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 2px;
+  overflow: hidden;
+  padding: 1px 2px;
+  border-radius: 3px;
+  background:
+    rgba(255,255,255,.82);
+  color: #174c72;
+  font-size: 8px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.renovation-furniture-visual {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border:
+    1px solid rgba(0,57,102,.18);
+  background:
+    linear-gradient(
+      145deg,
+      #e8f6fd,
+      #cfe9f6
+    );
+}
+
+.renovation-item
+.renovation-furniture-visual {
+  width: 72%;
+  height: 58%;
+  min-width: 10px;
+  min-height: 8px;
+  border-radius: 5px;
+}
+
+.renovation-furniture-visual::before,
+.renovation-furniture-visual::after {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+}
+
+/* Tables */
+[data-furniture-family^="table"]
+.renovation-furniture-visual::before {
+  inset: 24% 18%;
+  border:
+    2px solid #8c5a2d;
+  border-radius: 45%;
+  background:
+    linear-gradient(
+      #e5b66a,
+      #bf7d3b
+    );
+}
+
+[data-furniture-family^="table"]
+.renovation-furniture-visual::after {
+  left: 12%;
+  right: 12%;
+  top: 10%;
+  bottom: 10%;
+  border-top:
+    4px solid #6a86a1;
+  border-bottom:
+    4px solid #6a86a1;
+  border-radius: 5px;
+}
+
+/* Kitchen line / prep / pass / sink */
+[data-furniture-family*="stove"]
+.renovation-furniture-visual,
+[data-furniture-family*="prep_counter"]
+.renovation-furniture-visual,
+[data-furniture-family*="pass_counter"]
+.renovation-furniture-visual,
+[data-furniture-family*="wash_sink"]
+.renovation-furniture-visual {
+  background:
+    linear-gradient(
+      180deg,
+      #e9f0f4,
+      #aebdc7
+    );
+}
+
+[data-furniture-family*="stove"]
+.renovation-furniture-visual::before {
+  left: 14%;
+  right: 14%;
+  top: 18%;
+  height: 28%;
+  background:
+    radial-gradient(
+      circle,
+      #394c58 0 34%,
+      transparent 36%
+    ) 0 0 / 33% 100%;
+}
+
+[data-furniture-family*="stove"]
+.renovation-furniture-visual::after {
+  left: 12%;
+  right: 12%;
+  bottom: 16%;
+  height: 22%;
+  border:
+    2px solid #667985;
+  background: #dce5ea;
+}
+
+[data-furniture-family*="prep_counter"]
+.renovation-furniture-visual::before,
+[data-furniture-family*="pass_counter"]
+.renovation-furniture-visual::before {
+  inset: 18% 10%;
+  border:
+    2px solid #7b8f9c;
+  border-top:
+    6px solid #f4f8fa;
+  background: #c7d3da;
+}
+
+[data-furniture-family*="wash_sink"]
+.renovation-furniture-visual::before {
+  inset: 18% 12%;
+  border:
+    3px solid #7f939f;
+  border-radius: 7px;
+  background:
+    radial-gradient(
+      ellipse at center,
+      #92d1ec 0 42%,
+      #d9eef7 45% 100%
+    );
+}
+
+/* Storage */
+[data-furniture-family*="storage_rack"]
+.renovation-furniture-visual::before {
+  inset: 10% 18%;
+  border:
+    2px solid #7c5a39;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #d4ad79 0 5px,
+      #7c5a39 5px 7px
+    );
+}
+
+/* Cashier and service */
+[data-furniture-family*="cashier"]
+.renovation-furniture-visual::before,
+[data-furniture-family*="service_station"]
+.renovation-furniture-visual::before {
+  inset: 25% 10% 14%;
+  border-radius: 4px;
+  background:
+    linear-gradient(
+      #4e8ab5,
+      #245f8c
+    );
+}
+
+[data-furniture-family*="cashier"]
+.renovation-furniture-visual::after {
+  width: 28%;
+  height: 24%;
+  right: 18%;
+  top: 14%;
+  border-radius: 3px;
+  background: #172f42;
+  box-shadow:
+    inset 0 0 0 2px #6ec8e9;
+}
+
+/* Waiting */
+[data-furniture-family*="waiting_bench"]
+.renovation-furniture-visual::before {
+  left: 9%;
+  right: 9%;
+  bottom: 20%;
+  height: 34%;
+  border-radius: 6px 6px 3px 3px;
+  background:
+    linear-gradient(
+      #d69c5a,
+      #a76933
+    );
+  box-shadow:
+    0 -8px 0 -3px #bb7c42;
+}
+
+/* Queue */
+[data-furniture-family*="queue_barrier"]
+.renovation-furniture-visual::before {
+  left: 18%;
+  right: 18%;
+  top: 45%;
+  height: 3px;
+  background: #d2a92d;
+  box-shadow:
+    -7px -8px 0 -1px #536b7e,
+    7px -8px 0 -1px #536b7e;
+}
+
+/* Decor */
+[data-furniture-family*="decor_plant"]
+.renovation-furniture-visual::before {
+  width: 38%;
+  height: 58%;
+  left: 31%;
+  top: 10%;
+  border-radius: 60% 45% 55% 40%;
+  background:
+    radial-gradient(
+      circle at 35% 25%,
+      #82c96f 0 24%,
+      #3c8e50 25% 100%
+    );
+}
+
+[data-furniture-family*="decor_plant"]
+.renovation-furniture-visual::after {
+  left: 37%;
+  right: 37%;
+  bottom: 8%;
+  height: 28%;
+  border-radius: 3px 3px 7px 7px;
+  background: #a86d3f;
+}
+
+[data-furniture-family*="decor_feature"]
+.renovation-furniture-visual::before {
+  inset: 12% 22%;
+  border:
+    3px solid #d5a92d;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      #fff5bb,
+      #45a5d0 62%,
+      #126a9b 64%
+    );
+}
+
+[data-furniture-family*="wall_art"]
+.renovation-furniture-visual::before {
+  inset: 12% 16%;
+  border:
+    4px solid #7b5631;
+  background:
+    linear-gradient(
+      145deg,
+      #f2d35a,
+      #55a6c9 45%,
+      #48668c
+    );
+}
+
+[data-furniture-family*="ambient_light"]
+.renovation-furniture-visual::before {
+  width: 44%;
+  height: 44%;
+  left: 28%;
+  top: 17%;
+  border-radius: 50%;
+  background: #ffe479;
+  box-shadow:
+    0 0 10px #ffd94b;
+}
+
+[data-furniture-family*="partition"]
+.renovation-furniture-visual::before {
+  inset: 8% 30%;
+  border:
+    2px solid #825f3f;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #d2a66d 0 4px,
+      #9b7047 4px 6px
+    );
+}
+
+/* Tier polish without separate image files */
+[data-furniture-tier="standard"]
+.renovation-furniture-visual {
+  filter:
+    saturate(1.04);
+}
+
+[data-furniture-tier="pro"]
+.renovation-furniture-visual {
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(20,126,181,.25);
+}
+
+[data-furniture-tier="premium"]
+.renovation-furniture-visual,
+[data-furniture-tier="flagship"]
+.renovation-furniture-visual {
+  border-color: #d4a923;
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(255,226,99,.75);
+}
