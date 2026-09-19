@@ -232,14 +232,9 @@ class CityMapView {
 
       rightHtml:
         `
-          <button
-            type="button"
-            class="city-title-property-button"
-            data-action="navigate"
-            data-page-id="properties"
-          >
-            房源列表
-          </button>
+          <div class="city-title-slogan">
+            选对位置，开创美食未来！
+          </div>
         `
     });
   }
@@ -403,10 +398,14 @@ class CityMapView {
                       </strong>
 
                       <small>
-                        ${
+                        客流 ${
                           district
-                            .propertyCount
-                        }套
+                            .trafficIndex
+                        }
+                        · 消费 ${
+                          district
+                            .spendingPower
+                        }
                       </small>
 
                     </button>
@@ -708,122 +707,39 @@ class CityMapView {
 
 
   renderFilters() {
+    const filters = [
+      { label: "面积", value: "30㎡–10000㎡" },
+      { label: "月租预算", value: "不限" },
+      { label: "房型", value: "不限" },
+      { label: "客流", value: "不限" },
+      { label: "楼层", value: "不限" },
+      { label: "餐饮条件", value: "可做餐饮" },
+      { label: "后厨条件", value: "可排烟" }
+    ];
+
     return `
-      <section class="city-filter-panel">
-
-        <header>
-          <strong>
-            快速筛选
-          </strong>
-
-          <span>
-            房源面积范围 30–10000㎡
-          </span>
-        </header>
-
-
+      <section class="city-filter-panel city-filter-panel--compact">
         <div class="city-filter-grid">
-
-          <button
-            type="button"
-            data-action="navigate"
-            data-page-id="properties"
-          >
-            <span>
-              面积
-            </span>
-
-            <strong>
-              30–150㎡
-            </strong>
-
-            <small>
-              小店起步
-            </small>
-          </button>
-
-
-          <button
-            type="button"
-            data-action="navigate"
-            data-page-id="properties"
-          >
-            <span>
-              面积
-            </span>
-
-            <strong>
-              151–500㎡
-            </strong>
-
-            <small>
-              标准餐厅
-            </small>
-          </button>
-
-
-          <button
-            type="button"
-            data-action="navigate"
-            data-page-id="properties"
-          >
-            <span>
-              面积
-            </span>
-
-            <strong>
-              500㎡以上
-            </strong>
-
-            <small>
-              大型门店
-            </small>
-          </button>
-
-
-          <button
-            type="button"
-            data-action="navigate"
-            data-page-id="properties"
-          >
-            <span>
-              条件
-            </span>
-
-            <strong>
-              可做餐饮
-            </strong>
-
-            <small>
-              优先筛选
-            </small>
-          </button>
-
-
-          <button
-            type="button"
-            data-action="navigate"
-            data-page-id="properties"
-          >
-            <span>
-              条件
-            </span>
-
-            <strong>
-              可排烟
-            </strong>
-
-            <small>
-              热厨必备
-            </small>
-          </button>
-
+          ${filters
+            .map(
+              (filter, index) => `
+                <button
+                  type="button"
+                  class="${index === 0 ? "is-primary" : ""}"
+                  data-action="navigate"
+                  data-page-id="properties"
+                >
+                  <span>${filter.label}</span>
+                  <strong>${filter.value}</strong>
+                  <small>⌄</small>
+                </button>
+              `
+            )
+            .join("")}
         </div>
-
       </section>
     `;
   }
-
 
   renderRecommended(
     page
