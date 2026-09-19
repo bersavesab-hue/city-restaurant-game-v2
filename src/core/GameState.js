@@ -1,5 +1,9 @@
 import { eventBus } from "./EventBus.js";
 
+import {
+  CURRENT_STATE_SCHEMA_VERSION
+} from "./SaveSchema.js";
+
 const clone = (value) => structuredClone(value);
 
 function createInitialState() {
@@ -7,7 +11,8 @@ function createInitialState() {
 
   return {
     meta: {
-      schemaVersion: 1,
+      schemaVersion:
+        CURRENT_STATE_SCHEMA_VERSION,
       createdAt: now,
       updatedAt: now
     },
@@ -24,7 +29,22 @@ function createInitialState() {
       speed: 1
     },
 
-    data: {}
+    scheduler: {
+      nextId: 1,
+      tasks: []
+    },
+
+    simulation: {
+      processedMinutes: 0,
+      processedHours: 0,
+      processedDays: 0,
+      ticks: 0
+    },
+
+    data: {
+      entities: {},
+      entityCounters: {}
+    }
   };
 }
 
