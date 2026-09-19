@@ -56,6 +56,23 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (gameView == null) {
+            super.onBackPressed();
+            return;
+        }
+
+        gameView.evaluateJavascript(
+                "(window.restaurantGameBack && window.restaurantGameBack()) ? 'true' : 'false';",
+                value -> {
+                    if (!"\"true\"".equals(value)) {
+                        MainActivity.super.onBackPressed();
+                    }
+                }
+        );
+    }
+
+    @Override
     protected void onDestroy() {
         if (gameView != null) {
             gameView.destroy();
