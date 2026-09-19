@@ -32,10 +32,9 @@ const tests = [
   "tests/opening-live-refresh.test.js",
   "tests/opening-journey-e2e.test.js",
 
-  "tests/restaurant-home-ui.test.js",
-  "tests/restaurant-home-formal-ui.test.js",
 
   "tests/operating-command-center.test.js",
+  "tests/operating-command-center-formal-ui.test.js",
   "tests/operating-cycle.test.js",
   "tests/operating-day-e2e.test.js",
   "tests/formal-runtime-live-refresh.test.js",

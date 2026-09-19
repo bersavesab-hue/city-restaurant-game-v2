@@ -37,8 +37,6 @@ class CityMapViewportRuntime {
     root.addEventListener("pointercancel", this.boundPointerUp, true);
     root.addEventListener("wheel", this.boundWheel, { passive: false, capture: true });
 
-    this.observer = new MutationObserver(() => this.attach());
-    this.observer.observe(document.body, { childList: true, subtree: true });
     this.attach();
     return this;
   }
@@ -51,8 +49,6 @@ class CityMapViewportRuntime {
     this.root.removeEventListener("pointerup", this.boundPointerUp, true);
     this.root.removeEventListener("pointercancel", this.boundPointerUp, true);
     this.root.removeEventListener("wheel", this.boundWheel, true);
-    this.observer?.disconnect();
-    this.observer = null;
     this.pointers.clear();
     this.drag = null;
     this.pinch = null;

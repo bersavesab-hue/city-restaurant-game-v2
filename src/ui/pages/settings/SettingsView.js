@@ -286,24 +286,7 @@ class SettingsView {
       );
 
 
-    this.root
-      .querySelectorAll(
-        "[data-page-target]"
-      )
-      .forEach(
-        button => {
-          button.addEventListener(
-            "click",
-            () => {
-              this.onNavigate?.(
-                button.dataset
-                  .pageTarget,
-                this.restaurantId
-              );
-            }
-          );
-        }
-      );
+
   }
 
 

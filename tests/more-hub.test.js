@@ -113,7 +113,7 @@ test("更多主页只保留已经接入的正式功能入口", () => {
 });
 
 
-test("Android运行时不再把more渲染为占位页", () => {
+test("Android运行时通过统一导航解析器进入more-home", () => {
   const source=
     fs.readFileSync(
       new URL(
@@ -123,9 +123,17 @@ test("Android运行时不再把more渲染为占位页", () => {
       "utf8"
     );
 
+  assert.equal(
+    gameplayNavigationSystem
+      .resolveNavigationTarget(
+        "more"
+      ),
+    "more-home"
+  );
+
   assert.match(
     source,
-    /pageId =\s*"more-home"/
+    /gameplayNavigationSystem[\s\S]*resolveNavigationTarget/
   );
 
   assert.doesNotMatch(

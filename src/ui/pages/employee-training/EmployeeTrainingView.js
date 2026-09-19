@@ -275,28 +275,7 @@ class EmployeeTrainingView {
 
 
   bind() {
-    this.root
-      .querySelectorAll(
-        "[data-page-target]"
-      )
-      .forEach(
-        element => {
-          element.addEventListener(
-            "click",
-            () => {
-              this.onNavigate?.(
-                element.dataset
-                  .pageTarget,
-                this.restaurantId,
-                {
-                  employeeId:
-                    this.employeeId
-                }
-              );
-            }
-          );
-        }
-      );
+
 
     this.root
       .querySelectorAll(

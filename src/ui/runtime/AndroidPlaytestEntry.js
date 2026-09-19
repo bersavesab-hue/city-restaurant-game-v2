@@ -37,6 +37,10 @@ import {
 } from "./FormalPageRuntime.js";
 
 import {
+  gameplayNavigationSystem
+} from "../navigation/GameplayNavigationSystem.js";
+
+import {
   restaurantSystem
 } from "../../systems/RestaurantSystem.js";
 
@@ -104,6 +108,7 @@ import {
 } from "../components/GameChromeView.js";
 
 import {
+  bindVisualAsset,
   bindVisualAssets
 } from "../assets/VisualAssetBinder.js";
 
@@ -123,6 +128,9 @@ let currentView =
 let currentRoute =
   null;
 
+let routeRevision =
+  0;
+
 const navigationHistory =
   [];
 
@@ -135,6 +143,12 @@ const SEGMENT_NAMES =
 
 let runtimeEnhancementObserver =
   null;
+
+let runtimeEnhancementFrame =
+  null;
+
+const pendingEnhancementRoots =
+  new Set();
 
 
 function refreshSegmentNames() {
@@ -187,6 +201,7 @@ function updateVisibleCustomerLabels() {
 function startRuntimeEnhancements() {
   refreshSegmentNames();
   updateVisibleCustomerLabels();
+
   void bindVisualAssets(
     root
   );
@@ -194,16 +209,115 @@ function startRuntimeEnhancements() {
   runtimeEnhancementObserver
     ?.disconnect();
 
-  runtimeEnhancementObserver =
-    new MutationObserver(
-      () => {
-        updateVisibleCustomerLabels();
+
+  const flush =
+    () => {
+      runtimeEnhancementFrame =
+        null;
+
+      const nodes =
+        [
+          ...pendingEnhancementRoots
+        ];
+
+      pendingEnhancementRoots
+        .clear();
+
+
+      let needsCustomerRefresh =
+        false;
+
+
+      for (
+        const node
+        of nodes
+      ) {
+        if (
+          !node ||
+          node.nodeType !== 1
+        ) {
+          continue;
+        }
+
+
+        if (
+          node.matches?.(
+            ".city-customer-mix, .city-customer-mix *"
+          ) ||
+          node.querySelector?.(
+            ".city-customer-mix"
+          )
+        ) {
+          needsCustomerRefresh =
+            true;
+        }
+
+
+        if (
+          node.matches?.(
+            "[data-image-slot], [data-ingredient-id]"
+          )
+        ) {
+          void bindVisualAsset(
+            node
+          );
+        }
+
 
         void bindVisualAssets(
-          root
+          node
         );
       }
+
+
+      if (
+        needsCustomerRefresh
+      ) {
+        updateVisibleCustomerLabels();
+      }
+    };
+
+
+  runtimeEnhancementObserver =
+    new MutationObserver(
+      mutations => {
+        for (
+          const mutation
+          of mutations
+        ) {
+          for (
+            const node
+            of mutation.addedNodes
+          ) {
+            if (
+              node?.nodeType === 1
+            ) {
+              pendingEnhancementRoots
+                .add(
+                  node
+                );
+            }
+          }
+        }
+
+
+        if (
+          pendingEnhancementRoots.size ===
+          0 ||
+          runtimeEnhancementFrame !==
+          null
+        ) {
+          return;
+        }
+
+
+        runtimeEnhancementFrame =
+          requestAnimationFrame(
+            flush
+          );
+      }
     );
+
 
   runtimeEnhancementObserver
     .observe(
@@ -433,9 +547,6 @@ function startRuntimeSystems() {
     }
   });
 
-  cityMapViewportRuntime.start(
-    root
-  );
 }
 
 
@@ -456,6 +567,9 @@ function saveNow() {
 
 
 function destroyCurrent() {
+  cityMapViewportRuntime
+    .stop();
+
   if (
     currentView &&
     typeof currentView
@@ -565,6 +679,9 @@ function navigate(
     passedRestaurantId ??
     restaurantId;
 
+  routeRevision +=
+    1;
+
   const nextRoute = {
     pageId,
     restaurantId,
@@ -594,18 +711,14 @@ function navigate(
   currentRoute =
     nextRoute;
 
-  saveNow();
-
+  /*
+   * 导航不是经营数据修改。
+   * 不允许每次点击页面都同步序列化整个存档。
+   */
   destroyCurrent();
 
   try {
-    if (
-      pageId ===
-      "employees"
-    ) {
-      pageId =
-        "employee_roster";
-    }
+
 
     if (
       pageId ===
@@ -624,6 +737,13 @@ function navigate(
     }
 
 
+    pageId =
+      gameplayNavigationSystem
+        .resolveNavigationTarget(
+          pageId
+        );
+
+
     if (
       pageId ===
       "city"
@@ -638,6 +758,11 @@ function navigate(
         });
 
       currentView.mount();
+
+      cityMapViewportRuntime
+        .start(
+          root
+        );
 
       return;
     }
@@ -796,23 +921,6 @@ function navigate(
     }
 
 
-    if (
-      pageId ===
-      "operations"
-    ) {
-      pageId =
-        "operations-home";
-    }
-
-
-    if (
-      pageId ===
-      "more"
-    ) {
-      pageId =
-        "more-home";
-    }
-
 
     if (
       pageId ===
@@ -932,6 +1040,209 @@ window.restaurantGameBack =
 
     return true;
   };
+
+
+root.addEventListener(
+  "click",
+  event => {
+    const element =
+      event.target
+        ?.closest?.(
+          "[data-page-target]"
+        );
+
+    if (
+      !element ||
+      !root.contains(
+        element
+      ) ||
+      element.disabled
+    ) {
+      return;
+    }
+
+
+    const target =
+      element.dataset
+        .pageTarget;
+
+    if (!target) {
+      return;
+    }
+
+
+    const revisionBefore =
+      routeRevision;
+
+
+    const params = {};
+
+
+    for (
+      const [
+        key,
+        value
+      ]
+      of Object.entries(
+        element.dataset
+      )
+    ) {
+      if (
+        key ===
+        "pageTarget"
+      ) {
+        continue;
+      }
+
+
+      if (
+        key.startsWith(
+          "page"
+        ) &&
+        key.length >
+          4
+      ) {
+        const raw =
+          key.slice(
+            4
+          );
+
+        const paramName =
+          raw.charAt(0)
+            .toLowerCase() +
+          raw.slice(1);
+
+        params[
+          paramName
+        ] =
+          value;
+
+        continue;
+      }
+
+
+      if (
+        key.endsWith(
+          "Id"
+        )
+      ) {
+        params[
+          key
+        ] =
+          value;
+      }
+    }
+
+
+    setTimeout(
+      () => {
+        /*
+         * 原页面自己的事件已经成功导航，
+         * revision 会变化，因此这里不会重复执行。
+         */
+        if (
+          routeRevision !==
+          revisionBefore
+        ) {
+          return;
+        }
+
+
+        navigate(
+          target,
+          restaurantId,
+          params
+        );
+      },
+      0
+    );
+  },
+  true
+);
+
+
+/* data-page-navigation-listener */
+
+root.addEventListener(
+  "click",
+  event => {
+    const element =
+      event.target
+        ?.closest?.(
+          "[data-page-target]"
+        );
+
+    if (
+      !element ||
+      !root.contains(element) ||
+      element.disabled
+    ) {
+      return;
+    }
+
+    const pageId =
+      element.dataset
+        .pageTarget;
+
+    if (!pageId) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const params = {};
+
+    for (
+      const [key, value]
+      of Object.entries(
+        element.dataset
+      )
+    ) {
+      if (
+        key === "pageTarget" ||
+        key === "restaurantId"
+      ) {
+        continue;
+      }
+
+      if (
+        key.startsWith("page") &&
+        key.length > 4
+      ) {
+        const raw =
+          key.slice(4);
+
+        const paramName =
+          raw.charAt(0)
+            .toLowerCase() +
+          raw.slice(1);
+
+        params[paramName] =
+          value;
+
+        continue;
+      }
+
+      if (
+        key.endsWith("Id")
+      ) {
+        params[key] =
+          value;
+      }
+    }
+
+    navigate(
+      pageId,
+
+      element.dataset
+        .restaurantId ??
+      restaurantId,
+
+      params
+    );
+  },
+  true
+);
 
 
 root.addEventListener(

@@ -192,12 +192,6 @@ export {
 } from "./components/GameChromeSystem.js";
 
 export {
-  navigationHistorySystem,
-  NavigationHistorySystem
-} from "./navigation/NavigationHistorySystem.js";
-
-
-export {
   rankingCenterPageSystem,
   RankingCenterPageSystem,
   RANKING_PERIODS,

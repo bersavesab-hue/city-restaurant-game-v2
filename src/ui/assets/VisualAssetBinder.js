@@ -472,50 +472,11 @@ async function bindIngredient(
     return false;
   }
 
-  let visual;
-
-  try {
-    visual =
-      getIngredientVisual(
-        ingredientId
-      );
-  } catch {
-    return false;
-  }
-
-  const candidates =
-    [
-      visual.image,
-      ...withExtensions(
-        "assets/images/ingredients/" +
-        visual.code +
-        "_" +
-        visual.id
-      )
-    ];
-
-  const source =
-    await firstAvailable(
-      unique(
-        candidates
-      )
-    );
-
-  if (
-    source
-  ) {
-    applyImage(
-      element,
-      source,
-      {
-        fit:
-          "cover"
-      }
-    );
-
-    return true;
-  }
-
+  /*
+   * 食材正式资源已经在构建阶段生成 Atlas。
+   * Android 运行时不再逐个探测独立 PNG/WEBP，
+   * 避免大量 Image 请求与失败回退。
+   */
   return applyIngredientAtlas(
     element,
     ingredientId
@@ -533,12 +494,19 @@ export async function bindVisualAsset(
     return null;
   }
 
-  if (
+  const bindingState =
     element.dataset
-      .imageBinding ===
-    "pending"
+      .imageBinding;
+
+  if (
+    bindingState === "pending" ||
+    bindingState === "done"
   ) {
-    return null;
+    return (
+      element.dataset
+        .imageResolved ??
+      null
+    );
   }
 
   const slot =

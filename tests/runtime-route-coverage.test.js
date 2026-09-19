@@ -150,15 +150,49 @@ test(
 
 
 test(
-  "经营主页不再错误直达菜品页",
+  "主导航统一解析到唯一正式落地页",
   () => {
-    assert.match(
-      androidSource,
-      /pageId\s*===\s*"operations"[\s\S]{0,180}"operations-home"/
+    assert.equal(
+      gameplayNavigationSystem
+        .resolveNavigationTarget(
+          "city"
+        ),
+      "city"
+    );
+
+    assert.equal(
+      gameplayNavigationSystem
+        .resolveNavigationTarget(
+          "restaurant"
+        ),
+      "operating-command-center"
+    );
+
+    assert.equal(
+      gameplayNavigationSystem
+        .resolveNavigationTarget(
+          "operations"
+        ),
+      "operations-home"
+    );
+
+    assert.equal(
+      gameplayNavigationSystem
+        .resolveNavigationTarget(
+          "employees"
+        ),
+      "employee_roster"
+    );
+
+    assert.equal(
+      gameplayNavigationSystem
+        .resolveNavigationTarget(
+          "more"
+        ),
+      "more-home"
     );
   }
 );
-
 
 test(
   "正式运行时挂载器已接入Android入口",

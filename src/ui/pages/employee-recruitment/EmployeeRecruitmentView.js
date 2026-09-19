@@ -372,24 +372,7 @@ class EmployeeRecruitmentView {
 
 
   bind() {
-    this.root
-      .querySelectorAll(
-        "[data-page-target]"
-      )
-      .forEach(
-        element => {
-          element.addEventListener(
-            "click",
-            () => {
-              this.onNavigate?.(
-                element.dataset
-                  .pageTarget,
-                this.restaurantId
-              );
-            }
-          );
-        }
-      );
+
 
     this.root
       .querySelectorAll(
