@@ -905,7 +905,10 @@ function navigate(
       "analytics"
     ) {
       currentView =
-        new BusinessAnalyticsView();
+        new BusinessAnalyticsView({
+          onNavigate:
+            navigate
+        });
 
       currentView.mount(
         root,
@@ -913,7 +916,10 @@ function navigate(
           restaurantId,
           period:
             params.period ??
-            "week"
+            "week",
+
+          onNavigate:
+            navigate
         }
       );
 
