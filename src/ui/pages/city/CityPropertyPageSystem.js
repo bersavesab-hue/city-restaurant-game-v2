@@ -6,6 +6,7 @@ import { propertyLeaseMarketSystem } from "../../../systems/PropertyLeaseMarketS
 import { financeSystem } from "../../../systems/FinanceSystem.js";
 import { leaseSystem } from "../../../systems/LeaseSystem.js";
 import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
+import { chainSystem } from "../../../systems/ChainSystem.js";
 import { venueTypeSystem } from "../../../systems/VenueTypeSystem.js";
 import { pageRegistry } from "../../registry/PageRegistry.js";
 
@@ -358,14 +359,88 @@ class CityPropertyPageSystem {
   } = {}) {
     const districts = districtSystem.getAll();
 
+    let plannedRegionId =
+      null;
+
+    if (restaurantId) {
+      try {
+        const restaurant =
+          restaurantSystem.get(
+            restaurantId
+          );
+
+        const chain =
+          chainSystem
+            .findChainByRestaurant(
+              restaurantId
+            );
+
+        if (
+          chain &&
+          !restaurant.locationId &&
+          restaurant.plannedRegionId
+        ) {
+          plannedRegionId =
+            restaurant
+              .plannedRegionId;
+        }
+      } catch {
+        plannedRegionId =
+          null;
+      }
+    }
+
+    const allowedDistricts =
+      plannedRegionId
+        ? districts.filter(
+            district =>
+              chainSystem
+                .getRegionIdForDistrict(
+                  district.id
+                ) ===
+              plannedRegionId
+          )
+        : districts;
+
+    const allowedDistrictIds =
+      new Set(
+        allowedDistricts.map(
+          item =>
+            item.id
+        )
+      );
+
+    const effectiveDistrictId =
+      districtId !== null &&
+      allowedDistrictIds.has(
+        districtId
+      )
+        ? districtId
+        : (
+            districtId === null
+              ? null
+              : "__unavailable__"
+          );
+
     if (generateListings) {
-      if (districtId !== null) {
+      if (
+        effectiveDistrictId !==
+          null &&
+        effectiveDistrictId !==
+          "__unavailable__"
+      ) {
         propertyMarketSystem.ensureDistrictStock(
-          districtId,
+          effectiveDistrictId,
           { target: marketTarget }
         );
-      } else {
-        for (const district of districts) {
+      } else if (
+        effectiveDistrictId ===
+          null
+      ) {
+        for (
+          const district
+          of allowedDistricts
+        ) {
           propertyMarketSystem.ensureDistrictStock(
             district.id,
             { target: marketTarget }
@@ -375,7 +450,21 @@ class CityPropertyPageSystem {
     }
 
     const properties = propertySystem
-      .list({ districtId, availableOnly })
+      .list({
+        districtId:
+          effectiveDistrictId ===
+            "__unavailable__"
+            ? "__unavailable__"
+            : effectiveDistrictId,
+        availableOnly
+      })
+      .filter(
+        item =>
+          allowedDistrictIds
+            .has(
+              item.districtId
+            )
+      )
       .filter(item => minArea === null || item.area >= minArea)
       .filter(item => maxArea === null || item.area <= maxArea)
       .filter(item => maxRent === null || item.monthlyRent <= maxRent)
@@ -439,14 +528,19 @@ class CityPropertyPageSystem {
       ? leaseSystem.getByRestaurant(restaurantId) ?? null
       : null;
 
-    const marketDistricts = districtId === null
-      ? districts
-      : districts.filter(item => item.id === districtId);
+    const marketDistricts =
+      effectiveDistrictId === null
+        ? allowedDistricts
+        : allowedDistricts.filter(
+            item =>
+              item.id ===
+              effectiveDistrictId
+          );
 
     return {
       pageId: "properties",
       title: "城市与房源",
-      districts: districts.map(item => ({
+      districts: allowedDistricts.map(item => ({
         id: item.id,
         name: item.name,
         trafficIndex: item.trafficIndex,
@@ -500,7 +594,13 @@ class CityPropertyPageSystem {
       })),
       properties,
       filters: {
-        districtId,
+        districtId:
+          effectiveDistrictId ===
+            "__unavailable__"
+            ? null
+            : effectiveDistrictId,
+
+        plannedRegionId,
         minArea,
         maxArea,
         maxRent,
