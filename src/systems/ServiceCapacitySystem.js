@@ -411,13 +411,13 @@ class ServiceCapacitySystem {
 
       kitchenGuests:
         Math.max(
-          1,
+          0,
           finalKitchenGuests
         ),
 
       serviceGuests:
         Math.max(
-          1,
+          0,
           finalServiceGuests
         ),
 
