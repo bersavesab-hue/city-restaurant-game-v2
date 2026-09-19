@@ -27,7 +27,10 @@ test(
         "command-dish-",
         "command-employee-",
         "command-ingredient-",
-        "market-strategy"
+        "market-strategy",
+        "command-center__store-strip",
+        "data-restaurant-id",
+        "集团经营范围"
       ]
     ) {
       assert.equal(

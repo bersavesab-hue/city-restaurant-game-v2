@@ -47,6 +47,10 @@ import {
   getDishVisualSource
 } from "../../assets/DishVisualResolver.js";
 
+import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
+import { financeSystem } from "../../../systems/FinanceSystem.js";
+import { managementScopeSystem } from "../../components/ManagementScopeSystem.js";
+
 
 
 function noticeType(
@@ -479,11 +483,51 @@ function buildMarketPreview(
   };
 }
 
+function buildStorePortfolio(restaurantId) {
+  const current = restaurantSystem.get(restaurantId);
+  const stores = restaurantSystem.list()
+    .filter(store => current.chainId ? store.chainId === current.chainId : store.id === current.id)
+    .sort((a,b) => (a.branchNumber ?? 1) - (b.branchNumber ?? 1));
+
+  const cards = stores.map(store => {
+    const dashboard = safe(() => operatingCommandCenterSystem.getDashboard(store.id), null);
+    return {
+      id: store.id,
+      name: store.name,
+      active: store.id === restaurantId,
+      status: store.status ?? "closed",
+      statusLabel: { open:"营业中", paused:"暂停营业", closed:"未营业" }[store.status] ?? "筹备中",
+      level: store.level ?? 1,
+      reviewScore: store.reviewScore ?? 0,
+      revenue: dashboard?.sales?.revenue ?? 0,
+      profit: dashboard?.sales?.profit ?? 0,
+      orders: dashboard?.sales?.orderCount ?? 0,
+      balance: safe(() => financeSystem.getBalance(store.id), 0),
+      issueCount: dashboard?.priorities?.length ?? 0
+    };
+  });
+
+  return {
+    scope: managementScopeSystem.getCurrent(),
+    canSwitch: cards.length > 1,
+    storeCount: cards.length,
+    cards,
+    totals: cards.reduce((result,store) => ({
+      revenue: result.revenue + store.revenue,
+      profit: result.profit + store.profit,
+      orders: result.orders + store.orders,
+      balance: result.balance + store.balance,
+      issueCount: result.issueCount + store.issueCount
+    }), { revenue:0, profit:0, orders:0, balance:0, issueCount:0 })
+  };
+}
+
 
 class OperatingCommandCenterPageSystem {
   getPage(
     restaurantId
   ) {
+    const storePortfolio = buildStorePortfolio(restaurantId);
     const dashboard =
       operatingCommandCenterSystem
         .getDashboard(
@@ -630,7 +674,10 @@ class OperatingCommandCenterPageSystem {
           runtime,
 
           currentStoreId:
-            restaurantId
+            restaurantId,
+
+          stores:
+            storePortfolio.cards
         }),
 
       noticeTicker:
@@ -678,7 +725,9 @@ class OperatingCommandCenterPageSystem {
           dashboard
         ),
 
-      awardFeedback
+      awardFeedback,
+
+      storePortfolio
     };
   }
 }

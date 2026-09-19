@@ -448,6 +448,31 @@ function channelName(
   }[id] ?? id;
 }
 
+function renderStorePortfolio(portfolio) {
+  if (!portfolio) return "";
+  const groupMode = portfolio.scope?.type === "group" && portfolio.canSwitch;
+  return `
+    <section class="command-center__portfolio ${groupMode ? "is-group" : "is-store"}">
+      <header>
+        <div><span>${groupMode ? "集团经营范围" : "当前管理门店"}</span><h2>${groupMode ? `${portfolio.storeCount} 家门店` : "门店实时状态"}</h2></div>
+        <strong>${portfolio.totals.issueCount > 0 ? `${portfolio.totals.issueCount} 项待处理` : "全部正常"}</strong>
+      </header>
+      ${groupMode ? `<div class="command-center__portfolio-totals">
+        <article><span>集团营业额</span><strong>${money(portfolio.totals.revenue)}</strong></article>
+        <article><span>集团利润</span><strong>${money(portfolio.totals.profit)}</strong></article>
+        <article><span>总订单</span><strong>${portfolio.totals.orders}</strong></article>
+        <article><span>集团现金</span><strong>${money(portfolio.totals.balance)}</strong></article>
+      </div>` : ""}
+      <div class="command-center__store-strip" aria-label="门店列表">
+        ${portfolio.cards.map(store => `<button type="button" class="command-center__store-card ${store.active ? "is-active" : ""}" data-page-target="operating-command-center" data-restaurant-id="${escapeHtml(store.id)}">
+          <span class="command-center__store-status" data-status="${escapeHtml(store.status)}">${escapeHtml(store.statusLabel)}</span>
+          <strong>${escapeHtml(store.name)}</strong><small>Lv.${store.level} · 评分 ${Number(store.reviewScore).toFixed(1)}</small>
+          <b>${money(store.revenue)}</b><i>${store.orders} 单 · ${store.issueCount} 项提醒</i>
+        </button>`).join("")}
+      </div>
+    </section>`;
+}
+
 
 class OperatingCommandCenterView {
   renderMarkup(page) {
@@ -490,13 +515,14 @@ class OperatingCommandCenterView {
         : "";
 
 
+    const isGroupScope = page.storePortfolio?.scope?.type === "group" && page.storePortfolio?.canSwitch;
     const pageTitleHtml =
       renderPageTitle({
         title:
-          "经营总控",
+          isGroupScope ? "集团门店总览" : "门店总览",
 
         subtitle:
-          "掌握门店经营全局 · 实时数据驱动决策",
+          isGroupScope ? "查看全部门店表现 · 快速定位异常门店" : "掌握当前门店现场 · 实时数据驱动决策",
 
         helpLabel:
           "经营攻略",
@@ -521,6 +547,8 @@ class OperatingCommandCenterView {
         ${pageTitleHtml}
 
         <section class="command-center">
+
+        ${renderStorePortfolio(page.storePortfolio)}
 
         <header class="command-center__header">
           <div
