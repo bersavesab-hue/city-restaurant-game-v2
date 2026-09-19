@@ -1,5 +1,9 @@
 import { eventBus } from "./EventBus.js";
 
+import {
+  CURRENT_STATE_SCHEMA_VERSION
+} from "./SaveSchema.js";
+
 const clone = (value) => structuredClone(value);
 
 function validateVersion(version, name = "Version") {
@@ -10,6 +14,386 @@ function validateVersion(version, name = "Version") {
   }
 
   return version;
+}
+
+function requireObject(
+  value,
+  name,
+  fallback = {}
+) {
+  if (
+    value === undefined ||
+    value === null
+  ) {
+    return clone(
+      fallback
+    );
+  }
+
+  if (
+    typeof value !== "object" ||
+    Array.isArray(value)
+  ) {
+    throw new TypeError(
+      `${name} must be an object`
+    );
+  }
+
+  return clone(value);
+}
+
+function normalizeCounter(
+  value
+) {
+  const number =
+    Number(value);
+
+  if (
+    !Number.isFinite(number) ||
+    number < 0
+  ) {
+    return 0;
+  }
+
+  return Math.floor(
+    number
+  );
+}
+
+function inferEntityCounter(
+  type,
+  collection
+) {
+  const prefix =
+    `${type}_`;
+
+  let maximum = 0;
+
+  for (
+    const id
+    of Object.keys(
+      collection
+    )
+  ) {
+    if (
+      !id.startsWith(
+        prefix
+      )
+    ) {
+      continue;
+    }
+
+    const suffix =
+      id.slice(
+        prefix.length
+      );
+
+    if (
+      !/^\d+$/.test(
+        suffix
+      )
+    ) {
+      continue;
+    }
+
+    maximum =
+      Math.max(
+        maximum,
+        Number(suffix)
+      );
+  }
+
+  return maximum;
+}
+
+function inferSchedulerNextId(
+  tasks
+) {
+  let maximum = 0;
+
+  for (
+    const task
+    of tasks
+  ) {
+    const id =
+      task?.id;
+
+    if (
+      typeof id !== "string"
+    ) {
+      continue;
+    }
+
+    const match =
+      /^task_(\d+)$/.exec(
+        id
+      );
+
+    if (!match) {
+      continue;
+    }
+
+    maximum =
+      Math.max(
+        maximum,
+        Number(
+          match[1]
+        )
+      );
+  }
+
+  return maximum + 1;
+}
+
+function normalizeNonNegativeInteger(
+  value,
+  fallback = 0
+) {
+  const number =
+    Number(value);
+
+  if (
+    !Number.isFinite(number) ||
+    number < 0
+  ) {
+    return fallback;
+  }
+
+  return Math.floor(
+    number
+  );
+}
+
+function migrateStateV1ToV2(
+  sourceState
+) {
+  const state =
+    clone(sourceState);
+
+  state.meta =
+    requireObject(
+      state.meta,
+      "State meta"
+    );
+
+  const time =
+    requireObject(
+      state.time,
+      "State time"
+    );
+
+  state.time = {
+    ...time,
+
+    day:
+      Math.max(
+        1,
+        normalizeNonNegativeInteger(
+          time.day,
+          1
+        )
+      ),
+
+    hour:
+      Math.min(
+        23,
+        normalizeNonNegativeInteger(
+          time.hour,
+          8
+        )
+      ),
+
+    minute:
+      Math.min(
+        59,
+        normalizeNonNegativeInteger(
+          time.minute,
+          0
+        )
+      ),
+
+    totalMinutes:
+      normalizeNonNegativeInteger(
+        time.totalMinutes,
+        0
+      )
+  };
+
+  const runtime =
+    requireObject(
+      state.runtime,
+      "State runtime"
+    );
+
+  state.runtime = {
+    ...runtime,
+
+    paused:
+      typeof runtime.paused ===
+        "boolean"
+        ? runtime.paused
+        : true,
+
+    speed:
+      [
+        1,
+        2,
+        4
+      ].includes(
+        runtime.speed
+      )
+        ? runtime.speed
+        : 1
+  };
+
+  const data =
+    requireObject(
+      state.data,
+      "State data"
+    );
+
+  const entities =
+    requireObject(
+      data.entities,
+      "State data.entities"
+    );
+
+  const counters =
+    requireObject(
+      data.entityCounters,
+      "State data.entityCounters"
+    );
+
+  const nextCounters = {};
+
+  for (
+    const [
+      type,
+      value
+    ]
+    of Object.entries(
+      counters
+    )
+  ) {
+    nextCounters[type] =
+      normalizeCounter(
+        value
+      );
+  }
+
+  for (
+    const [
+      type,
+      collectionValue
+    ]
+    of Object.entries(
+      entities
+    )
+  ) {
+    const collection =
+      requireObject(
+        collectionValue,
+        `Entity collection "${type}"`
+      );
+
+    entities[type] =
+      collection;
+
+    nextCounters[type] =
+      Math.max(
+        nextCounters[type] ??
+          0,
+        inferEntityCounter(
+          type,
+          collection
+        )
+      );
+  }
+
+  state.data = {
+    ...data,
+    entities,
+    entityCounters:
+      nextCounters
+  };
+
+  const scheduler =
+    requireObject(
+      state.scheduler,
+      "State scheduler"
+    );
+
+  const tasks =
+    scheduler.tasks ===
+      undefined
+      ? []
+      : scheduler.tasks;
+
+  if (
+    !Array.isArray(tasks)
+  ) {
+    throw new TypeError(
+      "State scheduler.tasks must be an array"
+    );
+  }
+
+  state.scheduler = {
+    ...scheduler,
+
+    nextId:
+      Math.max(
+        1,
+        normalizeNonNegativeInteger(
+          scheduler.nextId,
+          1
+        ),
+        inferSchedulerNextId(
+          tasks
+        )
+      ),
+
+    tasks:
+      clone(tasks)
+  };
+
+  const simulation =
+    requireObject(
+      state.simulation,
+      "State simulation"
+    );
+
+  state.simulation = {
+    ...simulation,
+
+    processedMinutes:
+      normalizeNonNegativeInteger(
+        simulation
+          .processedMinutes,
+        0
+      ),
+
+    processedHours:
+      normalizeNonNegativeInteger(
+        simulation
+          .processedHours,
+        0
+      ),
+
+    processedDays:
+      normalizeNonNegativeInteger(
+        simulation
+          .processedDays,
+        0
+      ),
+
+    ticks:
+      normalizeNonNegativeInteger(
+        simulation.ticks,
+        0
+      )
+  };
+
+  return state;
 }
 
 class MigrationSystem {
@@ -279,7 +663,21 @@ class MigrationSystem {
 
 export const migrationSystem =
   new MigrationSystem({
-    currentVersion: 1
+    currentVersion:
+      CURRENT_STATE_SCHEMA_VERSION
   });
 
-export { MigrationSystem };
+migrationSystem.register(
+  1,
+  2,
+  migrateStateV1ToV2,
+  {
+    description:
+      "Normalize runtime/core sections and rebuild persistent counters"
+  }
+);
+
+export {
+  MigrationSystem,
+  migrateStateV1ToV2
+};
