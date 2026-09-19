@@ -241,66 +241,7 @@ class OpeningSetupPageSystem {
         }
       ],
 
-      bottomNavigation: [
-        {
-          label:
-            "城市",
-
-          target:
-            "city",
-
-          icon:
-            "city"
-        },
-
-        {
-          label:
-            "门店",
-
-          target:
-            "restaurant",
-
-          icon:
-            "store",
-
-          active:
-            true
-        },
-
-        {
-          label:
-            "经营",
-
-          target:
-            "operations",
-
-          icon:
-            "operations"
-        },
-
-        {
-          label:
-            "员工",
-
-          target:
-            "employees",
-
-          icon:
-            "employees"
-        },
-
-        {
-          label:
-            "更多",
-
-          target:
-            "more",
-
-          icon:
-            "more"
-        }
-      ]
-    };
+};
   }
 
 
