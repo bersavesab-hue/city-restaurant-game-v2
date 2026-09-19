@@ -48,6 +48,20 @@ const RULES =
 
     {
       directory:
+        "assets/images/ui/common/icons",
+
+      width:
+        256,
+
+      height:
+        256,
+
+      label:
+        "正式UI图标"
+    },
+
+    {
+      directory:
         "assets/images/ui/employees/avatars",
 
       width:
