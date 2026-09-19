@@ -460,5 +460,25 @@ test(
         'data-image-slot="dish-green_pepper_beef"'
       )
     );
+
+    assert.ok(
+      html.includes(
+        'role="img"'
+      )
+    );
+
+    assert.equal(
+      html.includes(
+        "图片槽位"
+      ),
+      false
+    );
+
+    assert.equal(
+      html.includes(
+        "后续接入动态门店场景图"
+      ),
+      false
+    );
   }
 );
