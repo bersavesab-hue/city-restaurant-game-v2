@@ -30,6 +30,10 @@ import {
   MEMBER_IDENTITY_POLICY
 } from "../data/memberProgramRules.js";
 
+import {
+  lateGameInvestmentSystem
+} from "./LateGameInvestmentSystem.js";
+
 
 function currentDay() {
   return gameState
@@ -87,6 +91,27 @@ class CustomerIdentitySystem {
   }
 
 
+  getMaxRecognizedPerSegment(
+    restaurantId
+  ) {
+    const modifiers =
+      lateGameInvestmentSystem
+        .getModifiers(
+          restaurantId
+        );
+
+    return (
+      MEMBER_IDENTITY_POLICY
+        .maxRecognizedCustomersPerSegment +
+      (
+        modifiers
+          .recognizedCustomerCapacityBonus ??
+        0
+      )
+    );
+  }
+
+
   getRecognitionRate(
     restaurantId
   ) {
@@ -106,12 +131,23 @@ class CustomerIdentitySystem {
         )
       );
 
+    const modifiers =
+      lateGameInvestmentSystem
+        .getModifiers(
+          restaurantId
+        );
+
     return Math.min(
-      0.35,
+      0.5,
       MEMBER_IDENTITY_POLICY
         .recognitionRate +
       repeatRate /
-        1000
+        1000 +
+      (
+        modifiers
+          .customerRecognitionRateBonus ??
+        0
+      )
     );
   }
 
@@ -136,8 +172,9 @@ class CustomerIdentitySystem {
 
     if (
       profiles.length >=
-      MEMBER_IDENTITY_POLICY
-        .maxRecognizedCustomersPerSegment
+      this.getMaxRecognizedPerSegment(
+        restaurantId
+      )
     ) {
       return profiles[
         profiles.length - 1
@@ -198,7 +235,22 @@ class CustomerIdentitySystem {
           currentDay(),
 
         recognizedVisits:
-          0
+          0,
+
+        totalSpend:
+          0,
+
+        averageSatisfaction:
+          0,
+
+        lastOrderId:
+          null,
+
+        favoriteDishCounts:
+          {},
+
+        relationshipStage:
+          "new"
       }
     );
   }
@@ -223,6 +275,262 @@ class CustomerIdentitySystem {
           1
       }
     );
+  }
+
+
+  getRelationshipStage(
+    recognizedVisits
+  ) {
+    const visits =
+      Math.max(
+        0,
+        Math.floor(
+          Number(
+            recognizedVisits
+          ) || 0
+        )
+      );
+
+    if (visits >= 12) {
+      return "core";
+    }
+
+    if (visits >= 6) {
+      return "familiar";
+    }
+
+    if (visits >= 3) {
+      return "regular";
+    }
+
+    return "new";
+  }
+
+
+  recordVisitOutcome({
+    restaurantId,
+    customerId,
+    spend = 0,
+    satisfaction = 0,
+    orderId = null,
+    dishIds = []
+  }) {
+    const profile =
+      this.getProfiles(
+        restaurantId
+      )
+        .find(
+          item =>
+            item.customerId ===
+            customerId
+        );
+
+    if (!profile) {
+      return null;
+    }
+
+    const visits =
+      Math.max(
+        1,
+        profile
+          .recognizedVisits ??
+        1
+      );
+
+    const previousOutcomeVisits =
+      Math.max(
+        0,
+        profile
+          .outcomeVisits ??
+        0
+      );
+
+    const nextOutcomeVisits =
+      previousOutcomeVisits + 1;
+
+    const nextSpend =
+      Math.max(
+        0,
+        Math.round(
+          Number(spend) || 0
+        )
+      );
+
+    const nextSatisfaction =
+      Math.max(
+        0,
+        Math.min(
+          100,
+          Number(
+            satisfaction
+          ) || 0
+        )
+      );
+
+    const favoriteDishCounts = {
+      ...(
+        profile
+          .favoriteDishCounts ??
+        {}
+      )
+    };
+
+    for (
+      const dishId
+      of dishIds
+    ) {
+      if (
+        typeof dishId !==
+          "string" ||
+        !dishId.trim()
+      ) {
+        continue;
+      }
+
+      favoriteDishCounts[dishId] =
+        (
+          favoriteDishCounts[
+            dishId
+          ] ??
+          0
+        ) + 1;
+    }
+
+    return entitySystem.update(
+      "recognized_customer_profile",
+      profile.id,
+      {
+        totalSpend:
+          (
+            profile.totalSpend ??
+            0
+          ) +
+          nextSpend,
+
+        averageSatisfaction:
+          Math.round(
+            (
+              (
+                profile
+                  .averageSatisfaction ??
+                0
+              ) *
+              previousOutcomeVisits +
+              nextSatisfaction
+            ) /
+            nextOutcomeVisits
+          ),
+
+        outcomeVisits:
+          nextOutcomeVisits,
+
+        lastOrderId:
+          orderId,
+
+        favoriteDishCounts,
+
+        relationshipStage:
+          this.getRelationshipStage(
+            visits
+          )
+      }
+    );
+  }
+
+
+  getDetailedProfiles(
+    restaurantId
+  ) {
+    const day =
+      currentDay();
+
+    const riskGrace =
+      lateGameInvestmentSystem
+        .getModifiers(
+          restaurantId
+        )
+        .relationshipRiskGraceDays ??
+      0;
+
+    return this
+      .getProfiles(
+        restaurantId
+      )
+      .map(
+        profile => {
+          const customer =
+            customerSystem.get(
+              profile.customerId
+            );
+
+          const daysSinceSeen =
+            Math.max(
+              0,
+              day -
+              (
+                profile.lastSeenDay ??
+                day
+              )
+            );
+
+          const riskThreshold =
+            (
+              profile
+                .recognizedVisits ??
+              0
+            ) >= 6
+              ? 21 + riskGrace
+              : 30 + riskGrace;
+
+          const favoriteDishId =
+            Object.entries(
+              profile
+                .favoriteDishCounts ??
+              {}
+            )
+              .sort(
+                (a, b) =>
+                  b[1] - a[1]
+              )[0]?.[0] ??
+            null;
+
+          return {
+            ...structuredClone(
+              profile
+            ),
+
+            customerName:
+              customer.name,
+
+            customerBudget:
+              customer.budget,
+
+            relationshipStage:
+              profile
+                .relationshipStage ??
+              this
+                .getRelationshipStage(
+                  profile
+                    .recognizedVisits
+                ),
+
+            daysSinceSeen,
+
+            atRisk:
+              (
+                profile
+                  .recognizedVisits ??
+                0
+              ) >= 3 &&
+              daysSinceSeen >
+                riskThreshold,
+
+            riskThreshold,
+
+            favoriteDishId
+          };
+        }
+      );
   }
 
 
@@ -263,8 +571,9 @@ class CustomerIdentitySystem {
       profiles.length > 0 &&
       (
         profiles.length >=
-          MEMBER_IDENTITY_POLICY
-            .maxRecognizedCustomersPerSegment ||
+          this.getMaxRecognizedPerSegment(
+            restaurantId
+          ) ||
         randomSystem.chance(
           MEMBER_IDENTITY_POLICY
             .repeatCustomerBias
@@ -388,8 +697,49 @@ class CustomerIdentitySystem {
         ),
 
       maxPerSegment:
-        MEMBER_IDENTITY_POLICY
-          .maxRecognizedCustomersPerSegment
+        this.getMaxRecognizedPerSegment(
+          restaurantId
+        ),
+
+      recognitionRate:
+        Number(
+          (
+            this.getRecognitionRate(
+              restaurantId
+            ) *
+            100
+          ).toFixed(1)
+        ),
+
+      relationshipCounts:
+        this
+          .getDetailedProfiles(
+            restaurantId
+          )
+          .reduce(
+            (
+              result,
+              item
+            ) => {
+              result[
+                item.relationshipStage
+              ] =
+                (
+                  result[
+                    item.relationshipStage
+                  ] ??
+                  0
+                ) + 1;
+
+              return result;
+            },
+            {
+              new: 0,
+              regular: 0,
+              familiar: 0,
+              core: 0
+            }
+          )
     };
   }
 }
