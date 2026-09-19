@@ -2,6 +2,17 @@ import {
   rankingCenterPageSystem
 } from "./RankingCenterPageSystem.js";
 
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 
 function escapeHtml(
   value
@@ -167,43 +178,49 @@ class RankingCenterView {
 
 
     return `
-      <main class="ranking-center">
+      <main class="rg-screen ranking-center-page">
 
-        <header class="ranking-center__header">
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "市场竞争 · 菜品 · 人才"
+          }
+        )}
 
-          <div>
-            <span>
-              市场竞争 · 菜品 · 人才
-            </span>
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
 
-            <h1>
-              排行榜中心
-            </h1>
+        ${renderPageTitle({
+          title:
+            "排行榜中心",
 
-            <p>
-              共
-              ${page.boardCount}
-              类榜单，NPC竞争店与玩家门店按对应规则共同参与。
-            </p>
-          </div>
+          subtitle:
+            `共${page.boardCount}类榜单 · 玩家与竞争店共同参榜`,
 
-          <nav>
-            <button
-              type="button"
-              data-page-target="awards-center"
-            >
-              奖项中心
-            </button>
+          backTarget:
+            "market-strategy",
 
-            <button
-              type="button"
-              data-page-target="honor-hall"
-            >
-              荣誉馆
-            </button>
-          </nav>
+          rightHtml:
+            `
+              <div class="competition-suite-links">
+                <button
+                  type="button"
+                  data-page-target="awards-center"
+                >
+                  奖项中心
+                </button>
 
-        </header>
+                <button
+                  type="button"
+                  data-page-target="honor-hall"
+                >
+                  荣誉馆
+                </button>
+              </div>
+            `
+        })}
 
 
         <section class="ranking-center__periods">
@@ -446,6 +463,17 @@ class RankingCenterView {
           </div>
 
         </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "operations"
+            })
+        )}
 
       </main>
     `;
