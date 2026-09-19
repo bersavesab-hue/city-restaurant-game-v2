@@ -105,6 +105,20 @@ function renderDishImage(
           dish.grade
         )}
       "
+      data-image-slot="dish-${escapeHtml(
+        dish.id
+      )}"
+      data-image-src="${escapeHtml(
+        dish.image
+      )}"
+      ${
+        dish.custom
+          ? `data-custom-dish-id="${escapeHtml(
+              dish.id
+            )}"`
+          : ""
+      }
+      data-image-fit="cover"
       style="
         --dish-image:
           url('${escapeHtml(
