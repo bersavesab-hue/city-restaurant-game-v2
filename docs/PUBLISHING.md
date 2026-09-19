@@ -1,6 +1,6 @@
 # 发布清单
 
-当前候选版本：**0.8.66 Playtest / versionCode 866**
+当前候选版本：**0.8.67 Playtest / versionCode 867**
 
 ## CI 自动完成
 
@@ -19,7 +19,7 @@
 - Debug APK 构建。
 
 发布产物包含：
-- `city-restaurant-v0.8.66-playtest.apk`
+- `city-restaurant-v0.8.67-playtest.apk`
 - `release-metadata.json`
 - `SHA256SUMS.txt`
 
