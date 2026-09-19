@@ -3,28 +3,8 @@ import {
 } from "../core/EntitySystem.js";
 
 import {
-  restaurantSystem
-} from "./RestaurantSystem.js";
-
-import {
-  leaseSystem
-} from "./LeaseSystem.js";
-
-import {
-  renovationSystem
-} from "./RenovationSystem.js";
-
-import {
-  employeeSystem
-} from "./EmployeeSystem.js";
-
-import {
-  menuSystem
-} from "./MenuSystem.js";
-
-import {
-  inventorySystem
-} from "./InventorySystem.js";
+  openingFlowSystem
+} from "./OpeningFlowSystem.js";
 
 
 const ONBOARDING_STEPS =
@@ -67,8 +47,8 @@ const ONBOARDING_STEPS =
     Object.freeze({
       id: "opening",
       title: "开始营业",
-      description: "完成准备后开启门店营业。",
-      pageId: "restaurant"
+      description: "完成证照、厨师、菜单、首批库存和营业时间后正式开业。",
+      pageId: "opening-setup"
     }),
 
     Object.freeze({
@@ -100,48 +80,27 @@ class OnboardingSystem {
   getState(
     restaurantId
   ) {
+    const openingStatus =
+      openingFlowSystem
+        .getStatus(
+          restaurantId
+        );
+
     const restaurant =
-      restaurantSystem.get(
-        restaurantId
+      openingStatus
+        .restaurant;
+
+    const stepById =
+      new Map(
+        openingStatus
+          .steps
+          .map(
+            step => [
+              step.id,
+              step
+            ]
+          )
       );
-
-    const lease =
-      leaseSystem
-        .getByRestaurant(
-          restaurantId
-        );
-
-    const renovation =
-      renovationSystem
-        .getSummary(
-          restaurantId
-        );
-
-    const employees =
-      employeeSystem
-        .listByRestaurant(
-          restaurantId
-        )
-        .filter(
-          item =>
-            item.status ===
-            "active"
-        );
-
-    const menu =
-      menuSystem
-        .listByRestaurant(
-          restaurantId,
-          {
-            activeOnly: true
-          }
-        );
-
-    const inventory =
-      inventorySystem
-        .getSummary(
-          restaurantId
-        );
 
     const completedOrders =
       this.getOrderCount(
@@ -151,55 +110,44 @@ class OnboardingSystem {
     const observed = {
       location:
         Boolean(
-          restaurant.locationId &&
-          lease
+          stepById.get(
+            "lease"
+          )?.complete
         ),
 
       renovation:
         Boolean(
-          renovation
-            .initialized &&
-          renovation.active
+          stepById.get(
+            "renovation"
+          )?.complete
         ),
 
       staff:
-        employees.length >
-        0,
+        Boolean(
+          stepById.get(
+            "staff"
+          )?.complete
+        ),
 
       menu:
-        menu.length >
-        0,
+        Boolean(
+          stepById.get(
+            "menu"
+          )?.complete
+        ),
 
       inventory:
-        inventory.some(
-          item =>
-            item.usableQuantity >
-            0
+        Boolean(
+          stepById.get(
+            "stock"
+          )?.complete
         ),
 
       opening:
-        restaurant.status ===
-          "open" ||
-        restaurant.status ===
-          "paused" ||
-        Number.isFinite(
-          restaurant.firstOpenedAt
-        ) ||
-        Number.isFinite(
-          restaurant.openedAt
-        ) ||
-        (
-          restaurant
-            .totalOperatingMinutes ??
-          0
-        ) >
-          0 ||
-        (
-          restaurant
-            .totalOperatingDays ??
-          0
-        ) >
-          0,
+        Boolean(
+          openingStatus
+            .hasOpened
+        ),
 
       first_order:
         completedOrders >
@@ -211,7 +159,6 @@ class OnboardingSystem {
         ) >
           0
     };
-
 
     const previousMilestones =
       restaurant
@@ -298,6 +245,28 @@ class OnboardingSystem {
           item.completed
       ).length;
 
+    const actionableNextStep =
+      nextStep?.id ===
+        "opening" &&
+      !openingStatus
+        .canOpen
+        ? {
+            ...nextStep,
+            title:
+              "完成开业准备",
+            description:
+              openingStatus
+                .nextAction
+                ?.description ??
+              "完成剩余开业条件。",
+            pageId:
+              openingFlowSystem
+                .getRecommendedPage(
+                  restaurantId
+                )
+          }
+        : nextStep;
+
     return {
       restaurantId,
       completed:
@@ -313,7 +282,8 @@ class OnboardingSystem {
           100
         ),
       steps,
-      nextStep
+      nextStep:
+        actionableNextStep
     };
   }
 }
