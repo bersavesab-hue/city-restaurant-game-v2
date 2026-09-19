@@ -124,7 +124,11 @@ class OpeningFlowSystem {
           employee.roleId ===
             "server" &&
           employee.status ===
-            "active"
+            "active" &&
+          (
+            employee.fatigue ??
+            0
+          ) < 95
       );
 
 
@@ -190,6 +194,11 @@ class OpeningFlowSystem {
       0;
 
 
+    const hasServer =
+      activeServers.length >
+      0;
+
+
     const hasMenu =
       activeMenu.length >
       0;
@@ -215,6 +224,7 @@ class OpeningFlowSystem {
       hasRenovation &&
       hasPermits &&
       hasChef &&
+      hasServer &&
       hasMenu &&
       hasStarterStock &&
       hasSchedule;
@@ -321,12 +331,19 @@ class OpeningFlowSystem {
           "招聘员工",
 
         description:
-          hasChef
+          hasChef &&
+          hasServer
             ? `可工作厨师${availableChefs.length}人 · 服务员${activeServers.length}人`
-            : "至少需要1名当前可工作的厨师",
+            : !hasChef &&
+              !hasServer
+              ? "至少需要1名可工作的厨师和1名服务员"
+              : !hasChef
+                ? "还需要至少1名当前可工作的厨师"
+                : "还需要至少1名当前可工作的服务员",
 
         complete:
-          hasChef,
+          hasChef &&
+          hasServer,
 
         target:
           "employees",
