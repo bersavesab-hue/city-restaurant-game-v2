@@ -39,6 +39,24 @@ test(
       ),
       true
     );
+
+    assert.equal(
+      getSlotAssetCandidates(
+        "restaurant-hero"
+      ).includes(
+        "assets/images/scenes/restaurants/restaurant-home-hero.webp"
+      ),
+      true
+    );
+
+    assert.equal(
+      getSlotAssetCandidates(
+        "restaurant-live"
+      ).includes(
+        "assets/images/scenes/restaurants/restaurant-live.webp"
+      ),
+      true
+    );
   }
 );
 
