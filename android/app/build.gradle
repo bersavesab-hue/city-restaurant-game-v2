@@ -9,7 +9,7 @@ def testKeystorePath =
 
 android {
     namespace 'com.cityrestaurant.game'
-    compileSdk 34
+    compileSdk 36
 
     signingConfigs {
         testDebug {
@@ -26,10 +26,10 @@ android {
         applicationId "com.cityrestaurant.v2playtest"
 
         minSdk 23
-        targetSdk 34
+        targetSdk 36
 
-        versionCode 865
-        versionName '0.8.65'
+        versionCode 866
+        versionName '0.8.66'
     }
 
     buildTypes {
