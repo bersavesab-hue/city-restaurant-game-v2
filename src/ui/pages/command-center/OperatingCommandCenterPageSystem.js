@@ -19,6 +19,23 @@ import {
   gameChromeSystem
 } from "../../components/GameChromeSystem.js";
 
+import {
+  employeeSystem
+} from "../../../systems/EmployeeSystem.js";
+
+import {
+  inventorySystem
+} from "../../../systems/InventorySystem.js";
+
+import {
+  ingredientCatalogSystem
+} from "../../../systems/IngredientCatalogSystem.js";
+
+import {
+  marketInsightSystem
+} from "../../../systems/MarketInsightSystem.js";
+
+
 
 function noticeType(
   severity
@@ -29,6 +46,373 @@ function noticeType(
     medium: "warning",
     low: "info"
   }[severity] ?? "info";
+}
+
+
+function safe(
+  fn,
+  fallback
+) {
+  try {
+    return fn();
+  } catch {
+    return fallback;
+  }
+}
+
+
+function employeeRoleName(
+  roleId
+) {
+  return safe(
+    () =>
+      employeeSystem
+        .getRole(
+          roleId
+        )
+        .name,
+    roleId ??
+      "员工"
+  );
+}
+
+
+function buildStaffPreview(
+  restaurantId,
+  dashboard
+) {
+  const employees =
+    safe(
+      () =>
+        employeeSystem
+          .listByRestaurant(
+            restaurantId
+          ),
+      []
+    )
+      .filter(
+        item =>
+          item.status !==
+          "fired"
+      )
+      .sort(
+        (a, b) => {
+          const activeDiff =
+            Number(
+              b.status ===
+              "active"
+            ) -
+            Number(
+              a.status ===
+              "active"
+            );
+
+          if (
+            activeDiff !==
+            0
+          ) {
+            return activeDiff;
+          }
+
+          return (
+            (b.level ?? 1) -
+            (a.level ?? 1)
+          );
+        }
+      );
+
+  return {
+    available:
+      dashboard.workforce
+        .availableEmployees ??
+      0,
+
+    total:
+      employees.length,
+
+    averageFatigue:
+      dashboard
+        .workforcePulse
+        .averageFatigue ??
+      0,
+
+    highFatigue:
+      dashboard
+        .workforcePulse
+        .highFatigue ??
+      0,
+
+    preview:
+      employees
+        .slice(
+          0,
+          3
+        )
+        .map(
+          employee => ({
+            id:
+              employee.id,
+
+            name:
+              employee.name,
+
+            roleId:
+              employee.roleId,
+
+            roleName:
+              employeeRoleName(
+                employee.roleId
+              ),
+
+            level:
+              employee.level ??
+              1,
+
+            fatigue:
+              employee.fatigue ??
+              0,
+
+            mood:
+              employee.mood ??
+              0,
+
+            status:
+              employee.status
+          })
+        )
+  };
+}
+
+
+function buildInventoryPreview(
+  restaurantId
+) {
+  const rows =
+    safe(
+      () =>
+        inventorySystem
+          .getSummary(
+            restaurantId
+          ),
+      []
+    )
+      .sort(
+        (a, b) =>
+          (
+            a.usableQuantity ??
+            0
+          ) -
+          (
+            b.usableQuantity ??
+            0
+          )
+      )
+      .slice(
+        0,
+        3
+      );
+
+  return rows.map(
+    item => {
+      const ingredient =
+        safe(
+          () =>
+            ingredientCatalogSystem
+              .get(
+                item.ingredientId
+              ),
+          null
+        );
+
+      const usable =
+        Number(
+          item.usableQuantity ??
+          0
+        );
+
+      const state =
+        usable <= 0
+          ? "out"
+          : usable <= 5
+            ? "low"
+            : "ok";
+
+      return {
+        ingredientId:
+          item.ingredientId,
+
+        name:
+          ingredient
+            ?.name ??
+          item.ingredientId,
+
+        unit:
+          ingredient
+            ?.unit ??
+          "",
+
+        usableQuantity:
+          usable,
+
+        spoiledQuantity:
+          Number(
+            item.spoiledQuantity ??
+            0
+          ),
+
+        state,
+
+        stateLabel:
+          {
+            out:
+              "缺货",
+            low:
+              "库存偏低",
+            ok:
+              "库存正常"
+          }[state],
+
+        levelPercent:
+          Math.max(
+            0,
+            Math.min(
+              100,
+              Math.round(
+                usable /
+                5 *
+                100
+              )
+            )
+          )
+      };
+    }
+  );
+}
+
+
+function buildTopDishPreview(
+  dashboard
+) {
+  return (
+    dashboard.menu
+      .dishes ??
+    []
+  )
+    .slice()
+    .sort(
+      (a, b) =>
+        (
+          b.quantity ??
+          0
+        ) -
+        (
+          a.quantity ??
+          0
+        )
+    )
+    .slice(
+      0,
+      3
+    )
+    .map(
+      item => ({
+        id:
+          item.menuItemId ??
+          item.dishId,
+
+        dishId:
+          item.dishId,
+
+        name:
+          item.name,
+
+        sold:
+          item.quantity ??
+          0,
+
+        salesShare:
+          item.salesShare ??
+          0,
+
+        quality:
+          item.averageQuality ??
+          0,
+
+        classification:
+          item.classificationName ??
+          "在售菜品"
+      })
+    );
+}
+
+
+function buildMarketPreview(
+  restaurantId,
+  dashboard
+) {
+  const market =
+    safe(
+      () =>
+        marketInsightSystem
+          .getSummary(
+            restaurantId
+          ),
+      {
+        marketShare:
+          null,
+
+        change:
+          0,
+
+        competitorCount:
+          0,
+
+        competitionFactor:
+          100,
+
+        alert:
+          "stable"
+      }
+    );
+
+  return {
+    marketShare:
+      market.marketShare,
+
+    marketShareChange:
+      market.change ??
+      0,
+
+    competitorCount:
+      market.competitorCount ??
+      0,
+
+    competitionFactor:
+      market.competitionFactor ??
+      100,
+
+    competitionAlert:
+      market.alert ??
+      "stable",
+
+    repeatRate:
+      dashboard
+        .restaurant
+        .repeatRate ??
+      0,
+
+    reviewScore:
+      dashboard
+        .restaurant
+        .reviewScore ??
+      0,
+
+    reputation:
+      dashboard
+        .restaurant
+        .reputation ??
+      0
+  };
 }
 
 
@@ -207,6 +591,28 @@ class OperatingCommandCenterPageSystem {
                 "restaurant"
             })
           ),
+
+      staffPreview:
+        buildStaffPreview(
+          restaurantId,
+          dashboard
+        ),
+
+      inventoryPreview:
+        buildInventoryPreview(
+          restaurantId
+        ),
+
+      topDishPreview:
+        buildTopDishPreview(
+          dashboard
+        ),
+
+      marketPreview:
+        buildMarketPreview(
+          restaurantId,
+          dashboard
+        ),
 
       awardFeedback
     };
