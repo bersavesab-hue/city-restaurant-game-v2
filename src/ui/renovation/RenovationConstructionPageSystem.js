@@ -22,6 +22,11 @@ import {
   pageRegistry
 } from "../registry/PageRegistry.js";
 
+import {
+  buildGlobalTopBarModel,
+  buildNoticeTickerModel
+} from "../components/GlobalChromeModel.js";
+
 
 if (
   !pageRegistry.has(
@@ -222,6 +227,11 @@ class RenovationConstructionPageSystem {
         "time"
       );
 
+    const runtime =
+      gameState.getSection(
+        "runtime"
+      );
+
 
     const modifiers =
       construction
@@ -247,21 +257,67 @@ class RenovationConstructionPageSystem {
           restaurant.reputation
       },
 
-      topBar: {
-        balance:
-          safeBalance(
+      topBar:
+        buildGlobalTopBarModel({
+          restaurantName:
+            restaurant.name,
+
+          balance:
+            safeBalance(
+              restaurantId
+            ),
+
+          storeLevel:
+            restaurant.level ??
+            1,
+
+          reputation:
+            restaurant.reputation ??
+            0,
+
+          time,
+
+          runtime,
+
+          currentStoreId:
             restaurantId
-          ),
+        }),
 
-        day:
-          time.day,
+      noticeTicker:
+        buildNoticeTickerModel(
+          construction
+            ? [
+                {
+                  id:
+                    "renovation_progress",
 
-        hour:
-          time.hour,
+                  type:
+                    construction.status ===
+                      "ready_for_inspection"
+                      ? "success"
+                      : "info",
 
-        minute:
-          time.minute
-      },
+                  title:
+                    construction.status ===
+                      "ready_for_inspection"
+                      ? "装修待验收"
+                      : "装修施工",
+
+                  message:
+                    construction.status ===
+                      "ready_for_inspection"
+                      ? "施工已经完成，可以进行完工验收"
+                      : `当前进度${progress.progress}% · ${progress.phaseLabel}`,
+
+                  priority:
+                    construction.status ===
+                      "ready_for_inspection"
+                      ? 100
+                      : 50
+                }
+              ]
+            : []
+        ),
 
       construction,
 
