@@ -208,6 +208,28 @@ function getEntityCount() {
     );
 }
 
+function getEntityTypeCounts() {
+  return entitySystem
+    .listTypes()
+    .map(
+      type => ({
+        type,
+        count:
+          entitySystem.count(
+            type
+          )
+      })
+    )
+    .filter(
+      item =>
+        item.count > 0
+    )
+    .sort(
+      (a, b) =>
+        b.count - a.count
+    );
+}
+
 function getHistoryCoverage() {
   const daily =
     entitySystem.filter(
@@ -288,6 +310,16 @@ function checkpoint(
     `覆盖=${history.coveredDays}天 | ` +
     `任务=${schedulerSystem.count()} | ` +
     `余额=${finance.balance}`
+  );
+
+  console.log(
+    `  实体Top12: ${getEntityTypeCounts()
+      .slice(0, 12)
+      .map(
+        item =>
+          `${item.type}=${item.count}`
+      )
+      .join(" | ")}`
   );
 
   assert.equal(
