@@ -457,6 +457,15 @@ class RenovationMobileView {
     this.root.innerHTML = `
       <main class="renovation-page">
         <header class="renovation-topbar">
+          <button
+            type="button"
+            class="renovation-back-button"
+            data-action="close"
+            aria-label="保存草稿并返回开店准备"
+          >
+            ‹ 返回
+          </button>
+
           <div class="renovation-stat"><span class="renovation-stat-label">资金</span><span class="renovation-stat-value">¥${formatMoney(page.header.balance)}</span></div>
           <div class="renovation-stat"><span class="renovation-stat-label">本次花费</span><span class="renovation-stat-value">¥${formatMoney(page.header.currentCost)}</span></div>
           <div class="renovation-stat"><span class="renovation-stat-label">剩余</span><span class="renovation-stat-value">¥${formatMoney(page.header.remaining)}</span></div>
@@ -652,6 +661,8 @@ class RenovationMobileView {
             target.dataset.templateId
           )
         );
+      } else if (action === "close") {
+        this.commit(false);
       } else if (action === "save") {
         this.commit(false);
       } else if (action === "activate") {
