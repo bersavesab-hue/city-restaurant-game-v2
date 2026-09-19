@@ -25,6 +25,7 @@ on:
       - "scripts/phase6-lifecycle-gate.mjs"
       - "scripts/phase7-ux-gate.mjs"
       - "scripts/phase8-release-gate.mjs"
+      - "scripts/pre-release-playtest-gate.mjs"
       - "scripts/generate-release-metadata.mjs"
       - "PRIVACY.md"
       - "docs/PUBLISHING.md"
@@ -74,6 +75,9 @@ jobs:
 
       - name: Run phase8 release gate
         run: npm run test:phase8:release
+
+      - name: Run pre-release playtest acceptance gate
+        run: npm run test:release:acceptance
 
       - name: Run phase3 performance gate
         run: npm run test:phase3:performance
