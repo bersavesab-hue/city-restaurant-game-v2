@@ -1,3 +1,15 @@
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+
 function roleName(id) {
   return {
     chef: "厨师",
@@ -17,11 +29,32 @@ class WorkforceCapacityView {
       page.workforce.capacity;
 
     return `
-      <section class="workforce-capacity">
-        <header>
-          <span>高峰期人力配置</span>
-          <h1>员工产能</h1>
-        </header>
+      <main class="rg-screen workforce-capacity-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "高峰期人力配置"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "员工产能",
+
+          subtitle:
+            "高峰期人力配置",
+
+          backTarget:
+            "employees"
+        })}
+
+        <section class="workforce-capacity">
 
         <section>
           <article>
@@ -157,6 +190,19 @@ class WorkforceCapacityView {
           </p>
         </section>
       </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "employees"
+            })
+        )}
+
+      </main>
     `;
   }
 }
