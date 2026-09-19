@@ -50,11 +50,52 @@ test(
       },
 
       topBar: {
+        restaurantName:
+          "东门小馆",
+
         balance:
           88000,
 
-        day:
-          5
+        storeLevel:
+          2,
+
+        reputation:
+          60,
+
+        weather: {
+          label:
+            "晴"
+        },
+
+        clock: {
+          dateText:
+            "第5天",
+
+          clockText:
+            "10:00",
+
+          paused:
+            false,
+
+          speed:
+            1
+        }
+      },
+
+      noticeTicker: {
+        current: {
+          type:
+            "success",
+
+          title:
+            "装修待验收",
+
+          message:
+            "施工已经完成，可以进行完工验收"
+        },
+
+        unreadCount:
+          1
       },
 
       construction: {
@@ -205,6 +246,19 @@ test(
     assert.ok(
       html.includes(
         'data-image-slot="renovation-construction-site"'
+      )
+    );
+
+    assert.equal(
+      html.includes(
+        "后续可绑定施工效果图"
+      ),
+      false
+    );
+
+    assert.ok(
+      html.includes(
+        'data-page-target="restaurant"'
       )
     );
   }
