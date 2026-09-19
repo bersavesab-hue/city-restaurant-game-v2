@@ -169,7 +169,14 @@ test(
 
     assert.match(
       report.app,
-      /0\.8\.65/
+      new RegExp(
+        RELEASE_INFO
+          .versionName
+          .replaceAll(
+            ".",
+            "\\."
+          )
+      )
     );
 
     secondInstance.clear();
@@ -277,6 +284,24 @@ test(
         "utf8"
       );
 
+    const rootGradle =
+      fs.readFileSync(
+        new URL(
+          "../android/build.gradle",
+          import.meta.url
+        ),
+        "utf8"
+      );
+
+    const wrapper =
+      fs.readFileSync(
+        new URL(
+          "../android/gradle/wrapper/gradle-wrapper.properties",
+          import.meta.url
+        ),
+        "utf8"
+      );
+
     assert.equal(
       packageJson.version,
       RELEASE_INFO.versionName
@@ -319,6 +344,32 @@ test(
           .replaceAll(".", "\\.") +
         "['\"]"
       )
+    );
+
+    assert.match(
+      gradle,
+      new RegExp(
+        "compileSdk\\s+" +
+        RELEASE_INFO.compileSdk
+      )
+    );
+
+    assert.match(
+      gradle,
+      new RegExp(
+        "targetSdk\\s+" +
+        RELEASE_INFO.targetSdk
+      )
+    );
+
+    assert.match(
+      rootGradle,
+      /com\.android\.application' version '8\.10\.1'/
+    );
+
+    assert.match(
+      wrapper,
+      /gradle-8\.11\.1-bin\.zip/
     );
   }
 );
@@ -410,6 +461,11 @@ test(
     assert.doesNotMatch(
       manifest,
       /android\.permission\.INTERNET/
+    );
+
+    assert.match(
+      manifest,
+      /android:allowBackup="false"/
     );
   }
 );
