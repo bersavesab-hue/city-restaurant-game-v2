@@ -25,8 +25,8 @@ const CORE_PAGES = [
 
   { id: "member-marketing", title: "会员营销", parent: "more", order: 510, layout: "management", unlock: "membership" },
   { id: "compliance-center", title: "合规中心", parent: "more", order: 515, layout: "management" },
-  { id: "chain", title: "连锁管理", parent: "more", order: 520, layout: "management", unlock: "chain_management" },
-  { id: "brand-investments", title: "长期品牌基建", parent: "more", order: 530, layout: "management" },
+  { id: "chain", title: "连锁管理", parent: "more", order: 520, layout: "management", unlock: "second_store" },
+  { id: "brand-investments", title: "长期品牌基建", parent: "more", order: 530, layout: "management", unlock: "membership" },
   { id: "settings", title: "设置", parent: "more", order: 590, layout: "management" }
 ];
 
