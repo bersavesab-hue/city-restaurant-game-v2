@@ -98,6 +98,8 @@ class AwardCeremonyPageSystem {
       title:
         "颁奖典礼",
 
+      restaurantId,
+
       resultId:
         result?.id ??
         null,
