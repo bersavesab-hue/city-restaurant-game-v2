@@ -1,6 +1,9 @@
 import { cityPropertyPageSystem } from "./CityPropertyPageSystem.js";
 
 import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
@@ -58,6 +61,81 @@ export class CityPropertyView {
     return this;
   }
 
+  appendFormalHeader(
+    model
+  ) {
+    const wrapper =
+      document.createElement(
+        "div"
+      );
+
+    wrapper.innerHTML = `
+      ${renderGameTopBar(
+        model.topBar,
+        {
+          subtitle:
+            "城市选址中心"
+        }
+      )}
+
+      ${renderNoticeTicker(
+        model.noticeTicker
+      )}
+
+      ${renderPageTitle({
+        title:
+          "城市与房源",
+
+        subtitle:
+          `${model.properties.length}套可租房源 · ${model.districts.length}个商圈`,
+
+        backTarget:
+          "city"
+      })}
+    `;
+
+    const nodes =
+      [
+        ...wrapper.children
+      ];
+
+    for (
+      const node
+      of nodes
+    ) {
+      this.root.append(
+        node
+      );
+    }
+
+    this.root
+      .querySelectorAll(
+        ".rg-page-title [data-page-target], .rg-notice-ticker [data-page-target]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              const target =
+                button.dataset
+                  .pageTarget;
+
+              if (
+                target
+              ) {
+                this.onNavigate?.(
+                  target,
+                  this.restaurantId
+                );
+              }
+            }
+          );
+        }
+      );
+  }
+
+
   renderMarketplace(filters = {}) {
     this.offerId = null;
     this.currentFilters = {
@@ -70,16 +148,11 @@ export class CityPropertyView {
     });
 
     this.root.innerHTML = "";
-    this.root.className = "cr-city-property-page";
+    this.root.className =
+      "rg-screen cr-city-property-page";
 
-    const header = el("header", "cr-city-property-header");
-    header.append(
-      el("div", "cr-city-property-title", "城市与房源"),
-      el(
-        "div",
-        "cr-city-property-balance",
-        model.balance === null ? "未选择门店" : `可用资金 ${money(model.balance)}`
-      )
+    this.appendFormalHeader(
+      model
     );
 
     const districtRow = el("div", "cr-city-district-row");
@@ -188,7 +261,13 @@ export class CityPropertyView {
         `
         : "";
       card.innerHTML = `
-        <div class="cr-property-card__scene" aria-hidden="true"></div>
+        <div
+          class="cr-property-card__scene"
+          role="img"
+          aria-label="${property.name}"
+          data-image-slot="property-${property.id}"
+          data-image-fit="cover"
+        ></div>
         <div class="cr-property-card__body">
           ${marketBadges}
           <div class="cr-property-card__name">${property.name}</div>
@@ -232,7 +311,6 @@ export class CityPropertyView {
     }
 
     this.root.append(
-      header,
       districtRow,
       marketInfo,
       list
