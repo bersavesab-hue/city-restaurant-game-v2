@@ -77,6 +77,14 @@ const MORE_GROUPS =
         },
 
         {
+          id: "lease",
+          title: "租约管理",
+          description: "查看租金、物业费、押金、欠款与续租",
+          target: "lease",
+          state: "ready"
+        },
+
+        {
           id: "chain",
           title: "扩张与连锁",
           description: "第二门店、品牌管理、中央厨房与区域扩张",
@@ -84,6 +92,30 @@ const MORE_GROUPS =
           state: "ready",
           unlockFeature: "second_store",
           unlockScope: "chain"
+        },
+
+        {
+          id: "brand-investments",
+          title: "长期品牌基建",
+          description: "CRM、会员服务、冷链仓配与区域品牌总部",
+          target: "brand-investments",
+          state: "ready",
+          minLevel: 7
+        }
+      ]
+    },
+
+    {
+      id: "system",
+      title: "系统",
+
+      entries: [
+        {
+          id: "settings",
+          title: "设置",
+          description: "运行速度、暂停与存档控制",
+          target: "settings",
+          state: "ready"
         }
       ]
     }
@@ -160,6 +192,38 @@ class MoreHubPageSystem {
               group.entries
                 .map(
                   entry => {
+                    if (
+                      Number.isInteger(
+                        entry.minLevel
+                      )
+                    ) {
+                      const anchorRestaurant =
+                        chainSystem
+                          .getAnchorRestaurant(
+                            restaurantId
+                          );
+
+                      const unlocked =
+                        (
+                          anchorRestaurant
+                            .level ??
+                          1
+                        ) >=
+                        entry.minLevel;
+
+                      return {
+                        ...entry,
+
+                        state:
+                          unlocked
+                            ? entry.state
+                            : "locked",
+
+                        unlockLevel:
+                          entry.minLevel
+                      };
+                    }
+
                     if (
                       !entry
                         .unlockFeature
