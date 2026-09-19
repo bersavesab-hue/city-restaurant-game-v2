@@ -1442,3 +1442,18 @@ button.is-active {
       minmax(130px,.75fr);
   }
 }
+
+
+.restaurant-image-slot[data-image-state="loaded"]::before {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 31, 65, .02),
+      rgba(0, 31, 65, .16)
+    );
+}
+
+.restaurant-image-slot[data-image-state="loaded"]
+.restaurant-image-slot__placeholder {
+  display: none;
+}
