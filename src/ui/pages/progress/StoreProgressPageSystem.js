@@ -10,6 +10,10 @@ import {
   STORE_EXPERIENCE_POLICY
 } from "../../../data/storeProgressionRules.js";
 
+import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
 
 const FEATURE_NAMES =
   Object.freeze({
@@ -182,9 +186,65 @@ class StoreProgressPageSystem {
       null;
 
 
+    const notices =
+      [];
+
+    if (
+      progress.maxLevel
+    ) {
+      notices.push({
+        id:
+          "store_progress_max",
+
+        type:
+          "success",
+
+        title:
+          "成长完成",
+
+        message:
+          "当前成长线已经达到最高等级",
+
+        priority:
+          60
+      });
+    } else {
+      notices.push({
+        id:
+          "store_progress_next",
+
+        type:
+          "info",
+
+        title:
+          "升级进度",
+
+        message:
+          `距离Lv.${progress.nextLevel}还需${progress.remainingExperience}经验`,
+
+        priority:
+          40
+      });
+    }
+
+    const chrome =
+      buildFormalPageChrome(
+        restaurantId,
+        {
+          notices,
+          restaurant
+        }
+      );
+
     return {
       pageId:
         "store-progress",
+
+      topBar:
+        chrome.topBar,
+
+      noticeTicker:
+        chrome.noticeTicker,
 
       title:
         "成长与解锁",
