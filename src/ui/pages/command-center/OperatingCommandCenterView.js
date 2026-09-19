@@ -5,6 +5,10 @@ import {
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
+import {
+  renderUiIcon
+} from "../../components/UiIconView.js";
+
 function escapeHtml(
   value
 ) {
@@ -1146,37 +1150,37 @@ class OperatingCommandCenterView {
           <div class="command-center__quick-grid">
 
             <button type="button" data-page-target="dishes">
-              <b>菜</b>
+              ${renderUiIcon("dishes","command-center__quick-icon")}
               <strong>菜品中心</strong>
               <span>研发 · 定价</span>
             </button>
 
             <button type="button" data-page-target="supply">
-              <b>供</b>
+              ${renderUiIcon("supply","command-center__quick-icon")}
               <strong>供应链</strong>
               <span>采购 · 库存</span>
             </button>
 
             <button type="button" data-page-target="analytics">
-              <b>数</b>
+              ${renderUiIcon("analytics","command-center__quick-icon")}
               <strong>经营数据</strong>
               <span>报表 · 分析</span>
             </button>
 
             <button type="button" data-page-target="employee_roster">
-              <b>员</b>
+              ${renderUiIcon("employees","command-center__quick-icon")}
               <strong>员工管理</strong>
               <span>排班 · 培养</span>
             </button>
 
             <button type="button" data-page-target="renovation">
-              <b>装</b>
+              ${renderUiIcon("renovation","command-center__quick-icon")}
               <strong>装修布局</strong>
               <span>布局 · 升级</span>
             </button>
 
             <button type="button" data-page-target="ranking-center">
-              <b>榜</b>
+              ${renderUiIcon("ranking","command-center__quick-icon")}
               <strong>排行榜</strong>
               <span>排名 · 荣誉</span>
             </button>
