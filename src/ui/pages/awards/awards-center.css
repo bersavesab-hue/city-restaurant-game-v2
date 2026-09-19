@@ -1,0 +1,217 @@
+.awards-center-page {
+  min-height: 100%;
+  padding-bottom: calc(78px + env(safe-area-inset-bottom));
+  color: #174f7e;
+  background:
+    linear-gradient(180deg, #d9f1ff, #f8fcff 280px, #eaf7ff);
+}
+
+.awards-center__progress,
+.awards-center__periods,
+.awards-center__divisions,
+.awards-center__catalog,
+.awards-center__participation,
+.awards-center__results {
+  margin: 5px;
+}
+
+.awards-center__progress {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto auto;
+  gap: 6px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #e3bf47;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fff8d3, #fff);
+}
+
+.awards-center__progress strong {
+  color: #795400;
+  font-size: 10px;
+}
+
+.awards-center__progress span {
+  color: #7b6a42;
+  font-size: 8px;
+}
+
+.awards-center__progress progress {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 7px;
+  accent-color: #e5b214;
+}
+
+.awards-center__periods,
+.awards-center__divisions {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 4px;
+  border: 1px solid #8fd3f2;
+  border-radius: 8px;
+  background: #e5f7ff;
+  scrollbar-width: none;
+}
+
+.awards-center__periods button,
+.awards-center__divisions button {
+  flex: 0 0 auto;
+  min-height: 31px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: #3b7196;
+  background: transparent;
+  font-size: 8px;
+}
+
+.awards-center__periods button.is-active,
+.awards-center__divisions button.is-active {
+  border-color: #d9a900;
+  color: #624400;
+  background: linear-gradient(#ffe96b, #ffc91e);
+  font-weight: 900;
+}
+
+.awards-center__catalog,
+.awards-center__participation,
+.awards-center__results {
+  overflow: hidden;
+  border: 1px solid #9dd8f1;
+  border-radius: 8px;
+  background: linear-gradient(#fff, #f5fbfe);
+  box-shadow: 0 2px 6px rgba(0,70,135,.12);
+}
+
+.awards-center__catalog > h2,
+.awards-center__participation > h2,
+.awards-center__results > h2 {
+  margin: 0;
+  padding: 7px 8px;
+  color: #fff;
+  background: linear-gradient(#0b7bc5, #06569d);
+  font-size: 10px;
+}
+
+.awards-center__catalog > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 5px;
+  padding: 7px;
+}
+
+.awards-center__catalog article {
+  padding: 8px;
+  border: 1px solid #d3e9f4;
+  border-radius: 7px;
+  background: #f8fcff;
+}
+
+.awards-center__catalog article header span,
+.awards-center__catalog article header strong,
+.awards-center__catalog article > small {
+  display: block;
+}
+
+.awards-center__catalog article header span {
+  color: #71869a;
+  font-size: 8px;
+}
+
+.awards-center__catalog article header strong {
+  margin-top: 2px;
+  color: #145687;
+  font-size: 10px;
+}
+
+.awards-center__catalog article p,
+.awards-center__catalog article > small {
+  color: #667f91;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.awards-center__catalog article p {
+  margin: 5px 0;
+}
+
+.awards-center__catalog article footer {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.awards-center__catalog article footer span {
+  padding: 4px;
+  border-radius: 4px;
+  color: #775700;
+  background: #fff3bd;
+  font-size: 7px;
+}
+
+.awards-center__participation,
+.awards-center__results {
+  padding-bottom: 5px;
+}
+
+.awards-center__participation > article,
+.awards-center__results > article {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto auto auto;
+  gap: 6px;
+  align-items: center;
+  min-height: 42px;
+  margin: 0 6px;
+  padding: 6px 2px;
+  border-bottom: 1px solid #dcecf4;
+}
+
+.awards-center__participation > article:last-of-type,
+.awards-center__results > article:last-of-type {
+  border-bottom: 0;
+}
+
+.awards-center__participation strong,
+.awards-center__results strong,
+.awards-center__results b {
+  color: #145687;
+  font-size: 9px;
+}
+
+.awards-center__participation span,
+.awards-center__participation small,
+.awards-center__results span,
+.awards-center__participation > p,
+.awards-center__results > p {
+  color: #71869a;
+  font-size: 8px;
+}
+
+.awards-center__participation b {
+  padding: 3px 5px;
+  border-radius: 999px;
+  color: #805800;
+  background: #fff0a9;
+  font-size: 7px;
+}
+
+.awards-center__participation > p,
+.awards-center__results > p {
+  margin: 0;
+  padding: 20px 8px;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .awards-center__catalog > div {
+    grid-template-columns: 1fr;
+  }
+
+  .awards-center__participation > article,
+  .awards-center__results > article {
+    grid-template-columns: minmax(0,1fr) auto;
+  }
+}
