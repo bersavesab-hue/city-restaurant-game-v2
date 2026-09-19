@@ -22,12 +22,6 @@ const SLOT_PREFIXES =
         "assets/images/dishes/generated"
       ],
 
-    "signature-dish-":
-      [
-        "assets/images/dishes/official",
-        "assets/images/dishes/generated"
-      ],
-
     "dish-":
       [
         "assets/images/dishes/official",
