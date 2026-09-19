@@ -91,8 +91,8 @@ import {
 } from "../pages/analytics/BusinessAnalyticsView.js";
 
 import {
-  RenovationFloorplanMobileView
-} from "../renovation/RenovationFloorplanMobileView.js";
+  RenovationGameView
+} from "../renovation/RenovationGameView.js";
 
 import {
   RenovationConstructionView
@@ -727,7 +727,7 @@ function navigate(
       "renovation"
     ) {
       currentView =
-        new RenovationFloorplanMobileView({
+        new RenovationGameView({
           root,
           restaurantId,
 
