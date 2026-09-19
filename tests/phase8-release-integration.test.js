@@ -84,6 +84,13 @@ test(
           "test:feedback"
       });
 
+    system.captureRuntimeError(
+      new Error(
+        "drag pointer lost"
+      ),
+      "renovation-drag"
+    );
+
     const saved =
       system.submit({
         restaurantId:
@@ -119,6 +126,20 @@ test(
         .restaurant
         .balance,
       123456
+    );
+
+    assert.equal(
+      saved.diagnostics
+        .recentErrors[0]
+        .context,
+      "renovation-drag"
+    );
+
+    assert.match(
+      saved.diagnostics
+        .recentErrors[0]
+        .message,
+      /drag pointer lost/
     );
 
     const secondInstance =
