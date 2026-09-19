@@ -174,7 +174,7 @@ test(
 );
 
 test(
-  "会员和连锁入口分别在Lv7与Lv8开放",
+  "第二门店入口Lv6开放且会员入口Lv7开放",
   () => {
     gameState.reset();
 
@@ -223,6 +223,45 @@ test(
 
     restaurantSystem.setLevel(
       restaurant.id,
+      6
+    );
+
+    page =
+      moreHubPageSystem
+        .getPage(
+          restaurant.id
+        );
+
+    assert.equal(
+      page.groups
+        .flatMap(
+          group =>
+            group.entries
+        )
+        .find(
+          item =>
+            item.id ===
+            "chain"
+        ).state,
+      "ready"
+    );
+
+    assert.equal(
+      page.groups
+        .flatMap(
+          group =>
+            group.entries
+        )
+        .find(
+          item =>
+            item.id ===
+            "chain"
+        ).unlockLevel,
+      6
+    );
+
+    restaurantSystem.setLevel(
+      restaurant.id,
       7
     );
 
@@ -257,32 +296,7 @@ test(
             item.id ===
             "chain"
         ).state,
-      "locked"
-    );
-
-    restaurantSystem.setLevel(
-      restaurant.id,
-      8
-    );
-
-    page =
-      moreHubPageSystem
-        .getPage(
-          restaurant.id
-        );
-
-    assert.equal(
-      page.groups
-        .flatMap(
-          group =>
-            group.entries
-        )
-        .find(
-          item =>
-            item.id ===
-            "chain"
-        ).state,
-      "placeholder"
+      "ready"
     );
   }
 );
