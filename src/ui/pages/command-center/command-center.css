@@ -645,3 +645,423 @@
     font-size: 20px;
   }
 }
+
+
+/* ===== 经营总控第二阶段：热销菜 / 员工 / 库存 / 市场 ===== */
+
+.command-center__insight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.command-center__visual-panel {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #78cef5;
+  border-radius: 10px;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff,
+      #effaff
+    );
+  box-shadow: 0 2px 7px rgba(0, 71, 132, .14);
+}
+
+.command-center__visual-panel .command-center__section-title {
+  min-height: 39px;
+}
+
+.command-center__visual-panel .command-center__section-title button {
+  min-height: 27px;
+  padding: 4px 6px;
+  border: 1px solid rgba(255,255,255,.42);
+  border-radius: 6px;
+  color: #fff;
+  background: rgba(0,58,121,.32);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.command-center__empty {
+  grid-column: 1 / -1;
+  padding: 16px 10px;
+  color: #7790a6;
+  font-size: 9px;
+  text-align: center;
+}
+
+/* 热销菜品 */
+.command-center__dish-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 7px;
+}
+
+.command-center__dish-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #c9e8f7;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.command-center__dish-image {
+  position: relative;
+  aspect-ratio: 1.25 / 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 5px;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 42% 44%,
+      #ffd57b 0,
+      #e26d2f 31%,
+      #a73e23 58%,
+      #f4e0bf 60%,
+      #f9f6ed 72%,
+      #e7f5fb 73%
+    );
+}
+
+.command-center__dish-image::after {
+  content: "";
+  position: absolute;
+  inset: auto 10% 8% 10%;
+  height: 14%;
+  border-radius: 50%;
+  background: rgba(0, 31, 64, .13);
+  filter: blur(4px);
+}
+
+.command-center__dish-image span {
+  position: relative;
+  z-index: 2;
+  padding: 3px 5px;
+  border-radius: 5px;
+  background:
+    linear-gradient(
+      #ffe474,
+      #e6a211
+    );
+  color: #704500;
+  font-size: 8px;
+  font-weight: 900;
+  box-shadow: 0 1px 3px rgba(87, 47, 0, .24);
+}
+
+.command-center__dish-card > div:last-child {
+  padding: 6px;
+}
+
+.command-center__dish-card strong,
+.command-center__dish-card small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-center__dish-card strong {
+  color: #0a4177;
+  font-size: 10px;
+}
+
+.command-center__dish-card small {
+  margin-top: 2px;
+  color: #ed7d16;
+  font-size: 7px;
+}
+
+.command-center__dish-card p {
+  margin: 4px 0 0;
+  color: #71879b;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.command-center__dish-card p b {
+  color: #e84b3d;
+}
+
+/* 员工 */
+.command-center__staff-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 7px 7px 0;
+}
+
+.command-center__staff-summary article {
+  min-width: 0;
+  padding: 6px 5px;
+  border: 1px solid #c9e9f8;
+  border-radius: 7px;
+  background: #fff;
+  text-align: center;
+}
+
+.command-center__staff-summary span,
+.command-center__staff-summary strong {
+  display: block;
+}
+
+.command-center__staff-summary span {
+  color: #738aa1;
+  font-size: 8px;
+}
+
+.command-center__staff-summary strong {
+  margin-top: 3px;
+  color: #0b4d88;
+  font-size: 12px;
+}
+
+.command-center__staff-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 7px;
+}
+
+.command-center__staff-grid article {
+  min-width: 0;
+  padding: 6px;
+  border: 1px solid #d0eaf8;
+  border-radius: 8px;
+  background: #fff;
+  text-align: center;
+}
+
+.command-center__staff-avatar {
+  width: 44px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 5px;
+  border: 1px solid #9fd8f3;
+  border-radius: 9px 9px 7px 7px;
+  color: #fff;
+  background:
+    linear-gradient(
+      145deg,
+      #25a8df,
+      #1765a7
+    );
+  font-size: 18px;
+  font-weight: 900;
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.34),
+    0 2px 4px rgba(0,69,121,.18);
+}
+
+.command-center__staff-grid strong,
+.command-center__staff-grid span,
+.command-center__staff-grid small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-center__staff-grid strong {
+  color: #0b4378;
+  font-size: 9px;
+}
+
+.command-center__staff-grid span {
+  margin-top: 2px;
+  color: #7189a0;
+  font-size: 7px;
+}
+
+.command-center__staff-grid small {
+  margin-top: 3px;
+  padding: 2px 3px;
+  border-radius: 4px;
+  color: #168554;
+  background: #e9fff5;
+  font-size: 7px;
+}
+
+/* 库存 */
+.command-center__inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 7px;
+}
+
+.command-center__inventory-grid article {
+  min-width: 0;
+  padding: 6px;
+  border: 1px solid #d1ebf8;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.command-center__ingredient-image {
+  aspect-ratio: 1.4 / 1;
+  display: grid;
+  place-items: center;
+  margin-bottom: 5px;
+  border-radius: 7px;
+  color: rgba(255,255,255,.9);
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      #9fd35e 0,
+      #49a83b 48%,
+      #247b3e 100%
+    );
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.command-center__inventory-grid strong,
+.command-center__inventory-grid span,
+.command-center__inventory-grid small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-center__inventory-grid strong {
+  color: #0b447c;
+  font-size: 9px;
+}
+
+.command-center__inventory-grid span {
+  margin-top: 2px;
+  color: #17935b;
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.command-center__inventory-grid article[data-stock-state="low"] span,
+.command-center__inventory-grid article[data-stock-state="out"] span {
+  color: #ea4335;
+}
+
+.command-center__stock-track {
+  height: 5px;
+  margin-top: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e7eff4;
+}
+
+.command-center__stock-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #20c56e,
+      #6bdc55
+    );
+}
+
+.command-center__inventory-grid article[data-stock-state="low"] .command-center__stock-track i {
+  background:
+    linear-gradient(
+      90deg,
+      #ff8a28,
+      #ffc13c
+    );
+}
+
+.command-center__inventory-grid article[data-stock-state="out"] .command-center__stock-track i {
+  background: #ef4747;
+}
+
+.command-center__inventory-grid small {
+  margin-top: 4px;
+  color: #7b8ea1;
+  font-size: 7px;
+}
+
+.command-center__inventory-grid button {
+  width: 100%;
+  min-height: 26px;
+  margin-top: 5px;
+  border: 1px solid #d99f0b;
+  border-radius: 5px;
+  color: #694500;
+  background:
+    linear-gradient(
+      #ffe46c,
+      #ffc82d
+    );
+  font-size: 8px;
+  font-weight: 900;
+}
+
+/* 市场与口碑 */
+.command-center__market-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  padding: 7px;
+}
+
+.command-center__market-grid article {
+  min-width: 0;
+  min-height: 70px;
+  padding: 8px;
+  border: 1px solid #c8e7f6;
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      180deg,
+      #fff,
+      #f2faff
+    );
+}
+
+.command-center__market-grid span,
+.command-center__market-grid strong,
+.command-center__market-grid small {
+  display: block;
+}
+
+.command-center__market-grid span {
+  color: #738ca4;
+  font-size: 8px;
+}
+
+.command-center__market-grid strong {
+  margin-top: 4px;
+  color: #0b4d87;
+  font-size: 15px;
+}
+
+.command-center__market-grid small {
+  margin-top: 4px;
+  color: #e95144;
+  font-size: 7px;
+}
+
+@media (max-width: 430px) {
+  .command-center__insight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .command-center__dish-grid,
+  .command-center__staff-grid,
+  .command-center__inventory-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 431px) and (max-width: 620px) {
+  .command-center__insight-grid {
+    grid-template-columns: 1fr;
+  }
+}
