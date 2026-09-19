@@ -166,3 +166,51 @@
     grid-column: 1 / -1;
   }
 }
+
+
+.honor-hall__filters {
+  display: grid;
+  gap: 4px;
+  margin: 5px;
+}
+
+
+.honor-hall__divisions,
+.honor-hall__subjects {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 4px;
+  border: 1px solid #8fd3f2;
+  border-radius: 8px;
+  background: #e5f7ff;
+  scrollbar-width: none;
+}
+
+
+.honor-hall__divisions::-webkit-scrollbar,
+.honor-hall__subjects::-webkit-scrollbar {
+  display: none;
+}
+
+
+.honor-hall__divisions button,
+.honor-hall__subjects button {
+  flex: 0 0 auto;
+  min-height: 29px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: #3b7196;
+  background: transparent;
+  font-size: 8px;
+}
+
+
+.honor-hall__divisions button.is-active,
+.honor-hall__subjects button.is-active {
+  border-color: #d9a900;
+  color: #624400;
+  background: linear-gradient(#ffe96b, #ffc91e);
+  font-weight: 900;
+}
