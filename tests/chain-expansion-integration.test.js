@@ -54,6 +54,14 @@ import {
   ChainManagementView
 } from "../src/ui/pages/chain/ChainManagementView.js";
 
+import {
+  channelManagementPageSystem
+} from "../src/ui/pages/channels/ChannelManagementPageSystem.js";
+
+import {
+  FORMAL_PAGE_DEFINITIONS
+} from "../src/ui/runtime/FormalPageRuntime.js";
+
 
 function setupFlagship(
   level
@@ -184,6 +192,13 @@ test(
         branch.id
       ),
       40000
+    );
+
+    assert.equal(
+      financeSystem.getAccount(
+        branch.id
+      ).lifetimeIncome,
+      0
     );
 
     assert.equal(
@@ -560,6 +575,35 @@ test(
     assert.match(
       html,
       /筹建新门店/
+    );
+  }
+);
+
+
+test(
+  "销售渠道与连锁管理保持独立正式运行时映射",
+  () => {
+    assert.equal(
+      FORMAL_PAGE_DEFINITIONS
+        .channels
+        .pageSystem,
+      channelManagementPageSystem
+    );
+
+    assert.equal(
+      FORMAL_PAGE_DEFINITIONS
+        .chain
+        .pageSystem,
+      chainManagementPageSystem
+    );
+
+    assert.notEqual(
+      FORMAL_PAGE_DEFINITIONS
+        .channels
+        .pageSystem,
+      FORMAL_PAGE_DEFINITIONS
+        .chain
+        .pageSystem
     );
   }
 );
