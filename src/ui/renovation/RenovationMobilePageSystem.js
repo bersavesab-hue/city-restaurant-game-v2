@@ -59,6 +59,12 @@ class RenovationMobilePageSystem {
       ...structuredClone(placement),
       name: definition.name,
       type: definition.type,
+      familyId:
+        definition.familyId ??
+        definition.id,
+      specTier:
+        definition.specTier ??
+        "basic",
       width: size.width,
       height: size.height,
       seats: definition.seats ?? 0,
