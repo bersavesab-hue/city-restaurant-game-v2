@@ -7,7 +7,7 @@ import {
 
 
 test(
-  "图片槽位按固定目录自动解析正式资产候选路径",
+  "正式视觉位按固定目录自动解析资产候选路径",
   () => {
     assert.deepEqual(
       getSlotAssetCandidates(
