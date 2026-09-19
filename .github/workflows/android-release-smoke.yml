@@ -25,6 +25,7 @@ on:
       - "tests/new-player-full-journey-e2e.test.js"
       - "tests/phase7-ux-integration.test.js"
       - "tests/pre-release-playtest-acceptance.test.js"
+      - "tests/real-startup-affordability.test.js"
       - "tests/phase8-release-integration.test.js"
       - "package.json"
       - "package-lock.json"
