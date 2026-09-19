@@ -165,6 +165,21 @@ test(
         "经营"
       )
     );
+
+
+    assert.ok(
+      html.includes(
+        'data-ui-icon="operations"'
+      )
+    );
+
+
+    assert.equal(
+      html.includes(
+        ">营<"
+      ),
+      false
+    );
   }
 );
 
@@ -214,6 +229,21 @@ test(
           ]
         }
       });
+
+
+    assert.ok(
+      html.includes(
+        'data-ui-icon="store"'
+      )
+    );
+
+
+    assert.equal(
+      html.includes(
+        'data-image-slot="restaurant-avatar"'
+      ),
+      false
+    );
 
 
     for (
