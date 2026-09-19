@@ -7,7 +7,7 @@ import {
 
 
 test(
-  "正式房源详情包含媒体槽位户型结构经营条件风险与租赁",
+  "正式房源详情包含媒体户型结构经营条件风险与租赁",
   () => {
     const root = {
       addEventListener() {},
@@ -41,20 +41,38 @@ test(
         balance:
           100000,
 
-        level:
+        storeLevel:
           2,
 
         reputation:
           60,
 
-        day:
-          4,
+        weather: {
+          label:
+            "晴"
+        },
 
-        hour:
-          10,
+        clock: {
+          dateText:
+            "4月10日",
 
-        minute:
-          30
+          clockText:
+            "10:30",
+
+          paused:
+            false,
+
+          speed:
+            1
+        }
+      },
+
+      noticeTicker: {
+        current:
+          null,
+
+        unreadCount:
+          0
       },
 
       property: {
@@ -402,6 +420,26 @@ test(
     assert.ok(
       html.includes(
         'data-image-slot="property-exterior-p1"'
+      )
+    );
+
+    assert.equal(
+      html.includes(
+        "图片槽位"
+      ),
+      false
+    );
+
+    assert.equal(
+      html.includes(
+        "户型装饰覆盖层槽位"
+      ),
+      false
+    );
+
+    assert.ok(
+      html.includes(
+        'data-page-target="properties"'
       )
     );
   }
