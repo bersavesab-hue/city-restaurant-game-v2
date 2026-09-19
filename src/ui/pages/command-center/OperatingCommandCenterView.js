@@ -331,7 +331,7 @@ function renderMarketPreview(
     '<section class="command-center__visual-panel command-center__market-preview">' +
       '<header class="command-center__section-title">' +
         '<div><span>商圈竞争与顾客反馈</span><h2>市场与口碑</h2></div>' +
-        '<button type="button" data-page-target="market-competition">商圈分析 ›</button>' +
+        '<button type="button" data-page-target="market-strategy">商圈分析 ›</button>' +
       '</header>' +
       '<div class="command-center__market-grid">' +
         '<article><span>市场份额</span><strong>' +
