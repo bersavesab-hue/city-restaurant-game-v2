@@ -619,12 +619,17 @@ export function createDishVisualPlan({
     );
   }
 
+  const seedKey =
+    recipe?.id ??
+    dish.recipeId ??
+    dish.id;
+
   const seed =
     hashDishVisualSeed(
       "dish_visual_v" +
       DISH_VISUAL_VERSION +
       ":" +
-      dish.id
+      seedKey
     );
 
   const random =
@@ -687,6 +692,7 @@ export function createDishVisualPlan({
     },
 
     seed,
+    seedKey,
 
     cacheKey:
       "dish_visual_v" +
