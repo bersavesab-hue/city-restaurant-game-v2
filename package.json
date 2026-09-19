@@ -46,6 +46,7 @@
     "test:phase3:longrun": "node scripts/phase3-longrun-gate.mjs",
     "test:phase3:performance": "node scripts/phase3-performance-gate.mjs",
     "test:save-compat": "node scripts/save-compatibility-gate.mjs",
+    "test:phase5:chain": "node scripts/chain-expansion-gate.mjs",
     "assets:validate": "node scripts/validate-visual-assets.mjs"
   },
   "devDependencies": {
