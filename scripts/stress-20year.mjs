@@ -467,6 +467,33 @@ assert.ok(
 );
 
 assert.ok(
+  entitySystem.count(
+    "operating_cost_settlement"
+  ) <= 394,
+  `20年经营成本日报过多: ${entitySystem.count(
+    "operating_cost_settlement"
+  )}`
+);
+
+assert.ok(
+  entitySystem.count(
+    "monthly_operating_cost_settlement"
+  ) <= 36,
+  `20年经营成本月报过多: ${entitySystem.count(
+    "monthly_operating_cost_settlement"
+  )}`
+);
+
+assert.ok(
+  entitySystem.count(
+    "yearly_operating_cost_settlement"
+  ) >= 15,
+  `20年经营成本年报过少: ${entitySystem.count(
+    "yearly_operating_cost_settlement"
+  )}`
+);
+
+assert.ok(
   year20.entities <
     year5.entities * 2 + 3000,
   "长期实体仍接近线性膨胀"

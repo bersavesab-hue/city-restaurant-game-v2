@@ -36,6 +36,34 @@ test(
           cashOperatingProfit: 70
         }
       );
+
+      entitySystem.create(
+        "operating_cost_settlement",
+        {
+          restaurantId:
+            restaurant.id,
+          day,
+          orders: 2,
+          openHours: 10,
+          total: 10,
+          paid: 10,
+          unpaid: 0,
+
+          usage: {
+            electricityKwh: 1,
+            waterTon: 0.1,
+            gasCubicMeter: 0.2
+          },
+
+          breakdown: {
+            electricity: 4,
+            water: 1,
+            gas: 2,
+            waste: 2,
+            internet: 1
+          }
+        }
+      );
     }
 
     periodArchiveSystem
@@ -52,6 +80,26 @@ test(
     );
 
     periodArchiveSystem
+      .archiveOperatingCostMonths(
+        restaurant.id,
+        800
+      );
+
+    assert.equal(
+      entitySystem.count(
+        "monthly_operating_cost_settlement"
+      ),
+      14
+    );
+
+    assert.equal(
+      entitySystem.count(
+        "operating_cost_settlement"
+      ),
+      0
+    );
+
+    periodArchiveSystem
       .archiveYears(
         restaurant.id,
         1500
@@ -62,6 +110,26 @@ test(
         "yearly_settlement"
       ),
       1
+    );
+
+    periodArchiveSystem
+      .archiveOperatingCostYears(
+        restaurant.id,
+        1500
+      );
+
+    assert.equal(
+      entitySystem.count(
+        "yearly_operating_cost_settlement"
+      ),
+      1
+    );
+
+    assert.equal(
+      entitySystem.count(
+        "monthly_operating_cost_settlement"
+      ),
+      2
     );
 
     const year =
@@ -78,6 +146,38 @@ test(
         "monthly_settlement"
       ),
       2
+    );
+
+    const costYear =
+      entitySystem.list(
+        "yearly_operating_cost_settlement"
+      )[0];
+
+    assert.equal(
+      costYear.days,
+      360
+    );
+
+    assert.equal(
+      costYear.total,
+      3600
+    );
+
+    assert.equal(
+      costYear.paid,
+      3600
+    );
+
+    assert.equal(
+      costYear.usage
+        .electricityKwh,
+      360
+    );
+
+    assert.equal(
+      costYear.breakdown
+        .internet,
+      360
     );
   }
 );
