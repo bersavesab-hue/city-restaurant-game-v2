@@ -122,6 +122,32 @@ test(
       const text
       of expected
     ) {
+      assert.equal(
+        html.includes(
+          text
+        ),
+        true,
+        `员工正式页面缺少：${text}`
+      );
     }
+
+    assert.equal(
+      html.includes(
+        "头像槽位"
+      ),
+      false
+    );
+
+    assert.ok(
+      html.includes(
+        'data-image-slot="employee-avatar-'
+      )
+    );
+
+    assert.ok(
+      html.includes(
+        'data-page-target="employees"'
+      )
+    );
   }
 );
