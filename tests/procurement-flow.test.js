@@ -21,7 +21,6 @@ test("采购完整链路：报价 -> 扣款 -> 到货 -> 入库", () => {
         name: "测试猪肉",
         category: "meat",
         unit: "kg",
-        baseQuality: 2,
         storageType: "chilled",
         basePurchasePrice: 2000,
         shelfLifeDays: 3,

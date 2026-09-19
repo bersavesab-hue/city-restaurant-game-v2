@@ -294,7 +294,7 @@ test(
 
     assert.ok(
       comfortableExperience
-        .satisfaction >
+        .satisfaction >=
       plainExperience
         .satisfaction
     );

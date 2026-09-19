@@ -16,7 +16,6 @@ function setup() {
     name: "测试大米",
     category: "grain",
     unit: "kg",
-    baseQuality: 3,
     storageType: "dry",
     basePurchasePrice: 100,
     shelfLifeDays: 30,

@@ -31,7 +31,6 @@ function createStressRestaurant() {
       name: "压力测试大米",
       category: "grain",
       unit: "kg",
-      baseQuality: 3,
       storageType: "dry",
       basePurchasePrice: 100,
       shelfLifeDays: 30,
@@ -43,7 +42,6 @@ function createStressRestaurant() {
       name: "压力测试猪肉",
       category: "meat",
       unit: "kg",
-      baseQuality: 3,
       storageType: "chilled",
       basePurchasePrice: 400,
       shelfLifeDays: 5,
@@ -54,17 +52,25 @@ function createStressRestaurant() {
 
   dishCatalogSystem.load([
     {
+      schemaVersion: 1,
       id: "stress_dish",
       name: "猪肉盖饭",
       category: "rice",
-      basePrice: 3000
+      basePrice: 3000,
+      unlockLevel: 1,
+      baseDifficulty: 30,
+      defaultRecipeId: "recipe_stress_dish_standard"
     }
   ], { overwrite: true });
 
   recipeSystem.load([
     {
-      id: "stress_recipe",
+      schemaVersion: 1,
+      id: "recipe_stress_dish_standard",
+      variantId: "standard",
+      name: "猪肉盖饭标准配方",
       dishId: "stress_dish",
+      method: "stir_fry",
       difficulty: 30,
       cookingMinutes: 10,
       ingredients: [
@@ -163,7 +169,7 @@ function createStressRestaurant() {
   menuSystem.addItem({
     restaurantId: restaurant.id,
     dishId: "stress_dish",
-    recipeId: "stress_recipe",
+    recipeId: "recipe_stress_dish_standard",
     price: 3000
   });
 

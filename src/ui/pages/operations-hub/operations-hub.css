@@ -59,9 +59,7 @@
 }
 
 
-.operations-hub__card[
-  data-entry-state="locked"
-] {
+.operations-hub__card[data-entry-state="locked"] {
   opacity: .58;
 }
 
@@ -269,9 +267,7 @@
 }
 
 
-.operations-hub__card[
-  data-entry-state="locked"
-]
+.operations-hub__card[data-entry-state="locked"]
 .operations-hub__primary > b {
   color: #6f7e89;
 

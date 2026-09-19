@@ -7,9 +7,9 @@ import { CUSTOMER_SEGMENTS_V2 } from "../src/data/customerSegments.v2.js";
 import { EconomicBaselineSystem } from "../src/systems/EconomicBaselineSystem.js";
 
 
-test("城市包含10个差异化经营区域", () => {
-  assert.equal(CITY_DISTRICTS.length, 10);
-  assert.equal(new Set(CITY_DISTRICTS.map((item) => item.id)).size, 10);
+test("城市包含20个差异化经营区域", () => {
+  assert.equal(CITY_DISTRICTS.length, 20);
+  assert.equal(new Set(CITY_DISTRICTS.map((item) => item.id)).size, 20);
   assert.ok(CITY_DISTRICTS.some((item) => item.id === "suburban_resort"));
   assert.ok(CITY_DISTRICTS.every((item) => Number.isFinite(item.mapPosition?.x) && Number.isFinite(item.mapPosition?.y)));
 });

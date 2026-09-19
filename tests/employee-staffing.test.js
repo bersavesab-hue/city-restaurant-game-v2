@@ -82,7 +82,13 @@ test(
     );
 
     assert.ok(
-      employee.potential >= 40
+      employee.potential >= 1 &&
+      employee.potential <= 5
+    );
+
+    assert.ok(
+      typeof employee.potentialName === "string" &&
+      employee.potentialName.length > 0
     );
 
     const hiredCandidate =

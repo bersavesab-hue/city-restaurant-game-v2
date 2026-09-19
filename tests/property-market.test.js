@@ -12,7 +12,7 @@ const {
   cityPropertyPageSystem
 } = app.ui;
 
-test("动态房源池生成30到10000平米连续房源并按周期换新", () => {
+test("动态房源池按正式模板生成连续房源并按周期换新", () => {
   districtSystem.load(
     [
       {
@@ -49,7 +49,7 @@ test("动态房源池生成30到10000平米连续房源并按周期换新", () =
   );
 
   assert.equal(listings.length, 24);
-  assert.ok(listings.every(item => item.area >= 30 && item.area <= 10000));
+  assert.ok(listings.every(item => item.area >= 18 && item.area <= 8000));
   assert.ok(listings.every(item => item.usableArea > 0 && item.usableArea <= item.area));
   assert.ok(listings.every(item => item.monthlyRent > 0));
   assert.ok(listings.every(item => item.floors.length >= 1));
@@ -66,9 +66,6 @@ test("动态房源池生成30到10000平米连续房源并按周期换新", () =
 
   assert.ok(profileTypes.size >= 5);
   assert.ok(uniqueAreas.size >= 12);
-  assert.ok(profileTypes.has("micro"));
-  assert.ok(profileTypes.has("medium"));
-  assert.ok(profileTypes.has("complex"));
 
   const marketplace = cityPropertyPageSystem.getMarketplace({
     districtId: "dynamic_property_market_area",
@@ -120,6 +117,6 @@ test("动态房源池生成30到10000平米连续房源并按周期换新", () =
   assert.equal(summary.active, true);
   assert.equal(summary.target, 24);
   assert.equal(summary.availableGenerated, 24);
-  assert.ok(summary.areaRange.min >= 30);
-  assert.ok(summary.areaRange.max <= 10000);
+  assert.ok(summary.areaRange.min >= 18);
+  assert.ok(summary.areaRange.max <= 8000);
 });

@@ -15,3 +15,8 @@ node_modules/
 *.temp
 # Local architecture scan output
 reports/architecture/
+
+android/.gradle/
+android/build/
+android/local.properties
+assets/images/ingredients/ingredient-atlas-v1.webp

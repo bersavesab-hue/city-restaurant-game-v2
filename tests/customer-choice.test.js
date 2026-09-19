@@ -27,7 +27,6 @@ test(
           name: "测试大米",
           category: "grain",
           unit: "g",
-          baseQuality: 2,
           storageType: "dry",
           basePurchasePrice: 5,
           shelfLifeDays: 180,
@@ -43,10 +42,14 @@ test(
     dishCatalogSystem.load(
       [
         {
+          schemaVersion: 1,
           id: "choice_rice",
           name: "测试盖饭",
           category: "rice",
-          basePrice: 1000
+          basePrice: 1000,
+          unlockLevel: 1,
+          baseDifficulty: 10,
+          defaultRecipeId: "recipe_choice_rice_standard"
         }
       ],
       {
@@ -57,8 +60,12 @@ test(
     recipeSystem.load(
       [
         {
-          id: "choice_recipe",
+          schemaVersion: 1,
+          id: "recipe_choice_rice_standard",
+          variantId: "standard",
+          name: "测试盖饭标准配方",
           dishId: "choice_rice",
+          method: "stir_fry",
           difficulty: 10,
           cookingMinutes: 5,
           ingredients: [
@@ -81,7 +88,7 @@ test(
           restaurant.id,
         dishId: "choice_rice",
         recipeId:
-          "choice_recipe",
+          "recipe_choice_rice_standard",
         price: 1800
       });
 

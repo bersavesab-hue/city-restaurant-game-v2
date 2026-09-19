@@ -175,14 +175,12 @@
 }
 
 
-.store-bottom-nav,
 .city-bottom-nav,
 .rg-bottom-nav {
   width: min(100%, var(--rg-shell-max, 760px)) !important;
 }
 
 
-.store-bottom-nav,
 .city-bottom-nav {
   display: none !important;
 }

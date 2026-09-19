@@ -367,9 +367,6 @@ class OrderSystem {
 
         benefitRecordId: null,
 
-        paidAmount:
-          paidAmount,
-
         channelGrossRevenue:
           channelSettlement.grossRevenue,
 

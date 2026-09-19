@@ -22,6 +22,10 @@ import {
 } from "../src/systems/ServiceCapacitySystem.js";
 
 import {
+  storeProgressSystem
+} from "../src/systems/StoreProgressSystem.js";
+
+import {
   equipmentManagementPageSystem
 } from "../src/ui/pages/equipment/EquipmentManagementPageSystem.js";
 
@@ -46,18 +50,23 @@ test(
       100000
     );
 
+    const storeLimits =
+      storeProgressSystem.getLimits(
+        restaurant.id
+      );
+
     serviceCapacitySystem
       .configure(
         restaurant.id,
         {
           seats: 100,
-          tables: 20,
+          tables: storeLimits.tables,
 
           averageMealMinutes:
             60,
 
           kitchenStations:
-            10,
+            storeLimits.kitchenStations,
 
           kitchenPortionsPerHour:
             100,

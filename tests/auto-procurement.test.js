@@ -17,7 +17,6 @@ test("安全库存自动补货且不会重复下单", () => {
     name: "补货测试米",
     category: "grain",
     unit: "kg",
-    baseQuality: 3,
     storageType: "dry",
     basePurchasePrice: 100,
     shelfLifeDays: 30,
