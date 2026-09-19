@@ -7,6 +7,9 @@ import {
 } from "../../components/GameChromeSystem.js";
 
 import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
@@ -194,12 +197,34 @@ class ChainManagementView {
 
   renderMarkup(page) {
     return `
-      <main class="rg-screen chain-management">
-        <header class="chain-management__header">
-          <h1>${esc(page.brandName)}</h1>
-          <p>多门店 · 中央厨房 · 区域扩张</p>
-          <strong>${page.storeCount}/${page.maxStores} 家门店 · 总部 Lv.${page.anchorLevel}</strong>
-        </header>
+      <main class="rg-screen chain-management-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "多门店 · 中央厨房 · 区域扩张"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            esc(
+              page.brandName
+            ),
+
+          subtitle:
+            `${page.storeCount}/${page.maxStores}家门店 · 总部Lv.${page.anchorLevel}`,
+
+          backTarget:
+            "more-home"
+        })}
+
+        <section class="chain-management">
 
         ${this.message ? `<p class="chain-management__message">${esc(this.message)}</p>` : ""}
 
@@ -213,6 +238,8 @@ class ChainManagementView {
         ${this.renderKitchen(page)}
         ${this.renderRegions(page)}
 
+        </section>
+
         ${renderBottomNavigation(
           gameChromeSystem
             .getNavigation({
@@ -223,6 +250,7 @@ class ChainManagementView {
                 "more"
             })
         )}
+
       </main>
     `;
   }
