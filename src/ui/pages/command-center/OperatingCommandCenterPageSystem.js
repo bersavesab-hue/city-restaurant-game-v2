@@ -528,6 +528,11 @@ class OperatingCommandCenterPageSystem {
     restaurantId
   ) {
     const storePortfolio = buildStorePortfolio(restaurantId);
+
+    const groupScope =
+      storePortfolio.scope?.type === "group" &&
+      storePortfolio.canSwitch;
+
     const dashboard =
       operatingCommandCenterSystem
         .getDashboard(
@@ -656,9 +661,11 @@ class OperatingCommandCenterPageSystem {
               .name,
 
           balance:
-            dashboard
-              .finance
-              .balance,
+            groupScope
+              ? storePortfolio.totals.balance
+              : dashboard
+                  .finance
+                  .balance,
 
           storeLevel:
             dashboard
