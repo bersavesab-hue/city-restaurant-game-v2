@@ -199,12 +199,9 @@ class MoreHubView {
 
                           <small>
                             ${entry.state ===
-                              "ready"
-                                ? "进入 →"
-                                : entry.state ===
-                                  "locked"
-                                  ? `Lv.${entry.unlockLevel} 解锁`
-                                  : "待正式页面 →"
+                              "locked"
+                                ? `Lv.${entry.unlockLevel} 解锁`
+                                : "进入 →"
                             }
                           </small>
 
