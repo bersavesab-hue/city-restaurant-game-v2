@@ -27,6 +27,7 @@ const CORE_PAGES = [
   { id: "compliance-center", title: "合规中心", parent: "more", order: 515, layout: "management" },
   { id: "chain", title: "连锁管理", parent: "more", order: 520, layout: "management", unlock: "second_store" },
   { id: "brand-investments", title: "长期品牌基建", parent: "more", order: 530, layout: "management", unlock: "membership" },
+  { id: "feedback", title: "测试反馈", parent: "more", order: 580, layout: "management" },
   { id: "settings", title: "设置", parent: "more", order: 590, layout: "management" }
 ];
 
