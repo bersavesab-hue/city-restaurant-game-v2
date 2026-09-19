@@ -491,22 +491,22 @@ test(
 
     assert.match(
       runtime,
-      /import[\\s\\S]{0,120}RenovationGameView[\\s\\S]{0,120}RenovationGameView\\.js/
+      /import[\s\S]{0,120}RenovationGameView[\s\S]{0,120}RenovationGameView\.js/
     );
 
     assert.match(
       runtime,
-      /new RenovationGameView\\(/
+      /new RenovationGameView\(/
     );
 
     assert.doesNotMatch(
       runtime,
-      /new RenovationFloorplanMobileView\\(/
+      /new RenovationFloorplanMobileView\(/
     );
 
     assert.match(
       theme,
-      /renovation-game\\.css/
+      /renovation-game\.css/
     );
   }
 );
