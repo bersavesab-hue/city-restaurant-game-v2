@@ -108,12 +108,12 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_ROOT" >> "$GITHUB_ENV"
           echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
 
-      - name: Install Android SDK 34
+      - name: Install Android SDK 36
         shell: bash
         run: |
           set -euo pipefail
           yes | "$SDKMANAGER" --licenses >/dev/null || true
-          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;35.0.0"
 
       - name: Prepare stable test signing
         shell: bash
