@@ -980,7 +980,7 @@ class CityMapView {
     page
   ) {
     return `
-      <main class="city-map-game">
+      <main class="rg-screen city-map-game">
 
         ${this.renderTopbar(
           page
