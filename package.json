@@ -31,7 +31,7 @@
     "test:data:venues": "node --test tests/formal-venue-type-data.test.js tests/city-property-game-ui.test.js tests/renovation-planning.test.js",
     "test:data:properties": "node --test tests/formal-property-template-data.test.js tests/property-lease-market.test.js tests/city-property-game-ui.test.js tests/formal-venue-type-data.test.js",
     "assets:ingredients": "node scripts/materialize-ingredient-atlas.mjs",
-    "prebuild:android-js": "npm run assets:ingredients",
+    "prebuild:android-js": "npm run assets:ingredients && npm run assets:validate",
     "test:data:competitors": "node --test tests/formal-competitor-data.test.js tests/market-competition.test.js tests/competitor-dynamics.test.js tests/market-strategy-ui.test.js",
     "test:data:events": "node --test tests/formal-random-event-data.test.js tests/random-event-integration.test.js tests/district-event.test.js tests/business-calendar.test.js",
     "test:data:marketing": "node --test tests/formal-marketing-action-data.test.js tests/marketing-action-integration.test.js tests/market-strategy-ui.test.js tests/member-benefit-marketing.test.js",
@@ -44,7 +44,8 @@
     "test:data:economy": "node --test tests/formal-economic-balance-data.test.js tests/economic-balance-integration.test.js tests/economy-foundation.test.js tests/finance-settlement.test.js tests/finance-center-ui.test.js tests/formal-sales-channel-data.test.js tests/sales-channel.test.js tests/sales-channel-order.test.js tests/sales-channel-integration.test.js tests/dish-research-preview.test.js tests/dish-research.test.js tests/dish-growth.test.js",
     "test:phase3:balance": "node scripts/phase3-balance-gate.mjs",
     "test:phase3:longrun": "node scripts/phase3-longrun-gate.mjs",
-    "test:phase3:performance": "node scripts/phase3-performance-gate.mjs"
+    "test:phase3:performance": "node scripts/phase3-performance-gate.mjs",
+    "assets:validate": "node scripts/validate-visual-assets.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
