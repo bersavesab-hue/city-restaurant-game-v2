@@ -14,6 +14,19 @@ import {
   customerIdentitySystem
 } from "../../../systems/CustomerIdentitySystem.js";
 
+import {
+  financeSystem
+} from "../../../systems/FinanceSystem.js";
+
+import {
+  gameState
+} from "../../../core/GameState.js";
+
+import {
+  buildGlobalTopBarModel,
+  buildNoticeTickerModel
+} from "../../components/GlobalChromeModel.js";
+
 class CustomerManagementPageSystem {
   getPage(
     restaurantId
@@ -91,9 +104,92 @@ class CustomerManagementPageSystem {
           }
         );
 
+    let balance =
+      0;
+
+    try {
+      balance =
+        financeSystem.getBalance(
+          restaurantId
+        );
+    } catch {
+      balance =
+        0;
+    }
+
+    const atRiskMembers =
+      dashboard.atRiskMembers
+        .map(
+          member =>
+            customerLoyaltySystem
+              .getMemberProfile(
+                restaurantId,
+                member.customerId
+              )
+        );
+
+    const notices =
+      [];
+
+    if (
+      atRiskMembers.length >
+      0
+    ) {
+      notices.push({
+        id:
+          "customer_churn",
+
+        type:
+          "warning",
+
+        title:
+          "会员流失预警",
+
+        message:
+          `${atRiskMembers.length}名会员存在流失风险`,
+
+        priority:
+          90
+      });
+    }
+
     return {
       pageId:
         "customers",
+
+      topBar:
+        buildGlobalTopBarModel({
+          restaurantName:
+            restaurant.name,
+
+          balance,
+
+          storeLevel:
+            restaurant.level ??
+            1,
+
+          reputation:
+            restaurant.reputation ??
+            0,
+
+          time:
+            gameState.getSection(
+              "time"
+            ),
+
+          runtime:
+            gameState.getSection(
+              "runtime"
+            ),
+
+          currentStoreId:
+            restaurantId
+        }),
+
+      noticeTicker:
+        buildNoticeTickerModel(
+          notices
+        ),
 
       title:
         "顾客与会员",
@@ -194,16 +290,7 @@ class CustomerManagementPageSystem {
             }
           ),
 
-      atRiskMembers:
-        dashboard.atRiskMembers
-          .map(
-            member =>
-              customerLoyaltySystem
-                .getMemberProfile(
-                  restaurantId,
-                  member.customerId
-                )
-          )
+      atRiskMembers
     };
   }
 }
