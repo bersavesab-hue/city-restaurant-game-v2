@@ -20,7 +20,14 @@ const SLOT_PREFIXES =
 
     "signature-dish-":
       [
-        "assets/images/dishes/official"
+        "assets/images/dishes/official",
+        "assets/images/dishes/generated"
+      ],
+
+    "dish-":
+      [
+        "assets/images/dishes/official",
+        "assets/images/dishes/generated"
       ],
 
     "command-employee-":
@@ -91,6 +98,48 @@ export function getSlotAssetCandidates(
     "command-center-hero"
   ) {
     candidates.push(
+      ...withExtensions(
+        "assets/images/scenes/restaurants/command-center-hero"
+      ),
+      ...withExtensions(
+        "assets/images/scenes/restaurants/default"
+      )
+    );
+
+    return unique(
+      candidates
+    );
+  }
+
+  if (
+    slot ===
+    "restaurant-hero"
+  ) {
+    candidates.push(
+      ...withExtensions(
+        "assets/images/scenes/restaurants/restaurant-home-hero"
+      ),
+      ...withExtensions(
+        "assets/images/scenes/restaurants/command-center-hero"
+      ),
+      ...withExtensions(
+        "assets/images/scenes/restaurants/default"
+      )
+    );
+
+    return unique(
+      candidates
+    );
+  }
+
+  if (
+    slot ===
+    "restaurant-live"
+  ) {
+    candidates.push(
+      ...withExtensions(
+        "assets/images/scenes/restaurants/restaurant-live"
+      ),
       ...withExtensions(
         "assets/images/scenes/restaurants/command-center-hero"
       ),
