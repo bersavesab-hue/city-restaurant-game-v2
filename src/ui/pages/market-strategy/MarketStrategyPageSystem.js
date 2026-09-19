@@ -608,7 +608,9 @@ class MarketStrategyPageSystem {
       buildFormalPageChrome(
         restaurantId,
         {
-          notices
+          notices,
+          restaurant,
+          balance
         }
       );
 
