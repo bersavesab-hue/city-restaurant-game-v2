@@ -808,7 +808,7 @@ class DishCenterView {
             "菜品与研发",
 
           backTarget:
-            "opening-setup",
+            "operations",
 
           helpLabel:
             "研发说明"
