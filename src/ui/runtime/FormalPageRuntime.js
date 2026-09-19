@@ -245,6 +245,33 @@ import {
 } from "../pages/chain/ChainManagementView.js";
 
 
+import {
+  leaseManagementPageSystem
+} from "../pages/lease/LeaseManagementPageSystem.js";
+
+import {
+  leaseManagementView
+} from "../pages/lease/LeaseManagementView.js";
+
+
+import {
+  settingsPageSystem
+} from "../pages/settings/SettingsPageSystem.js";
+
+import {
+  settingsView
+} from "../pages/settings/SettingsView.js";
+
+
+import {
+  brandInvestmentPageSystem
+} from "../pages/brand-investments/BrandInvestmentPageSystem.js";
+
+import {
+  brandInvestmentView
+} from "../pages/brand-investments/BrandInvestmentView.js";
+
+
 const FORMAL_PAGE_DEFINITIONS =
   Object.freeze({
     supply: {
@@ -571,6 +598,54 @@ const FORMAL_PAGE_DEFINITIONS =
         "chain:kitchenStockReceived",
         "chain:kitchenStockDispatched",
         "chain:regionUnlocked"
+      ]
+    },
+
+
+    lease: {
+      pageSystem:
+        leaseManagementPageSystem,
+
+      view:
+        leaseManagementView,
+
+      mode:
+        "mount",
+
+      refreshEvents: [
+        "lease:signed",
+        "lease:renewed",
+        "lease:rentArrears",
+        "lease:propertyFeeArrears",
+        "lease:terminated"
+      ]
+    },
+
+
+    settings: {
+      pageSystem:
+        settingsPageSystem,
+
+      view:
+        settingsView,
+
+      mode:
+        "mount"
+    },
+
+
+    "brand-investments": {
+      pageSystem:
+        brandInvestmentPageSystem,
+
+      view:
+        brandInvestmentView,
+
+      mode:
+        "mount",
+
+      refreshEvents: [
+        "brandInvestment:purchased"
       ]
     }
   });
