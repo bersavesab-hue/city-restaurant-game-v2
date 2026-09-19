@@ -1,0 +1,251 @@
+import {
+  entitySystem
+} from "../core/EntitySystem.js";
+
+import {
+  restaurantSystem
+} from "./RestaurantSystem.js";
+
+import {
+  leaseSystem
+} from "./LeaseSystem.js";
+
+import {
+  renovationSystem
+} from "./RenovationSystem.js";
+
+import {
+  employeeSystem
+} from "./EmployeeSystem.js";
+
+import {
+  menuSystem
+} from "./MenuSystem.js";
+
+import {
+  inventorySystem
+} from "./InventorySystem.js";
+
+
+const ONBOARDING_STEPS =
+  Object.freeze([
+    Object.freeze({
+      id: "location",
+      title: "完成选址",
+      description: "先为门店签下正式经营铺位。",
+      pageId: "properties"
+    }),
+
+    Object.freeze({
+      id: "renovation",
+      title: "完成基础装修",
+      description: "布置餐位、后厨和服务区域，并完成施工。",
+      pageId: "renovation"
+    }),
+
+    Object.freeze({
+      id: "staff",
+      title: "配置员工",
+      description: "至少安排一名可工作的正式员工。",
+      pageId: "employee_recruitment"
+    }),
+
+    Object.freeze({
+      id: "menu",
+      title: "准备营业菜单",
+      description: "至少上架一道正式菜品。",
+      pageId: "dishes"
+    }),
+
+    Object.freeze({
+      id: "inventory",
+      title: "准备首批库存",
+      description: "采购营业所需食材，避免开门后无货可卖。",
+      pageId: "supply"
+    }),
+
+    Object.freeze({
+      id: "opening",
+      title: "开始营业",
+      description: "完成准备后开启门店营业。",
+      pageId: "restaurant"
+    }),
+
+    Object.freeze({
+      id: "first_order",
+      title: "完成第一单",
+      description: "让门店完成第一笔真实顾客订单。",
+      pageId: "restaurant"
+    })
+  ]);
+
+
+class OnboardingSystem {
+  getOrderCount(
+    restaurantId
+  ) {
+    return entitySystem
+      .filter(
+        "customer_order",
+        item =>
+          item.restaurantId ===
+            restaurantId &&
+          item.status ===
+            "completed"
+      )
+      .length;
+  }
+
+
+  getState(
+    restaurantId
+  ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    const lease =
+      leaseSystem
+        .getByRestaurant(
+          restaurantId
+        );
+
+    const renovation =
+      renovationSystem
+        .getSummary(
+          restaurantId
+        );
+
+    const employees =
+      employeeSystem
+        .listByRestaurant(
+          restaurantId
+        )
+        .filter(
+          item =>
+            item.status ===
+            "active"
+        );
+
+    const menu =
+      menuSystem
+        .listByRestaurant(
+          restaurantId,
+          {
+            activeOnly: true
+          }
+        );
+
+    const inventory =
+      inventorySystem
+        .getSummary(
+          restaurantId
+        );
+
+    const completedOrders =
+      this.getOrderCount(
+        restaurantId
+      );
+
+    const completion = {
+      location:
+        Boolean(
+          restaurant.locationId &&
+          lease
+        ),
+
+      renovation:
+        Boolean(
+          renovation
+            .initialized &&
+          renovation.active
+        ),
+
+      staff:
+        employees.length >
+        0,
+
+      menu:
+        menu.length >
+        0,
+
+      inventory:
+        inventory.some(
+          item =>
+            item.usableQuantity >
+            0
+        ),
+
+      opening:
+        restaurant.status ===
+          "open" ||
+        restaurant.status ===
+          "paused",
+
+      first_order:
+        completedOrders >
+        0
+    };
+
+    const steps =
+      ONBOARDING_STEPS
+        .map(
+          (
+            step,
+            index
+          ) => ({
+            ...step,
+            order:
+              index + 1,
+            completed:
+              Boolean(
+                completion[
+                  step.id
+                ]
+              )
+          })
+        );
+
+    const nextStep =
+      steps.find(
+        item =>
+          !item.completed
+      ) ??
+      null;
+
+    const completedCount =
+      steps.filter(
+        item =>
+          item.completed
+      ).length;
+
+    return {
+      restaurantId,
+      completed:
+        completedCount ===
+        steps.length,
+      completedCount,
+      totalSteps:
+        steps.length,
+      progress:
+        Math.round(
+          completedCount /
+          steps.length *
+          100
+        ),
+      steps,
+      nextStep
+    };
+  }
+}
+
+
+export const onboardingSystem =
+  new OnboardingSystem();
+
+
+export {
+  OnboardingSystem,
+  ONBOARDING_STEPS
+};
