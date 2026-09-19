@@ -7,6 +7,13 @@ import {
 } from "../../components/GameChromeSystem.js";
 
 import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
@@ -113,17 +120,39 @@ class BrandInvestmentView {
 
 
   renderMarkup(page) {
-    return [
-      '<main class="rg-screen brand-investment">',
+    const chrome =
+      buildFormalPageChrome(
+        page.restaurantId ??
+        this.restaurantId
+      );
 
-      '<header class="brand-investment__header">',
-      "<h1>长期品牌基建</h1>",
-      "<p>",
-      esc(page.brandName ?? page.restaurant.name),
-      " · 总部 Lv.",
-      page.level,
-      "</p>",
-      "</header>",
+    return [
+      '<main class="rg-screen brand-investment-page">',
+
+      renderGameTopBar(
+        chrome.topBar,
+        {
+          subtitle:
+            "品牌 · CRM · 冷链 · 总部"
+        }
+      ),
+
+      renderNoticeTicker(
+        chrome.noticeTicker
+      ),
+
+      renderPageTitle({
+        title:
+          "长期品牌基建",
+        subtitle:
+          esc(page.brandName ?? page.restaurant.name) +
+          " · 总部 Lv." +
+          page.level,
+        backTarget:
+          "more-home"
+      }),
+
+      '<section class="brand-investment">',
 
       this.message
         ? '<p class="brand-investment__message">' +
@@ -182,6 +211,8 @@ class BrandInvestmentView {
         1
       ).toFixed(2),
       "</p>",
+      "</section>",
+
       "</section>",
 
       renderBottomNavigation(
