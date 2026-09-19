@@ -2,6 +2,17 @@ import {
   marketStrategyPageSystem
 } from "./MarketStrategyPageSystem.js";
 
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 
 function money(
   value
@@ -309,44 +320,51 @@ class MarketStrategyView {
     page
   ) {
     return `
-      <main class="market-strategy">
+      <main class="rg-screen market-strategy-page">
 
-        <header class="market-strategy__header">
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "市场 · 定位 · 竞争"
+          }
+        )}
 
-          <div>
-            <span>
-              市场 · 定位 · 竞争
-            </span>
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
 
-            <h1>
-              市场与竞争
-            </h1>
+        ${renderPageTitle({
+          title:
+            "市场与竞争",
 
-            <p>
-              ${page.district
-                ? page.district.name
-                : "尚未形成有效商圈"
-              }
-            </p>
-          </div>
+          subtitle:
+            page.district
+              ? page.district.name
+              : "尚未形成有效商圈",
 
-          <nav>
-            <button
-              type="button"
-              data-page-target="ranking-center"
-            >
-              排行榜
-            </button>
+          backTarget:
+            "operations",
 
-            <button
-              type="button"
-              data-page-target="awards-center"
-            >
-              奖项中心
-            </button>
-          </nav>
+          rightHtml:
+            `
+              <div class="competition-suite-links">
+                <button
+                  type="button"
+                  data-page-target="ranking-center"
+                >
+                  排行榜
+                </button>
 
-        </header>
+                <button
+                  type="button"
+                  data-page-target="awards-center"
+                >
+                  奖项中心
+                </button>
+              </div>
+            `
+        })}
 
 
         <section class="market-strategy__overview">
@@ -691,6 +709,17 @@ class MarketStrategyView {
           }
 
         </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "operations"
+            })
+        )}
 
       </main>
     `;
