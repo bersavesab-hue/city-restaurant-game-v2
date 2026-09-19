@@ -1,0 +1,182 @@
+.feedback-page__header {
+  margin: 5px;
+  padding: 10px 12px;
+  border: 1px solid #58caff;
+  border-radius: 8px;
+  color: #fff;
+  background:
+    linear-gradient(
+      #087bc7,
+      #055199
+    );
+}
+
+.feedback-page__header h1,
+.feedback-page__header p {
+  margin: 0;
+}
+
+.feedback-page__header h1 {
+  font-size: 17px;
+}
+
+.feedback-page__header p {
+  margin-top: 3px;
+  color: rgba(255,255,255,.78);
+  font-size: 10px;
+}
+
+.feedback-page__message {
+  margin: 5px;
+  padding: 7px 9px;
+  border: 1px solid #8cd1a9;
+  border-radius: 7px;
+  color: #087b48;
+  background: #eaf8f0;
+  font-size: 10px;
+}
+
+.feedback-page__summary {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0,1fr));
+  gap: 5px;
+  margin: 5px;
+}
+
+.feedback-page__summary article,
+.feedback-page__panel {
+  border: 1px solid #b9dff1;
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      #fff,
+      #eef9ff
+    );
+}
+
+.feedback-page__summary article {
+  padding: 8px 5px;
+  text-align: center;
+}
+
+.feedback-page__summary span,
+.feedback-page__summary strong {
+  display: block;
+}
+
+.feedback-page__summary span {
+  color: #70869a;
+  font-size: 9px;
+}
+
+.feedback-page__summary strong {
+  margin-top: 3px;
+  color: #07578f;
+  font-size: 13px;
+}
+
+.feedback-page__panel {
+  margin: 5px;
+  padding: 10px;
+}
+
+.feedback-page__panel h2 {
+  margin: 0 0 8px;
+  color: #07578f;
+  font-size: 13px;
+}
+
+.feedback-page__panel label {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  color: #58748a;
+  font-size: 10px;
+}
+
+.feedback-page__panel select,
+.feedback-page__panel textarea,
+.feedback-page__panel button {
+  min-height: 38px;
+  border: 1px solid #9cd8f1;
+  border-radius: 7px;
+  font: inherit;
+}
+
+.feedback-page__panel select,
+.feedback-page__panel textarea {
+  width: 100%;
+  padding: 7px 8px;
+  color: #154c78;
+  background: #fff;
+}
+
+.feedback-page__panel textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.feedback-page__panel button {
+  margin-top: 8px;
+  padding: 0 10px;
+  color: #fff;
+  background:
+    linear-gradient(
+      #159fe2,
+      #07529a
+    );
+}
+
+.feedback-page__panel > p {
+  margin: 7px 0 0;
+  color: #70869a;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.feedback-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.feedback-page__actions button {
+  flex: 1 1 110px;
+  margin-top: 0;
+}
+
+.feedback-page__export {
+  margin-top: 8px;
+  min-height: 180px !important;
+  font-family: monospace !important;
+  font-size: 9px !important;
+}
+
+.feedback-page__item {
+  padding: 8px 0;
+  border-top: 1px solid #d9eaf3;
+}
+
+.feedback-page__item:first-of-type {
+  border-top: 0;
+}
+
+.feedback-page__item strong,
+.feedback-page__item p,
+.feedback-page__item small {
+  display: block;
+  margin: 0;
+}
+
+.feedback-page__item p {
+  margin-top: 4px;
+  color: #154c78;
+  font-size: 10px;
+}
+
+.feedback-page__item small {
+  margin-top: 4px;
+  color: #8195a5;
+  font-size: 8px;
+}
