@@ -197,7 +197,16 @@ class OperatingCommandCenterPageSystem {
 
             activePageId:
               "operating-command-center"
-          }),
+          })
+          .map(
+            item => ({
+              ...item,
+
+              active:
+                item.id ===
+                "restaurant"
+            })
+          ),
 
       awardFeedback
     };
