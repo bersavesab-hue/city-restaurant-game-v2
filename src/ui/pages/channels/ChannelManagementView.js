@@ -2,25 +2,79 @@ import {
   channelManagementPageSystem
 } from "./ChannelManagementPageSystem.js";
 
-function money(value) {
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+
+function money(
+  value
+) {
   return (
     "¥" +
     Math.round(
-      Number(value ?? 0)
+      Number(
+        value ??
+        0
+      )
     ).toLocaleString(
       "zh-CN"
     )
   );
 }
 
-function percent(value) {
+
+function percent(
+  value
+) {
   return (
     Number(
-      value ?? 0
-    ).toFixed(1) +
+      value ??
+      0
+    ).toFixed(
+      1
+    ) +
     "%"
   );
 }
+
+
+function escapeHtml(
+  value
+) {
+  return String(
+    value ??
+    ""
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+}
+
 
 function requirementText(
   channel
@@ -48,328 +102,479 @@ function requirementText(
     `Lv.${required.restaurantLevel ?? 1}`,
     `口碑${required.reputation ?? 0}`,
     `满意度${required.satisfaction ?? 0}`
-  ].join(" · ");
+  ].join(
+    " · "
+  );
 }
+
 
 class ChannelManagementView {
   constructor({
     pageSystem =
-      channelManagementPageSystem
+      channelManagementPageSystem,
+
+    onNavigate =
+      null
   } = {}) {
     this.pageSystem =
       pageSystem;
 
-    this.root = null;
-    this.restaurantId = null;
+    this.onNavigate =
+      onNavigate;
+
+    this.root =
+      null;
+
+    this.restaurantId =
+      null;
   }
 
-  renderMarkup(page) {
+
+  renderMarkup(
+    page
+  ) {
     return `
-      <main class="channel-management">
-        <header>
-          <span>营业渠道 · 成本 · 容量</span>
-          <h1>销售渠道</h1>
-          <p>
-            管理堂食、自取、外卖与预约的接单优先级和小时容量。
-          </p>
-        </header>
+      <main class="rg-screen channel-management-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "堂食 · 自取 · 外卖 · 预约"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "销售渠道",
+
+          subtitle:
+            "管理接单优先级、容量与渠道成本",
+
+          backTarget:
+            "operations"
+        })}
+
 
         <section class="channel-kpis">
-          <article>
-            <span>已解锁</span>
-            <strong>
-              ${page.unlockedCount}
-            </strong>
-          </article>
 
-          <article>
-            <span>营业中</span>
-            <strong>
-              ${page.activeCount}
-            </strong>
-          </article>
-
-          <article>
-            <span>累计订单</span>
-            <strong>
-              ${page.totalOrders}
-            </strong>
-          </article>
-
-          <article>
-            <span>渠道净收入</span>
-            <strong>
-              ${money(
+          ${[
+            [
+              "已解锁",
+              page.unlockedCount,
+              "个渠道"
+            ],
+            [
+              "营业中",
+              page.activeCount,
+              "个渠道"
+            ],
+            [
+              "累计订单",
+              page.totalOrders,
+              "单"
+            ],
+            [
+              "渠道净收入",
+              money(
                 page.netRevenue
-              )}
-            </strong>
-          </article>
-
-          <article>
-            <span>贡献利润</span>
-            <strong>
-              ${money(
+              ),
+              "累计"
+            ],
+            [
+              "贡献利润",
+              money(
                 page.contributionProfit
-              )}
-            </strong>
-          </article>
-
-          <article>
-            <span>渠道费用</span>
-            <strong>
-              ${money(
+              ),
+              "累计"
+            ],
+            [
+              "渠道费用",
+              money(
                 page.totalFees
-              )}
-            </strong>
-          </article>
-        </section>
+              ),
+              "佣金+包装"
+            ]
+          ]
+            .map(
+              (
+                [
+                  label,
+                  value,
+                  sub
+                ]
+              ) => `
+                <article>
+                  <span>
+                    ${label}
+                  </span>
 
-        <section>
-          <h2>渠道经营</h2>
-
-          ${page.channels.map(
-            channel => `
-              <article
-                data-channel-card="${channel.id}"
-              >
-                <header>
-                  <div>
-                    <strong>
-                      ${channel.name}
-                    </strong>
-
-                    <span>
-                      ${
-                        channel.active
-                          ? "营业中"
-                          : channel.unlocked
-                            ? "已停用"
-                            : "未解锁"
-                      }
-                    </span>
-                  </div>
+                  <strong>
+                    ${value}
+                  </strong>
 
                   <small>
-                    ${requirementText(
-                      channel
-                    )}
+                    ${sub}
                   </small>
-                </header>
+                </article>
+              `
+            )
+            .join("")}
 
-                <p>
-                  ${channel.description}
-                </p>
-
-                <div>
-                  <span>
-                    抽佣
-                    ${channel.commissionRate}%
-                  </span>
-
-                  <span>
-                    单均包装
-                    ${money(
-                      channel
-                        .packagingCostPerOrder
-                    )}
-                  </span>
-
-                  <span>
-                    优先级
-                    ×${channel.priorityMultiplier}
-                  </span>
-                </div>
-
-                <div>
-                  <span>
-                    本小时
-                    ${channel.capacityStatus.used}
-                    /
-                    ${channel.capacityStatus.limit}
-                    单
-                  </span>
-
-                  <span>
-                    占用
-                    ${percent(
-                      channel.capacityStatus
-                        .utilizationRate
-                    )}
-                  </span>
-
-                  <span>
-                    剩余
-                    ${channel.capacityStatus.remaining}
-                    单
-                  </span>
-                </div>
-
-                <div>
-                  <span>
-                    累计
-                    ${channel.lifetimeOrders}
-                    单
-                  </span>
-
-                  <span>
-                    净收入
-                    ${money(
-                      channel
-                        .lifetimeNetRevenue
-                    )}
-                  </span>
-
-                  <span>
-                    贡献利润
-                    ${money(
-                      channel.performance
-                        .contributionProfit
-                    )}
-                  </span>
-
-                  <span>
-                    利润率
-                    ${percent(
-                      channel.performance
-                        .profitMargin
-                    )}
-                  </span>
-                </div>
-
-                <div>
-                  ${
-                    !channel.unlocked
-                      ? `
-                        <button
-                          type="button"
-                          data-channel-unlock="${channel.id}"
-                          ${
-                            channel.requirementStatus
-                              ?.eligible
-                              ? ""
-                              : "disabled"
-                          }
-                        >
-                          解锁渠道
-                        </button>
-                      `
-                      : channel.id !==
-                        "dine_in"
-                        ? `
-                          <button
-                            type="button"
-                            data-channel-toggle="${channel.id}"
-                            data-next-active="${String(
-                              !channel.active
-                            )}"
-                          >
-                            ${channel.active
-                              ? "暂停渠道"
-                              : "启用渠道"
-                            }
-                          </button>
-                        `
-                        : ""
-                  }
-
-                  ${
-                    channel.unlocked
-                      ? `
-                        <button
-                          type="button"
-                          data-channel-priority="${channel.id}"
-                          data-channel-priority-delta="-0.1"
-                        >
-                          降低优先级
-                        </button>
-
-                        <button
-                          type="button"
-                          data-channel-priority="${channel.id}"
-                          data-channel-priority-delta="0.1"
-                        >
-                          提高优先级
-                        </button>
-
-                        <button
-                          type="button"
-                          data-channel-limit="${channel.id}"
-                          data-channel-limit-delta="-5"
-                        >
-                          -5单/小时
-                        </button>
-
-                        <button
-                          type="button"
-                          data-channel-limit="${channel.id}"
-                          data-channel-limit-delta="5"
-                        >
-                          +5单/小时
-                        </button>
-                      `
-                      : ""
-                  }
-                </div>
-              </article>
-            `
-          ).join("")}
         </section>
 
-        <section>
-          <h2>当前渠道结构</h2>
 
-          ${
-            page.demandWeights.length
-              ? page.demandWeights.map(
-                  item => `
-                    <article>
+        <section class="channel-card-list">
+
+          ${page.channels
+            .map(
+              channel => `
+                <article
+                  class="
+                    channel-card
+                    ${channel.active
+                      ? "is-active"
+                      : ""
+                    }
+                  "
+                  data-channel-card="${escapeHtml(
+                    channel.id
+                  )}"
+                >
+
+                  <header>
+
+                    <div>
                       <strong>
-                        ${item.name}
+                        ${escapeHtml(
+                          channel.name
+                        )}
                       </strong>
 
                       <span>
-                        综合客流权重
                         ${
-                          Math.round(
-                            item.weight *
-                            100
-                          )
-                        }%
+                          channel.active
+                            ? "营业中"
+                            : channel.unlocked
+                              ? "已停用"
+                              : "未解锁"
+                        }
                       </span>
+                    </div>
 
-                      <span>
-                        优先级
-                        ×${item.priorityMultiplier}
-                      </span>
+                    <small>
+                      ${escapeHtml(
+                        requirementText(
+                          channel
+                        )
+                      )}
+                    </small>
 
-                      <span>
-                        容量
-                        ${item.capacity.used}
+                  </header>
+
+
+                  <p>
+                    ${escapeHtml(
+                      channel.description
+                    )}
+                  </p>
+
+
+                  <div class="channel-stat-grid">
+
+                    <span>
+                      抽佣
+                      <strong>
+                        ${channel.commissionRate}%
+                      </strong>
+                    </span>
+
+                    <span>
+                      单均包装
+                      <strong>
+                        ${money(
+                          channel
+                            .packagingCostPerOrder
+                        )}
+                      </strong>
+                    </span>
+
+                    <span>
+                      优先级
+                      <strong>
+                        ×${channel.priorityMultiplier}
+                      </strong>
+                    </span>
+
+                    <span>
+                      本小时容量
+                      <strong>
+                        ${channel.capacityStatus.used}
                         /
-                        ${item.capacity.limit}
-                      </span>
-                    </article>
-                  `
-                ).join("")
-              : "<p>暂无可接单营业渠道</p>"
-          }
+                        ${channel.capacityStatus.limit}
+                      </strong>
+                    </span>
+
+                    <span>
+                      容量占用
+                      <strong>
+                        ${percent(
+                          channel.capacityStatus
+                            .utilizationRate
+                        )}
+                      </strong>
+                    </span>
+
+                    <span>
+                      剩余
+                      <strong>
+                        ${channel.capacityStatus.remaining}单
+                      </strong>
+                    </span>
+
+                  </div>
+
+
+                  <div class="channel-lifetime">
+
+                    <span>
+                      累计
+                      <strong>
+                        ${channel.lifetimeOrders}单
+                      </strong>
+                    </span>
+
+                    <span>
+                      净收入
+                      <strong>
+                        ${money(
+                          channel
+                            .lifetimeNetRevenue
+                        )}
+                      </strong>
+                    </span>
+
+                    <span>
+                      贡献利润
+                      <strong>
+                        ${money(
+                          channel.performance
+                            .contributionProfit
+                        )}
+                      </strong>
+                    </span>
+
+                    <span>
+                      利润率
+                      <strong>
+                        ${percent(
+                          channel.performance
+                            .profitMargin
+                        )}
+                      </strong>
+                    </span>
+
+                  </div>
+
+
+                  <div class="channel-actions">
+
+                    ${
+                      !channel.unlocked
+                        ? `
+                          <button
+                            type="button"
+                            data-channel-unlock="${escapeHtml(
+                              channel.id
+                            )}"
+                            ${
+                              channel.requirementStatus
+                                ?.eligible
+                                ? ""
+                                : "disabled"
+                            }
+                          >
+                            解锁渠道
+                          </button>
+                        `
+                        : channel.id !==
+                          "dine_in"
+                          ? `
+                            <button
+                              type="button"
+                              data-channel-toggle="${escapeHtml(
+                                channel.id
+                              )}"
+                              data-next-active="${String(
+                                !channel.active
+                              )}"
+                            >
+                              ${channel.active
+                                ? "暂停渠道"
+                                : "启用渠道"
+                              }
+                            </button>
+                          `
+                          : ""
+                    }
+
+                    ${
+                      channel.unlocked
+                        ? `
+                          <button
+                            type="button"
+                            data-channel-priority="${escapeHtml(
+                              channel.id
+                            )}"
+                            data-channel-priority-delta="-0.1"
+                          >
+                            优先级−
+                          </button>
+
+                          <button
+                            type="button"
+                            data-channel-priority="${escapeHtml(
+                              channel.id
+                            )}"
+                            data-channel-priority-delta="0.1"
+                          >
+                            优先级＋
+                          </button>
+
+                          <button
+                            type="button"
+                            data-channel-limit="${escapeHtml(
+                              channel.id
+                            )}"
+                            data-channel-limit-delta="-5"
+                          >
+                            容量−5
+                          </button>
+
+                          <button
+                            type="button"
+                            data-channel-limit="${escapeHtml(
+                              channel.id
+                            )}"
+                            data-channel-limit-delta="5"
+                          >
+                            容量＋5
+                          </button>
+                        `
+                        : ""
+                    }
+
+                  </div>
+
+                </article>
+              `
+            )
+            .join("")}
+
         </section>
+
+
+        <section class="channel-structure-panel">
+
+          <header>
+            <strong>
+              当前渠道结构
+            </strong>
+
+            <span>
+              综合客流权重
+            </span>
+          </header>
+
+          <div>
+
+            ${
+              page.demandWeights.length
+                ? page.demandWeights
+                    .map(
+                      item => `
+                        <article>
+                          <strong>
+                            ${escapeHtml(
+                              item.name
+                            )}
+                          </strong>
+
+                          <span>
+                            客流
+                            ${Math.round(
+                              item.weight *
+                              100
+                            )}%
+                          </span>
+
+                          <span>
+                            优先级
+                            ×${item.priorityMultiplier}
+                          </span>
+
+                          <span>
+                            容量
+                            ${item.capacity.used}
+                            /
+                            ${item.capacity.limit}
+                          </span>
+                        </article>
+                      `
+                    )
+                    .join("")
+                : `
+                  <div class="channel-empty">
+                    暂无可接单营业渠道
+                  </div>
+                `
+            }
+
+          </div>
+
+        </section>
+
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "channels"
+            })
+        )}
+
       </main>
     `;
   }
 
+
   mount(
     root,
     {
-      restaurantId
+      restaurantId,
+      onNavigate =
+        this.onNavigate
     } = {}
   ) {
-    this.root = root;
+    this.root =
+      root;
+
     this.restaurantId =
       restaurantId;
 
+    this.onNavigate =
+      onNavigate;
+
     return this.render();
   }
+
 
   render() {
     const page =
@@ -388,7 +593,28 @@ class ChannelManagementView {
     return page;
   }
 
+
   bind() {
+    this.root
+      .querySelectorAll(
+        "[data-page-target]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              this.onNavigate?.(
+                button.dataset
+                  .pageTarget,
+
+                this.restaurantId
+              );
+            }
+          );
+        }
+      );
+
     this.root
       .querySelectorAll(
         "[data-channel-unlock]"
@@ -495,14 +721,20 @@ class ChannelManagementView {
       );
   }
 
+
   destroy() {
-    this.root = null;
-    this.restaurantId = null;
+    this.root =
+      null;
+
+    this.restaurantId =
+      null;
   }
 }
 
+
 export const channelManagementView =
   new ChannelManagementView();
+
 
 export {
   ChannelManagementView
