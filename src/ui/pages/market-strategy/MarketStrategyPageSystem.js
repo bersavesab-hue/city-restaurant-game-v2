@@ -30,6 +30,10 @@ import {
   trafficDemandSystem
 } from "../../../systems/TrafficDemandSystem.js";
 
+import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
 
 function round1(
   value
@@ -526,6 +530,88 @@ class MarketStrategyPageSystem {
       );
 
 
+    const insight =
+      this.insight
+        .getSummary(
+          restaurantId
+        );
+
+    const competition =
+      this.getCompetition(
+        district
+      );
+
+    const events =
+      this.getEvents(
+        district
+      );
+
+    const notices =
+      [];
+
+    if (
+      insight.alert ===
+        "critical_share" ||
+      insight.alert ===
+        "losing_share"
+    ) {
+      notices.push({
+        id:
+          "market_share_alert",
+
+        type:
+          insight.alert ===
+            "critical_share"
+            ? "danger"
+            : "warning",
+
+        title:
+          "市场份额提醒",
+
+        message:
+          insight.alert ===
+            "critical_share"
+            ? "当前市场份额偏低，建议检查定位、价格与市场动作"
+            : "市场份额正在下降，建议关注竞争店与商圈变化",
+
+        priority:
+          insight.alert ===
+            "critical_share"
+            ? 120
+            : 90
+      });
+    }
+
+    if (
+      events.active.length >
+      0
+    ) {
+      notices.push({
+        id:
+          "district_event",
+
+        type:
+          "info",
+
+        title:
+          "商圈事件",
+
+        message:
+          `${events.active.length}个商圈事件正在影响当前经营环境`,
+
+        priority:
+          70
+      });
+    }
+
+    const chrome =
+      buildFormalPageChrome(
+        restaurantId,
+        {
+          notices
+        }
+      );
+
     return {
       pageId:
         "market-strategy",
@@ -534,6 +620,12 @@ class MarketStrategyPageSystem {
         "市场与竞争",
 
       restaurantId,
+
+      topBar:
+        chrome.topBar,
+
+      noticeTicker:
+        chrome.noticeTicker,
 
       restaurant: {
         id:
@@ -569,11 +661,7 @@ class MarketStrategyPageSystem {
             }
           : null,
 
-      insight:
-        this.insight
-          .getSummary(
-            restaurantId
-          ),
+      insight,
 
       positioning,
 
@@ -593,15 +681,9 @@ class MarketStrategyPageSystem {
           availableActions
       },
 
-      competition:
-        this.getCompetition(
-          district
-        ),
+      competition,
 
-      events:
-        this.getEvents(
-          district
-        )
+      events
     };
   }
 
