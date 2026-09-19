@@ -41,7 +41,10 @@ const EXPECTED = [
   "more-home",
   "market-strategy",
   "store-progress",
-  "chain"
+  "chain",
+  "lease",
+  "settings",
+  "brand-investments"
 ];
 
 
