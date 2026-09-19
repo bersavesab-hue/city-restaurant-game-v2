@@ -40,7 +40,8 @@ const EXPECTED = [
   "award-ceremony",
   "more-home",
   "market-strategy",
-  "store-progress"
+  "store-progress",
+  "chain"
 ];
 
 
