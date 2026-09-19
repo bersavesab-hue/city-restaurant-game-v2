@@ -78,6 +78,24 @@ import {
   brandInvestmentPageSystem
 } from "../src/ui/pages/brand-investments/BrandInvestmentPageSystem.js";
 
+import {
+  LeaseManagementView
+} from "../src/ui/pages/lease/LeaseManagementView.js";
+
+import {
+  SettingsView
+} from "../src/ui/pages/settings/SettingsView.js";
+
+import {
+  BrandInvestmentView
+} from "../src/ui/pages/brand-investments/BrandInvestmentView.js";
+
+import {
+  pageRegistry
+} from "../src/ui/registry/PageRegistry.js";
+
+import "../src/ui/registry/defaultPages.js";
+
 
 function setup({
   level = 1,
@@ -173,6 +191,22 @@ test(
       page.renewalQuote
     );
 
+    const leaseHtml =
+      new LeaseManagementView()
+        .renderMarkup(
+          page
+        );
+
+    assert.match(
+      leaseHtml,
+      /续租12个月/
+    );
+
+    assert.match(
+      leaseHtml,
+      /结束当前租约/
+    );
+
     const renewed =
       leaseManagementPageSystem
         .renew(
@@ -252,6 +286,22 @@ test(
     assert.equal(
       page.runtime.speed,
       4
+    );
+
+    const settingsHtml =
+      new SettingsView()
+        .renderMarkup(
+          page
+        );
+
+    assert.match(
+      settingsHtml,
+      /立即保存/
+    );
+
+    assert.match(
+      settingsHtml,
+      /读取自动存档/
     );
 
     settingsPageSystem
@@ -483,6 +533,22 @@ test(
       980000
     );
 
+    const investmentHtml =
+      new BrandInvestmentView()
+        .renderMarkup(
+          dashboard
+        );
+
+    assert.match(
+      investmentHtml,
+      /熟客CRM中心/
+    );
+
+    assert.match(
+      investmentHtml,
+      /区域品牌总部/
+    );
+
     assert.equal(
       financeSystem.getBalance(
         restaurant.id
@@ -589,6 +655,40 @@ test(
         restaurant.id
       ),
       expectedRegionCost
+    );
+  }
+);
+
+
+test(
+  "正式路由权限与阶段解锁保持一致",
+  () => {
+    assert.equal(
+      pageRegistry.get(
+        "chain"
+      ).unlock,
+      "second_store"
+    );
+
+    assert.equal(
+      pageRegistry.get(
+        "brand-investments"
+      ).unlock,
+      "membership"
+    );
+
+    assert.equal(
+      pageRegistry.has(
+        "lease"
+      ),
+      true
+    );
+
+    assert.equal(
+      pageRegistry.has(
+        "settings"
+      ),
+      true
     );
   }
 );
