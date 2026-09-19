@@ -71,6 +71,13 @@ export function renderGameTopBar(
     model?.level ??
     1;
 
+  const groupScope =
+    model?.scope?.type === "group";
+
+  const scopeStoreCount =
+    model?.scope?.stores?.length ??
+    0;
+
 
   const speeds =
     model?.actions
@@ -206,18 +213,22 @@ export function renderGameTopBar(
       <section class="rg-topbar__level">
 
         <span>
-          门店等级
+          ${groupScope ? "门店数量" : "门店等级"}
         </span>
 
         <strong>
-          Lv.${level}
+          ${
+            groupScope
+              ? scopeStoreCount + "家"
+              : "Lv." + level
+          }
         </strong>
 
         <small>
-          声望
           ${
-            model?.reputation ??
-            0
+            groupScope
+              ? "集团视角"
+              : "声望 " + (model?.reputation ?? 0)
           }
         </small>
 
