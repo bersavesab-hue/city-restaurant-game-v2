@@ -72,6 +72,12 @@ const ICONS =
       <circle cx="19" cy="5" r="1"/>
     `,
 
+    cash: `
+      <circle cx="12" cy="12" r="8"/>
+      <path d="M15.5 8.5h-5a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4H8.5"/>
+      <path d="M12 6v12"/>
+    `,
+
     renovation: `
       <path d="m4 19 7-7"/>
       <path d="m9 5 3-2 4 4-2 3"/>
