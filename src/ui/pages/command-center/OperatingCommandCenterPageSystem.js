@@ -35,6 +35,10 @@ import {
   marketInsightSystem
 } from "../../../systems/MarketInsightSystem.js";
 
+import {
+  employeeDynamicsSystem
+} from "../../../systems/EmployeeDynamicsSystem.js";
+
 
 
 function noticeType(
@@ -177,7 +181,30 @@ function buildStaffPreview(
               0,
 
             status:
-              employee.status
+              employee.status,
+
+            avatarId:
+              safe(
+                () =>
+                  employeeDynamicsSystem
+                    .getAvatarId(
+                      employee
+                    ),
+                employee.roleId +
+                  "_01"
+              ),
+
+            avatarPath:
+              safe(
+                () =>
+                  employeeDynamicsSystem
+                    .getAvatarPath(
+                      employee
+                    ),
+                "assets/images/ui/employees/avatars/" +
+                  employee.roleId +
+                  "_01.webp"
+              )
           })
         )
   };
