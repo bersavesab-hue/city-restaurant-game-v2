@@ -10,6 +10,7 @@
 @import url("../pages/employee-promotion/employee-promotion.css");
 @import url("../renovation/renovation-game.css");
 @import url("./game-chrome.css");
+@import url("../pages/command-center/command-center.css");
 
 :root {
   --ui-brand-900: #073b5a;
