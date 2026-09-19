@@ -59,6 +59,10 @@ import {
 } from "../../../data/ingredientVisuals.js";
 
 import {
+  getDishVisualSource
+} from "../../assets/DishVisualResolver.js";
+
+import {
   buildGlobalTopBarModel,
   buildNoticeTickerModel
 } from "../../components/GlobalChromeModel.js";
@@ -116,7 +120,9 @@ function getDishImage(
   return (
     dish.image ??
     dish.coverImage ??
-    `assets/images/ui/dishes/${dish.id}.webp`
+    getDishVisualSource(
+      dish
+    )
   );
 }
 
