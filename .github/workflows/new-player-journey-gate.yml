@@ -20,6 +20,7 @@ on:
       - "src/ui/runtime/AndroidPlaytestEntry.js"
       - "src/ui/pages/award-ceremony/AwardCeremonyPageSystem.js"
       - "src/ui/pages/award-ceremony/AwardCeremonyView.js"
+      - "src/ui/pages/capacity/CapacityManagementPageSystem.js"
       - "tests/award-ceremony.test.js"
       - "tests/new-player-full-journey-e2e.test.js"
       - "tests/pre-release-playtest-acceptance.test.js"
