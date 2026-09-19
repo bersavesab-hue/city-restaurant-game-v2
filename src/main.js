@@ -34,6 +34,8 @@ import { staffingRecommendationSystem } from "./systems/StaffingRecommendationSy
 import { storeProgressSystem } from "./systems/StoreProgressSystem.js";
 import { chainSystem } from "./systems/ChainSystem.js";
 import { lateGameInvestmentSystem } from "./systems/LateGameInvestmentSystem.js";
+import { onboardingSystem } from "./systems/OnboardingSystem.js";
+import { operatingAdvisorSystem } from "./systems/OperatingAdvisorSystem.js";
 
 import { ingredientCatalogSystem } from "./systems/IngredientCatalogSystem.js";
 import { dishRecipeBootstrapSystem } from "./systems/DishRecipeBootstrapSystem.js";
@@ -154,6 +156,8 @@ function bootstrap() {
       storeProgressSystem,
       chainSystem,
       lateGameInvestmentSystem,
+      onboardingSystem,
+      operatingAdvisorSystem,
 
       ingredientCatalogSystem,
       dishRecipeBootstrapSystem,
