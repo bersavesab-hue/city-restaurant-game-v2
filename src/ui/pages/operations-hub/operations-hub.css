@@ -1,86 +1,324 @@
+.operations-hub-screen {
+  padding-bottom:
+    calc(
+      78px +
+      env(
+        safe-area-inset-bottom
+      )
+    );
+}
+
+
 .operations-hub {
-  min-height: 100%;
-  box-sizing: border-box;
-  padding: 18px 14px 90px;
-  background: #f4efe4;
-  color: #173d42;
+  padding:
+    0 5px 6px;
 }
 
-.operations-hub__header {
-  margin-bottom: 16px;
-}
-
-.operations-hub__header span {
-  font-size: 11px;
-  color: #8b8477;
-}
-
-.operations-hub__header h1 {
-  margin: 4px 0;
-  font-size: 25px;
-}
-
-.operations-hub__header p {
-  margin: 0;
-  color: #747b75;
-  font-size: 12px;
-}
 
 .operations-hub__grid {
   display: grid;
-  gap: 10px;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 6px;
 }
 
+
 .operations-hub__card {
+  min-width: 0;
+
   overflow: hidden;
-  border-radius: 16px;
-  background: #fffaf0;
+
+  border:
+    1px solid #8fd6f4;
+
+  border-radius: 9px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff,
+      #eef9ff
+    );
+
+  box-shadow:
+    0 2px 6px
+    rgba(
+      0,
+      70,
+      135,
+      .14
+    );
 }
+
+
+.operations-hub__card[
+  data-entry-state="locked"
+] {
+  opacity: .58;
+}
+
 
 .operations-hub__primary {
   width: 100%;
-  box-sizing: border-box;
-  padding: 15px;
+
+  min-height: 96px;
+
+  display: grid;
+
+  grid-template-columns:
+    42px
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  gap: 7px;
+
+  align-items: center;
+
+  padding: 9px;
+
   border: 0;
-  background: transparent;
+
+  color: #164d7b;
+
+  background:
+    transparent;
+
   text-align: left;
-  color: inherit;
 }
 
-.operations-hub__primary strong,
-.operations-hub__primary span,
-.operations-hub__primary b {
+
+.operations-hub__primary:disabled {
+  cursor: default;
+}
+
+
+.operations-hub__icon {
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .72
+    );
+
+  border-radius: 9px;
+
+  color: #fff;
+
+  background:
+    linear-gradient(
+      145deg,
+      #20a9e7,
+      #0b67b4
+    );
+
+  box-shadow:
+    inset 0 1px
+    rgba(
+      255,
+      255,
+      255,
+      .34
+    );
+}
+
+
+.operations-hub__card--menu
+.operations-hub__icon {
+  background:
+    linear-gradient(
+      #ff9b33,
+      #ec6414
+    );
+}
+
+
+.operations-hub__card--supply
+.operations-hub__icon {
+  background:
+    linear-gradient(
+      #39c77c,
+      #159d54
+    );
+}
+
+
+.operations-hub__card--channels
+.operations-hub__icon {
+  background:
+    linear-gradient(
+      #2db9e8,
+      #187ac3
+    );
+}
+
+
+.operations-hub__card--analytics
+.operations-hub__icon {
+  background:
+    linear-gradient(
+      #786de8,
+      #514bbf
+    );
+}
+
+
+.operations-hub__card--finance
+.operations-hub__icon {
+  background:
+    linear-gradient(
+      #27bca8,
+      #128977
+    );
+}
+
+
+.operations-hub__card--market
+.operations-hub__icon {
+  background:
+    linear-gradient(
+      #e6b32e,
+      #c78208
+    );
+}
+
+
+.operations-hub__card--competition
+.operations-hub__icon {
+  color: #674500;
+
+  background:
+    linear-gradient(
+      #ffe665,
+      #f4bb20
+    );
+}
+
+
+.operations-hub__icon-svg {
+  width: 24px;
+  height: 24px;
+
+  stroke-width: 1.9;
+}
+
+
+.operations-hub__copy {
+  min-width: 0;
+}
+
+
+.operations-hub__copy strong,
+.operations-hub__copy small {
   display: block;
 }
 
-.operations-hub__primary strong {
-  font-size: 17px;
+
+.operations-hub__copy strong {
+  overflow: hidden;
+
+  color: #0d4f85;
+
+  font-size: 12px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.operations-hub__primary span {
-  margin-top: 5px;
-  font-size: 12px;
-  line-height: 1.45;
-  color: #737c76;
+
+.operations-hub__copy small {
+  margin-top: 4px;
+
+  color: #6f8599;
+
+  font-size: 8px;
+  line-height: 1.4;
 }
 
-.operations-hub__primary b {
-  margin-top: 10px;
-  font-size: 12px;
-  color: #936843;
+
+.operations-hub__primary > b {
+  padding: 4px 6px;
+
+  border-radius: 5px;
+
+  color: #674700;
+
+  background: #ffe166;
+
+  font-size: 8px;
+
+  white-space: nowrap;
 }
+
+
+.operations-hub__card[
+  data-entry-state="locked"
+]
+.operations-hub__primary > b {
+  color: #6f7e89;
+
+  background: #e3edf2;
+}
+
 
 .operations-hub__secondary {
   display: flex;
-  gap: 7px;
-  padding: 0 15px 13px;
+
+  flex-wrap: wrap;
+
+  gap: 4px;
+
+  padding:
+    0 8px 8px;
 }
 
+
 .operations-hub__secondary button {
-  padding: 7px 10px;
-  border: 0;
-  border-radius: 9px;
-  background: #eee6d7;
-  color: #31575a;
-  font-size: 11px;
+  min-height: 27px;
+
+  padding: 4px 7px;
+
+  border:
+    1px solid #b9ddec;
+
+  border-radius: 5px;
+
+  color: #24608a;
+
+  background: #f5fbfe;
+
+  font-size: 8px;
+}
+
+
+@media (
+  max-width: 390px
+) {
+  .operations-hub__grid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .operations-hub__primary {
+    min-height: 82px;
+  }
 }
