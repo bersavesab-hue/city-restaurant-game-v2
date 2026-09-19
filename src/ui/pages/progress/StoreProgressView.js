@@ -2,6 +2,17 @@ import {
   storeProgressPageSystem
 } from "./StoreProgressPageSystem.js";
 
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 
 function percent(
   value
@@ -63,29 +74,32 @@ class StoreProgressView {
     page
   ) {
     return `
-      <main class="store-progress">
+      <main class="rg-screen store-progress-page">
 
-        <header class="store-progress__header">
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "门店成长 · 等级解锁"
+          }
+        )}
 
-          <div>
-            <span>
-              门店成长
-            </span>
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
 
-            <h1>
-              Lv.${page.restaurant.level}
-              ${page.progress.title ?? ""}
-              ·
-              ${page.restaurant.name}
-            </h1>
-          </div>
+        ${renderPageTitle({
+          title:
+            `Lv.${page.restaurant.level} ${page.progress.title ?? ""}`,
 
-          <strong>
-            ${page.restaurant.experience}
-            经验
-          </strong>
+          subtitle:
+            `${page.restaurant.name} · ${page.restaurant.experience}经验`,
 
-        </header>
+          backTarget:
+            "more-home"
+        })}
+
+        <section class="store-progress">
 
 
         <section class="store-progress__next">
@@ -332,14 +346,18 @@ class StoreProgressView {
         </section>
 
 
-        <nav>
-          <button
-            type="button"
-            data-page-target="more-home"
-          >
-            返回更多
-          </button>
-        </nav>
+        </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "more"
+            })
+        )}
 
       </main>
     `;
