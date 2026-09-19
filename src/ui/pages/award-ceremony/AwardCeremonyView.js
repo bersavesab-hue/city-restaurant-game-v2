@@ -6,6 +6,21 @@ import {
   awardFeedbackSystem
 } from "../../../systems/AwardFeedbackSystem.js";
 
+import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 
 function escapeHtml(
   value
@@ -98,19 +113,50 @@ class AwardCeremonyView {
   renderMarkup(
     page
   ) {
+    const chrome =
+      buildFormalPageChrome(
+        page.restaurantId ??
+        this.restaurantId
+      );
+
     if (
       !page.hasAward
     ) {
       return `
-        <main class="award-ceremony">
+        <main class="rg-screen award-ceremony-page">
+
+          ${renderGameTopBar(
+            chrome.topBar,
+            {
+              subtitle:
+                "正式颁奖"
+            }
+          )}
+
+          ${renderNoticeTicker(
+            chrome.noticeTicker
+          )}
+
+          ${renderPageTitle({
+            title:
+              "颁奖典礼",
+
+            subtitle:
+              "暂无待展示的获奖结果",
+
+            backTarget:
+              "awards-center"
+          })}
 
           <section class="award-ceremony__empty">
 
             <div
+              class="award-ceremony__stage-visual"
+              role="img"
+              aria-label="颁奖舞台"
               data-image-slot="award-stage"
-            >
-              颁奖舞台
-            </div>
+              data-image-fit="cover"
+            ></div>
 
             <h1>
               暂无待展示的获奖结果
@@ -129,49 +175,59 @@ class AwardCeremonyView {
 
           </section>
 
+          ${renderBottomNavigation(
+            gameChromeSystem
+              .getNavigation({
+                restaurantId:
+                  page.restaurantId ??
+                  this.restaurantId,
+
+                activePageId:
+                  "more"
+              })
+          )}
+
         </main>
       `;
     }
 
 
     return `
-      <main class="award-ceremony">
+      <main class="rg-screen award-ceremony-page">
 
-        <header class="award-ceremony__header">
+        ${renderGameTopBar(
+          chrome.topBar,
+          {
+            subtitle:
+              "正式颁奖"
+          }
+        )}
 
-          <span>
-            ${escapeHtml(
-              page.award.periodName
-            )}
-            正式颁奖
-          </span>
+        ${renderNoticeTicker(
+          chrome.noticeTicker
+        )}
 
-          <h1>
-            ${escapeHtml(
-              page.award.name
-            )}
-          </h1>
+        ${renderPageTitle({
+          title:
+            page.award.name,
 
-          <p>
-            ${escapeHtml(
-              page.award.division
-            )}
-            ·
-            荣誉值
-            ${page.award.prestige}
-          </p>
+          subtitle:
+            `${page.award.periodName} · ${page.award.division} · 荣誉值${page.award.prestige}`,
 
-        </header>
+          backTarget:
+            "awards-center"
+        })}
 
 
         <section class="award-ceremony__stage">
 
           <div
             class="award-ceremony__trophy"
+            role="img"
+            aria-label="获奖奖杯"
             data-image-slot="award-trophy"
-          >
-            奖杯
-          </div>
+            data-image-fit="contain"
+          ></div>
 
           <span>
             获奖者
@@ -300,6 +356,18 @@ class AwardCeremonyView {
           </button>
 
         </nav>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId ??
+                this.restaurantId,
+
+              activePageId:
+                "more"
+            })
+        )}
 
       </main>
     `;
