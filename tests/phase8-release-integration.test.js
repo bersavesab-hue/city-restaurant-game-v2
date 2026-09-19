@@ -469,3 +469,28 @@ test(
     );
   }
 );
+
+
+test(
+  "Android网页壳使用唯一正式应用名称",
+  () => {
+    const buildScript =
+      fs.readFileSync(
+        new URL(
+          "../scripts/build-android-js.mjs",
+          import.meta.url
+        ),
+        "utf8"
+      );
+
+    assert.match(
+      buildScript,
+      /RELEASE_INFO\.appName/
+    );
+
+    assert.doesNotMatch(
+      buildScript,
+      /城市餐厅测试版/
+    );
+  }
+);
