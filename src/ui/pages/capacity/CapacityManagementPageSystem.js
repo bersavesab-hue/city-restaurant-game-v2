@@ -90,6 +90,8 @@ class CapacityManagementPageSystem {
       pageId:
         "capacity",
 
+      restaurantId,
+
       topBar:
         chrome.topBar,
 
