@@ -5,6 +5,11 @@ import { ingredientCatalogSystem } from "../../../systems/IngredientCatalogSyste
 import { supplierSystem } from "../../../systems/SupplierSystem.js";
 import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
 import { getIngredientVisual } from "../../../data/ingredientVisuals.js";
+import { gameState } from "../../../core/GameState.js";
+import {
+  buildGlobalTopBarModel,
+  buildNoticeTickerModel
+} from "../../components/GlobalChromeModel.js";
 
 function safeIngredientVisual(
   ingredientId
@@ -123,6 +128,123 @@ class SupplyManagementPageSystem {
           restaurantId
         );
 
+    const balance =
+      safeBalance(
+        restaurantId
+      );
+
+    const summary = {
+      supplierCount:
+        suppliers.length,
+
+      shortageCount:
+        inventory.filter(
+          item =>
+            [
+              "critical",
+              "high"
+            ].includes(
+              item.level
+            )
+        ).length,
+
+      pendingOrders:
+        orders.filter(
+          item =>
+            item.status ===
+            "pending"
+        ).length,
+
+      payableAmount:
+        payables
+          .filter(
+            item =>
+              [
+                "open",
+                "overdue"
+              ].includes(
+                item.status
+              )
+          )
+          .reduce(
+            (
+              sum,
+              item
+            ) =>
+              sum +
+              item.amount,
+            0
+          ),
+
+      overdueAmount:
+        payables
+          .filter(
+            item =>
+              item.status ===
+              "overdue"
+          )
+          .reduce(
+            (
+              sum,
+              item
+            ) =>
+              sum +
+              item.amount,
+            0
+          )
+    };
+
+    const notices =
+      [];
+
+    if (
+      summary.shortageCount >
+      0
+    ) {
+      notices.push({
+        id:
+          "supply_shortage",
+
+        type:
+          "warning",
+
+        title:
+          "库存预警",
+
+        message:
+          `${summary.shortageCount}项食材存在缺货风险，请及时补货`,
+
+        priority:
+          100
+      });
+    }
+
+    if (
+      summary.overdueAmount >
+      0
+    ) {
+      notices.push({
+        id:
+          "supply_overdue",
+
+        type:
+          "danger",
+
+        title:
+          "账期逾期",
+
+        message:
+          `已有¥${Math.round(
+            summary.overdueAmount
+          ).toLocaleString(
+            "zh-CN"
+          )}供应商账款逾期`,
+
+        priority:
+          110
+      });
+    }
+
     return {
       pageId:
         "supply",
@@ -130,67 +252,47 @@ class SupplyManagementPageSystem {
       title:
         "供应链",
 
-      balance:
-        safeBalance(
-          restaurantId
-        ),
+      topBar:
+        buildGlobalTopBarModel({
+          restaurantName:
+            restaurant.name,
 
-      summary: {
-        supplierCount:
-          suppliers.length,
+          balance:
+            balance ??
+            0,
 
-        shortageCount:
-          inventory.filter(
-            item =>
-              [
-                "critical",
-                "high"
-              ].includes(
-                item.level
-              )
-          ).length,
+          storeLevel:
+            restaurant.level ??
+            1,
 
-        pendingOrders:
-          orders.filter(
-            item =>
-              item.status ===
-              "pending"
-          ).length,
+          reputation:
+            restaurant.reputation ??
+            0,
 
-        payableAmount:
-          payables
-            .filter(
-              item =>
-                [
-                  "open",
-                  "overdue"
-                ].includes(
-                  item.status
-                )
-            )
-            .reduce(
-              (sum, item) =>
-                sum +
-                item.amount,
-              0
+          time:
+            gameState.getSection(
+              "time"
             ),
 
-        overdueAmount:
-          payables
-            .filter(
-              item =>
-                item.status ===
-                "overdue"
-            )
-            .reduce(
-              (sum, item) =>
-                sum +
-                item.amount,
-              0
-            )
-      },
+          runtime:
+            gameState.getSection(
+              "runtime"
+            ),
 
-      suppliers,
+          currentStoreId:
+            restaurantId
+        }),
+
+      noticeTicker:
+        buildNoticeTickerModel(
+          notices
+        ),
+
+      balance,
+
+      summary,
+
+            suppliers,
       inventory,
       orders,
       payables,
