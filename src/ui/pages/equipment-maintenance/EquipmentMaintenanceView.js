@@ -1,3 +1,15 @@
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+
 function money(
   value
 ) {
@@ -30,11 +42,32 @@ class EquipmentMaintenanceView {
     page
   ) {
     return `
-      <section class="equipment-maintenance">
-        <header>
-          <span>设备生命周期</span>
-          <h1>设备维护</h1>
-        </header>
+      <main class="rg-screen equipment-maintenance-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "设备生命周期 · 故障风险"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "设备维护",
+
+          subtitle:
+            "设备生命周期 · 故障风险",
+
+          backTarget:
+            "restaurant"
+        })}
+
+        <section class="equipment-maintenance">
 
         <section>
           <article>
@@ -148,6 +181,19 @@ class EquipmentMaintenanceView {
           }
         </section>
       </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "restaurant"
+            })
+        )}
+
+      </main>
     `;
   }
 }
