@@ -1,6 +1,6 @@
 # 发布清单
 
-当前候选版本：**0.8.65 Playtest / versionCode 865**
+当前候选版本：**0.8.66 Playtest / versionCode 866**
 
 ## CI 自动完成
 
@@ -15,10 +15,11 @@
 - 90 天经营回归；
 - 365 天长期回归；
 - Android Web Bundle；
+- Android 16 / API 36 目标版本检查；
 - Debug APK 构建。
 
 发布产物包含：
-- `city-restaurant-v0.8.65-playtest.apk`
+- `city-restaurant-v0.8.66-playtest.apk`
 - `release-metadata.json`
 - `SHA256SUMS.txt`
 
