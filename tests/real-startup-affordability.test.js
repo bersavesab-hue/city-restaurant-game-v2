@@ -326,6 +326,15 @@ test(
         "chef"
     });
 
+    employeeSystem.hire({
+      restaurantId:
+        restaurant.id,
+      name:
+        "首局验收服务员",
+      roleId:
+        "server"
+    });
+
     const dish =
       dishCatalogSystem
         .getAll()
@@ -420,6 +429,16 @@ test(
         .getStatus(
           restaurant.id
         );
+
+    assert.equal(
+      ready.availableChefs.length,
+      1
+    );
+
+    assert.equal(
+      ready.activeServers.length,
+      1
+    );
 
     assert.equal(
       ready.canOpen,
