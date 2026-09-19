@@ -59,7 +59,11 @@ class OperationsHubView {
             : ""
         }
 
-        ${renderNoticeTicker(\n          page.noticeTicker\n        )}\n\n        ${renderPageTitle({
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
           title:
             "经营",
 
