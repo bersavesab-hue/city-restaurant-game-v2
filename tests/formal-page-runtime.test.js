@@ -44,7 +44,8 @@ const EXPECTED = [
   "chain",
   "lease",
   "settings",
-  "brand-investments"
+  "brand-investments",
+  "feedback"
 ];
 
 
