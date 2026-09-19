@@ -230,7 +230,7 @@ test(
         .getLandingPage(
           "city"
         ),
-      "properties"
+      "city"
     );
 
     assert.equal(
