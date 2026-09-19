@@ -10,6 +10,11 @@ import { chainSystem } from "../../../systems/ChainSystem.js";
 import { venueTypeSystem } from "../../../systems/VenueTypeSystem.js";
 import { pageRegistry } from "../../registry/PageRegistry.js";
 
+import {
+  buildGlobalTopBarModel,
+  buildNoticeTickerModel
+} from "../../components/GlobalChromeModel.js";
+
 function clamp(
   value,
   min,
@@ -537,9 +542,125 @@ class CityPropertyPageSystem {
               effectiveDistrictId
           );
 
+    let restaurant =
+      null;
+
+    if (
+      restaurantId
+    ) {
+      try {
+        restaurant =
+          restaurantSystem.get(
+            restaurantId
+          );
+      } catch {
+        restaurant =
+          null;
+      }
+    }
+
+    const time =
+      gameState.getSection(
+        "time"
+      );
+
+    const runtime =
+      gameState.getSection(
+        "runtime"
+      );
+
+    const notices =
+      [
+        {
+          id:
+            "property_market_count",
+
+          type:
+            "info",
+
+          title:
+            "房源市场",
+
+          message:
+            `当前筛选下共有${properties.length}套可租房源`,
+
+          priority:
+            40
+        }
+      ];
+
+    const urgentCount =
+      properties.filter(
+        property =>
+          Number.isInteger(
+            property
+              .competition
+              ?.daysUntilPossibleClaim
+          ) &&
+          property
+            .competition
+            .daysUntilPossibleClaim <=
+            3
+      ).length;
+
+    if (
+      urgentCount >
+      0
+    ) {
+      notices.push({
+        id:
+          "property_claim_risk",
+
+        type:
+          "warning",
+
+        title:
+          "热门房源",
+
+        message:
+          `${urgentCount}套房源存在3天内被其他经营者抢租的风险`,
+
+        priority:
+          100
+      });
+    }
+
     return {
       pageId: "properties",
       title: "城市与房源",
+
+      topBar:
+        buildGlobalTopBarModel({
+          restaurantName:
+            restaurant?.name ??
+            "城市餐饮创业",
+
+          balance:
+            safeBalance(
+              restaurantId
+            ) ??
+            0,
+
+          storeLevel:
+            restaurant?.level ??
+            1,
+
+          reputation:
+            restaurant?.reputation ??
+            0,
+
+          time,
+
+          runtime,
+
+          currentStoreId:
+            restaurantId
+        }),
+
+      noticeTicker:
+        buildNoticeTickerModel(
+          notices
+        ),
       districts: allowedDistricts.map(item => ({
         id: item.id,
         name: item.name,
