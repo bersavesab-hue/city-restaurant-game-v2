@@ -6,6 +6,17 @@ import {
   eventBus
 } from "../../core/EventBus.js";
 
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../components/GameChromeSystem.js";
+
 
 function escapeHtml(
   value
@@ -108,7 +119,10 @@ class RenovationConstructionView {
     root = this.root,
     {
       restaurantId =
-        this.restaurantId
+        this.restaurantId,
+
+      onNavigate =
+        this.onNavigate
     } = {}
   ) {
     this.root =
@@ -116,6 +130,9 @@ class RenovationConstructionView {
 
     this.restaurantId =
       restaurantId;
+
+    this.onNavigate =
+      onNavigate;
 
 
     this.unsubscribeConstructionReady
@@ -183,82 +200,34 @@ class RenovationConstructionView {
 
 
     return `
-      <main class="construction-page">
+      <main class="rg-screen construction-page">
 
-        <header class="construction-hud">
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "装修工程中心"
+          }
+        )}
 
-          <div>
-            <strong>
-              ${escapeHtml(
-                page.restaurant
-                  .name
-              )}
-            </strong>
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
 
-            <span>
-              装修工程中心
-            </span>
-          </div>
+        ${renderPageTitle({
+          title:
+            "装修施工",
 
-          <section>
-            <span>
-              当前时间
-            </span>
+          subtitle:
+            "施工期间新布局不会提前产生经营能力",
 
-            <strong>
-              第${page.topBar.day}天
-            </strong>
-          </section>
+          backTarget:
+            "restaurant",
 
-          <section>
-            <span>
-              当前资金
-            </span>
-
-            <strong>
-              ${money(
-                page.topBar
-                  .balance
-              )}
-            </strong>
-          </section>
-
-          <section>
-            <span>
-              门店等级
-            </span>
-
-            <strong>
-              Lv.${page.restaurant.level}
-            </strong>
-          </section>
-
-        </header>
-
-
-        <section class="construction-title">
-
-          <button
-            type="button"
-            data-page-target="restaurant"
-          >
-            ‹ 门店
-          </button>
-
-          <div>
-            <strong>
-              装修施工
-            </strong>
-
-            <span>
-              施工期间新布局不会提前产生经营能力
-            </span>
-          </div>
-
-          ${
+          rightHtml:
             construction
               ? `
-                <b>
+                <b class="construction-status-badge">
                   ${
                     construction.status ===
                     "building"
@@ -271,9 +240,7 @@ class RenovationConstructionView {
                 </b>
               `
               : ""
-          }
-
-        </section>
+        })}
 
 
         ${
@@ -535,7 +502,7 @@ class RenovationConstructionView {
                   </strong>
 
                   <span>
-                    后续可绑定施工效果图
+                    根据当前方案展示施工布局
                   </span>
                 </header>
 
@@ -604,6 +571,18 @@ class RenovationConstructionView {
               </section>
             `
         }
+
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                this.restaurantId,
+
+              activePageId:
+                "restaurant"
+            })
+        )}
 
       </main>
     `;
