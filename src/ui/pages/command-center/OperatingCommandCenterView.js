@@ -525,13 +525,12 @@ class OperatingCommandCenterView {
         <header class="command-center__header">
           <div
             class="command-center__hero-image"
+            role="img"
             data-image-slot="command-center-hero"
             data-image-src="assets/images/scenes/restaurants/command-center-hero.webp"
             data-image-fit="cover"
-            aria-label="门店经营场景图片槽位"
-          >
-            <span>门店经营场景</span>
-          </div>
+            aria-label="门店经营场景"
+          ></div>
 
           <div class="command-center__identity">
             <span>第${page.day}天 · 今日经营</span>
