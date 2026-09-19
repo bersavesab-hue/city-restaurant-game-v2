@@ -82,7 +82,10 @@ class OpeningSetupView {
   mount(
     root,
     {
-      restaurantId
+      restaurantId,
+
+      onNavigate =
+        this.onNavigate
     }
   ) {
     this.root =
@@ -90,6 +93,9 @@ class OpeningSetupView {
 
     this.restaurantId =
       restaurantId;
+
+    this.onNavigate =
+      onNavigate;
 
 
     this.unsubscribeProcurement
