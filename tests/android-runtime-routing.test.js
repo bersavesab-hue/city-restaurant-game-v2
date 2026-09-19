@@ -33,3 +33,21 @@ test(
     );
   }
 );
+
+
+test(
+  "Android运行时只保留一条正式页面点击导航链",
+  () => {
+    assert.equal(
+      source.split(
+        "/* data-page-navigation-listener */"
+      ).length - 1,
+      1
+    );
+
+    assert.match(
+      source,
+      /element\.dataset\s*\n\s*\.restaurantId\s*\?\?\s*\n\s*restaurantId/
+    );
+  }
+);
