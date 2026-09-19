@@ -10,6 +10,10 @@ import {
   customerSegmentSystem
 } from "../../../systems/CustomerSegmentSystem.js";
 
+import {
+  customerIdentitySystem
+} from "../../../systems/CustomerIdentitySystem.js";
+
 class CustomerManagementPageSystem {
   getPage(
     restaurantId
@@ -39,6 +43,54 @@ class CustomerManagementPageSystem {
               )
         );
 
+    const identitySummary =
+      customerIdentitySystem
+        .getSummary(
+          restaurantId
+        );
+
+    const recognizedCustomers =
+      customerIdentitySystem
+        .getDetailedProfiles(
+          restaurantId
+        )
+        .map(
+          profile => {
+            const segment =
+              profile.segmentId
+                ? customerSegmentSystem
+                    .get(
+                      profile.segmentId
+                    )
+                : null;
+
+            const member =
+              customerLoyaltySystem
+                .findMember(
+                  restaurantId,
+                  profile.customerId
+                );
+
+            return {
+              ...profile,
+
+              segmentName:
+                segment?.name ??
+                profile.segmentId ??
+                "未分类",
+
+              member:
+                Boolean(
+                  member
+                ),
+
+              memberLevelId:
+                member?.levelId ??
+                null
+            };
+          }
+        );
+
     return {
       pageId:
         "customers",
@@ -47,6 +99,10 @@ class CustomerManagementPageSystem {
         "顾客与会员",
 
       restaurantId,
+
+      identitySummary,
+
+      recognizedCustomers,
 
       overview: {
         satisfaction:
