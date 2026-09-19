@@ -7,18 +7,11 @@ import {
 } from "../../components/GameChromeSystem.js";
 
 import {
-  buildGlobalTopBarModel
-} from "../../components/GlobalChromeModel.js";
-
-import {
   renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
-
-import {
-  gameState
-} from "../../../core/GameState.js";
-
 
 function escapeHtml(
   value
@@ -76,45 +69,28 @@ class MoreHubView {
   renderMarkup(
     page
   ) {
-    const topBar =
-      buildGlobalTopBarModel({
-        restaurantName:
-          page.restaurant.name,
-
-        balance:
-          page.restaurant.balance,
-
-        storeLevel:
-          page.restaurant.level,
-
-        reputation:
-          page.restaurant.reputation,
-
-        time:
-          gameState.getSection(
-            "time"
-          ),
-
-        runtime:
-          gameState.getSection(
-            "runtime"
-          ),
-
-        currentStoreId:
-          page.restaurant.id
-      });
-
-
     return `
       <main class="rg-screen more-hub">
 
         ${renderGameTopBar(
-          topBar,
+          page.topBar,
           {
             subtitle:
               "顾客 · 品牌 · 荣誉 · 扩张"
           }
         )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "更多",
+
+          subtitle:
+            "会员、合规、成长、连锁与系统管理"
+        })}
 
 
         <section class="more-hub__summary">
