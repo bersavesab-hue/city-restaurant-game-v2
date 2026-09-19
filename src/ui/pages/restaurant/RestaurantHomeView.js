@@ -127,7 +127,10 @@ function statusText(
 function renderImageSlot({
   id,
   label,
-  className = ""
+  className = "",
+  source = null,
+  fallback = null,
+  fit = "cover"
 }) {
   return `
     <div
@@ -137,6 +140,19 @@ function renderImageSlot({
       "
       data-image-slot="${escapeHtml(
         id
+      )}"
+      ${source
+        ? `data-image-src="${escapeHtml(
+            source
+          )}"`
+        : ""}
+      ${fallback
+        ? `data-image-fallback="${escapeHtml(
+            fallback
+          )}"`
+        : ""}
+      data-image-fit="${escapeHtml(
+        fit
       )}"
     >
 
@@ -347,7 +363,13 @@ class RestaurantHomeView {
               "门店实景主图",
 
             className:
-              "restaurant-image-slot--hero"
+              "restaurant-image-slot--hero",
+
+            source:
+              "assets/images/scenes/restaurants/restaurant-home-hero.webp",
+
+            fallback:
+              "assets/images/scenes/restaurants/command-center-hero.webp"
           })}
 
           <div class="store-hero__overlay">
@@ -828,7 +850,13 @@ class RestaurantHomeView {
               "营业场景图",
 
             className:
-              "restaurant-image-slot--live"
+              "restaurant-image-slot--live",
+
+            source:
+              "assets/images/scenes/restaurants/restaurant-live.webp",
+
+            fallback:
+              "assets/images/scenes/restaurants/command-center-hero.webp"
           })}
 
 
@@ -1017,7 +1045,14 @@ class RestaurantHomeView {
                       `招牌菜${index + 1}`,
 
                     className:
-                      "restaurant-image-slot--dish"
+                      "restaurant-image-slot--dish",
+
+                    source:
+                      dish?.dishId
+                        ? `assets/images/dishes/official/${escapeHtml(
+                            dish.dishId
+                          )}.webp`
+                        : null
                   })}
 
                   <div class="store-signature-card__body">
