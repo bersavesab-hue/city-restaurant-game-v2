@@ -1,26 +1,200 @@
-function money(value) {
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+
+function escapeHtml(
+  value
+) {
+  return String(
+    value ??
+    ""
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+}
+
+
+function money(
+  value
+) {
   const number =
-    Number(value ?? 0);
+    Number(
+      value ??
+      0
+    );
 
   return (
-    (number < 0 ? "-" : "") +
+    (
+      number <
+      0
+        ? "-"
+        : ""
+    ) +
     "¥" +
     Math.abs(
-      Math.round(number)
-    ).toLocaleString("zh-CN")
+      Math.round(
+        number
+      )
+    ).toLocaleString(
+      "zh-CN"
+    )
   );
 }
 
-class FinanceCenterView {
-  renderMarkup(page) {
-    return `
-      <section class="finance-center">
-        <header>
-          <span>门店资金管理</span>
-          <h1>财务中心</h1>
-        </header>
 
-        <section>
+function healthName(
+  status
+) {
+  return {
+    healthy:
+      "健康",
+
+    watch:
+      "观察",
+
+    warning:
+      "预警",
+
+    danger:
+      "危险"
+  }[
+    status
+  ] ??
+    status;
+}
+
+
+function healthTone(
+  status
+) {
+  if (
+    status ===
+    "healthy"
+  ) {
+    return "success";
+  }
+
+  if (
+    status ===
+    "watch"
+  ) {
+    return "info";
+  }
+
+  if (
+    status ===
+    "warning"
+  ) {
+    return "warning";
+  }
+
+  return "danger";
+}
+
+
+class FinanceCenterView {
+  renderMarkup(
+    page
+  ) {
+    const navigation =
+      gameChromeSystem
+        .getNavigation({
+          restaurantId:
+            page.restaurantId,
+
+          activePageId:
+            "finance"
+        });
+
+    return `
+      <main class="rg-screen finance-center-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "资金 · 利润 · 成本"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "财务中心",
+
+          subtitle:
+            `第${page.range.startDay}天—第${page.range.endDay}天`,
+
+          backTarget:
+            "operations"
+        })}
+
+        <section class="finance-periods">
+
+          <span>
+            统计周期
+          </span>
+
+          <div>
+            ${page.periods
+              .map(
+                item => `
+                  <button
+                    type="button"
+                    data-page-target="finance"
+                    data-page-period="${escapeHtml(
+                      item.id
+                    )}"
+                    class="${
+                      page.period ===
+                      item.id
+                        ? "is-active"
+                        : ""
+                    }"
+                  >
+                    ${escapeHtml(
+                      item.name
+                    )}
+                  </button>
+                `
+              )
+              .join("")}
+          </div>
+
+        </section>
+
+
+        <section class="finance-kpis">
+
           <article>
             <span>可用现金</span>
             <strong>
@@ -28,6 +202,9 @@ class FinanceCenterView {
                 page.account.balance
               )}
             </strong>
+            <small>
+              当前可调度资金
+            </small>
           </article>
 
           <article>
@@ -38,6 +215,9 @@ class FinanceCenterView {
                   .reservedDeposits
               )}
             </strong>
+            <small>
+              暂不可动用
+            </small>
           </article>
 
           <article>
@@ -47,209 +227,397 @@ class FinanceCenterView {
                 page.payables.amount
               )}
             </strong>
+            <small>
+              ${page.payables.count}笔
+            </small>
           </article>
-        </section>
 
-        <section>
-          <h2>经营结果</h2>
-
-          <p>
-            营业收入
-            ${money(
-              page.summary.income
-            )}
-          </p>
-
-          <p>
-            经营支出
-            ${money(
-              page.summary.expense
-            )}
-          </p>
-
-          <p>
-            经营利润
-            ${money(
-              page.summary.profit
-            )}
-          </p>
-
-          <p>
-            利润率
-            ${page.summary
-              .profitMargin}%
-          </p>
-        </section>
-
-        <section>
-          <h2>现金流</h2>
-
-          <p>
-            流入
-            ${money(
-              page.summary.cashIn
-            )}
-          </p>
-
-          <p>
-            流出
-            ${money(
-              page.summary.cashOut
-            )}
-          </p>
-
-          <p>
-            净现金变化
-            ${money(
-              page.summary
-                .netCashFlow
-            )}
-          </p>
-        </section>
-
-        <section class="finance-health">
-          <h2>经营健康</h2>
-
-          <p>
-            状态
+          <article
+            class="finance-health-card finance-health-card--${healthTone(
+              page.health.status
+            )}"
+          >
+            <span>财务健康</span>
             <strong>
-              ${
-                page.health.status === "healthy"
-                  ? "健康"
-                  : page.health.status === "watch"
-                    ? "观察"
-                    : page.health.status === "warning"
-                      ? "预警"
-                      : "危险"
-              }
+              ${escapeHtml(
+                healthName(
+                  page.health.status
+                )
+              )}
             </strong>
-          </p>
+            <small>
+              跑道
+              ${
+                page.health
+                  .cashRunwayDays ===
+                  null
+                  ? "暂无"
+                  : `${page.health.cashRunwayDays}天`
+              }
+            </small>
+          </article>
 
-          <p>
-            日均经营支出
-            ${money(
-              page.health
-                .averageDailyExpense
-            )}
-          </p>
-
-          <p>
-            现金跑道
-            ${
-              page.health.cashRunwayDays === null
-                ? "暂无支出基数"
-                : `${page.health.cashRunwayDays}天`
-            }
-          </p>
-
-          <p>
-            食材成本率
-            ${(
-              page.health
-                .costRatios
-                .ingredient *
-              100
-            ).toFixed(1)}%
-          </p>
-
-          <p>
-            人工成本率
-            ${(
-              page.health
-                .costRatios
-                .salary *
-              100
-            ).toFixed(1)}%
-          </p>
-
-          <p>
-            租金成本率
-            ${(
-              page.health
-                .costRatios
-                .rent *
-              100
-            ).toFixed(1)}%
-          </p>
-
-          <p>
-            渠道费用率
-            ${(
-              page.health
-                .costRatios
-                .channel *
-              100
-            ).toFixed(1)}%
-          </p>
-
-          <p>
-            营销费用率
-            ${(
-              page.health
-                .costRatios
-                .marketing *
-              100
-            ).toFixed(1)}%
-          </p>
         </section>
 
-        <section>
-          <h2>收支结构</h2>
 
-          ${page.categories.map(
-            item => `
-              <article>
+        <section class="finance-grid">
+
+          <article class="finance-panel">
+
+            <header>
+              <strong>
+                经营结果
+              </strong>
+
+              <span>
+                本周期
+              </span>
+            </header>
+
+            <div class="finance-result-grid">
+
+              <div>
+                <span>营业收入</span>
                 <strong>
-                  ${item.name}
+                  ${money(
+                    page.summary.income
+                  )}
                 </strong>
+              </div>
 
-                <span>
-                  收入
-                  ${money(
-                    item.income
-                  )}
-                </span>
-
-                <span>
-                  支出
-                  ${money(
-                    item.expense
-                  )}
-                </span>
-              </article>
-            `
-          ).join("")}
-        </section>
-
-        <section>
-          <h2>资金流水</h2>
-
-          ${page.transactions.map(
-            item => `
-              <article>
+              <div>
+                <span>经营支出</span>
                 <strong>
-                  ${
-                    item.description ||
-                    item.categoryName
-                  }
-                </strong>
-
-                <span>
                   ${money(
-                    item.cashEffect
+                    page.summary.expense
                   )}
-                </span>
-              </article>
-            `
-          ).join("")}
+                </strong>
+              </div>
+
+              <div>
+                <span>经营利润</span>
+                <strong>
+                  ${money(
+                    page.summary.profit
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>利润率</span>
+                <strong>
+                  ${page.summary
+                    .profitMargin}%
+                </strong>
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <article class="finance-panel">
+
+            <header>
+              <strong>
+                现金流
+              </strong>
+
+              <span>
+                ${page.summary.transactionCount}笔流水
+              </span>
+            </header>
+
+            <div class="finance-result-grid">
+
+              <div>
+                <span>流入</span>
+                <strong>
+                  ${money(
+                    page.summary.cashIn
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>流出</span>
+                <strong>
+                  ${money(
+                    page.summary.cashOut
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>净现金变化</span>
+                <strong>
+                  ${money(
+                    page.summary
+                      .netCashFlow
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>总资产</span>
+                <strong>
+                  ${money(
+                    page.account
+                      .totalAssets
+                  )}
+                </strong>
+              </div>
+
+            </div>
+
+          </article>
+
         </section>
-      </section>
+
+
+        <section class="finance-panel finance-health-panel">
+
+          <header>
+            <strong>
+              成本健康
+            </strong>
+
+            <span>
+              日均支出
+              ${money(
+                page.health
+                  .averageDailyExpense
+              )}
+            </span>
+          </header>
+
+          <div class="finance-ratio-grid">
+
+            ${[
+              [
+                "食材成本率",
+                page.health
+                  .costRatios
+                  .ingredient
+              ],
+              [
+                "人工成本率",
+                page.health
+                  .costRatios
+                  .salary
+              ],
+              [
+                "租金成本率",
+                page.health
+                  .costRatios
+                  .rent
+              ],
+              [
+                "渠道费用率",
+                page.health
+                  .costRatios
+                  .channel
+              ],
+              [
+                "营销费用率",
+                page.health
+                  .costRatios
+                  .marketing
+              ]
+            ]
+              .map(
+                (
+                  [
+                    label,
+                    ratio
+                  ]
+                ) => {
+                  const percent =
+                    Math.max(
+                      0,
+                      Number(
+                        ratio ??
+                        0
+                      ) *
+                      100
+                    );
+
+                  return `
+                    <article>
+                      <span>
+                        ${label}
+                      </span>
+
+                      <strong>
+                        ${percent.toFixed(
+                          1
+                        )}%
+                      </strong>
+
+                      <div>
+                        <i
+                          style="width:${Math.min(
+                            100,
+                            percent
+                          )}%"
+                        ></i>
+                      </div>
+                    </article>
+                  `;
+                }
+              )
+              .join("")}
+
+          </div>
+
+        </section>
+
+
+        <section class="finance-grid">
+
+          <article class="finance-panel">
+
+            <header>
+              <strong>
+                收支结构
+              </strong>
+
+              <span>
+                按类别汇总
+              </span>
+            </header>
+
+            <div class="finance-list">
+
+              ${
+                page.categories.length
+                  ? page.categories
+                      .map(
+                        item => `
+                          <article>
+                            <div>
+                              <strong>
+                                ${escapeHtml(
+                                  item.name
+                                )}
+                              </strong>
+
+                              <small>
+                                ${item.count}笔
+                              </small>
+                            </div>
+
+                            <div>
+                              <span>
+                                收入
+                                ${money(
+                                  item.income
+                                )}
+                              </span>
+
+                              <span>
+                                支出
+                                ${money(
+                                  item.expense
+                                )}
+                              </span>
+                            </div>
+                          </article>
+                        `
+                      )
+                      .join("")
+                  : `
+                    <div class="finance-empty">
+                      当前周期暂无分类流水
+                    </div>
+                  `
+              }
+
+            </div>
+
+          </article>
+
+
+          <article class="finance-panel">
+
+            <header>
+              <strong>
+                最近流水
+              </strong>
+
+              <span>
+                最新优先
+              </span>
+            </header>
+
+            <div class="finance-list finance-transaction-list">
+
+              ${
+                page.transactions.length
+                  ? page.transactions
+                      .slice(
+                        0,
+                        20
+                      )
+                      .map(
+                        item => `
+                          <article>
+                            <div>
+                              <strong>
+                                ${escapeHtml(
+                                  item.description ||
+                                  item.categoryName
+                                )}
+                              </strong>
+
+                              <small>
+                                第${item.day}天
+                              </small>
+                            </div>
+
+                            <b
+                              class="${
+                                item.cashEffect >=
+                                0
+                                  ? "is-income"
+                                  : "is-expense"
+                              }"
+                            >
+                              ${money(
+                                item.cashEffect
+                              )}
+                            </b>
+                          </article>
+                        `
+                      )
+                      .join("")
+                  : `
+                    <div class="finance-empty">
+                      当前周期暂无资金流水
+                    </div>
+                  `
+              }
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        ${renderBottomNavigation(
+          navigation
+        )}
+
+      </main>
     `;
   }
 }
 
+
 export const financeCenterView =
   new FinanceCenterView();
+
 
 export {
   FinanceCenterView
