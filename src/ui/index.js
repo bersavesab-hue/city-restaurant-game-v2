@@ -26,12 +26,6 @@ export {
   buildFloorplanVisualModel
 } from "./renovation/index.js";
 export {
-  restaurantHomePageSystem,
-  RestaurantHomePageSystem,
-  restaurantHomeView,
-  RestaurantHomeView
-} from "./pages/restaurant/index.js";
-export {
   cityPropertyPageSystem,
   CityPropertyPageSystem,
   CityPropertyView

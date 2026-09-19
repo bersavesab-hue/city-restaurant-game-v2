@@ -8,32 +8,6 @@ import "./defaultPages.js";
 const GAMEPLAY_PAGES = [
   {
     id:
-      "restaurant-home",
-
-    title:
-      "门店",
-
-    parent:
-      "restaurant",
-
-    order:
-      201,
-
-    layout:
-      "management",
-
-    metadata: {
-      hiddenFromMenu:
-        true,
-
-      landingFor:
-        "restaurant"
-    }
-  },
-
-
-  {
-    id:
       "equipment-management",
 
     title:
@@ -291,23 +265,6 @@ const GAMEPLAY_PAGES = [
       "dashboard"
   },
 
-
-  {
-    id:
-      "member-marketing",
-
-    title:
-      "会员营销",
-
-    parent:
-      "more",
-
-    order:
-      515,
-
-    layout:
-      "management"
-  },
 
   {
     id:

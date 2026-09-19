@@ -49,9 +49,6 @@ import {
   inventorySystem
 } from "../src/systems/InventorySystem.js";
 
-import {
-  RestaurantHomeView
-} from "../src/ui/pages/restaurant/RestaurantHomeView.js";
 
 import {
   RenovationEditorBaseView
@@ -212,91 +209,6 @@ test(
     assert.match(
       advice[0].title,
       /下一步/
-    );
-  }
-);
-
-
-test(
-  "门店主页可渲染连续新手步骤和动态经营建议",
-  () => {
-    const view =
-      new RestaurantHomeView({
-        root: {
-          addEventListener() {},
-          removeEventListener() {},
-          contains() {
-            return true;
-          },
-          innerHTML: ""
-        },
-
-        restaurantId:
-          "restaurant_phase7",
-
-        pageSystem: {}
-      });
-
-    const html =
-      view.renderOnboarding({
-        onboarding: {
-          completed: false,
-          completedCount: 2,
-          totalSteps: 7,
-          progress: 29,
-          nextStep: {
-            id: "staff",
-            title: "配置员工",
-            description:
-              "至少安排一名可工作的正式员工。",
-            pageId:
-              "employee_recruitment"
-          },
-          steps: [
-            {
-              id: "location",
-              order: 1,
-              title: "完成选址",
-              pageId: "properties",
-              completed: true
-            },
-            {
-              id: "renovation",
-              order: 2,
-              title: "完成基础装修",
-              pageId: "renovation",
-              completed: true
-            },
-            {
-              id: "staff",
-              order: 3,
-              title: "配置员工",
-              pageId:
-                "employee_recruitment",
-              completed: false
-            }
-          ]
-        }
-      });
-
-    assert.match(
-      html,
-      /开店引导/
-    );
-
-    assert.match(
-      html,
-      /29%/
-    );
-
-    assert.match(
-      html,
-      /配置员工/
-    );
-
-    assert.match(
-      html,
-      /data-page-id="employee_recruitment"/
     );
   }
 );

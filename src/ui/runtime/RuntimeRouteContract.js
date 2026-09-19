@@ -23,7 +23,6 @@ const NATIVE_RUNTIME_PAGE_IDS =
     "dishes",
     "analytics",
 
-    "restaurant-home"
   ]);
 
 
@@ -42,7 +41,8 @@ const LEGACY_PAGE_IDS =
     "restaurant_home",
     "employee-home",
     "employees-home",
-    "members"
+    "members",
+    "restaurant-home"
   ]);
 
 

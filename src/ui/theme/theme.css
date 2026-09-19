@@ -22,7 +22,6 @@
 @import url("../pages/opening/opening-setup.css");
 @import url("../pages/city/city-property.css");
 @import url("./restaurant-game-ui.css");
-@import url("../pages/restaurant/restaurant-home.css");
 @import url("../pages/employees/employee-management.css");
 @import url("../pages/employee-promotion/employee-promotion.css");
 @import url("../renovation/renovation-game.css");
@@ -161,7 +160,6 @@
 /* ===== Unified game shell final override ===== */
 
 .rg-screen,
-.restaurant-home-game,
 .city-map-game,
 .property-detail-game,
 .construction-page,
@@ -186,7 +184,6 @@
 }
 
 
-.restaurant-home-game,
 .city-map-game,
 .cr-city-property-page,
 .property-detail-game,
@@ -219,7 +216,6 @@ button {
 
 
 @media (min-width: 520px) {
-  .restaurant-home-game,
   .city-map-game,
   .property-detail-game,
   .construction-page,

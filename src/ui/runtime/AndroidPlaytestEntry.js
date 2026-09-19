@@ -70,9 +70,6 @@ import {
   PropertyDetailView
 } from "../pages/city/PropertyDetailView.js";
 
-import {
-  RestaurantHomeView
-} from "../pages/restaurant/RestaurantHomeView.js";
 
 import {
   OpeningSetupView
@@ -862,24 +859,6 @@ function navigate(
       return;
     }
 
-
-    if (
-      pageId ===
-      "restaurant-home"
-    ) {
-      currentView =
-        new RestaurantHomeView({
-          root,
-          restaurantId,
-
-          onNavigate:
-            navigate
-        });
-
-      currentView.mount();
-
-      return;
-    }
 
 
     if (

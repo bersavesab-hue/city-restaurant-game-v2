@@ -35,7 +35,12 @@ test(
       "src/ui/renovation/RenovationMobileView.js",
       "src/ui/renovation/RenovationFloorplanMobileView.js",
       "src/ui/renovation/renovation-mobile.css",
-      "src/ui/renovation/renovation-mobile-interactions.css"
+      "src/ui/renovation/renovation-mobile-interactions.css",
+      "src/ui/pages/restaurant/RestaurantHomeView.js",
+      "src/ui/pages/restaurant/RestaurantHomePageSystem.js",
+      "src/ui/pages/restaurant/RestaurantHomeDashboardSystem.js",
+      "src/ui/pages/restaurant/restaurant-home.css",
+      "src/ui/pages/restaurant/index.js"
     ];
 
     for (const relativePath of deprecated) {
@@ -73,7 +78,7 @@ test(
 
     assert.doesNotMatch(
       runtime,
-      /CityPropertyGameView|RenovationMobileView|RenovationFloorplanMobileView/
+      /CityPropertyGameView|RenovationMobileView|RenovationFloorplanMobileView|RestaurantHomeView|restaurant-home/
     );
   }
 );
@@ -105,6 +110,11 @@ test(
       publicUi,
       /RenovationGameView/
     );
+
+    assert.doesNotMatch(
+      publicUi,
+      /RestaurantHomeView|restaurantHomePageSystem|pages\/restaurant/
+    );
   }
 );
 
@@ -128,7 +138,7 @@ test(
 
     assert.doesNotMatch(
       theme,
-      /city-property-game\.css|renovation-mobile\.css|renovation-mobile-interactions\.css/
+      /city-property-game\.css|renovation-mobile\.css|renovation-mobile-interactions\.css|restaurant-home\.css/
     );
   }
 );
@@ -149,6 +159,37 @@ test(
     assert.doesNotMatch(
       navigation,
       /city:\s*"properties"/
+    );
+  }
+);
+
+
+test(
+  "页面注册表不再重复定义正式入口",
+  () => {
+    const core =
+      read(
+        "src/ui/registry/defaultPages.js"
+      );
+
+    const gameplay =
+      read(
+        "src/ui/registry/gameplayPages.js"
+      );
+
+    assert.doesNotMatch(
+      gameplay,
+      /"restaurant-home"/
+    );
+
+    assert.doesNotMatch(
+      gameplay,
+      /id:\s*\n?\s*"member-marketing"/
+    );
+
+    assert.match(
+      core,
+      /"member-marketing"/
     );
   }
 );
