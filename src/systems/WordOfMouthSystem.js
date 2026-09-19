@@ -329,6 +329,93 @@ class WordOfMouthSystem {
     return true;
   }
 
+  pruneHistory(
+    currentDayValue =
+      currentDay(),
+    retentionDays = 30
+  ) {
+    if (
+      !Number.isInteger(
+        currentDayValue
+      ) ||
+      currentDayValue < 1
+    ) {
+      throw new RangeError(
+        "currentDay must be a positive integer"
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        retentionDays
+      ) ||
+      retentionDays < 7
+    ) {
+      throw new RangeError(
+        "retentionDays must be an integer >= 7"
+      );
+    }
+
+    const archiveThrough =
+      currentDayValue -
+      retentionDays -
+      1;
+
+    if (
+      archiveThrough < 1
+    ) {
+      return {
+        removedWordOfMouth:
+          0,
+        removedDishBuzz:
+          0
+      };
+    }
+
+    const wordOfMouth =
+      entitySystem.filter(
+        "word_of_mouth_daily",
+        item =>
+          Number.isInteger(
+            item.day
+          ) &&
+          item.day <=
+            archiveThrough
+      );
+
+    const dishBuzz =
+      entitySystem.filter(
+        "dish_buzz_daily",
+        item =>
+          Number.isInteger(
+            item.day
+          ) &&
+          item.day <=
+            archiveThrough
+      );
+
+    return {
+      removedWordOfMouth:
+        entitySystem.removeMany(
+          "word_of_mouth_daily",
+          wordOfMouth.map(
+            item =>
+              item.id
+          )
+        ),
+
+      removedDishBuzz:
+        entitySystem.removeMany(
+          "dish_buzz_daily",
+          dishBuzz.map(
+            item =>
+              item.id
+          )
+        )
+    };
+  }
+
+
   getRecentRecords(
     restaurantId,
     days = 7

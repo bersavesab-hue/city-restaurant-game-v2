@@ -288,6 +288,36 @@ class HistoryArchiveSystem {
         finance.map(x => x.id)
       );
 
+    const orderIds =
+      new Set(
+        orders.map(
+          item =>
+            item.id
+        )
+      );
+
+    const loyaltyRecords =
+      orderIds.size > 0
+        ? entitySystem.filter(
+            "loyalty_order_record",
+            item =>
+              item.restaurantId ===
+                restaurantId &&
+              orderIds.has(
+                item.orderId
+              )
+          )
+        : [];
+
+    const removedLoyaltyRecords =
+      entitySystem.removeMany(
+        "loyalty_order_record",
+        loyaltyRecords.map(
+          item =>
+            item.id
+        )
+      );
+
     eventBus.emit(
       "history:dayArchived",
       {
@@ -295,7 +325,8 @@ class HistoryArchiveSystem {
         day,
         removedOrders,
         removedCooking,
-        removedFinance
+        removedFinance,
+        removedLoyaltyRecords
       }
     );
 

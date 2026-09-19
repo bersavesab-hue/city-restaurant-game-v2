@@ -29,24 +29,37 @@ test(
         }
       );
 
+    const archivedOrder =
+      entitySystem.create(
+        "customer_order",
+        {
+          restaurantId:
+            restaurant.id,
+          day: 1,
+          totalRevenue: 3000,
+          ingredientCost: 500,
+          grossProfit: 2500,
+          averageQuality: 80,
+          items: [
+            {
+              dishId: "dish_a",
+              quantity: 1,
+              revenue: 3000,
+              qualityScore: 80
+            }
+          ]
+        }
+      );
+
     entitySystem.create(
-      "customer_order",
+      "loyalty_order_record",
       {
         restaurantId:
           restaurant.id,
-        day: 1,
-        totalRevenue: 3000,
-        ingredientCost: 500,
-        grossProfit: 2500,
-        averageQuality: 80,
-        items: [
-          {
-            dishId: "dish_a",
-            quantity: 1,
-            revenue: 3000,
-            qualityScore: 80
-          }
-        ]
+        orderId:
+          archivedOrder.id,
+        mode:
+          "cohort"
       }
     );
 
@@ -75,13 +88,26 @@ test(
       }
     );
 
+    const retainedOrder =
+      entitySystem.create(
+        "customer_order",
+        {
+          restaurantId:
+            restaurant.id,
+          day: 2,
+          totalRevenue: 1000
+        }
+      );
+
     entitySystem.create(
-      "customer_order",
+      "loyalty_order_record",
       {
         restaurantId:
           restaurant.id,
-        day: 2,
-        totalRevenue: 1000
+        orderId:
+          retainedOrder.id,
+        mode:
+          "cohort"
       }
     );
 
@@ -136,6 +162,32 @@ test(
         .filter(x => x.day === 2)
         .length,
       1
+    );
+
+    assert.equal(
+      entitySystem
+        .list(
+          "loyalty_order_record"
+        )
+        .some(
+          item =>
+            item.orderId ===
+            archivedOrder.id
+        ),
+      false
+    );
+
+    assert.equal(
+      entitySystem
+        .list(
+          "loyalty_order_record"
+        )
+        .some(
+          item =>
+            item.orderId ===
+            retainedOrder.id
+        ),
+      true
     );
   }
 );

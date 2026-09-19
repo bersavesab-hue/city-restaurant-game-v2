@@ -10,6 +10,10 @@ import {
 } from "../src/core/EventBus.js";
 
 import {
+  entitySystem
+} from "../src/core/EntitySystem.js";
+
+import {
   restaurantSystem
 } from "../src/systems/RestaurantSystem.js";
 
@@ -160,6 +164,118 @@ test(
     assert.match(
       html,
       /热门菜品讨论/
+    );
+  }
+);
+
+test(
+  "口碑和菜品热度日记录只保留最近30天",
+  () => {
+    gameState.reset();
+
+    entitySystem.create(
+      "word_of_mouth_daily",
+      {
+        restaurantId:
+          "restaurant_test",
+        day: 1,
+        reviewEvents: 1,
+        positiveSignals: 1,
+        negativeSignals: 0,
+        scoreTotal: 40,
+        satisfactionTotal: 85
+      }
+    );
+
+    entitySystem.create(
+      "dish_buzz_daily",
+      {
+        restaurantId:
+          "restaurant_test",
+        day: 1,
+        dishId:
+          "dish_old",
+        mentions: 2,
+        positiveMentions: 2,
+        negativeMentions: 0,
+        qualityTotal: 180
+      }
+    );
+
+    entitySystem.create(
+      "word_of_mouth_daily",
+      {
+        restaurantId:
+          "restaurant_test",
+        day: 20,
+        reviewEvents: 1,
+        positiveSignals: 1,
+        negativeSignals: 0,
+        scoreTotal: 30,
+        satisfactionTotal: 80
+      }
+    );
+
+    entitySystem.create(
+      "dish_buzz_daily",
+      {
+        restaurantId:
+          "restaurant_test",
+        day: 20,
+        dishId:
+          "dish_recent",
+        mentions: 1,
+        positiveMentions: 1,
+        negativeMentions: 0,
+        qualityTotal: 88
+      }
+    );
+
+    const result =
+      wordOfMouthSystem
+        .pruneHistory(
+          32,
+          30
+        );
+
+    assert.equal(
+      result
+        .removedWordOfMouth,
+      1
+    );
+
+    assert.equal(
+      result
+        .removedDishBuzz,
+      1
+    );
+
+    assert.deepEqual(
+      entitySystem
+        .list(
+          "word_of_mouth_daily"
+        )
+        .map(
+          item =>
+            item.day
+        ),
+      [
+        20
+      ]
+    );
+
+    assert.deepEqual(
+      entitySystem
+        .list(
+          "dish_buzz_daily"
+        )
+        .map(
+          item =>
+            item.day
+        ),
+      [
+        20
+      ]
     );
   }
 );

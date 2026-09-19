@@ -472,6 +472,33 @@ assert.ok(
   "长期实体仍接近线性膨胀"
 );
 
+assert.ok(
+  entitySystem.count(
+    "loyalty_order_record"
+  ) <= 40,
+  `20年订单去重记录未归档: ${entitySystem.count(
+    "loyalty_order_record"
+  )}`
+);
+
+assert.ok(
+  entitySystem.count(
+    "word_of_mouth_daily"
+  ) <= 31,
+  `20年口碑日记录未裁剪: ${entitySystem.count(
+    "word_of_mouth_daily"
+  )}`
+);
+
+assert.ok(
+  entitySystem.count(
+    "dish_buzz_daily"
+  ) <= 31,
+  `20年菜品热度日记录未裁剪: ${entitySystem.count(
+    "dish_buzz_daily"
+  )}`
+);
+
 console.log(
   "✅ 1/5/10/20年长期压力测试全部通过"
 );
