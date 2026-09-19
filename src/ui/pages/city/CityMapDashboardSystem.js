@@ -287,7 +287,7 @@ class CityMapDashboardSystem {
 
   getRecommendedProperties(
     marketplace,
-    limit = 4
+    limit = 6
   ) {
     return marketplace
       .properties
@@ -484,7 +484,7 @@ class CityMapDashboardSystem {
     const recommended =
       this.getRecommendedProperties(
         marketplace,
-        4
+        6
       );
 
     const restaurant =
