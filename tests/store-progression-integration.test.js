@@ -312,6 +312,11 @@ test(
           "市场解锁测试店"
       });
 
+    financeSystem.createAccount(
+      restaurant.id,
+      100000
+    );
+
     let page =
       operationsHubPageSystem
         .getPage(
