@@ -105,6 +105,10 @@ import {
   renderBottomNavigation
 } from "../components/GameChromeView.js";
 
+import {
+  bindVisualAssets
+} from "../assets/VisualAssetBinder.js";
+
 
 const root =
   document.getElementById(
@@ -175,6 +179,9 @@ function updateVisibleCustomerLabels() {
 function startRuntimeEnhancements() {
   refreshSegmentNames();
   updateVisibleCustomerLabels();
+  void bindVisualAssets(
+    root
+  );
 
   runtimeEnhancementObserver
     ?.disconnect();
@@ -183,6 +190,10 @@ function startRuntimeEnhancements() {
     new MutationObserver(
       () => {
         updateVisibleCustomerLabels();
+
+        void bindVisualAssets(
+          root
+        );
       }
     );
 
