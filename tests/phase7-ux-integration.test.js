@@ -38,6 +38,18 @@ import {
 } from "../src/systems/OperatingAdvisorSystem.js";
 
 import {
+  employeeSystem
+} from "../src/systems/EmployeeSystem.js";
+
+import {
+  ingredientCatalogSystem
+} from "../src/systems/IngredientCatalogSystem.js";
+
+import {
+  inventorySystem
+} from "../src/systems/InventorySystem.js";
+
+import {
   RestaurantHomeView
 } from "../src/ui/pages/restaurant/RestaurantHomeView.js";
 
@@ -419,6 +431,83 @@ test(
           "assets/images/ui/renovation/furniture/table_4.webp"
         ),
       true
+    );
+  }
+);
+
+
+test(
+  "新手员工与库存步骤严格服从正式开业条件",
+  () => {
+    const {
+      restaurant
+    } =
+      setupRestaurant();
+
+    employeeSystem.hire({
+      restaurantId:
+        restaurant.id,
+      name:
+        "只有服务员",
+      roleId:
+        "server"
+    });
+
+    let onboarding =
+      onboardingSystem
+        .getState(
+          restaurant.id
+        );
+
+    const staffStep =
+      onboarding.steps.find(
+        item =>
+          item.id ===
+          "staff"
+      );
+
+    assert.equal(
+      staffStep.completed,
+      false,
+      "只有服务员时不能误判员工开业条件已完成"
+    );
+
+    const ingredient =
+      ingredientCatalogSystem
+        .getAll()[0];
+
+    assert.ok(
+      ingredient
+    );
+
+    inventorySystem.addBatch({
+      restaurantId:
+        restaurant.id,
+      ingredientId:
+        ingredient.id,
+      quantity:
+        10,
+      quality:
+        3
+    });
+
+    onboarding =
+      onboardingSystem
+        .getState(
+          restaurant.id
+        );
+
+    const inventoryStep =
+      onboarding.steps.find(
+        item =>
+          item.id ===
+          "inventory"
+      );
+
+    assert.equal(
+      inventoryStep.completed,
+      false,
+      "无菜单或非首批需求库存不能误判首批采购已完成"
     );
   }
 );
