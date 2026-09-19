@@ -34,6 +34,20 @@ const RULES =
 
     {
       directory:
+        "assets/images/dishes/generated",
+
+      width:
+        1024,
+
+      height:
+        1024,
+
+      label:
+        "自研菜缓存图"
+    },
+
+    {
+      directory:
         "assets/images/ui/employees/avatars",
 
       width:
