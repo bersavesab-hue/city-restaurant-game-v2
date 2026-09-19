@@ -24,6 +24,7 @@ on:
       - "scripts/generate-release-metadata.mjs"
       - "PRIVACY.md"
       - "docs/PUBLISHING.md"
+      - "docs/STORE_LISTING_DRAFT.md"
       - "scripts/stress-20year.mjs"
       - "scripts/aging-performance.mjs"
       - "tests/**"
@@ -148,5 +149,6 @@ jobs:
             SHA256SUMS.txt
             PRIVACY.md
             docs/PUBLISHING.md
+            docs/STORE_LISTING_DRAFT.md
           if-no-files-found: error
           retention-days: 30
