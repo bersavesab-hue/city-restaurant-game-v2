@@ -112,7 +112,7 @@ class MoreHubView {
           topBar,
           {
             subtitle:
-              "品牌 · 荣誉 · 扩张 · 系统"
+              "顾客 · 品牌 · 荣誉 · 扩张"
           }
         )}
 
