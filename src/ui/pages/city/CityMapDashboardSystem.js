@@ -39,6 +39,36 @@ const FALLBACK_POSITIONS =
   ]);
 
 
+const HOME_MAP_DISTRICT_LAYOUT =
+  Object.freeze([
+    {
+      id: "old_town",
+      x: 35,
+      y: 60
+    },
+    {
+      id: "cbd",
+      x: 52,
+      y: 27
+    },
+    {
+      id: "university",
+      x: 78,
+      y: 27
+    },
+    {
+      id: "residential",
+      x: 59,
+      y: 56
+    },
+    {
+      id: "tourist_scenic",
+      x: 82,
+      y: 69
+    }
+  ]);
+
+
 function safeBalance(
   restaurantId
 ) {
@@ -285,6 +315,53 @@ class CityMapDashboardSystem {
   }
 
 
+  getHomeMapDistricts(
+    districts
+  ) {
+    const byId =
+      new Map(
+        districts.map(
+          item => [
+            item.id,
+            item
+          ]
+        )
+      );
+
+    return HOME_MAP_DISTRICT_LAYOUT
+      .map(
+        layout => {
+          const district =
+            byId.get(
+              layout.id
+            );
+
+          if (!district) {
+            return null;
+          }
+
+          return {
+            ...district,
+
+            position: {
+              x:
+                layout.x,
+
+              y:
+                layout.y,
+
+              source:
+                "city-home-layout"
+            }
+          };
+        }
+      )
+      .filter(
+        Boolean
+      );
+  }
+
+
   getRecommendedProperties(
     marketplace,
     limit = 6
@@ -472,12 +549,18 @@ class CityMapDashboardSystem {
         marketplace
       );
 
+    const homeMapDistricts =
+      this.getHomeMapDistricts(
+        districts
+      );
+
     const selectedDistrict =
       districts.find(
         item =>
           item.id ===
           selectedDistrictId
       ) ??
+      homeMapDistricts[0] ??
       districts[0] ??
       null;
 
@@ -617,7 +700,11 @@ class CityMapDashboardSystem {
           selectedDistrict?.id ??
           null,
 
-        districts
+        districts:
+          homeMapDistricts,
+
+        totalDistrictCount:
+          districts.length
       },
 
       citySummary:
