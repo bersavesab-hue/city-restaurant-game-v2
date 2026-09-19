@@ -1002,7 +1002,7 @@ class RestaurantHomeView {
             </strong>
 
             <span>
-              按累计销量动态排序
+              按近7日真实销量动态变化
             </span>
           </div>
 
@@ -1038,7 +1038,8 @@ class RestaurantHomeView {
 
                   ${renderImageSlot({
                     id:
-                      `signature-dish-${index + 1}`,
+                      dish?.imageSlot ??
+                      `signature-empty-${index + 1}`,
 
                     label:
                       dish?.name ??
@@ -1048,11 +1049,8 @@ class RestaurantHomeView {
                       "restaurant-image-slot--dish",
 
                     source:
-                      dish?.dishId
-                        ? `assets/images/dishes/official/${escapeHtml(
-                            dish.dishId
-                          )}.webp`
-                        : null
+                      dish?.image ??
+                      null
                   })}
 
                   <div class="store-signature-card__body">
