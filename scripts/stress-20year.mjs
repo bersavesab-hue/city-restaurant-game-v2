@@ -117,6 +117,14 @@ financeSystem.createAccount(
   100000000
 );
 
+restaurantSystem.open(
+  restaurant.id
+);
+
+restaurantSystem.close(
+  restaurant.id
+);
+
 for (let i = 1; i <= 2; i += 1) {
   employeeSystem.hire({
     restaurantId: restaurant.id,
