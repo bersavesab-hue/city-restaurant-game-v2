@@ -1,5 +1,6 @@
 import {
   renderGameTopBar,
+  renderNoticeTicker,
   renderPageTitle,
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
@@ -58,7 +59,7 @@ class OperationsHubView {
             : ""
         }
 
-        ${renderPageTitle({
+        ${renderNoticeTicker(\n          page.noticeTicker\n        )}\n\n        ${renderPageTitle({
           title:
             "经营",
 
