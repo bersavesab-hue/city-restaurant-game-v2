@@ -425,3 +425,54 @@ test(
     );
   }
 );
+
+
+test(
+  "Android进入后台暂停WebView定时器且返回前台恢复",
+  () => {
+    const activity =
+      read(
+        "android/app/src/main/java/com/cityrestaurant/game/MainActivity.java"
+      );
+
+    const runtime =
+      read(
+        "src/ui/runtime/GameRuntimeLoop.js"
+      );
+
+    assert.match(
+      activity,
+      /protected void onPause\(\)/
+    );
+
+    assert.match(
+      activity,
+      /gameView\.onPause\(\)/
+    );
+
+    assert.match(
+      activity,
+      /gameView\.pauseTimers\(\)/
+    );
+
+    assert.match(
+      activity,
+      /protected void onResume\(\)/
+    );
+
+    assert.match(
+      activity,
+      /gameView\.resumeTimers\(\)/
+    );
+
+    assert.match(
+      activity,
+      /gameView\.onResume\(\)/
+    );
+
+    assert.match(
+      runtime,
+      /document\.hidden/
+    );
+  }
+);
