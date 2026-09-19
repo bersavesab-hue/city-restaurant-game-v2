@@ -476,3 +476,39 @@ test(
     );
   }
 );
+
+
+test(
+  "Android装修页使用与正式样式匹配的RenovationGameView",
+  () => {
+    const runtime =
+      read(
+        "src/ui/runtime/AndroidPlaytestEntry.js"
+      );
+
+    const theme =
+      read(
+        "src/ui/theme/theme.css"
+      );
+
+    assert.match(
+      runtime,
+      /import[\\s\\S]{0,120}RenovationGameView[\\s\\S]{0,120}RenovationGameView\\.js/
+    );
+
+    assert.match(
+      runtime,
+      /new RenovationGameView\\(/
+    );
+
+    assert.doesNotMatch(
+      runtime,
+      /new RenovationFloorplanMobileView\\(/
+    );
+
+    assert.match(
+      theme,
+      /renovation-game\\.css/
+    );
+  }
+);
