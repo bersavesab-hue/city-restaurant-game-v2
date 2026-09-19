@@ -278,6 +278,20 @@ class CustomerLoyaltyIntegrationSystem {
         satisfaction
       });
 
+      customerIdentitySystem
+        .recordVisitOutcome({
+          restaurantId:
+            order.restaurantId,
+          customerId:
+            customer.id,
+          spend:
+            spendPerVisit,
+          satisfaction,
+          orderId:
+            syntheticOrderId,
+          dishIds
+        });
+
       const existingMember =
         customerLoyaltySystem
           .findMember(
@@ -467,6 +481,23 @@ class CustomerLoyaltyIntegrationSystem {
         order.customerSegmentId ??
         order.segmentId ??
         null;
+
+      customerIdentitySystem
+        .recordVisitOutcome({
+          restaurantId:
+            order.restaurantId,
+          customerId:
+            order.customerId,
+          spend:
+            revenue,
+          satisfaction,
+          orderId:
+            order.id,
+          dishIds:
+            this.getDishIds(
+              order
+            )
+        });
 
       const resolvedMember =
         this.resolveMember({
