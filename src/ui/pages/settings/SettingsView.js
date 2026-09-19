@@ -7,6 +7,13 @@ import {
 } from "../../components/GameChromeSystem.js";
 
 import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
@@ -53,6 +60,12 @@ class SettingsView {
 
 
   renderMarkup(page) {
+    const chrome =
+      buildFormalPageChrome(
+        page.restaurantId ??
+        this.restaurantId
+      );
+
     const speedButtons =
       [1, 2, 4]
         .map(
@@ -76,18 +89,32 @@ class SettingsView {
     return [
       '<main class="rg-screen settings-page">',
 
-      '<header class="settings-page__header">',
-      "<h1>设置</h1>",
-      "<p>",
-      esc(page.restaurant.name),
-      " · 第",
-      page.time.day,
-      "日 ",
-      String(page.time.hour).padStart(2, "0"),
-      ":",
-      String(page.time.minute).padStart(2, "0"),
-      "</p>",
-      "</header>",
+      renderGameTopBar(
+        chrome.topBar,
+        {
+          subtitle:
+            "运行 · 存档 · 测试"
+        }
+      ),
+
+      renderNoticeTicker(
+        chrome.noticeTicker
+      ),
+
+      renderPageTitle({
+        title:
+          "设置",
+        subtitle:
+          esc(page.restaurant.name) +
+          " · 第" +
+          page.time.day +
+          "日 " +
+          String(page.time.hour).padStart(2, "0") +
+          ":" +
+          String(page.time.minute).padStart(2, "0"),
+        backTarget:
+          "more-home"
+      }),
 
       this.message
         ? '<p class="settings-page__message">' +
