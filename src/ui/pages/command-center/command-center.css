@@ -1071,11 +1071,7 @@
 }
 
 
-/* 图片绑定成功后只隐藏占位文字，保留真实数据徽章 */
-.command-center__hero-image[data-image-state="loaded"] > span {
-  display: none;
-}
-
+/* 图片绑定成功后隐藏文字回退，保留真实数据徽章 */
 .command-center__staff-avatar[data-image-state="loaded"] {
   color: transparent;
   text-shadow: none;
