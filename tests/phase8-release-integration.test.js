@@ -350,7 +350,9 @@ test(
       of [
         "../PRIVACY.md",
         "../docs/PUBLISHING.md",
-        "../scripts/generate-release-metadata.mjs"
+        "../docs/STORE_LISTING_DRAFT.md",
+        "../scripts/generate-release-metadata.mjs",
+        "../android/app/src/main/res/drawable/ic_launcher.xml"
       ]
     ) {
       assert.equal(
@@ -377,6 +379,11 @@ test(
     assert.match(
       manifest,
       /android:label="城市餐饮创业"/
+    );
+
+    assert.match(
+      manifest,
+      /android:icon="@drawable\/ic_launcher"/
     );
 
     assert.doesNotMatch(
