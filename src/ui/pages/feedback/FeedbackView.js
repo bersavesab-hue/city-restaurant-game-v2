@@ -7,6 +7,13 @@ import {
 } from "../../components/GameChromeSystem.js";
 
 import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
@@ -66,15 +73,35 @@ class FeedbackView {
 
 
   renderMarkup(page) {
+    const chrome =
+      buildFormalPageChrome(
+        page.restaurantId ??
+        this.restaurantId
+      );
+
     return [
       '<main class="rg-screen feedback-page">',
 
-      '<header class="feedback-page__header">',
-      "<h1>测试反馈</h1>",
-      "<p>",
-      esc(page.releaseLabel),
-      "</p>",
-      "</header>",
+      renderGameTopBar(
+        chrome.topBar,
+        {
+          subtitle:
+            "测试 · 诊断 · 反馈"
+        }
+      ),
+
+      renderNoticeTicker(
+        chrome.noticeTicker
+      ),
+
+      renderPageTitle({
+        title:
+          "测试反馈",
+        subtitle:
+          esc(page.releaseLabel),
+        backTarget:
+          "more-home"
+      }),
 
       this.message
         ? '<p class="feedback-page__message">' +
@@ -210,6 +237,25 @@ class FeedbackView {
 
 
   bind() {
+    this.root
+      .querySelectorAll(
+        "[data-page-target]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              this.onNavigate?.(
+                button.dataset
+                  .pageTarget,
+                this.restaurantId
+              );
+            }
+          );
+        }
+      );
+
     this.root
       .querySelector(
         '[data-feedback-action="submit"]'
