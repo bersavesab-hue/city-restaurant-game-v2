@@ -457,12 +457,52 @@ test(
       "open"
     );
 
-    assert.ok(
+    const openingBalance =
       financeSystem.getBalance(
         restaurant.id
-      ) >
+      );
+
+    assert.ok(
+      openingBalance >
         0,
       "正式开业时没有任何剩余周转资金"
+    );
+
+    const monthlyPayroll =
+      employeeSystem
+        .listByRestaurant(
+          restaurant.id
+        )
+        .reduce(
+          (
+            sum,
+            employee
+          ) =>
+            sum +
+            (
+              employee.salary ??
+              0
+            ),
+          0
+        );
+
+    const oneMonthFixedReserve =
+      (
+        leaseResult.lease
+          .monthlyRent ??
+        0
+      ) +
+      (
+        leaseResult.lease
+          .propertyFeeMonthly ??
+        0
+      ) +
+      monthlyPayroll;
+
+    assert.ok(
+      openingBalance >=
+        oneMonthFixedReserve,
+      `开业剩余资金${openingBalance}不足覆盖一个月固定成本${oneMonthFixedReserve}`
     );
 
     app.core
