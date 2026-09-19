@@ -12,6 +12,10 @@ import {
   honorArchiveSystem
 } from "../../../systems/HonorArchiveSystem.js";
 
+import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
 
 const PERIOD_OPTIONS =
   Object.freeze([
@@ -118,9 +122,71 @@ class AwardsPageSystem {
         });
 
 
+    const honorSummary =
+      honorArchiveSystem
+        .getSummary(
+          restaurantId
+        );
+
+    const notices =
+      [];
+
+    const latestParticipation =
+      participation[0] ??
+      null;
+
+    if (
+      latestParticipation
+    ) {
+      notices.push({
+        id:
+          "award_participation",
+
+        type:
+          latestParticipation.stage ===
+            "winner"
+            ? "success"
+            : "info",
+
+        title:
+          latestParticipation.stage ===
+            "winner"
+            ? "获奖通知"
+            : "评审进展",
+
+        message:
+          latestParticipation.stage ===
+            "winner"
+            ? `${latestParticipation.awardName}已获奖，荣誉已归档`
+            : `${latestParticipation.awardName}当前阶段：${latestParticipation.stage}`,
+
+        priority:
+          latestParticipation.stage ===
+            "winner"
+            ? 110
+            : 60
+      });
+    }
+
+    const chrome =
+      buildFormalPageChrome(
+        restaurantId,
+        {
+          notices
+        }
+      );
+
     return {
       pageId:
         "awards-center",
+
+      restaurantId,
+
+      topBar:
+        chrome.topBar,
+
+      noticeTicker:
+        chrome.noticeTicker,
 
       title:
         "奖项中心",
@@ -147,11 +213,7 @@ class AwardsPageSystem {
 
       recentRuns,
 
-      honorSummary:
-        honorArchiveSystem
-          .getSummary(
-            restaurantId
-          ),
+      honorSummary,
 
       totalAwardCount:
         AWARD_DEFINITIONS
