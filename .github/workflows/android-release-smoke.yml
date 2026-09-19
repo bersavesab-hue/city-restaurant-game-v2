@@ -17,6 +17,7 @@ on:
       - "src/systems/FeedbackSystem.js"
       - "src/systems/OnboardingSystem.js"
       - "src/ui/runtime/AndroidPlaytestEntry.js"
+      - "src/ui/pages/**/*.js"
       - "scripts/build-android-js.mjs"
       - "scripts/generate-release-metadata.mjs"
       - "scripts/pre-release-playtest-gate.mjs"
