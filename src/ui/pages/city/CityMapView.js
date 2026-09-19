@@ -358,6 +358,26 @@ class CityMapView {
           )}
 
 
+          <div class="city-map-tools">
+            <div
+              class="city-map-compass"
+              aria-hidden="true"
+            >
+              <strong>N</strong>
+              <span>◆</span>
+            </div>
+
+            <button
+              type="button"
+              class="city-map-all-districts"
+              data-action="navigate"
+              data-page-id="properties"
+            >
+              全部${page.map.totalDistrictCount}商圈
+            </button>
+          </div>
+
+
           <div class="city-map-pins">
 
             ${
