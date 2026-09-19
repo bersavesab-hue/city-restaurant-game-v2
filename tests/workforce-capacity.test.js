@@ -305,3 +305,139 @@ test(
     );
   }
 );
+
+
+test(
+  "真实员工体系中缺失厨师或服务员时对应产能必须归零",
+  () => {
+    gameState.reset();
+
+    const restaurant =
+      restaurantSystem.create({
+        name:
+          "岗位缺失产能测试店"
+      });
+
+    serviceCapacitySystem
+      .configure(
+        restaurant.id,
+        {
+          seats: 30,
+          tables: 10,
+          averageMealMinutes: 60,
+          kitchenStations: 2,
+          kitchenPortionsPerHour: 30,
+          serviceGuestsPerHour: 30,
+          queueToleranceMinutes: 10,
+          maxQueueGuests: 20
+        }
+      );
+
+    const chef =
+      createEmployee(
+        restaurant.id,
+        {
+          name: "仅有厨师",
+          roleId: "chef",
+          skills: {
+            cooking: 70
+          }
+        }
+      );
+
+    let capacity =
+      serviceCapacitySystem
+        .getHourlyCapacity(
+          restaurant.id
+        );
+
+    assert.ok(
+      capacity.kitchenGuests >
+      0
+    );
+
+    assert.equal(
+      capacity.serviceGuests,
+      0,
+      "没有服务员时不应凭空产生堂食服务能力"
+    );
+
+    assert.equal(
+      capacity.checkoutGuests,
+      1,
+      "没有收银员时保留老板临时收银1单/小时"
+    );
+
+    const server =
+      createEmployee(
+        restaurant.id,
+        {
+          name: "后聘服务员",
+          roleId: "server",
+          skills: {
+            service: 70
+          }
+        }
+      );
+
+    capacity =
+      serviceCapacitySystem
+        .getHourlyCapacity(
+          restaurant.id
+        );
+
+    assert.ok(
+      capacity.serviceGuests >
+      0
+    );
+
+    entitySystem.update(
+      "employee",
+      chef.id,
+      {
+        fatigue: 96
+      }
+    );
+
+    capacity =
+      serviceCapacitySystem
+        .getHourlyCapacity(
+          restaurant.id
+        );
+
+    assert.equal(
+      capacity.kitchenGuests,
+      0,
+      "厨师不可工作时不应凭空产生厨房能力"
+    );
+
+    assert.ok(
+      capacity.serviceGuests >
+      0
+    );
+
+    entitySystem.update(
+      "employee",
+      server.id,
+      {
+        fatigue: 96
+      }
+    );
+
+    capacity =
+      serviceCapacitySystem
+        .getHourlyCapacity(
+          restaurant.id
+        );
+
+    assert.equal(
+      capacity.serviceGuests,
+      0
+    );
+
+    assert.equal(
+      capacity.checkoutGuests,
+      1
+    );
+  }
+);
