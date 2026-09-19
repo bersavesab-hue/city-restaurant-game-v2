@@ -2,6 +2,17 @@ import {
   complianceCenterPageSystem
 } from "./ComplianceCenterPageSystem.js";
 
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 function money(value) {
   return (
     "¥" +
@@ -40,10 +51,17 @@ function permitStatusText(
 class ComplianceCenterView {
   constructor({
     pageSystem =
-      complianceCenterPageSystem
+      complianceCenterPageSystem,
+
+    onNavigate =
+      null
   } = {}) {
     this.pageSystem =
       pageSystem;
+
+    this.onNavigate =
+      onNavigate;
+
     this.root = null;
     this.restaurantId = null;
   }
@@ -51,12 +69,17 @@ class ComplianceCenterView {
   mount(
     root,
     {
-      restaurantId
+      restaurantId,
+      onNavigate =
+        this.onNavigate
     } = {}
   ) {
     this.root = root;
     this.restaurantId =
       restaurantId;
+
+    this.onNavigate =
+      onNavigate;
 
     return this.render();
   }
@@ -66,21 +89,32 @@ class ComplianceCenterView {
       page.status;
 
     return `
-      <main class="compliance-center">
-        <header>
-          <span>证照 · 抽查 · 整改</span>
-          <h1>合规中心</h1>
-          <p>
-            合规分
-            ${status.complianceScore}
-            ·
-            有效许可
-            ${status.issuedCount}/${status.requiredCount}
-            ·
-            待续期
-            ${status.renewalDueCount}
-          </p>
-        </header>
+      <main class="rg-screen compliance-center-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "证照 · 抽查 · 整改"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "合规中心",
+
+          subtitle:
+            `合规分${status.complianceScore} · 有效许可${status.issuedCount}/${status.requiredCount} · 待续期${status.renewalDueCount}`,
+
+          backTarget:
+            "more-home"
+        })}
+
+        <section class="compliance-center">
 
         <section>
           <h2>证照状态</h2>
@@ -251,6 +285,19 @@ class ComplianceCenterView {
               : "<p>暂无抽查记录。</p>"
           }
         </section>
+        </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "more"
+            })
+        )}
+
       </main>
     `;
   }
@@ -273,6 +320,25 @@ class ComplianceCenterView {
   }
 
   bind() {
+    this.root
+      .querySelectorAll(
+        "[data-page-target]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              this.onNavigate?.(
+                button.dataset
+                  .pageTarget,
+                this.restaurantId
+              );
+            }
+          );
+        }
+      );
+
     this.root
       .querySelectorAll(
         "[data-compliance-apply]"
