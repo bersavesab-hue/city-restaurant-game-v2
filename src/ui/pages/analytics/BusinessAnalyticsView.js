@@ -6,6 +6,17 @@ import {
   businessAnalyticsPageSystem
 } from "./BusinessAnalyticsPageSystem.js";
 
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -182,10 +193,16 @@ function impactClass(
 class BusinessAnalyticsView {
   constructor({
     pageSystem =
-      businessAnalyticsPageSystem
+      businessAnalyticsPageSystem,
+
+    onNavigate =
+      null
   } = {}) {
     this.pageSystem =
       pageSystem;
+
+    this.onNavigate =
+      onNavigate;
 
     this.root =
       null;
@@ -208,7 +225,9 @@ class BusinessAnalyticsView {
     root,
     {
       restaurantId,
-      period = "week"
+      period = "week",
+      onNavigate =
+        this.onNavigate
     } = {}
   ) {
     if (!root) {
@@ -231,6 +250,9 @@ class BusinessAnalyticsView {
 
     this.period =
       period;
+
+    this.onNavigate =
+      onNavigate;
 
 
     this.bindLiveUpdates();
@@ -335,42 +357,53 @@ class BusinessAnalyticsView {
 
   renderMarkup(page) {
     return `
-      <header class="analytics-header">
-        <div>
-          <span class="analytics-eyebrow">
-            门店经营中枢
-          </span>
+      <main class="rg-screen business-analytics-page">
 
-          <h1>
-            经营数据
-          </h1>
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "经营分析 · 数据诊断"
+          }
+        )}
 
-          <p>
-            第${page.range.startDay}天
-            —
-            第${page.range.endDay}天
-          </p>
-        </div>
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
 
-        <div class="analytics-periods">
-          ${page.periods.map(
-            item => `
-              <button
-                type="button"
-                data-period="${item.id}"
-                class="${
-                  page.period ===
-                  item.id
-                    ? "active"
-                    : ""
-                }"
-              >
-                ${escapeHtml(item.name)}
-              </button>
-            `
-          ).join("")}
-        </div>
-      </header>
+        ${renderPageTitle({
+          title:
+            "经营分析",
+
+          subtitle:
+            `第${page.range.startDay}天—第${page.range.endDay}天`,
+
+          backTarget:
+            "operations"
+        })}
+
+        <section class="analytics-period-toolbar">
+          <span>统计周期</span>
+
+          <div class="analytics-periods">
+            ${page.periods.map(
+              item => `
+                <button
+                  type="button"
+                  data-period="${item.id}"
+                  class="${
+                    page.period ===
+                    item.id
+                      ? "active"
+                      : ""
+                  }"
+                >
+                  ${escapeHtml(item.name)}
+                </button>
+              `
+            ).join("")}
+          </div>
+        </section>
 
       <section class="analytics-kpis">
         ${this.renderKpi(
@@ -438,8 +471,21 @@ class BusinessAnalyticsView {
         ).join("")}
       </nav>
 
-      <main class="analytics-body">
+      <section class="analytics-body">
         ${this.renderSection(page)}
+      </section>
+
+      ${renderBottomNavigation(
+        gameChromeSystem
+          .getNavigation({
+            restaurantId:
+              this.restaurantId,
+
+            activePageId:
+              "analytics"
+          })
+      )}
+
       </main>
     `;
   }
@@ -1892,6 +1938,26 @@ class BusinessAnalyticsView {
   }
 
   bind() {
+    this.root
+      .querySelectorAll(
+        "[data-page-target]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              this.onNavigate?.(
+                button.dataset
+                  .pageTarget,
+
+                this.restaurantId
+              );
+            }
+          );
+        }
+      );
+
     this.root
       .querySelectorAll(
         "[data-period]"
