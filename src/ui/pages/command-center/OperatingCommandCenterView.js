@@ -83,7 +83,22 @@ function renderTopDishes(
                     dish.dishId ??
                     dish.id
                   ) +
-                '">' +
+                  '" data-image-src="' +
+                  escapeHtml(
+                    dish.image ??
+                    ""
+                  ) +
+                  '"' +
+                  (
+                    dish.custom
+                      ? ' data-custom-dish-id="' +
+                        escapeHtml(
+                          dish.dishId
+                        ) +
+                        '"'
+                      : ""
+                  ) +
+                  ' data-image-fit="cover">' +
                   '<span>TOP' +
                     (index + 1) +
                   '</span>' +
