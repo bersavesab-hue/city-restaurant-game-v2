@@ -2,6 +2,14 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  app
+} from "../src/main.js";
+
+import {
+  onboardingSystem
+} from "../src/systems/OnboardingSystem.js";
+
+import {
   gameState
 } from "../src/core/GameState.js";
 
@@ -411,6 +419,30 @@ test(
 
       roleId:
         "chef"
+    });
+
+
+    employeeSystem.hire({
+      restaurantId:
+        restaurant.id,
+
+      name:
+        "开店测试服务员",
+
+      roleId:
+        "server"
+    });
+
+
+    employeeSystem.hire({
+      restaurantId:
+        restaurant.id,
+
+      name:
+        "开店测试收银员",
+
+      roleId:
+        "cashier"
     });
 
 
@@ -836,6 +868,111 @@ test(
     assert.equal(
       commandCenter.pageId,
       "operating-command-center"
+    );
+
+
+    // ========================================================
+    // 16. 新手引导在正式开业后等待真实首单
+    // ========================================================
+
+    let onboarding =
+      onboardingSystem
+        .getState(
+          restaurant.id
+        );
+
+
+    assert.equal(
+      onboarding
+        .steps
+        .find(
+          step =>
+            step.id ===
+            "opening"
+        )
+        .completed,
+      true
+    );
+
+
+    assert.equal(
+      onboarding
+        .steps
+        .find(
+          step =>
+            step.id ===
+            "first_order"
+        )
+        .completed,
+      false
+    );
+
+
+    // ========================================================
+    // 17. 继续同一局营业至日结
+    // ========================================================
+
+    app.core
+      .simulationSystem
+      .advanceFast(
+        15 * 60
+      );
+
+
+    const afterDay =
+      restaurantSystem.get(
+        restaurant.id
+      );
+
+
+    assert.ok(
+      afterDay
+        .totalServedGuests >
+      0,
+      "正式开业后的第一天没有产生真实顾客"
+    );
+
+
+    onboarding =
+      onboardingSystem
+        .getState(
+          restaurant.id
+        );
+
+
+    assert.equal(
+      onboarding.completed,
+      true,
+      "真实首单完成后新手引导没有收口"
+    );
+
+
+    assert.equal(
+      onboarding.nextStep,
+      null
+    );
+
+
+    const report =
+      app.systems
+        .operatingReportSystem
+        .generate(
+          restaurant.id,
+          "day"
+        );
+
+
+    assert.ok(
+      report.finance.orders >
+      0,
+      "开业首日没有形成真实订单报表"
+    );
+
+
+    assert.ok(
+      report.finance.revenue >
+      0,
+      "开业首日没有形成真实营业收入"
     );
   }
 );
