@@ -571,14 +571,18 @@
   background: linear-gradient(#f4c437,#d99404);
 }
 
-.command-center__quick-grid b {
+.command-center__quick-icon {
   width: 28px;
   height: 28px;
-  display: grid;
-  place-items: center;
+
+  padding: 5px;
+
   border-radius: 7px;
-  background: rgba(255,255,255,.22);
-  font-size: 13px;
+
+  background:
+    rgba(255,255,255,.22);
+
+  stroke-width: 1.9;
 }
 
 .command-center__quick-grid strong {
