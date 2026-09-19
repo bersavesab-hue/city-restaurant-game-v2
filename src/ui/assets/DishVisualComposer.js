@@ -1,15 +1,3 @@
-import {
-  getIngredientVisual
-} from "../../data/ingredientVisuals.js";
-
-import {
-  INGREDIENT_ATLAS_COLUMNS,
-  INGREDIENT_ATLAS_ROWS,
-  INGREDIENT_ATLAS_SOURCE_CELL,
-  INGREDIENT_ATLAS_DATA_URI
-} from "../../data/ingredientAtlas.js";
-
-
 export const DISH_VISUAL_VERSION =
   1;
 
@@ -754,14 +742,80 @@ export function createDishVisualPlan({
 }
 
 
-function componentPath(
-  ingredientId
+function componentDirectories(
+  category
 ) {
-  return (
-    "assets/images/dishes/components/ingredients/" +
-    ingredientId +
-    ".webp"
-  );
+  if (
+    [
+      "meat",
+      "poultry",
+      "seafood"
+    ].includes(
+      category
+    )
+  ) {
+    return [
+      "proteins",
+      "ingredients"
+    ];
+  }
+
+  if (
+    [
+      "vegetable",
+      "fruit"
+    ].includes(
+      category
+    )
+  ) {
+    return [
+      "vegetables",
+      "ingredients"
+    ];
+  }
+
+  if (
+    category ===
+    "grain"
+  ) {
+    return [
+      "staples",
+      "ingredients"
+    ];
+  }
+
+  if (
+    category ===
+      "dry_goods" ||
+    category ===
+      "seasoning"
+  ) {
+    return [
+      "garnish",
+      "ingredients"
+    ];
+  }
+
+  return [
+    "ingredients"
+  ];
+}
+
+
+function componentCandidates(
+  placement
+) {
+  return componentDirectories(
+    placement.category
+  )
+    .map(
+      directory =>
+        "assets/images/dishes/components/" +
+        directory +
+        "/" +
+        placement.ingredientId +
+        ".webp"
+    );
 }
 
 
@@ -1037,12 +1091,26 @@ async function drawIngredient(
   context,
   placement
 ) {
-  const image =
-    await loadImage(
-      componentPath(
-        placement.ingredientId
-      )
-    );
+  let image =
+    null;
+
+  for (
+    const source
+    of componentCandidates(
+      placement
+    )
+  ) {
+    image =
+      await loadImage(
+        source
+      );
+
+    if (
+      image
+    ) {
+      break;
+    }
+  }
 
   if (
     image
