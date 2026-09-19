@@ -59,24 +59,14 @@ function renderSlot(
   return `
     <div
       class="construction-image-slot"
+      role="img"
+      aria-label="${escapeHtml(
+        label
+      )}"
       data-image-slot="${escapeHtml(
         id
       )}"
-    >
-      <span>
-        ▦
-      </span>
-
-      <strong>
-        ${escapeHtml(
-          label
-        )}
-      </strong>
-
-      <small>
-        图片槽位
-      </small>
-    </div>
+    ></div>
   `;
 }
 
