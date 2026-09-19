@@ -183,7 +183,11 @@
 
 
 .restaurant-home-game,
-.city-map-game {
+.city-map-game,
+.cr-city-property-page,
+.property-detail-game,
+.construction-page,
+.opening-setup-page {
   padding-bottom:
     calc(
       78px +
