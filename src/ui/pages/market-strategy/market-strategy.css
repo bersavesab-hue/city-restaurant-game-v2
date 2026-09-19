@@ -1,0 +1,297 @@
+.market-strategy-page {
+  min-height: 100%;
+  padding-bottom: calc(78px + env(safe-area-inset-bottom));
+  color: #174f7e;
+  background:
+    linear-gradient(180deg, #d9f1ff, #f8fcff 280px, #eaf7ff);
+}
+
+.competition-suite-links {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.competition-suite-links button {
+  min-height: 29px;
+  padding: 4px 7px;
+  border: 1px solid #d7a500;
+  border-radius: 5px;
+  color: #684700;
+  background: linear-gradient(#ffeb72, #ffc91d);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.market-strategy__overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  margin: 5px;
+}
+
+.market-strategy__overview article {
+  min-width: 0;
+  padding: 9px 7px;
+  border: 1px solid #9bd8f3;
+  border-radius: 8px;
+  background: linear-gradient(#fff, #effaff);
+}
+
+.market-strategy__overview span,
+.market-strategy__overview strong {
+  display: block;
+}
+
+.market-strategy__overview span {
+  color: #71869a;
+  font-size: 8px;
+}
+
+.market-strategy__overview strong {
+  margin-top: 3px;
+  overflow: hidden;
+  color: #0d578e;
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.market-strategy__positioning,
+.market-strategy__actions,
+.market-strategy__competition,
+.market-strategy__events {
+  margin: 5px;
+  overflow: hidden;
+  border: 1px solid #9dd8f1;
+  border-radius: 8px;
+  background: linear-gradient(#fff, #f5fbfe);
+  box-shadow: 0 2px 6px rgba(0,70,135,.12);
+}
+
+.market-strategy__positioning > header,
+.market-strategy__actions > h2,
+.market-strategy__competition > h2,
+.market-strategy__events > h2 {
+  margin: 0;
+  color: #fff;
+  background: linear-gradient(#0b7bc5, #06569d);
+}
+
+.market-strategy__positioning > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px;
+}
+
+.market-strategy__positioning > header span {
+  color: rgba(255,255,255,.75);
+  font-size: 8px;
+}
+
+.market-strategy__positioning > header h2 {
+  margin: 2px 0 0;
+  font-size: 11px;
+}
+
+.market-strategy__positioning > header > strong {
+  font-size: 9px;
+}
+
+.market-strategy__actions > h2,
+.market-strategy__competition > h2,
+.market-strategy__events > h2 {
+  padding: 7px 8px;
+  font-size: 10px;
+}
+
+.market-strategy__actions > p {
+  margin: 6px 8px 0;
+  color: #71869a;
+  font-size: 8px;
+}
+
+.market-strategy__positioning-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 5px;
+  padding: 7px;
+}
+
+.market-strategy__positioning-grid button {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #c6e3f1;
+  border-radius: 7px;
+  color: #174f7e;
+  background: #f7fcff;
+  text-align: left;
+}
+
+.market-strategy__positioning-grid button.is-active {
+  border-color: #e2b31d;
+  background: linear-gradient(#fffbed, #fff1ad);
+}
+
+.market-strategy__positioning-grid button:disabled {
+  opacity: .55;
+}
+
+.market-strategy__positioning-grid strong,
+.market-strategy__positioning-grid span,
+.market-strategy__positioning-grid p,
+.market-strategy__positioning-grid small {
+  display: block;
+}
+
+.market-strategy__positioning-grid strong {
+  color: #13578a;
+  font-size: 10px;
+}
+
+.market-strategy__positioning-grid span,
+.market-strategy__positioning-grid small {
+  margin-top: 3px;
+  color: #71869a;
+  font-size: 8px;
+}
+
+.market-strategy__positioning-grid p {
+  margin: 5px 0 0;
+  color: #5f788b;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.market-strategy__actions > div {
+  padding: 7px;
+}
+
+.market-strategy__action-group + .market-strategy__action-group {
+  margin-top: 8px;
+}
+
+.market-strategy__action-group h3 {
+  margin: 0 0 5px;
+  color: #13578a;
+  font-size: 9px;
+}
+
+.market-strategy__action-group > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 5px;
+}
+
+.market-strategy__action-group article {
+  padding: 8px;
+  border: 1px solid #d3e9f4;
+  border-radius: 7px;
+  background: #f8fcff;
+}
+
+.market-strategy__action-group strong,
+.market-strategy__action-group span,
+.market-strategy__action-group small {
+  display: block;
+}
+
+.market-strategy__action-group strong {
+  color: #145687;
+  font-size: 9px;
+}
+
+.market-strategy__action-group span,
+.market-strategy__action-group small {
+  margin-top: 3px;
+  color: #71869a;
+  font-size: 8px;
+}
+
+.market-strategy__action-group p {
+  margin: 5px 0;
+  color: #60788a;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.market-strategy__action-group button {
+  width: 100%;
+  min-height: 29px;
+  margin-top: 6px;
+  border: 1px solid #1284ce;
+  border-radius: 5px;
+  color: #fff;
+  background: linear-gradient(#1997dc, #0872bd);
+  font-size: 8px;
+}
+
+.market-strategy__action-group button:disabled {
+  border-color: #b9cbd5;
+  color: #758691;
+  background: #e5eef2;
+}
+
+.market-strategy__competition,
+.market-strategy__events {
+  padding-bottom: 5px;
+}
+
+.market-strategy__competition > article,
+.market-strategy__events > article {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto auto auto;
+  gap: 6px;
+  align-items: center;
+  min-height: 42px;
+  margin: 0 6px;
+  padding: 6px 2px;
+  border-bottom: 1px solid #dcecf4;
+}
+
+.market-strategy__competition > article:last-of-type,
+.market-strategy__events > article:last-of-type {
+  border-bottom: 0;
+}
+
+.market-strategy__competition article strong,
+.market-strategy__events article strong {
+  color: #145687;
+  font-size: 9px;
+}
+
+.market-strategy__competition article span,
+.market-strategy__competition article small,
+.market-strategy__events article span,
+.market-strategy__events article small,
+.market-strategy__competition > p,
+.market-strategy__events > p {
+  color: #71869a;
+  font-size: 8px;
+}
+
+.market-strategy__competition > p,
+.market-strategy__events > p {
+  margin: 0;
+  padding: 20px 8px;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .market-strategy__overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .market-strategy__positioning-grid,
+  .market-strategy__action-group > div {
+    grid-template-columns: 1fr;
+  }
+
+  .market-strategy__competition > article,
+  .market-strategy__events > article {
+    grid-template-columns: minmax(0,1fr) auto;
+  }
+}
