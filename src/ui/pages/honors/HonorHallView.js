@@ -2,6 +2,17 @@ import {
   honorHallPageSystem
 } from "./HonorHallPageSystem.js";
 
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 
 const PERIOD_NAME =
   Object.freeze({
@@ -101,41 +112,49 @@ class HonorHallView {
     page
   ) {
     return `
-      <main class="honor-hall">
+      <main class="rg-screen honor-hall-page">
 
-        <header class="honor-hall__header">
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "永久荣誉档案"
+          }
+        )}
 
-          <div>
-            <span>
-              永久荣誉档案
-            </span>
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
 
-            <h1>
-              荣誉馆
-            </h1>
+        ${renderPageTitle({
+          title:
+            "荣誉馆",
 
-            <p>
-              奖杯永久保留，记录门店、菜品和员工获得的正式荣誉。
-            </p>
-          </div>
+          subtitle:
+            "奖杯永久保留 · 门店、菜品与员工荣誉",
 
-          <nav>
-            <button
-              type="button"
-              data-page-target="ranking-center"
-            >
-              排行榜
-            </button>
+          backTarget:
+            "awards-center",
 
-            <button
-              type="button"
-              data-page-target="awards-center"
-            >
-              奖项中心
-            </button>
-          </nav>
+          rightHtml:
+            `
+              <div class="competition-suite-links">
+                <button
+                  type="button"
+                  data-page-target="ranking-center"
+                >
+                  排行榜
+                </button>
 
-        </header>
+                <button
+                  type="button"
+                  data-page-target="awards-center"
+                >
+                  奖项中心
+                </button>
+              </div>
+            `
+        })}
 
 
         <section class="honor-hall__summary">
@@ -340,6 +359,18 @@ class HonorHallView {
           }
 
         </section>
+
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "operations"
+            })
+        )}
 
       </main>
     `;
