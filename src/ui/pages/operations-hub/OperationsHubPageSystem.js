@@ -15,7 +15,8 @@ import {
 } from "../../../core/GameState.js";
 
 import {
-  buildGlobalTopBarModel
+  buildGlobalTopBarModel,
+  buildNoticeTickerModel
 } from "../../components/GlobalChromeModel.js";
 
 import {
@@ -293,6 +294,11 @@ class OperationsHubPageSystem {
       restaurantId,
 
       topBar,
+
+      noticeTicker:
+        buildNoticeTickerModel(
+          []
+        ),
 
       navigation:
         gameChromeSystem
