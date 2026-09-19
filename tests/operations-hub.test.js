@@ -19,7 +19,7 @@ import {
 
 
 test(
-  "经营入口只展示五个核心经营分类",
+  "经营入口展示七个正式经营分类",
   () => {
     const page =
       operationsHubPageSystem
@@ -27,7 +27,7 @@ test(
 
     assert.equal(
       page.entries.length,
-      5
+      7
     );
 
     assert.deepEqual(
@@ -40,7 +40,9 @@ test(
         "供应链",
         "客流与渠道",
         "经营分析",
-        "财务"
+        "财务",
+        "市场与竞争",
+        "榜单与荣誉"
       ]
     );
 
@@ -75,6 +77,21 @@ test(
     assert.match(
       html,
       /财务/
+    );
+
+    assert.match(
+      html,
+      /市场与竞争/
+    );
+
+    assert.match(
+      html,
+      /榜单与荣誉/
+    );
+
+    assert.match(
+      html,
+      /rg-bottom-nav/
     );
 
     assert.match(
