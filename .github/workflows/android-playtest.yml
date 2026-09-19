@@ -15,6 +15,9 @@ on:
       - "scripts/phase2-gate.mjs"
       - "scripts/phase3-balance-gate.mjs"
       - "scripts/phase3-longrun-gate.mjs"
+      - "scripts/phase3-performance-gate.mjs"
+      - "scripts/stress-20year.mjs"
+      - "scripts/aging-performance.mjs"
       - "tests/**"
       - "package.json"
       - "package-lock.json"
@@ -49,6 +52,9 @@ jobs:
 
       - name: Run phase3 365-day longrun gate
         run: npm run test:phase3:longrun
+
+      - name: Run phase3 performance gate
+        run: npm run test:phase3:performance
 
       - name: Build Android web bundle
         run: npm run build:android-js

@@ -358,6 +358,39 @@ console.log(
   }x`
 );
 
+assert.ok(
+  Number.isFinite(
+    year20.normal.p95
+  ) &&
+  Number.isFinite(
+    year20.hourly.p95
+  ) &&
+  Number.isFinite(
+    year20.midnight
+  ),
+  "20年老化性能统计必须保持有限数值"
+);
+
+assert.ok(
+  year20.entities < 10000,
+  `20年老化实体过多: ${year20.entities}`
+);
+
+assert.ok(
+  year20.normal.p95 < 50,
+  `20年普通分钟P95过慢: ${year20.normal.p95.toFixed(3)}ms`
+);
+
+assert.ok(
+  year20.hourly.p95 < 1000,
+  `20年整点P95过慢: ${year20.hourly.p95.toFixed(3)}ms`
+);
+
+assert.ok(
+  year20.midnight < 5000,
+  `20年跨日处理过慢: ${year20.midnight.toFixed(3)}ms`
+);
+
 console.log(
   "✅ 老化性能测试完成"
 );
