@@ -10,6 +10,14 @@ import {
 } from "../src/core/EntitySystem.js";
 
 import {
+  restaurantSystem
+} from "../src/systems/RestaurantSystem.js";
+
+import {
+  financeSystem
+} from "../src/systems/FinanceSystem.js";
+
+import {
   awardCeremonyPageSystem
 } from "../src/ui/pages/award-ceremony/AwardCeremonyPageSystem.js";
 
@@ -25,6 +33,17 @@ import {
 test("获奖结果可以生成正式颁奖页面", () => {
   gameState.reset();
 
+  const restaurant =
+    restaurantSystem.create({
+      name:
+        "测试餐厅"
+    });
+
+  financeSystem.createAccount(
+    restaurant.id,
+    100000
+  );
+
   entitySystem.create(
     "award_result",
     {
@@ -39,18 +58,18 @@ test("获奖结果可以生成正式颁奖页面", () => {
       prestige:5,
       endDay:360,
       winner:{
-        id:"restaurant_a",
+        id:restaurant.id,
         name:"测试餐厅",
-        restaurantId:"restaurant_a",
+        restaurantId:restaurant.id,
         isPlayer:true,
         rank:1,
         awardScore:96
       },
       finalists:[
         {
-          id:"restaurant_a",
+          id:restaurant.id,
           name:"测试餐厅",
-          restaurantId:"restaurant_a",
+          restaurantId:restaurant.id,
           isPlayer:true,
           rank:1,
           awardScore:96
@@ -80,9 +99,9 @@ test("获奖结果可以生成正式颁奖页面", () => {
       periodKey:"Y1",
       division:"competition",
       subjectType:"restaurant",
-      subjectId:"restaurant_a",
+      subjectId:restaurant.id,
       subjectName:"测试餐厅",
-      restaurantId:"restaurant_a",
+      restaurantId:restaurant.id,
       prestige:5,
       reward:{
         reputation:25,
@@ -94,7 +113,7 @@ test("获奖结果可以生成正式颁奖页面", () => {
 
   const page=
     awardCeremonyPageSystem.getPage(
-      "restaurant_a"
+      restaurant.id
     );
 
   assert.equal(
