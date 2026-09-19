@@ -18,6 +18,10 @@ import {
   propertySystem
 } from "../../../systems/PropertySystem.js";
 
+import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
 
 class ChainManagementPageSystem {
   getStoreModel(
@@ -156,9 +160,73 @@ class ChainManagementPageSystem {
       ) ??
       stores[0];
 
+    const notices =
+      [];
+
+    if (
+      dashboard.canCreateBranch
+    ) {
+      notices.push({
+        id:
+          "chain_branch_available",
+
+        type:
+          "success",
+
+        title:
+          "扩张机会",
+
+        message:
+          `当前可继续扩张，门店数量${dashboard.storeCount}/${dashboard.maxStores}`,
+
+        priority:
+          70
+      });
+    }
+
+    if (
+      dashboard.features.centralKitchen &&
+      !dashboard.centralKitchen
+    ) {
+      notices.push({
+        id:
+          "chain_kitchen_available",
+
+        type:
+          "info",
+
+        title:
+          "中央厨房",
+
+        message:
+          "已满足中央厨房解锁条件，可以启用集中备货与调拨",
+
+        priority:
+          50
+      });
+    }
+
+    const chrome =
+      buildFormalPageChrome(
+        dashboard.anchorRestaurantId,
+        {
+          notices,
+          restaurant:
+            chainSystem.getAnchorRestaurant(
+              restaurantId
+            )
+        }
+      );
+
     return {
       pageId:
         "chain",
+
+      topBar:
+        chrome.topBar,
+
+      noticeTicker:
+        chrome.noticeTicker,
 
       title:
         "扩张与连锁",
