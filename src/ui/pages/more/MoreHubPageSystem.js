@@ -86,21 +86,6 @@ const MORE_GROUPS =
           unlockScope: "chain"
         }
       ]
-    },
-
-    {
-      id: "system",
-      title: "系统",
-
-      entries: [
-        {
-          id: "settings",
-          title: "设置",
-          description: "游戏设置、显示和其他基础选项",
-          target: "settings",
-          state: "placeholder"
-        }
-      ]
     }
   ]);
 
