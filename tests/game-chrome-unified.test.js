@@ -271,3 +271,85 @@ test(
     }
   }
 );
+
+
+test(
+  "集团HUD显示集团范围而不是单店等级声望",
+  () => {
+    const html =
+      renderGameTopBar({
+        brandName:
+          "美味餐饮集团",
+
+        balance:
+          288000,
+
+        storeLevel:
+          8,
+
+        reputation:
+          92,
+
+        scope: {
+          type:
+            "group",
+
+          canSwitch:
+            true,
+
+          stores: [
+            { id: "store_1", name: "东门小馆" },
+            { id: "store_2", name: "南城小馆" }
+          ]
+        },
+
+        clock: {
+          clockText:
+            "11:30",
+
+          dateText:
+            "第12天"
+        },
+
+        actions: {
+          speeds: [
+            1,
+            2,
+            4
+          ]
+        }
+      });
+
+    assert.ok(
+      html.includes(
+        "美味餐饮集团"
+      )
+    );
+
+    assert.ok(
+      html.includes(
+        "门店数量"
+      )
+    );
+
+    assert.ok(
+      html.includes(
+        "2家"
+      )
+    );
+
+    assert.equal(
+      html.includes(
+        "Lv.8"
+      ),
+      false
+    );
+
+    assert.equal(
+      html.includes(
+        "声望 92"
+      ),
+      false
+    );
+  }
+);
