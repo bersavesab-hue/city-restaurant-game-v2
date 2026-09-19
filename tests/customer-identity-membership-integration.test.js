@@ -339,3 +339,127 @@ test(
     );
   }
 );
+
+test(
+  "中等入会倾向熟客会在多次识别复购后自动入会",
+  () => {
+    gameState.reset();
+
+    randomSystem.setSeed(
+      "repeat-driven-membership"
+    );
+
+    const restaurant =
+      restaurantSystem.create({
+        name:
+          "重复熟客入会测试店"
+      });
+
+    restaurantSystem.setLevel(
+      restaurant.id,
+      7
+    );
+
+    const resolved =
+      customerIdentitySystem
+        .resolveVisit({
+          restaurantId:
+            restaurant.id,
+          segmentId:
+            "office_worker",
+          force:
+            true
+        });
+
+    customerLoyaltyIntegrationSystem
+      .processOrder({
+        id:
+          "repeat_member_order_1",
+        restaurantId:
+          restaurant.id,
+        customerId:
+          resolved.customer.id,
+        customerSegmentId:
+          "office_worker",
+        totalRevenue:
+          120,
+        averageQuality:
+          86,
+        items: [
+          {
+            dishId:
+              "dish_lunch",
+            quantity:
+              1
+          }
+        ]
+      });
+
+    assert.equal(
+      customerLoyaltySystem
+        .getMemberProfile(
+          restaurant.id,
+          resolved.customer.id
+        ),
+      null
+    );
+
+    let profile =
+      resolved.profile;
+
+    for (
+      let index = 0;
+      index < 3;
+      index += 1
+    ) {
+      profile =
+        customerIdentitySystem
+          .touchProfile(
+            profile
+          );
+    }
+
+    customerLoyaltyIntegrationSystem
+      .processOrder({
+        id:
+          "repeat_member_order_2",
+        restaurantId:
+          restaurant.id,
+        customerId:
+          resolved.customer.id,
+        customerSegmentId:
+          "office_worker",
+        totalRevenue:
+          120,
+        averageQuality:
+          86,
+        items: [
+          {
+            dishId:
+              "dish_lunch",
+            quantity:
+              1
+          }
+        ]
+      });
+
+    const member =
+      customerLoyaltySystem
+        .getMemberProfile(
+          restaurant.id,
+          resolved.customer.id
+        );
+
+    assert.ok(member);
+
+    assert.equal(
+      member.enrollmentSource,
+      "behavioral_auto"
+    );
+
+    assert.equal(
+      member.visits,
+      1
+    );
+  }
+);

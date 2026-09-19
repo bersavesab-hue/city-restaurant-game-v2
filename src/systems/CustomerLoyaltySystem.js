@@ -169,12 +169,37 @@ class CustomerLoyaltySystem {
   shouldAutoEnroll({
     segmentId,
     satisfaction,
-    spend = 0
+    spend = 0,
+    recognizedVisits = 0
   }) {
+    const repeatVisits =
+      Math.max(
+        0,
+        Math.floor(
+          Number(
+            recognizedVisits
+          ) ||
+          0
+        )
+      );
+
+    const repeatBonus =
+      Math.min(
+        MEMBER_IDENTITY_POLICY
+          .maxEnrollmentRepeatBonus,
+        Math.max(
+          0,
+          repeatVisits - 1
+        ) *
+        MEMBER_IDENTITY_POLICY
+          .enrollmentRepeatBonusPerVisit
+      );
+
     return (
       this.getEnrollmentPropensity(
         segmentId
-      ) >=
+      ) +
+        repeatBonus >=
         MEMBER_POINT_POLICY
           .enrollmentThreshold &&
       Number(

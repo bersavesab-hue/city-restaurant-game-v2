@@ -156,6 +156,21 @@ class CustomerLoyaltyIntegrationSystem {
           customerId
         );
 
+    const recognizedProfile =
+      segmentId
+        ? customerIdentitySystem
+            .getProfiles(
+              restaurantId,
+              segmentId
+            )
+            .find(
+              item =>
+                item.customerId ===
+                customerId
+            ) ??
+          null
+        : null;
+
     if (
       !member &&
       segmentId &&
@@ -166,7 +181,11 @@ class CustomerLoyaltyIntegrationSystem {
         .shouldAutoEnroll({
           segmentId,
           satisfaction,
-          spend
+          spend,
+          recognizedVisits:
+            recognizedProfile
+              ?.recognizedVisits ??
+            0
         })
     ) {
       member =

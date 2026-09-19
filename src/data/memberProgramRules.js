@@ -36,6 +36,12 @@ export const MEMBER_IDENTITY_POLICY =
     maxAggregateRecognizedVisits:
       5,
 
+    enrollmentRepeatBonusPerVisit:
+      4,
+
+    maxEnrollmentRepeatBonus:
+      20,
+
     maxSegmentRetentionMultiplier:
       1.1
   });
