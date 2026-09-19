@@ -41,6 +41,11 @@
   margin-top: 6px;
 }
 
+
+.command-center.is-group-scope > :not(.command-center__portfolio) {
+  display: none;
+}
+
 .command-center h2 {
   margin: 0;
   font-size: 14px;
@@ -311,6 +316,31 @@
   display: block;
   color: #c9ecff;
   font-size: 10px;
+}
+
+.command-center__identity-meta {
+  display: flex !important;
+  align-items: center;
+  gap: 5px;
+}
+
+.command-center__identity-meta b {
+  padding: 3px 6px;
+  border-radius: 999px;
+  color: #5e6b79;
+  background: rgba(255,255,255,.9);
+  font-size: 8px;
+  line-height: 1;
+}
+
+.command-center__identity-meta b[data-status="open"] {
+  color: #087645;
+  background: #dff7e9;
+}
+
+.command-center__identity-meta b[data-status="paused"] {
+  color: #8c5b00;
+  background: #fff1bf;
 }
 
 .command-center__identity h1 {
