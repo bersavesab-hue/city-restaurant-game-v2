@@ -895,7 +895,7 @@ class EmployeeManagementView {
             "员工与晋升",
 
           backTarget:
-            "restaurant",
+            "employees",
 
           helpLabel:
             "员工说明"
