@@ -22,6 +22,19 @@ const PERIOD_NAME =
   });
 
 
+const SUBJECT_NAME =
+  Object.freeze({
+    restaurant:
+      "门店",
+
+    dish:
+      "菜品",
+
+    employee:
+      "员工"
+  });
+
+
 function escapeHtml(
   value
 ) {
@@ -242,6 +255,90 @@ class HonorHallView {
         </section>
 
 
+        <section class="honor-hall__filters">
+
+          <div class="honor-hall__divisions">
+
+            <button
+              type="button"
+              data-honor-division=""
+              class="${
+                !page.division
+                  ? "is-active"
+                  : ""
+              }"
+            >
+              全部类别
+            </button>
+
+            ${page.divisions
+              .map(
+                item => `
+                  <button
+                    type="button"
+                    data-honor-division="${escapeHtml(
+                      item.id
+                    )}"
+                    class="${
+                      page.division ===
+                        item.id
+                        ? "is-active"
+                        : ""
+                    }"
+                  >
+                    ${escapeHtml(
+                      item.name
+                    )}
+                  </button>
+                `
+              )
+              .join("")}
+
+          </div>
+
+          <div class="honor-hall__subjects">
+
+            <button
+              type="button"
+              data-honor-subject=""
+              class="${
+                !page.subjectType
+                  ? "is-active"
+                  : ""
+              }"
+            >
+              全部对象
+            </button>
+
+            ${Object.entries(
+                SUBJECT_NAME
+              )
+              .map(
+                ([
+                  id,
+                  name
+                ]) => `
+                  <button
+                    type="button"
+                    data-honor-subject="${id}"
+                    class="${
+                      page.subjectType ===
+                        id
+                        ? "is-active"
+                        : ""
+                    }"
+                  >
+                    ${name}
+                  </button>
+                `
+              )
+              .join("")}
+
+          </div>
+
+        </section>
+
+
         <section class="honor-hall__trophies">
 
           <h2>
@@ -419,6 +516,48 @@ class HonorHallView {
               this.period =
                 button.dataset
                   .honorPeriod ||
+                null;
+
+              this.render();
+            }
+          );
+        }
+      );
+
+
+    this.root
+      .querySelectorAll(
+        "[data-honor-division]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              this.division =
+                button.dataset
+                  .honorDivision ||
+                null;
+
+              this.render();
+            }
+          );
+        }
+      );
+
+
+    this.root
+      .querySelectorAll(
+        "[data-honor-subject]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              this.subjectType =
+                button.dataset
+                  .honorSubject ||
                 null;
 
               this.render();
