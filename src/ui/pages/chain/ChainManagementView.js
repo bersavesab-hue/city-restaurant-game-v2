@@ -2,6 +2,14 @@ import {
   chainManagementPageSystem
 } from "./ChainManagementPageSystem.js";
 
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+import {
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
 function esc(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -204,6 +212,17 @@ class ChainManagementView {
         ${this.renderBrand(page)}
         ${this.renderKitchen(page)}
         ${this.renderRegions(page)}
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "more"
+            })
+        )}
       </main>
     `;
   }
@@ -324,6 +343,22 @@ class ChainManagementView {
             button.dataset.storeId
           );
         });
+      });
+
+    this.root.querySelectorAll(
+      "[data-page-target]"
+    )
+      .forEach(button => {
+        button.addEventListener(
+          "click",
+          () => {
+            this.onNavigate?.(
+              button.dataset
+                .pageTarget,
+              this.restaurantId
+            );
+          }
+        );
       });
   }
 
