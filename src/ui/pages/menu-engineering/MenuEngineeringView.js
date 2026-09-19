@@ -1,3 +1,15 @@
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+
 function money(value) {
   return (
     "¥" +
@@ -12,11 +24,32 @@ function money(value) {
 class MenuEngineeringView {
   renderMarkup(page) {
     return `
-      <section class="menu-engineering">
-        <header>
-          <span>菜单经营诊断</span>
-          <h1>菜单工程</h1>
-        </header>
+      <main class="rg-screen menu-engineering-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "销量 · 贡献利润 · 菜品诊断"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "菜单工程",
+
+          subtitle:
+            "销量 · 贡献利润 · 菜品诊断",
+
+          backTarget:
+            "operations"
+        })}
+
+        <section class="menu-engineering">
 
         <section class="menu-engineering-kpis">
           <article>
@@ -127,6 +160,19 @@ class MenuEngineeringView {
           }
         </section>
       </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "operations"
+            })
+        )}
+
+      </main>
     `;
   }
 }
