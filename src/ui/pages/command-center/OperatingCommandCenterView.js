@@ -163,6 +163,11 @@ function renderStaffPreview(
                     employee.avatarPath ??
                     ""
                   ) +
+                  '" data-image-fallback="' +
+                  escapeHtml(
+                    employee.avatarFallbackPath ??
+                    ""
+                  ) +
                   '" data-image-fit="cover">' +
                   escapeHtml(
                     employee.name
