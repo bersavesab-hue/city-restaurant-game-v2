@@ -49,6 +49,7 @@
     "test:phase5:chain": "node scripts/chain-expansion-gate.mjs",
     "test:phase6:lifecycle": "node scripts/phase6-lifecycle-gate.mjs",
     "test:phase7:ux": "node scripts/phase7-ux-gate.mjs",
+    "test:phase8:release": "node scripts/phase8-release-gate.mjs",
     "assets:validate": "node scripts/validate-visual-assets.mjs"
   },
   "devDependencies": {
