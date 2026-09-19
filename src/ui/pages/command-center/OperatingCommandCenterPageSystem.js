@@ -39,6 +39,14 @@ import {
   employeeDynamicsSystem
 } from "../../../systems/EmployeeDynamicsSystem.js";
 
+import {
+  dishCatalogSystem
+} from "../../../systems/DishCatalogSystem.js";
+
+import {
+  getDishVisualSource
+} from "../../assets/DishVisualResolver.js";
+
 
 
 function noticeType(
@@ -347,33 +355,57 @@ function buildTopDishPreview(
       3
     )
     .map(
-      item => ({
-        id:
-          item.menuItemId ??
-          item.dishId,
+      item => {
+        const dish =
+          safe(
+            () =>
+              dishCatalogSystem
+                .get(
+                  item.dishId
+                ),
+            null
+          );
 
-        dishId:
-          item.dishId,
+        return {
+          id:
+            item.menuItemId ??
+            item.dishId,
 
-        name:
-          item.name,
+          dishId:
+            item.dishId,
 
-        sold:
-          item.quantity ??
-          0,
+          name:
+            item.name,
 
-        salesShare:
-          item.salesShare ??
-          0,
+          custom:
+            Boolean(
+              dish?.custom
+            ),
 
-        quality:
-          item.averageQuality ??
-          0,
+          image:
+            dish
+              ? getDishVisualSource(
+                  dish
+                )
+              : null,
 
-        classification:
-          item.classificationName ??
-          "在售菜品"
-      })
+          sold:
+            item.quantity ??
+            0,
+
+          salesShare:
+            item.salesShare ??
+            0,
+
+          quality:
+            item.averageQuality ??
+            0,
+
+          classification:
+            item.classificationName ??
+            "在售菜品"
+        };
+      }
     );
 }
 
