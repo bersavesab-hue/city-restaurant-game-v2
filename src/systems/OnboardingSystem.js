@@ -148,7 +148,7 @@ class OnboardingSystem {
         restaurantId
       );
 
-    const completion = {
+    const observed = {
       location:
         Boolean(
           restaurant.locationId &&
@@ -203,8 +203,68 @@ class OnboardingSystem {
 
       first_order:
         completedOrders >
-        0
+          0 ||
+        (
+          restaurant
+            .totalServedGuests ??
+          0
+        ) >
+          0
     };
+
+
+    const previousMilestones =
+      restaurant
+        .onboardingMilestones ??
+      {};
+
+
+    const completion =
+      Object.fromEntries(
+        ONBOARDING_STEPS
+          .map(
+            step => [
+              step.id,
+              Boolean(
+                previousMilestones[
+                  step.id
+                ] ||
+                observed[
+                  step.id
+                ]
+              )
+            ]
+          )
+      );
+
+
+    const milestoneChanged =
+      ONBOARDING_STEPS
+        .some(
+          step =>
+            completion[
+              step.id
+            ] &&
+            !previousMilestones[
+              step.id
+            ]
+        );
+
+
+    if (
+      milestoneChanged
+    ) {
+      entitySystem.update(
+        "restaurant",
+        restaurantId,
+        {
+          onboardingMilestones: {
+            ...previousMilestones,
+            ...completion
+          }
+        }
+      );
+    }
 
     const steps =
       ONBOARDING_STEPS
