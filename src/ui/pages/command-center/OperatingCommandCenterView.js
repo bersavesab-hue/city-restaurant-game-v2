@@ -90,9 +90,6 @@ class OperatingCommandCenterView {
         subtitle:
           "掌握门店经营全局 · 实时数据驱动决策",
 
-        backTarget:
-          "restaurant",
-
         helpLabel:
           "经营攻略",
 
