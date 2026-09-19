@@ -6,6 +6,7 @@ const tests = [
   "tests/new-player-full-journey-e2e.test.js",
   "tests/phase7-ux-integration.test.js",
   "tests/award-ceremony.test.js",
+  "tests/formal-page-module-load.test.js",
   "tests/pre-release-playtest-acceptance.test.js",
   "tests/runtime-route-coverage.test.js",
   "tests/no-formal-ui-placeholder.test.js",
