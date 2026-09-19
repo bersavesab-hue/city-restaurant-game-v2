@@ -36,6 +36,10 @@ import {
   getMemberEnrollmentPropensity
 } from "../data/memberProgramRules.js";
 
+import {
+  lateGameInvestmentSystem
+} from "./LateGameInvestmentSystem.js";
+
 const MEMBER_LEVELS =
   MEMBER_LEVELS_V1;
 
@@ -1485,11 +1489,20 @@ class CustomerLoyaltySystem {
           .maxRecognizedCustomersPerSegment
       );
 
+    const investmentBonus =
+      lateGameInvestmentSystem
+        .getModifiers(
+          restaurantId
+        )
+        .memberRetentionMultiplierBonus ??
+      0;
+
     return clamp(
       1 +
       memberScale * 0.04 +
       repeatRate * 0.04 +
-      activeRate * 0.02,
+      activeRate * 0.02 +
+      investmentBonus,
       1,
       MEMBER_IDENTITY_POLICY
         .maxSegmentRetentionMultiplier
