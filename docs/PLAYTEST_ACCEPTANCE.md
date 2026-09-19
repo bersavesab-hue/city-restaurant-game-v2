@@ -1,6 +1,6 @@
 # Playtest 验收记录
 
-候选版本：**0.8.66 Playtest / versionCode 866**
+候选版本：**0.8.67 Playtest / versionCode 867**
 
 游戏/UI代码基线：
 - `d6b008f9c12e5167fcf1ace23f1f19233706d90c`
@@ -34,13 +34,17 @@
 - 应用名称统一为“城市餐饮创业”，Android 网页壳不再出现旧“城市餐厅测试版”标题；
 - 升级 Android 16 / API 36 上架基线；
 - Android 工具链升级至 AGP 8.10.1 + Gradle 8.11.1；
-- 新增独立 Android Release Smoke，避免长期经营 CI 被频繁 UI 提交反复取消。
+- 新增独立 Android Release Smoke，避免长期经营 CI 被频繁 UI 提交反复取消；
+- 新增独立 New Player Journey Gate；
+- 修复门店每日自动打烊后新手“已开业”状态倒退；
+- 新手选址、装修、员工、菜单、首批库存、开业、首单改为一次达成永久里程碑；
+- 完整新玩家链已通过：空店 → 选址 → 装修 → 三类员工 → 自研菜 → 证照 → 采购 → 开业 → 首单 → 评价 → 日结 → 新手100%。
 
 ## Android 候选包合同
 
 - applicationId：`com.cityrestaurant.v2playtest`
-- versionName：`0.8.66`
-- versionCode：`866`
+- versionName：`0.8.67`
+- versionCode：`867`
 - minSdk：23
 - compileSdk：36
 - targetSdk：36
@@ -52,7 +56,7 @@
 ## 已验证的产物内容
 
 发布 ZIP 应包含：
-- `city-restaurant-v0.8.66-playtest.apk`
+- `city-restaurant-v0.8.67-playtest.apk`
 - `release-metadata.json`
 - `SHA256SUMS.txt`
 - `PRIVACY.md`
