@@ -164,17 +164,25 @@
       --rg-gold
     );
 
-  border-radius: 7px;
+  border-radius: 9px;
+
+  color: #ffe56b;
 
   background:
+    radial-gradient(
+      circle at 35% 28%,
+      rgba(106,220,255,.32),
+      transparent 36%
+    ),
     linear-gradient(
       145deg,
-      #238fc9,
-      #154f87
+      #1684c6,
+      #0a467f
     );
 
-  font-size: 15px;
-  font-weight: 900;
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(255,255,255,.12);
 }
 
 
@@ -637,10 +645,10 @@ button.is-active {
     1px solid
     rgba(255,255,255,.32);
 
-  border-radius: 6px;
+  border-radius: 7px;
 
-  font-size: 10px;
-  font-weight: 900;
+  background:
+    rgba(255,255,255,.035);
 }
 
 
@@ -871,4 +879,34 @@ button.is-active
       .9fr
       .7fr;
   }
+}
+
+
+.rg-ui-icon {
+  width: 1em;
+  height: 1em;
+
+  display: block;
+
+  flex: 0 0 auto;
+
+  overflow: visible;
+
+  color: inherit;
+}
+
+
+.rg-topbar__avatar-icon {
+  width: 25px;
+  height: 25px;
+
+  stroke-width: 1.9;
+}
+
+
+.rg-bottom-nav__svg {
+  width: 18px;
+  height: 18px;
+
+  stroke-width: 1.9;
 }
