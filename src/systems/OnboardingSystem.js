@@ -26,7 +26,7 @@ const ONBOARDING_STEPS =
     Object.freeze({
       id: "staff",
       title: "配置员工",
-      description: "至少安排一名可工作的正式员工。",
+      description: "至少配置1名可工作的厨师和1名服务员。",
       pageId: "employee_recruitment"
     }),
 
@@ -47,7 +47,7 @@ const ONBOARDING_STEPS =
     Object.freeze({
       id: "opening",
       title: "开始营业",
-      description: "完成证照、厨师、菜单、首批库存和营业时间后正式开业。",
+      description: "完成证照、厨师与服务员、菜单、首批库存和营业时间后正式开业。",
       pageId: "opening-setup"
     }),
 
