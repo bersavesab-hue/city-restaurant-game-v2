@@ -30,6 +30,7 @@ on:
       - "PRIVACY.md"
       - "docs/PUBLISHING.md"
       - "docs/STORE_LISTING_DRAFT.md"
+      - "docs/PLAYTEST_ACCEPTANCE.md"
       - "scripts/stress-20year.mjs"
       - "scripts/aging-performance.mjs"
       - "tests/**"
@@ -158,5 +159,6 @@ jobs:
             PRIVACY.md
             docs/PUBLISHING.md
             docs/STORE_LISTING_DRAFT.md
+            docs/PLAYTEST_ACCEPTANCE.md
           if-no-files-found: error
           retention-days: 30
