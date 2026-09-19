@@ -55,9 +55,52 @@ class MenuOptimizationPageSystem {
         }
       );
 
+    const dashboard =
+      menuOptimizationSystem
+        .getDashboard(
+          restaurantId
+        );
+
+    const engineering =
+      menuEngineeringSystem
+        .analyze(
+          restaurantId
+        );
+
+    const chrome =
+      buildFormalPageChrome(
+        restaurantId,
+        {
+          notices:
+            dashboard.activePromotions >
+            0
+              ? [
+                  {
+                    id:
+                      "menu_promotion_active",
+                    type:
+                      "info",
+                    title:
+                      "菜单活动",
+                    message:
+                      `当前有${dashboard.activePromotions}个菜品促销正在执行`,
+                    priority:
+                      40
+                  }
+                ]
+              : []
+        }
+      );
+
     return {
       pageId:
         "menu-optimization",
+
+      topBar:
+        chrome.topBar,
+
+      noticeTicker:
+        chrome.noticeTicker,
 
       topBar:
         chrome.topBar,
