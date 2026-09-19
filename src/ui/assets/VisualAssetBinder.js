@@ -31,6 +31,11 @@ const SLOT_PREFIXES =
     "command-employee-":
       [
         "assets/images/ui/employees/avatars"
+      ],
+
+    "employee-avatar-":
+      [
+        "assets/images/ui/employees/avatars"
       ]
   });
 
