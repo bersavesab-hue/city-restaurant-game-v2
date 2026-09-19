@@ -59,6 +59,9 @@ jobs:
       - name: Install JavaScript dependencies
         run: npm ci
 
+      - name: Run full test suite
+        run: npm test
+
       - name: Run playable-flow gate
         run: npm run test:phase2
 
