@@ -342,9 +342,6 @@ class BusinessAnalyticsView {
     const page =
       this.getPage();
 
-    this.root.className =
-      "business-analytics-page";
-
     this.root.innerHTML =
       this.renderMarkup(
         page
