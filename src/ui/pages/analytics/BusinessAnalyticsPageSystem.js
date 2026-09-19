@@ -7,6 +7,13 @@ import { inventorySystem } from "../../../systems/InventorySystem.js";
 import { procurementSystem } from "../../../systems/ProcurementSystem.js";
 import { customerSegmentSystem } from "../../../systems/CustomerSegmentSystem.js";
 import { pricingDecisionImpactSystem } from "../../../systems/PricingDecisionImpactSystem.js";
+import { financeSystem } from "../../../systems/FinanceSystem.js";
+import { gameState } from "../../../core/GameState.js";
+
+import {
+  buildGlobalTopBarModel,
+  buildNoticeTickerModel
+} from "../../components/GlobalChromeModel.js";
 
 const PERIODS = Object.freeze([
   {
@@ -607,9 +614,10 @@ class BusinessAnalyticsPageSystem {
       period = "week"
     } = {}
   ) {
-    restaurantSystem.get(
-      restaurantId
-    );
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
 
     const periodRule =
       this.requirePeriod(
@@ -690,9 +698,87 @@ class BusinessAnalyticsPageSystem {
         supply
       );
 
+    let balance =
+      0;
+
+    try {
+      balance =
+        financeSystem.getBalance(
+          restaurantId
+        );
+    } catch {
+      balance =
+        0;
+    }
+
     return {
       pageId:
         "analytics",
+
+      topBar:
+        buildGlobalTopBarModel({
+          restaurantName:
+            restaurant.name,
+
+          balance,
+
+          storeLevel:
+            restaurant.level ??
+            1,
+
+          reputation:
+            restaurant.reputation ??
+            0,
+
+          time:
+            gameState.getSection(
+              "time"
+            ),
+
+          runtime:
+            gameState.getSection(
+              "runtime"
+            ),
+
+          currentStoreId:
+            restaurantId
+        }),
+
+      noticeTicker:
+        buildNoticeTickerModel(
+          alerts
+            .slice(
+              0,
+              6
+            )
+            .map(
+              alert => ({
+                id:
+                  alert.id,
+
+                type:
+                  alert.level ===
+                    "critical"
+                    ? "danger"
+                    : alert.level,
+
+                title:
+                  alert.title,
+
+                message:
+                  alert.message,
+
+                priority:
+                  alert.level ===
+                    "critical"
+                    ? 120
+                    : alert.level ===
+                      "warning"
+                      ? 90
+                      : 40
+              })
+            )
+        ),
 
       title:
         "经营数据",
