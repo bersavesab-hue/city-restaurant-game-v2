@@ -103,7 +103,7 @@ class CustomerManagementView {
             "顾客管理",
 
           subtitle:
-            "顾客资产、复购与会员关系",
+            "顾客与会员资产、复购与关系",
 
           backTarget:
             "operations",
