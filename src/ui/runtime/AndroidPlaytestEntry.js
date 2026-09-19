@@ -123,6 +123,16 @@ let currentView =
   null;
 
 
+let currentRoute =
+  null;
+
+const navigationHistory =
+  [];
+
+let handlingBackNavigation =
+  false;
+
+
 const SEGMENT_NAMES =
   new Map();
 
@@ -558,6 +568,35 @@ function navigate(
     passedRestaurantId ??
     restaurantId;
 
+  const nextRoute = {
+    pageId,
+    restaurantId,
+    params:
+      structuredClone(
+        params ??
+        {}
+      )
+  };
+
+  if (
+    !handlingBackNavigation &&
+    currentRoute
+  ) {
+    navigationHistory.push(
+      currentRoute
+    );
+
+    while (
+      navigationHistory.length >
+      50
+    ) {
+      navigationHistory.shift();
+    }
+  }
+
+  currentRoute =
+    nextRoute;
+
   saveNow();
 
   destroyCurrent();
@@ -896,6 +935,33 @@ function navigate(
     );
   }
 }
+
+
+window.restaurantGameBack =
+  () => {
+    const previous =
+      navigationHistory.pop();
+
+    if (!previous) {
+      return false;
+    }
+
+    handlingBackNavigation =
+      true;
+
+    try {
+      navigate(
+        previous.pageId,
+        previous.restaurantId,
+        previous.params
+      );
+    } finally {
+      handlingBackNavigation =
+        false;
+    }
+
+    return true;
+  };
 
 
 root.addEventListener(
