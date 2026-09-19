@@ -582,7 +582,8 @@ test(
 
 
     // --------------------------------------------------------
-    // 8. 同一家店继续真实模拟24小时
+    // 8. 同一家店继续真实模拟到午夜日结
+    //    必须跨过22:00自动打烊，验证引导不会倒退
     // --------------------------------------------------------
 
     const balanceBefore =
@@ -591,8 +592,23 @@ test(
       );
 
 
+    const currentTime =
+      timeSystem.getTime();
+
+
+    const minutesIntoDay =
+      currentTime.hour *
+      60 +
+      currentTime.minute;
+
+
+    const minutesToMidnight =
+      1440 -
+      minutesIntoDay;
+
+
     simulationSystem.advanceFast(
-      24 * 60
+      minutesToMidnight
     );
 
 
@@ -660,6 +676,15 @@ test(
       ),
       balanceBefore,
       "首日经营没有影响门店现金"
+    );
+
+
+    assert.equal(
+      restaurantSystem.get(
+        restaurant.id
+      ).status,
+      "closed",
+      "午夜日结前门店应该已按营业时间正常打烊"
     );
 
 
