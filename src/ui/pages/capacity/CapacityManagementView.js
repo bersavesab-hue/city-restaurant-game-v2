@@ -1,3 +1,15 @@
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+
 function money(value) {
   return (
     "¥" +
@@ -20,11 +32,32 @@ function bottleneckName(id) {
 class CapacityManagementView {
   renderMarkup(page) {
     return `
-      <section class="capacity-page">
-        <header>
-          <span>门店运营效率</span>
-          <h1>产能与排队</h1>
-        </header>
+      <main class="rg-screen capacity-management-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "门店运营效率"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "产能与排队",
+
+          subtitle:
+            "门店运营效率",
+
+          backTarget:
+            "operations"
+        })}
+
+        <section class="capacity-page">
 
         <section class="capacity-kpis">
           <article>
@@ -151,6 +184,19 @@ class CapacityManagementView {
           </p>
         </section>
       </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "operations"
+            })
+        )}
+
+      </main>
     `;
   }
 }
