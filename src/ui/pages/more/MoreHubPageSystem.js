@@ -111,6 +111,14 @@ const MORE_GROUPS =
 
       entries: [
         {
+          id: "feedback",
+          title: "测试反馈",
+          description: "记录问题、评分与建议，并生成可复制诊断报告",
+          target: "feedback",
+          state: "ready"
+        },
+
+        {
           id: "settings",
           title: "设置",
           description: "运行速度、暂停与存档控制",
