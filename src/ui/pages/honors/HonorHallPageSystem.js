@@ -10,6 +10,10 @@ import {
   awardSystem
 } from "../../../systems/AwardSystem.js";
 
+import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
 
 class HonorHallPageSystem {
   getPage(
@@ -43,6 +47,45 @@ class HonorHallPageSystem {
         );
 
 
+    const summary =
+      honorArchiveSystem
+        .getSummary(
+          restaurantId
+        );
+
+    const notices =
+      [];
+
+    if (
+      summary.totalHonors >
+      0
+    ) {
+      notices.push({
+        id:
+          "honor_summary",
+
+        type:
+          "success",
+
+        title:
+          "荣誉档案",
+
+        message:
+          `已获得${summary.totalHonors}项正式荣誉，累计荣誉值${summary.prestigePoints}`,
+
+        priority:
+          60
+      });
+    }
+
+    const chrome =
+      buildFormalPageChrome(
+        restaurantId,
+        {
+          notices
+        }
+      );
+
     return {
       pageId:
         "honor-hall",
@@ -50,15 +93,19 @@ class HonorHallPageSystem {
       title:
         "荣誉馆",
 
+      restaurantId,
+
+      topBar:
+        chrome.topBar,
+
+      noticeTicker:
+        chrome.noticeTicker,
+
       period,
       division,
       subjectType,
 
-      summary:
-        honorArchiveSystem
-          .getSummary(
-            restaurantId
-          ),
+      summary,
 
       honors,
 
