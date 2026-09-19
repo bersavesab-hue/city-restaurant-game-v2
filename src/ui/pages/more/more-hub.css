@@ -1,0 +1,119 @@
+.more-hub {
+  min-height: 100%;
+  padding-bottom: calc(78px + env(safe-area-inset-bottom));
+  color: #174f7e;
+  background: linear-gradient(180deg,#d9f1ff,#f8fcff 280px,#eaf7ff);
+}
+
+.more-hub__summary {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 5px;
+  margin: 5px;
+}
+
+.more-hub__summary article {
+  min-width: 0;
+  padding: 8px 7px;
+  border: 1px solid #e2bf4e;
+  border-radius: 8px;
+  background: linear-gradient(135deg,#fff8d2,#fff);
+}
+
+.more-hub__summary span,
+.more-hub__summary strong {
+  display: block;
+}
+
+.more-hub__summary span {
+  color: #7a6941;
+  font-size: 8px;
+}
+
+.more-hub__summary strong {
+  margin-top: 3px;
+  color: #755400;
+  font-size: 12px;
+}
+
+.more-hub__group {
+  margin: 5px;
+  overflow: hidden;
+  border: 1px solid #9dd8f1;
+  border-radius: 8px;
+  background: linear-gradient(#fff,#f5fbfe);
+  box-shadow: 0 2px 6px rgba(0,70,135,.12);
+}
+
+.more-hub__group > h2 {
+  margin: 0;
+  padding: 7px 8px;
+  color: #fff;
+  background: linear-gradient(#0b7bc5,#06569d);
+  font-size: 10px;
+}
+
+.more-hub__grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 5px;
+  padding: 7px;
+}
+
+.more-hub__grid > button {
+  position: relative;
+  min-height: 76px;
+  padding: 8px;
+  border: 1px solid #d3e9f4;
+  border-radius: 7px;
+  color: #174f7e;
+  background: #f8fcff;
+  text-align: left;
+}
+
+.more-hub__grid > button[data-entry-state="locked"] {
+  opacity: .55;
+}
+
+.more-hub__grid strong,
+.more-hub__grid span,
+.more-hub__grid small {
+  display: block;
+}
+
+.more-hub__grid strong {
+  color: #145687;
+  font-size: 9px;
+}
+
+.more-hub__grid span {
+  margin-top: 4px;
+  color: #71869a;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.more-hub__grid small {
+  margin-top: 6px;
+  color: #805b00;
+  font-size: 8px;
+}
+
+.more-hub__grid b {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 18px;
+  padding: 2px 4px;
+  border-radius: 999px;
+  color: #fff;
+  background: #d94b4b;
+  font-size: 7px;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .more-hub__grid {
+    grid-template-columns: 1fr;
+  }
+}
