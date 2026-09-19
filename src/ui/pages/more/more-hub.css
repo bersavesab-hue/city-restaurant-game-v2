@@ -112,8 +112,3 @@
   text-align: center;
 }
 
-@media (max-width: 420px) {
-  .more-hub__grid {
-    grid-template-columns: 1fr;
-  }
-}
