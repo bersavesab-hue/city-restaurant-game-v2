@@ -33,6 +33,7 @@ import { employeeDynamicsSystem } from "./systems/EmployeeDynamicsSystem.js";
 import { staffingRecommendationSystem } from "./systems/StaffingRecommendationSystem.js";
 import { storeProgressSystem } from "./systems/StoreProgressSystem.js";
 import { chainSystem } from "./systems/ChainSystem.js";
+import { lateGameInvestmentSystem } from "./systems/LateGameInvestmentSystem.js";
 
 import { ingredientCatalogSystem } from "./systems/IngredientCatalogSystem.js";
 import { dishRecipeBootstrapSystem } from "./systems/DishRecipeBootstrapSystem.js";
@@ -54,6 +55,7 @@ import { restaurantDishSystem } from "./systems/RestaurantDishSystem.js";
 
 import { menuSystem } from "./systems/MenuSystem.js";
 import { customerSystem } from "./systems/CustomerSystem.js";
+import { customerIdentitySystem } from "./systems/CustomerIdentitySystem.js";
 import { customerSegmentSystem } from "./systems/CustomerSegmentSystem.js";
 import { customerChoiceSystem } from "./systems/CustomerChoiceSystem.js";
 import { customerExperienceSystem } from "./systems/CustomerExperienceSystem.js";
@@ -151,6 +153,7 @@ function bootstrap() {
       staffingRecommendationSystem,
       storeProgressSystem,
       chainSystem,
+      lateGameInvestmentSystem,
 
       ingredientCatalogSystem,
       dishRecipeBootstrapSystem,
@@ -173,6 +176,7 @@ function bootstrap() {
 
       menuSystem,
       customerSystem,
+      customerIdentitySystem,
       customerSegmentSystem,
       customerChoiceSystem,
       customerExperienceSystem,
