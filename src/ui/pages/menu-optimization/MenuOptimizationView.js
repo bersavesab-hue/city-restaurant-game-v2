@@ -1,3 +1,15 @@
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+
 function money(value) {
   return (
     "¥" +
@@ -22,11 +34,32 @@ function resultName(result) {
 class MenuOptimizationView {
   renderMarkup(page) {
     return `
-      <section class="menu-optimization">
-        <header>
-          <span>菜单决策</span>
-          <h1>菜单调整</h1>
-        </header>
+      <main class="rg-screen menu-optimization-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "菜单决策 · 促销 · 调整效果"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "菜单调整",
+
+          subtitle:
+            "菜单决策 · 促销 · 调整效果",
+
+          backTarget:
+            "operations"
+        })}
+
+        <section class="menu-optimization">
 
         <section>
           <article>
@@ -157,6 +190,19 @@ class MenuOptimizationView {
           }
         </section>
       </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "operations"
+            })
+        )}
+
+      </main>
     `;
   }
 }
