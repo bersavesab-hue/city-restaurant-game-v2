@@ -1,3 +1,15 @@
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+
 function money(value) {
   return (
     "¥" +
@@ -21,27 +33,45 @@ function percent(value) {
 class MemberMarketingView {
   renderMarkup(page) {
     return `
-      <section class="member-marketing">
-        <header>
-          <span>会员经营 · 生命周期 · ROI</span>
-          <h1>会员营销</h1>
-          <p>
-            积分有效期
-            ${page.pointPolicy.expiryDays}天
-            ·
-            1积分抵
-            ${money(
+      <main class="rg-screen member-marketing-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "会员经营 · 生命周期 · ROI"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "会员营销",
+
+          subtitle:
+            `积分有效期${page.pointPolicy.expiryDays}天 · 1积分抵${money(
               page.pointPolicy.pointValue
-            )}
-            ·
-            单笔最高积分抵扣
-            ${percent(
-              page.pointPolicy
-                .maxRedemptionRate *
-              100
-            )}
-          </p>
-        </header>
+            )}`,
+
+          backTarget:
+            "more-home",
+
+          rightHtml:
+            `
+              <button
+                type="button"
+                class="member-marketing__customer-link"
+                data-page-target="customers"
+              >
+                顾客管理
+              </button>
+            `
+        })}
+
+        <section class="member-marketing">
 
         <section class="marketing-kpis">
           <article>
@@ -314,7 +344,20 @@ class MemberMarketingView {
               : "<p>暂无营销活动</p>"
           }
         </section>
-      </section>
+        </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "more"
+            })
+        )}
+
+      </main>
     `;
   }
 }
