@@ -253,25 +253,6 @@
 }
 
 
-.construction-image-slot span {
-  font-size: 30px;
-}
-
-
-.construction-image-slot strong {
-  margin-top: 6px;
-
-  font-size: 12px;
-}
-
-
-.construction-image-slot small {
-  margin-top: 3px;
-
-  font-size: 9px;
-}
-
-
 .construction-hero > aside {
   display: flex;
   flex-direction: column;
