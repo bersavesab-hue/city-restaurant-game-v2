@@ -60,3 +60,22 @@ test(
     );
   }
 );
+
+test(
+  "门店一级页使用成稿校正后的大场景三指标和移动端点击尺寸",
+  () => {
+    const css = fs.readFileSync(
+      new URL("../src/ui/pages/command-center/command-center.css", import.meta.url),
+      "utf8"
+    );
+
+    for (const contract of [
+      "--cc-card-radius: 14px",
+      "min-height: clamp(230px, 43vw, 326px)",
+      "grid-template-columns: repeat(3, minmax(0, 1fr))",
+      "min-height: 44px"
+    ]) {
+      assert.equal(css.includes(contract), true, "门店成稿校正缺少：" + contract);
+    }
+  }
+);
