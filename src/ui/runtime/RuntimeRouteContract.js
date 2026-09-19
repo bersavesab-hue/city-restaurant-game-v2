@@ -37,7 +37,6 @@ const INTENTIONAL_PLACEHOLDER_PAGE_IDS =
   Object.freeze([
     "lease",
     "members",
-    "chain",
     "settings"
   ]);
 
