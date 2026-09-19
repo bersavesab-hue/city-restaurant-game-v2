@@ -55,6 +55,10 @@ import {
 } from "../src/ui/pages/chain/ChainManagementView.js";
 
 import {
+  cityPropertyPageSystem
+} from "../src/ui/pages/city/CityPropertyPageSystem.js";
+
+import {
   channelManagementPageSystem
 } from "../src/ui/pages/channels/ChannelManagementPageSystem.js";
 
@@ -455,6 +459,49 @@ test(
     assert.equal(
       branch.plannedRegionId,
       targetRegion.id
+    );
+
+    const marketplace =
+      cityPropertyPageSystem
+        .getMarketplace({
+          restaurantId:
+            branch.id,
+
+          generateListings:
+            false
+        });
+
+    assert.ok(
+      marketplace
+        .districts
+        .length >
+      0
+    );
+
+    assert.ok(
+      marketplace
+        .districts
+        .every(
+          item =>
+            chainSystem
+              .getRegionIdForDistrict(
+                item.id
+              ) ===
+            targetRegion.id
+        )
+    );
+
+    assert.ok(
+      marketplace
+        .properties
+        .every(
+          item =>
+            chainSystem
+              .getRegionIdForDistrict(
+                item.districtId
+              ) ===
+            targetRegion.id
+        )
     );
 
     const targetProperty =
