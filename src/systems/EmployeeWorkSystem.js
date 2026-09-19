@@ -86,16 +86,29 @@ class EmployeeWorkSystem {
   getServiceCapacity(restaurantId) {
     const servers = this.listAvailableByRole(restaurantId, "server");
 
-    let baseCapacity;
+    const baseCapacity =
+      servers.reduce(
+        (
+          capacity,
+          employee
+        ) => {
+          const skill =
+            this.getEffectiveSkill(
+              employee,
+              "service"
+            );
 
-    if (servers.length === 0) {
-      baseCapacity = 1;
-    } else {
-      baseCapacity = servers.reduce((capacity, employee) => {
-        const skill = this.getEffectiveSkill(employee, "service");
-        return capacity + 2 + Math.floor(skill / 25);
-      }, 0);
-    }
+          return (
+            capacity +
+            2 +
+            Math.floor(
+              skill /
+              25
+            )
+          );
+        },
+        0
+      );
 
     const renovation = renovationSystem.getOperationalModifiers(restaurantId);
     const renovationMultiplier = renovation.active
@@ -103,7 +116,7 @@ class EmployeeWorkSystem {
       : 1;
     const flow = layoutFlowSystem.getOperationalEffects(restaurantId);
     const serviceCapacity = Math.max(
-      1,
+      0,
       Math.floor(
         baseCapacity * renovationMultiplier * flow.serviceMultiplier
       )
@@ -114,7 +127,7 @@ class EmployeeWorkSystem {
     }
 
     return Math.max(
-      1,
+      0,
       Math.min(serviceCapacity, flow.kitchenCapacityPerHour)
     );
   }
