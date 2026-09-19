@@ -52,9 +52,6 @@ import {
   propertySystem
 } from "../../systems/PropertySystem.js";
 
-import {
-  employeeSystem
-} from "../../systems/EmployeeSystem.js";
 
 
 import {
@@ -258,37 +255,6 @@ function ensureRestaurant() {
       restaurant.id,
       120000
     );
-  }
-
-  if (
-    employeeSystem
-      .listByRestaurant(
-        restaurant.id
-      )
-      .length ===
-    0
-  ) {
-    employeeSystem.hire({
-      restaurantId:
-        restaurant.id,
-
-      name:
-        "周师傅",
-
-      roleId:
-        "chef"
-    });
-
-    employeeSystem.hire({
-      restaurantId:
-        restaurant.id,
-
-      name:
-        "林小雨",
-
-      roleId:
-        "server"
-    });
   }
 
   return restaurant.id;
@@ -516,20 +482,20 @@ function errorPage(
       "
     >
       <h2>
-        测试包运行错误
+        页面加载失败
       </h2>
 
-      <pre
+      <p
         style="
-          white-space:pre-wrap;
           padding:12px;
           border-radius:8px;
           background:#fff;
+          line-height:1.6;
         "
-      >${String(
-        error?.stack ??
-        error
-      )}</pre>
+      >
+        已在本机记录诊断信息。可以返回门店继续游戏，
+        或前往“更多 → 测试反馈”生成报告。
+      </p>
 
       <button
         id="return-city"
@@ -538,7 +504,7 @@ function errorPage(
           margin-right:8px;
         "
       >
-        返回城市
+        返回门店
       </button>
 
       <button
@@ -560,7 +526,7 @@ function errorPage(
       "click",
       () =>
         navigate(
-          "city"
+          "restaurant"
         )
     );
 
@@ -580,76 +546,6 @@ function errorPage(
     );
 }
 
-
-function placeholderPage(
-  title,
-  description
-) {
-  const navigation =
-    gameChromeSystem
-      .getNavigation({
-        restaurantId,
-        activePageId:
-          "more"
-      });
-
-  root.innerHTML = `
-    <main
-      class="rg-screen"
-      style="
-        padding-top:20px;
-      "
-    >
-      <section
-        style="
-          margin:8px;
-          padding:18px;
-          border:1px solid #62c9f6;
-          border-radius:9px;
-          background:white;
-        "
-      >
-        <h2
-          style="
-            margin:0;
-            color:#115486;
-          "
-        >
-          ${title}
-        </h2>
-
-        <p
-          style="
-            color:#71869a;
-          "
-        >
-          ${description}
-        </p>
-      </section>
-
-      ${renderBottomNavigation(
-        navigation
-      )}
-    </main>
-  `;
-
-  root
-    .querySelectorAll(
-      "[data-page-target]"
-    )
-    .forEach(
-      button => {
-        button.addEventListener(
-          "click",
-          () =>
-            navigate(
-              button.dataset
-                .pageTarget
-            )
-        );
-      }
-    );
-}
 
 
 function navigate(
@@ -976,10 +872,18 @@ function navigate(
     }
 
 
-    placeholderPage(
-      "页面尚未接入",
-      `当前测试APK暂未接入：${pageId}`
-    );
+    const routeError =
+      new Error(
+        `Unknown page "${pageId}"`
+      );
+
+    feedbackSystem
+      .captureRuntimeError(
+        routeError,
+        "navigation"
+      );
+
+    throw routeError;
   } catch (
     error
   ) {
@@ -1078,9 +982,13 @@ document.addEventListener(
 );
 
 
+const AUTO_SAVE_INTERVAL_MS =
+  30000;
+
+
 setInterval(
   saveNow,
-  5000
+  AUTO_SAVE_INTERVAL_MS
 );
 
 
