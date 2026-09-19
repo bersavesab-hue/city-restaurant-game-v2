@@ -451,6 +451,11 @@ function channelName(
 function renderStorePortfolio(portfolio) {
   if (!portfolio) return "";
   const groupMode = portfolio.scope?.type === "group" && portfolio.canSwitch;
+
+  if (!groupMode) {
+    return "";
+  }
+
   return `
     <section class="command-center__portfolio ${groupMode ? "is-group" : "is-store"}">
       <header>
@@ -515,7 +520,17 @@ class OperatingCommandCenterView {
         : "";
 
 
-    const isGroupScope = page.storePortfolio?.scope?.type === "group" && page.storePortfolio?.canSwitch;
+    const isGroupScope =
+      page.storePortfolio?.scope?.type === "group" &&
+      page.storePortfolio?.canSwitch;
+
+    const activeStore =
+      page.storePortfolio?.cards?.find(
+        store => store.active
+      ) ??
+      page.storePortfolio?.cards?.[0] ??
+      null;
+
     const pageTitleHtml =
       renderPageTitle({
         title:
@@ -546,7 +561,7 @@ class OperatingCommandCenterView {
         ${noticeHtml}
         ${pageTitleHtml}
 
-        <section class="command-center">
+        <section class="command-center ${isGroupScope ? "is-group-scope" : "is-store-scope"}">
 
         ${renderStorePortfolio(page.storePortfolio)}
 
@@ -561,7 +576,10 @@ class OperatingCommandCenterView {
           ></div>
 
           <div class="command-center__identity">
-            <span>第${page.day}天 · 今日经营</span>
+            <span class="command-center__identity-meta">
+              ${activeStore ? `<b data-status="${escapeHtml(activeStore.status)}">${escapeHtml(activeStore.statusLabel)}</b>` : ""}
+              第${page.day}天 · 今日经营
+            </span>
 
             <h1>
               ${escapeHtml(page.restaurant.name)}
