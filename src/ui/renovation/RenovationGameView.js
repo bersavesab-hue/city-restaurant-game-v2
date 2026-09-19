@@ -1,6 +1,6 @@
 import {
-  RenovationFloorplanMobileView
-} from "./RenovationFloorplanMobileView.js";
+  RenovationFloorplanBaseView
+} from "./RenovationFloorplanBaseView.js";
 
 import {
   restaurantSystem
@@ -43,7 +43,7 @@ function money(value) {
 
 
 class RenovationGameView
-  extends RenovationFloorplanMobileView {
+  extends RenovationFloorplanBaseView {
 
   handleClick(
     event

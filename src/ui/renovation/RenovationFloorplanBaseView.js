@@ -1,6 +1,6 @@
 import {
-  RenovationMobileView as BaseRenovationMobileView
-} from "./RenovationMobileView.js";
+  RenovationEditorBaseView
+} from "./RenovationEditorBaseView.js";
 import {
   buildFloorplanVisualModel
 } from "./RenovationFloorplanVisualModel.js";
@@ -193,7 +193,7 @@ function renderFloorplanLayer(workspace, viewport = null) {
   `;
 }
 
-class RenovationFloorplanMobileView extends BaseRenovationMobileView {
+class RenovationFloorplanBaseView extends RenovationEditorBaseView {
   renderStructureMarkers() {
     return renderFloorplanLayer(
       this.page?.workspace,
@@ -202,12 +202,7 @@ class RenovationFloorplanMobileView extends BaseRenovationMobileView {
   }
 }
 
-function mountRenovationFloorplanMobilePage(options) {
-  return new RenovationFloorplanMobileView(options).mount();
-}
-
 export {
-  RenovationFloorplanMobileView,
-  mountRenovationFloorplanMobilePage,
+  RenovationFloorplanBaseView,
   renderFloorplanLayer
 };

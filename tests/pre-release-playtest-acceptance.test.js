@@ -183,9 +183,7 @@ test(
     }
 
     const aliases =
-      new Set([
-        "members"
-      ]);
+      new Set();
 
     const uiRoots = [
       path.join(

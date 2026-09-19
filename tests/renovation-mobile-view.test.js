@@ -5,7 +5,7 @@ import { app } from "../src/main.js";
 import {
   gridPointFromClient,
   placementStyle
-} from "../src/ui/renovation/RenovationMobileView.js";
+} from "../src/ui/renovation/RenovationEditorBaseView.js";
 
 const {
   districtSystem,

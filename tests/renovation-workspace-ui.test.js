@@ -8,7 +8,7 @@ import {
 } from "../src/ui/renovation/RenovationWorkspaceModel.js";
 import {
   gridPointFromClient
-} from "../src/ui/renovation/RenovationMobileView.js";
+} from "../src/ui/renovation/RenovationEditorBaseView.js";
 
 const {
   districtSystem,

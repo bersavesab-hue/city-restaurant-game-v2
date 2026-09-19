@@ -41,7 +41,8 @@ const LEGACY_PAGE_IDS =
   Object.freeze([
     "restaurant_home",
     "employee-home",
-    "employees-home"
+    "employees-home",
+    "members"
   ]);
 
 

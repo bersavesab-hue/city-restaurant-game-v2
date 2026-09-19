@@ -1,4 +1,19 @@
-import { cityPropertyPageSystem } from "./CityPropertyPageSystem.js";
+import {
+  cityPropertyPageSystem
+} from "./CityPropertyPageSystem.js";
+
+import {
+  restaurantSystem
+} from "../../../systems/RestaurantSystem.js";
+
+import {
+  gameState
+} from "../../../core/GameState.js";
+
+import {
+  buildGlobalTopBarModel,
+  buildNoticeTickerModel
+} from "../../components/GlobalChromeModel.js";
 
 import {
   renderGameTopBar,
@@ -7,35 +22,86 @@ import {
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
-import {
-  gameChromeSystem
-} from "../../components/GameChromeSystem.js";
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 
 function money(value) {
-  return `¥${Math.round(value ?? 0).toLocaleString("zh-CN")}`;
+  return (
+    "¥" +
+    Math.round(
+      Number(value) || 0
+    ).toLocaleString("zh-CN")
+  );
 }
 
-function el(tag, className, text = null) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== null) node.textContent = text;
-  return node;
+
+function scoreTone(value) {
+  const n = Number(value) || 0;
+
+  if (n >= 80) {
+    return "excellent";
+  }
+
+  if (n >= 60) {
+    return "good";
+  }
+
+  if (n >= 40) {
+    return "normal";
+  }
+
+  return "weak";
 }
 
-export class CityPropertyView {
+
+function getPropertyImage(
+  property,
+  index = 0
+) {
+  return (
+    property.image ??
+    property.coverImage ??
+    `assets/images/ui/properties/property-${index % 6 + 1}.webp`
+  );
+}
+
+
+class CityPropertyView {
   constructor({
-    pageSystem = cityPropertyPageSystem,
+    pageSystem =
+      cityPropertyPageSystem,
+
     onNavigate = null
   } = {}) {
-    this.pageSystem = pageSystem;
-    this.onNavigate = onNavigate;
+    this.pageSystem =
+      pageSystem;
+
+    this.onNavigate =
+      onNavigate;
+
     this.root = null;
-    this.restaurantId = null;
-    this.selectedPropertyId = null;
+
+    this.restaurantId =
+      null;
+
+    this.selectedPropertyId =
+      null;
+
     this.months = 12;
+
     this.offerId = null;
-    this.currentFilters = {};
+
+    this.filters = {};
   }
+
 
   mount(
     root,
@@ -51,553 +117,972 @@ export class CityPropertyView {
     }
 
     this.root = root;
+
     this.restaurantId =
       restaurantId;
 
-    this.renderMarketplace(
-      filters
-    );
+    this.filters = {
+      ...filters
+    };
+
+    this.renderMarketplace();
 
     return this;
   }
 
-  appendFormalHeader(
-    model
-  ) {
-    const wrapper =
-      document.createElement(
-        "div"
-      );
 
-    wrapper.innerHTML = `
-      ${renderGameTopBar(
-        model.topBar,
-        {
-          subtitle:
-            "城市选址中心"
-        }
-      )}
+  buildTopBar(balance) {
+    if (!this.restaurantId) {
+      return {
+        restaurantName:
+          "城市房产中心",
 
-      ${renderNoticeTicker(
-        model.noticeTicker
-      )}
+        balance:
+          balance ?? 0,
 
-      ${renderPageTitle({
-        title:
-          "城市与房源",
+        storeLevel: 1,
 
-        subtitle:
-          `${model.properties.length}套可租房源 · ${model.districts.length}个商圈`,
+        reputation: 0,
 
-        backTarget:
-          "city"
-      })}
-    `;
+        clock: {
+          dateText: "",
+          clockText: ""
+        },
 
-    const nodes =
-      [
-        ...wrapper.children
-      ];
-
-    for (
-      const node
-      of nodes
-    ) {
-      this.root.append(
-        node
-      );
+        weather: null
+      };
     }
 
+    const restaurant =
+      restaurantSystem.get(
+        this.restaurantId
+      );
+
+    return buildGlobalTopBarModel({
+      restaurantName:
+        restaurant.name,
+
+      balance:
+        balance ?? 0,
+
+      storeLevel:
+        restaurant.level,
+
+      reputation:
+        restaurant.reputation,
+
+      time:
+        gameState.getSection(
+          "time"
+        ),
+
+      runtime:
+        gameState.getSection(
+          "runtime"
+        ),
+
+      currentStoreId:
+        this.restaurantId
+    });
+  }
+
+
+  getBottomNavigation() {
+    return [
+      {
+        label: "城市",
+        target: "city",
+        icon: "city",
+        active: true
+      },
+      {
+        label: "门店",
+        target: "restaurant",
+        icon: "store"
+      },
+      {
+        label: "经营",
+        target: "operations",
+        icon: "operations"
+      },
+      {
+        label: "员工",
+        target: "employees",
+        icon: "employees"
+      },
+      {
+        label: "更多",
+        target: "more",
+        icon: "more"
+      }
+    ];
+  }
+
+
+  buildNotices(model) {
+    const notices = [];
+
+    const urgent =
+      model.properties
+        .filter(
+          item =>
+            item.competition
+              ?.daysUntilPossibleClaim !==
+              null &&
+            item.competition
+              ?.daysUntilPossibleClaim <=
+              3
+        )
+        .length;
+
+    if (urgent > 0) {
+      notices.push({
+        id:
+          "property_competition",
+
+        type:
+          "warning",
+
+        title:
+          "房源快讯",
+
+        message:
+          `${urgent}套优质房源近期可能被其他经营者抢租`,
+
+        priority:
+          100
+      });
+    }
+
+    if (
+      model.balance !== null
+    ) {
+      const affordable =
+        model.properties
+          .filter(
+            item =>
+              item.quote
+                ?.affordable !==
+                false
+          )
+          .length;
+
+      notices.push({
+        id:
+          "property_affordable",
+
+        type:
+          "info",
+
+        title:
+          "选址建议",
+
+        message:
+          `当前资金可覆盖${affordable}套房源的签约首付`,
+
+        priority:
+          50
+      });
+    }
+
+    return buildNoticeTickerModel(
+      notices
+    );
+  }
+
+
+  renderDistrictTabs(model) {
+    return `
+      <section class="property-district-panel">
+
+        <header>
+          <div>
+            <strong>
+              热门商圈
+            </strong>
+
+            <span>
+              不同商圈拥有不同客群与经营压力
+            </span>
+          </div>
+
+          <button
+            type="button"
+            data-filter-action="clear"
+          >
+            全城房源
+          </button>
+        </header>
+
+
+        <div class="property-district-strip">
+
+          ${
+            model.districts
+              .map(
+                district => `
+                  <button
+                    type="button"
+                    class="
+                      property-district-card
+                      ${
+                        model.filters
+                          .districtId ===
+                        district.id
+                          ? "is-active"
+                          : ""
+                      }
+                    "
+                    data-district-id="${escapeHtml(
+                      district.id
+                    )}"
+                  >
+
+                    <strong>
+                      ${escapeHtml(
+                        district.name
+                      )}
+                    </strong>
+
+                    <div>
+                      <span>
+                        客流
+                        <b>
+                          ${district.trafficIndex}
+                        </b>
+                      </span>
+
+                      <span>
+                        消费
+                        <b>
+                          ${district.spendingPower}
+                        </b>
+                      </span>
+
+                      <span>
+                        竞争
+                        <b>
+                          ${district.competition}
+                        </b>
+                      </span>
+                    </div>
+
+                    <small>
+                      ${district.propertyCount}
+                      套可租
+                    </small>
+
+                  </button>
+                `
+              )
+              .join("")
+          }
+
+        </div>
+
+      </section>
+    `;
+  }
+
+
+  renderFilterBar(model) {
+    return `
+      <section class="property-filter-bar">
+
+        <div class="property-filter-group">
+
+          <span>
+            面积
+          </span>
+
+          <button
+            type="button"
+            data-area-filter="small"
+            class="${
+              this.filters.maxArea ===
+              150
+                ? "is-active"
+                : ""
+            }"
+          >
+            30–150㎡
+          </button>
+
+          <button
+            type="button"
+            data-area-filter="medium"
+            class="${
+              this.filters.minArea ===
+                151 &&
+              this.filters.maxArea ===
+                500
+                ? "is-active"
+                : ""
+            }"
+          >
+            151–500㎡
+          </button>
+
+          <button
+            type="button"
+            data-area-filter="large"
+            class="${
+              this.filters.minArea ===
+              501
+                ? "is-active"
+                : ""
+            }"
+          >
+            500㎡以上
+          </button>
+
+        </div>
+
+
+        <div class="property-filter-group">
+
+          <span>
+            条件
+          </span>
+
+          <button
+            type="button"
+            data-toggle-filter="foodServiceOnly"
+            class="${
+              this.filters
+                .foodServiceOnly
+                ? "is-active"
+                : ""
+            }"
+          >
+            可做餐饮
+          </button>
+
+          <button
+            type="button"
+            data-toggle-filter="exhaustRequired"
+            class="${
+              this.filters
+                .exhaustRequired
+                ? "is-active"
+                : ""
+            }"
+          >
+            可排烟
+          </button>
+
+        </div>
+
+
+        <div class="property-market-count">
+
+          <strong>
+            ${model.properties.length}
+          </strong>
+
+          <span>
+            套房源
+          </span>
+
+        </div>
+
+      </section>
+    `;
+  }
+
+
+  renderPropertyCard(
+    property,
+    index
+  ) {
+    const urgent =
+      property.competition
+        ?.daysUntilPossibleClaim !==
+        null &&
+      property.competition
+        ?.daysUntilPossibleClaim <=
+        3;
+
+    const district =
+      property.district ?? {};
+
+    return `
+      <article
+        class="property-game-card"
+        data-property-id="${escapeHtml(
+          property.id
+        )}"
+      >
+
+        <div
+          class="property-game-card__image"
+          style="
+            --property-image:
+              url('${getPropertyImage(
+                property,
+                index
+              )}');
+          "
+        >
+
+          <div class="property-card-badges">
+
+            ${
+              property.source ===
+              "market"
+                ? `
+                  <span class="is-blue">
+                    动态房源
+                  </span>
+                `
+                : ""
+            }
+
+            ${
+              property.qualityScore !==
+              null
+                ? `
+                  <span class="is-gold">
+                    ★
+                    房源评分
+                    ${property.qualityScore}
+                  </span>
+                `
+                : ""
+            }
+
+            ${
+              urgent
+                ? `
+                  <span class="is-danger">
+                    抢租风险
+                  </span>
+                `
+                : ""
+            }
+
+          </div>
+
+
+          <div class="property-image-footer">
+
+            ${
+              property.listing
+                ?.remainingDays !==
+                null
+                ? `
+                  <span>
+                    ⏱
+                    ${property.listing.remainingDays}
+                    天后下架
+                  </span>
+                `
+                : ""
+            }
+
+          </div>
+
+        </div>
+
+
+        <div class="property-game-card__body">
+
+          <header>
+
+            <div>
+              <strong>
+                ${escapeHtml(
+                  property.name
+                )}
+              </strong>
+
+              <span>
+                📍
+                ${escapeHtml(
+                  property.districtName
+                )}
+              </span>
+            </div>
+
+            <div class="property-rent">
+
+              <strong>
+                ${money(
+                  property.monthlyRent
+                )}
+              </strong>
+
+              <span>
+                /月
+              </span>
+
+            </div>
+
+          </header>
+
+
+          <section class="property-core-metrics">
+
+            <article>
+              <strong>
+                ${property.area}㎡
+              </strong>
+              <span>
+                建筑面积
+              </span>
+            </article>
+
+            <article>
+              <strong>
+                ${property.usableArea}㎡
+              </strong>
+              <span>
+                可用面积
+              </span>
+            </article>
+
+            <article>
+              <strong>
+                ${property.floorCount}层
+              </strong>
+              <span>
+                楼层
+              </span>
+            </article>
+
+            <article>
+              <strong>
+                ${
+                  property.frontageMeters ??
+                  "-"
+                }m
+              </strong>
+              <span>
+                门面
+              </span>
+            </article>
+
+          </section>
+
+
+          <section class="property-district-metrics">
+
+            <article
+              class="${scoreTone(
+                district.trafficIndex
+              )}"
+            >
+              <span>
+                客流
+              </span>
+
+              <strong>
+                ${
+                  district.trafficIndex ??
+                  "-"
+                }
+              </strong>
+            </article>
+
+            <article
+              class="${scoreTone(
+                district.spendingPower
+              )}"
+            >
+              <span>
+                消费力
+              </span>
+
+              <strong>
+                ${
+                  district.spendingPower ??
+                  "-"
+                }
+              </strong>
+            </article>
+
+            <article
+              class="${scoreTone(
+                district.competition
+              )}"
+            >
+              <span>
+                竞争
+              </span>
+
+              <strong>
+                ${
+                  district.competition ??
+                  "-"
+                }
+              </strong>
+            </article>
+
+          </section>
+
+
+          <div class="property-feature-tags">
+
+            <span
+              class="${
+                property
+                  .foodServiceAllowed
+                  ? "is-good"
+                  : "is-bad"
+              }"
+            >
+              ${
+                property
+                  .foodServiceAllowed
+                  ? "✓ 可做餐饮"
+                  : "× 餐饮受限"
+              }
+            </span>
+
+            <span
+              class="${
+                property
+                  .exhaustAllowed
+                  ? "is-good"
+                  : "is-bad"
+              }"
+            >
+              ${
+                property
+                  .exhaustAllowed
+                  ? "✓ 可排烟"
+                  : "× 不可排烟"
+              }
+            </span>
+
+            ${
+              property
+                .leaseTerms
+                ?.negotiable
+                ? `
+                  <span class="is-gold">
+                    可议价
+                  </span>
+                `
+                : ""
+            }
+
+            ${
+              property.parkingSpaces >
+              0
+                ? `
+                  <span>
+                    ${property.parkingSpaces}
+                    车位
+                  </span>
+                `
+                : ""
+            }
+
+          </div>
+
+
+          <footer>
+
+            <div>
+              <span>
+                签约首付
+              </span>
+
+              <strong>
+                ${money(
+                  property.quote
+                    ?.upfront
+                )}
+              </strong>
+            </div>
+
+            ${
+              property.competition
+                ?.daysUntilPossibleClaim !==
+                null
+                ? `
+                  <small>
+                    ${
+                      property
+                        .competition
+                        .daysUntilPossibleClaim
+                    }
+                    天内可能被抢租
+                  </small>
+                `
+                : ""
+            }
+
+            <button
+              type="button"
+              data-property-open="${escapeHtml(
+                property.id
+              )}"
+            >
+              查看详情
+            </button>
+
+          </footer>
+
+        </div>
+
+      </article>
+    `;
+  }
+
+
+  renderMarketplace(
+    filters = {}
+  ) {
+    this.offerId = null;
+
+    this.filters = {
+      ...this.filters,
+      ...filters
+    };
+
+    const model =
+      this.pageSystem
+        .getMarketplace({
+          restaurantId:
+            this.restaurantId,
+
+          ...this.filters
+        });
+
+    const topBar =
+      this.buildTopBar(
+        model.balance
+      );
+
+    const noticeTicker =
+      this.buildNotices(
+        model
+      );
+
+    this.root.innerHTML = `
+      <main class="rg-screen property-game-page">
+
+        ${renderGameTopBar(
+          topBar,
+          {
+            subtitle:
+              "城市选址 · 房源市场"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "城市与房源",
+
+          backTarget:
+            "restaurant",
+
+          helpLabel:
+            "选址指南"
+        })}
+
+
+        ${this.renderDistrictTabs(
+          model
+        )}
+
+        ${this.renderFilterBar(
+          model
+        )}
+
+
+        <section class="property-market-summary">
+
+          <div>
+            <strong>
+              动态房源市场
+            </strong>
+
+            <span>
+              每7天滚动更新 · NPC经营者也会参与抢租
+            </span>
+          </div>
+
+          <div>
+            <span>
+              30–10000㎡
+            </span>
+
+            <span>
+              真实户型
+            </span>
+
+            <span>
+              可议价
+            </span>
+          </div>
+
+        </section>
+
+
+        <section class="property-game-list">
+
+          ${
+            model.properties.length
+              ? model.properties
+                  .map(
+                    (
+                      property,
+                      index
+                    ) =>
+                      this.renderPropertyCard(
+                        property,
+                        index
+                      )
+                  )
+                  .join("")
+              : `
+                <div class="property-game-empty">
+                  <strong>
+                    当前没有符合条件的房源
+                  </strong>
+
+                  <span>
+                    调整面积或商圈筛选条件
+                  </span>
+                </div>
+              `
+          }
+
+        </section>
+
+
+        ${renderBottomNavigation(
+          this.getBottomNavigation()
+        )}
+
+      </main>
+    `;
+
+    this.bindMarketplace();
+
+    return model;
+  }
+
+
+  bindMarketplace() {
     this.root
       .querySelectorAll(
-        ".rg-page-title [data-page-target], .rg-notice-ticker [data-page-target]"
+        "[data-district-id]"
       )
       .forEach(
         button => {
           button.addEventListener(
             "click",
             () => {
-              const target =
+              this.renderMarketplace({
+                districtId:
+                  button.dataset
+                    .districtId
+              });
+            }
+          );
+        }
+      );
+
+    this.root
+      .querySelector(
+        '[data-filter-action="clear"]'
+      )
+      ?.addEventListener(
+        "click",
+        () => {
+          this.filters = {};
+          this.renderMarketplace();
+        }
+      );
+
+    this.root
+      .querySelectorAll(
+        "[data-area-filter]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              const id =
                 button.dataset
-                  .pageTarget;
+                  .areaFilter;
 
               if (
-                target
+                id === "small"
               ) {
-                this.onNavigate?.(
-                  target,
-                  this.restaurantId
-                );
+                this.renderMarketplace({
+                  minArea: 30,
+                  maxArea: 150
+                });
+              } else if (
+                id === "medium"
+              ) {
+                this.renderMarketplace({
+                  minArea: 151,
+                  maxArea: 500
+                });
+              } else {
+                this.renderMarketplace({
+                  minArea: 501,
+                  maxArea: null
+                });
               }
             }
           );
         }
       );
-  }
 
+    this.root
+      .querySelectorAll(
+        "[data-toggle-filter]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              const key =
+                button.dataset
+                  .toggleFilter;
 
-  renderMarketplace(filters = {}) {
-    this.offerId = null;
-    this.currentFilters = {
-      ...filters
-    };
-
-    const model = this.pageSystem.getMarketplace({
-      restaurantId: this.restaurantId,
-      ...filters
-    });
-
-    this.root.innerHTML = "";
-    this.root.className =
-      "rg-screen cr-city-property-page";
-
-    this.appendFormalHeader(
-      model
-    );
-
-    const districtRow = el("div", "cr-city-district-row");
-    for (const district of model.districts) {
-      const button = el("button", "cr-city-district-chip");
-      button.type = "button";
-      button.innerHTML = `
-        <strong>${district.name}</strong>
-        <span>
-          机会 ${district.opportunityScore}
-          · 客流 ${district.trafficIndex}
-          · 消费 ${district.spendingPower}
-          · 竞争 ${district.competition}
-          · 交通 ${district.transitAccess}
-          · 停车 ${district.parkingConvenience}
-          · 外卖 ${district.deliveryDemand}
-          · ${district.propertyCount}套
-        </span>
-      `;
-      button.addEventListener("click", () => {
-        this.renderMarketplace({ districtId: district.id });
-      });
-      districtRow.append(button);
-    }
-
-    const marketInfo = el("div", "cr-property-market-info");
-    const summaries = model.market?.districts ?? [];
-    const available = summaries.reduce(
-      (sum, item) => sum + (item.availableGenerated ?? 0),
-      0
-    );
-    marketInfo.innerHTML = `
-      <div>
-        <strong>动态房源市场</strong>
-        <span>${available}套动态房源 · 每7天滚动更新</span>
-      </div>
-      <div class="cr-property-market-tags">
-        <span>22种房源模板</span>
-        <span>18–8000㎡动态结构</span>
-        <span>真实户型</span>
-        <span>可议价房源</span>
-        <span>NPC会抢租</span>
-      </div>
-    `;
-
-    const list =
-      el(
-        "section",
-        "cr-property-list"
-      );
-
-    const visibleProperties =
-      filters.districtId
-        ? model.properties
-        : model.properties.slice(
-            0,
-            30
+              this.renderMarketplace({
+                [key]:
+                  !this.filters[
+                    key
+                  ]
+              });
+            }
           );
-
-    if (
-      model.properties.length ===
-      0
-    ) {
-      list.append(
-        el(
-          "div",
-          "cr-property-empty",
-          "当前筛选条件下没有可租房源"
-        )
-      );
-    }
-
-    if (
-      !filters.districtId &&
-      model.properties.length >
-        visibleProperties.length
-    ) {
-      const notice =
-        el(
-          "div",
-          "cr-property-list-notice",
-          `当前显示推荐前${visibleProperties.length}套，共${model.properties.length}套；选择上方商圈可查看该商圈全部房源。`
-        );
-
-      list.append(
-        notice
-      );
-    }
-
-    for (
-      const property
-      of visibleProperties
-    ) {
-      const card = el("button", "cr-property-card");
-      card.type = "button";
-      const marketBadges = property.source === "market"
-        ? `
-          <div class="cr-property-card__badges">
-            <span>动态房源</span>
-            ${property.qualityScore !== null ? `<span>房源评分 ${property.qualityScore}</span>` : ""}
-            <span>推荐 ${property.recommendation?.score ?? "-"}</span>
-            ${property.template?.name ? `<span>${property.template.name}</span>` : ""}
-            ${property.listing.remainingDays !== null ? `<span>${property.listing.remainingDays}天后下架</span>` : ""}
-            ${property.competition?.daysUntilPossibleClaim !== null ? `<span>${property.competition.daysUntilPossibleClaim}天内可能被抢租</span>` : ""}
-          </div>
-        `
-        : "";
-      card.innerHTML = `
-        <div
-          class="cr-property-card__scene"
-          role="img"
-          aria-label="${property.name}"
-          data-image-slot="property-${property.id}"
-          data-image-fit="cover"
-        ></div>
-        <div class="cr-property-card__body">
-          ${marketBadges}
-          <div class="cr-property-card__name">${property.name}</div>
-          <div class="cr-property-card__district">${property.districtName} · 房东 ${property.landlord?.name ?? "业主"}</div>
-          <div class="cr-property-card__metrics">
-            <span>建筑 ${property.area}㎡</span>
-            <span>可用 ${property.usableArea}㎡</span>
-            <span>${property.floorCount}层</span>
-            <span>${money(property.monthlyRent)}/月</span>
-          </div>
-          <div class="cr-property-card__features">
-            <span class="${property.foodServiceAllowed ? "is-good" : "is-bad"}">${property.foodServiceAllowed ? "可做餐饮" : "限制餐饮"}</span>
-            <span class="${property.exhaustAllowed ? "is-good" : "is-bad"}">${property.exhaustAllowed ? "可排烟" : "不可排烟"}</span>
-            ${property.leaseTerms?.negotiable ? `<span class="is-good">可议价</span>` : ""}
-            ${property.parkingSpaces > 0 ? `<span>${property.parkingSpaces}车位</span>` : ""}
-          </div>
-          ${property.propertyFeatures
-            ? `<div class="cr-property-card__structure">
-                采光 ${property.propertyFeatures.naturalLightScore}
-                · 入口 ${property.propertyFeatures.entranceCount}
-                · 厨房 ${property.propertyFeatures.kitchenReadinessScore}
-              </div>`
-            : ""
-          }
-          ${property.recommendedVenueTypes?.length
-            ? `<div class="cr-property-card__venue-types">
-                推荐业态：
-                ${property.recommendedVenueTypes
-                  .map(item => `${item.name} ${item.score}`)
-                  .join(" · ")}
-              </div>`
-            : ""
-          }
-          <div class="cr-property-card__footer">
-            <span>签约首付 ${money(property.quote.upfront)}</span>
-            <strong>${property.quote.affordable === false ? "资金不足" : "查看房源"}</strong>
-          </div>
-        </div>`;
-      card.addEventListener("click", () => this.renderDetail(property.id));
-      list.append(card);
-    }
-
-    this.root.append(
-      districtRow,
-      marketInfo,
-      list
-    );
-
-    this.appendBottomNavigation(
-      "properties"
-    );
-
-    return model;
-  }
-
-  renderDetail(propertyId, offerId = null) {
-    this.selectedPropertyId = propertyId;
-    const model = this.pageSystem.getPropertyDetail(
-      propertyId,
-      this.restaurantId,
-      this.months,
-      offerId
-    );
-    this.months = model.quote.months;
-    this.offerId =
-      model.activeOffer?.status === "accepted"
-        ? model.activeOffer.id
-        : offerId;
-
-    const {
-      property,
-      district,
-      quote,
-      leaseState,
-      landlord,
-      leaseTerms,
-      activeOffer
-    } = model;
-    this.root.innerHTML = "";
-
-    const back = el("button", "cr-property-back", "← 返回房源列表");
-    back.type = "button";
-    back.addEventListener(
-      "click",
-      () =>
-        this.renderMarketplace(
-          this.currentFilters
-        )
-    );
-
-    const shell = el("section", "cr-property-detail");
-    shell.innerHTML = `
-      <div class="cr-property-detail__visual" aria-hidden="true"></div>
-      <div class="cr-property-detail__content">
-        <div class="cr-property-detail__eyebrow">${property.districtName}${property.source === "market" ? " · 动态房源" : ""}</div>
-        <h2>${property.name}</h2>
-        <div class="cr-property-detail__landlord">
-          <strong>房东 ${landlord?.name ?? "业主"}</strong>
-          <span>${leaseTerms.negotiable ? "可议价" : "固定条件"}</span>
-        </div>
-        <div class="cr-property-detail__specs">
-          <div><strong>${property.area}㎡</strong><span>建筑面积</span></div>
-          <div><strong>${property.usableArea}㎡</strong><span>可用面积</span></div>
-          <div><strong>${property.floorCount}层</strong><span>楼层</span></div>
-          <div><strong>${money(property.monthlyRent)}</strong><span>挂牌月租</span></div>
-        </div>
-        <div class="cr-property-detail__district">
-          <span>推荐 ${property.recommendation?.score ?? "-"}</span>
-          <span>商圈机会 ${property.recommendation?.districtOpportunityScore ?? "-"}</span>
-          ${property.template?.name ? `<span>房源模板 ${property.template.name}</span>` : ""}
-          ${property.propertyFeatures
-            ? `<span>采光 ${property.propertyFeatures.naturalLightScore}</span>
-               <span>入口 ${property.propertyFeatures.entranceCount}</span>
-               <span>柱网 ${property.propertyFeatures.columnDensityPer1000}/千㎡</span>
-               <span>厨房准备度 ${property.propertyFeatures.kitchenReadinessScore}</span>`
-            : ""
-          }
-          <span>当前业态 ${property.venueTypeName ?? "未设定"}</span>
-          ${property.recommendedVenueTypes?.length
-            ? `<span>推荐业态 ${property.recommendedVenueTypes
-                .map(item => item.name)
-                .join(" / ")}</span>`
-            : ""
-          }
-          <span>客流 ${district?.trafficIndex ?? "-"}</span>
-          <span>消费力 ${district?.spendingPower ?? "-"}</span>
-          <span>竞争 ${district?.competition ?? "-"}</span>
-          <span>交通 ${district?.transitAccess ?? "-"}</span>
-          <span>停车 ${district?.parkingConvenience ?? "-"}</span>
-          <span>外卖需求 ${district?.deliveryDemand ?? "-"}</span>
-          ${property.frontageMeters !== null ? `<span>门面 ${property.frontageMeters}m</span>` : ""}
-          ${property.ceilingHeight !== null ? `<span>层高 ${property.ceilingHeight}m</span>` : ""}
-          <span>${property.foodServiceAllowed ? "可做餐饮" : "餐饮受限"}</span>
-          <span>${property.exhaustAllowed ? "可排烟" : "不可排烟"}</span>
-        </div>
-        ${property.source === "market" ? `
-          <div class="cr-property-listing-meta">
-            <span>房源评分 ${property.qualityScore ?? "-"}</span>
-            <span>${property.listing.remainingDays ?? "-"}天后市场换新</span>
-            <span>抢租热度 ${leaseTerms.competitorDemand}</span>
-          </div>
-        ` : ""}
-        <div class="cr-property-detail__terms">
-          <span>租期 ${leaseTerms.minMonths}-${leaseTerms.maxMonths}个月</span>
-          <span>物业费 ${money(leaseTerms.propertyFeeMonthly)}/月</span>
-          ${Number.isFinite(leaseTerms.propertyFeePerSqm) ? `<span>物业单价 ¥${leaseTerms.propertyFeePerSqm}/㎡</span>` : ""}
-          <span>转让费 ${money(leaseTerms.transferFee)}</span>
-          ${leaseTerms.transferFee > 0 && Number.isFinite(leaseTerms.transferFeeRentMultiple)
-            ? `<span>转让费约 ${leaseTerms.transferFeeRentMultiple}个月租金</span>`
-            : ""
-          }
-          <span>最高免租 ${leaseTerms.rentFreeMaxDays}天</span>
-          <span>续租涨幅约 ${Math.round((leaseTerms.renewalIncreaseRate ?? 0) * 100)}%</span>
-        </div>
-        ${activeOffer ? `
-          <div class="cr-property-offer ${activeOffer.status}">
-            <strong>${activeOffer.status === "accepted" ? "房东已接受" : "房东还价"}</strong>
-            <span>月租 ${money(activeOffer.monthlyRent)} · 免租 ${activeOffer.rentFreeDays}天 · 有效至第${activeOffer.expiresDay}日</span>
-          </div>
-        ` : ""}
-        <div class="cr-property-detail__quote">
-          <span>月租 ${money(quote.monthlyRent)}</span>
-          <span>押金 ${money(quote.deposit)}</span>
-          <span>物业费 ${money(quote.propertyFeeMonthly)}</span>
-          <span>转让费 ${money(quote.transferFee)}</span>
-          <span>免租 ${quote.rentFreeDays}天</span>
-          <strong>签约首付 ${money(quote.upfront)}</strong>
-        </div>
-      </div>`;
-
-    const actions = el("div", "cr-property-detail__actions");
-
-    if (leaseState.canNegotiate && this.restaurantId && !activeOffer) {
-      const negotiateButton = el(
-        "button",
-        "cr-property-negotiate-button",
-        "尝试议价"
-      );
-      negotiateButton.type = "button";
-      negotiateButton.addEventListener("click", () => this.negotiateSelected(model));
-      actions.append(negotiateButton);
-    }
-
-    if (activeOffer?.status === "countered") {
-      const acceptCounterButton = el(
-        "button",
-        "cr-property-negotiate-button",
-        `接受房东还价 ${money(activeOffer.monthlyRent)}`
-      );
-      acceptCounterButton.type = "button";
-      acceptCounterButton.addEventListener("click", () => {
-        const accepted = this.pageSystem.acceptCounter(activeOffer.id);
-        this.offerId = accepted.id;
-        this.renderDetail(propertyId, accepted.id);
-      });
-      actions.append(acceptCounterButton);
-    }
-
-    const leaseButton = el(
-      "button",
-      "cr-property-lease-button",
-      leaseState.hasActiveLease
-        ? "当前门店已有租约"
-        : !property.foodServiceAllowed
-          ? "该房源不允许餐饮"
-          : quote.affordable === false
-            ? "资金不足"
-            : activeOffer?.status === "accepted"
-              ? "按谈妥条件签约"
-              : "按挂牌条件签约"
-    );
-    leaseButton.type = "button";
-    leaseButton.disabled =
-      !this.restaurantId ||
-      !leaseState.canSign ||
-      activeOffer?.status === "countered";
-    leaseButton.addEventListener("click", () => this.signSelected());
-    actions.append(leaseButton);
-
-    this.root.append(
-      back,
-      shell,
-      actions
-    );
-
-    this.appendBottomNavigation(
-      "properties"
-    );
-
-    return model;
-  }
-
-  negotiateSelected(model) {
-    if (!this.restaurantId || !this.selectedPropertyId) {
-      throw new Error("Restaurant and property must be selected before negotiation");
-    }
-
-    const requestedRent = Math.round(model.property.monthlyRent * 0.97);
-    const requestedRentFreeDays = Math.min(
-      7,
-      model.leaseTerms.rentFreeMaxDays ?? 0
-    );
-    const result = this.pageSystem.negotiateLease({
-      restaurantId: this.restaurantId,
-      propertyId: this.selectedPropertyId,
-      months: this.months,
-      requestedRent,
-      requestedRentFreeDays
-    });
-
-    this.offerId =
-      result.offer.status === "accepted"
-        ? result.offer.id
-        : null;
-    this.renderDetail(
-      this.selectedPropertyId,
-      this.offerId
-    );
-    return result;
-  }
-
-  signSelected() {
-    if (!this.restaurantId || !this.selectedPropertyId) {
-      throw new Error("Restaurant and property must be selected before lease signing");
-    }
-
-    const detail = this.pageSystem.getPropertyDetail(
-      this.selectedPropertyId,
-      this.restaurantId,
-      this.months,
-      this.offerId
-    );
-
-    const offerId =
-      detail.activeOffer?.status === "accepted"
-        ? detail.activeOffer.id
-        : null;
-
-    const result = this.pageSystem.signLease({
-      restaurantId: this.restaurantId,
-      propertyId: this.selectedPropertyId,
-      months: this.months,
-      offerId
-    });
-
-    if (
-      typeof this.onNavigate ===
-      "function"
-    ) {
-      this.onNavigate(
-        result.nextPage,
-        this.restaurantId,
-        result
-      );
-    }
-
-    return result;
-  }
-
-  appendBottomNavigation(
-    activePageId =
-      "properties"
-  ) {
-    if (!this.root) {
-      return;
-    }
-
-    const wrapper =
-      document.createElement(
-        "div"
+        }
       );
 
-    wrapper.innerHTML =
-      renderBottomNavigation(
-        gameChromeSystem
-          .getNavigation({
-            restaurantId:
-              this.restaurantId,
-            activePageId
-          })
+    this.root
+      .querySelectorAll(
+        "[data-property-open]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () =>
+              this.renderDetail(
+                button.dataset
+                  .propertyOpen
+              )
+          );
+        }
       );
 
-    const navigation =
-      wrapper.firstElementChild;
-
-    if (!navigation) {
-      return;
-    }
-
-    navigation
+    this.root
       .querySelectorAll(
         "[data-page-target]"
       )
@@ -606,30 +1091,944 @@ export class CityPropertyView {
           button.addEventListener(
             "click",
             () => {
-              const target =
+              this.onNavigate?.(
                 button.dataset
-                  .pageTarget;
-
-              if (
-                target &&
-                typeof this
-                  .onNavigate ===
-                  "function"
-              ) {
-                this.onNavigate(
-                  target,
-                  this.restaurantId
-                );
-              }
+                  .pageTarget
+              );
             }
           );
         }
       );
+  }
 
-    this.root.append(
-      navigation
+
+  renderDetail(
+    propertyId,
+    offerId = null
+  ) {
+    this.selectedPropertyId =
+      propertyId;
+
+    const model =
+      this.pageSystem
+        .getPropertyDetail(
+          propertyId,
+          this.restaurantId,
+          this.months,
+          offerId
+        );
+
+    this.months =
+      model.quote.months;
+
+    this.offerId =
+      model.activeOffer
+        ?.status ===
+        "accepted"
+        ? model.activeOffer.id
+        : offerId;
+
+
+    const property =
+      model.property;
+
+    const district =
+      model.district;
+
+    const terms =
+      model.leaseTerms;
+
+    const quote =
+      model.quote;
+
+    const topBar =
+      this.buildTopBar(
+        this.restaurantId
+          ? undefined
+          : null
+      );
+
+
+    const notices =
+      buildNoticeTickerModel([
+        property.competition
+          ?.daysUntilPossibleClaim !==
+          null
+          ? {
+              title:
+                "房源提醒",
+
+              message:
+                `预计${property.competition.daysUntilPossibleClaim}天内可能出现其他抢租者`,
+
+              type:
+                "warning",
+
+              priority:
+                80
+            }
+          : null
+      ].filter(Boolean));
+
+
+    this.root.innerHTML = `
+      <main class="rg-screen property-detail-game-page">
+
+        ${renderGameTopBar(
+          topBar,
+          {
+            subtitle:
+              "房源考察 · 合同决策"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          notices
+        )}
+
+        ${renderPageTitle({
+          title:
+            "房源详情",
+
+          backTarget:
+            "properties",
+
+          helpLabel:
+            "租赁说明"
+        })}
+
+
+        <section class="property-detail-hero">
+
+          <div
+            class="property-detail-hero__image"
+            style="
+              --property-image:
+                url('${getPropertyImage(
+                  property,
+                  0
+                )}');
+            "
+          >
+
+            <button
+              type="button"
+              class="property-detail-back"
+              data-back-properties
+            >
+              ‹ 房源列表
+            </button>
+
+            <div class="property-detail-hero__badges">
+
+              ${
+                property.qualityScore !==
+                null
+                  ? `
+                    <span>
+                      ★
+                      ${property.qualityScore}
+                    </span>
+                  `
+                  : ""
+              }
+
+              ${
+                terms.negotiable
+                  ? `
+                    <span>
+                      可议价
+                    </span>
+                  `
+                  : ""
+              }
+
+              ${
+                property.source ===
+                "market"
+                  ? `
+                    <span>
+                      动态房源
+                    </span>
+                  `
+                  : ""
+              }
+
+            </div>
+
+          </div>
+
+
+          <div class="property-detail-hero__info">
+
+            <header>
+
+              <div>
+                <small>
+                  📍
+                  ${escapeHtml(
+                    property.districtName
+                  )}
+                </small>
+
+                <h2>
+                  ${escapeHtml(
+                    property.name
+                  )}
+                </h2>
+
+                <span>
+                  房东：
+                  ${escapeHtml(
+                    model.landlord
+                      ?.name ??
+                    "业主"
+                  )}
+                </span>
+              </div>
+
+              <div class="property-detail-rent">
+
+                <strong>
+                  ${money(
+                    property.monthlyRent
+                  )}
+                </strong>
+
+                <span>
+                  /月
+                </span>
+
+              </div>
+
+            </header>
+
+
+            <section class="property-detail-spec-grid">
+
+              <article>
+                <strong>
+                  ${property.area}㎡
+                </strong>
+                <span>
+                  建筑面积
+                </span>
+              </article>
+
+              <article>
+                <strong>
+                  ${property.usableArea}㎡
+                </strong>
+                <span>
+                  可用面积
+                </span>
+              </article>
+
+              <article>
+                <strong>
+                  ${property.floorCount}层
+                </strong>
+                <span>
+                  楼层
+                </span>
+              </article>
+
+              <article>
+                <strong>
+                  ${
+                    property
+                      .frontageMeters ??
+                    "-"
+                  }m
+                </strong>
+                <span>
+                  门面宽度
+                </span>
+              </article>
+
+              <article>
+                <strong>
+                  ${
+                    property
+                      .ceilingHeight ??
+                    "-"
+                  }m
+                </strong>
+                <span>
+                  层高
+                </span>
+              </article>
+
+              <article>
+                <strong>
+                  ${property.parkingSpaces}
+                </strong>
+                <span>
+                  停车位
+                </span>
+              </article>
+
+            </section>
+
+          </div>
+
+        </section>
+
+
+        <section class="property-detail-grid">
+
+          <div class="property-detail-main">
+
+            <section class="property-detail-panel">
+
+              <header>
+                <strong>
+                  商圈经营环境
+                </strong>
+              </header>
+
+              <div class="property-detail-district">
+
+                <article>
+                  <span>
+                    客流指数
+                  </span>
+
+                  <strong>
+                    ${
+                      district
+                        ?.trafficIndex ??
+                      "-"
+                    }
+                  </strong>
+
+                  <div>
+                    <i
+                      style="
+                        width:${
+                          Math.min(
+                            100,
+                            district
+                              ?.trafficIndex ??
+                            0
+                          )
+                        }%
+                      "
+                    ></i>
+                  </div>
+                </article>
+
+                <article>
+                  <span>
+                    消费能力
+                  </span>
+
+                  <strong>
+                    ${
+                      district
+                        ?.spendingPower ??
+                      "-"
+                    }
+                  </strong>
+
+                  <div>
+                    <i
+                      style="
+                        width:${
+                          Math.min(
+                            100,
+                            district
+                              ?.spendingPower ??
+                            0
+                          )
+                        }%
+                      "
+                    ></i>
+                  </div>
+                </article>
+
+                <article>
+                  <span>
+                    竞争程度
+                  </span>
+
+                  <strong>
+                    ${
+                      district
+                        ?.competition ??
+                      "-"
+                    }
+                  </strong>
+
+                  <div>
+                    <i
+                      style="
+                        width:${
+                          Math.min(
+                            100,
+                            district
+                              ?.competition ??
+                            0
+                          )
+                        }%
+                      "
+                    ></i>
+                  </div>
+                </article>
+
+              </div>
+
+            </section>
+
+
+            <section class="property-detail-panel">
+
+              <header>
+                <strong>
+                  餐饮适配
+                </strong>
+              </header>
+
+              <div class="property-suitability-grid">
+
+                <article
+                  class="${
+                    model.suitability
+                      .foodServiceAllowed
+                      ? "is-good"
+                      : "is-bad"
+                  }"
+                >
+                  <strong>
+                    ${
+                      model.suitability
+                        .foodServiceAllowed
+                        ? "✓"
+                        : "×"
+                    }
+                  </strong>
+
+                  <span>
+                    餐饮许可
+                  </span>
+                </article>
+
+                <article
+                  class="${
+                    model.suitability
+                      .exhaustAllowed
+                      ? "is-good"
+                      : "is-bad"
+                  }"
+                >
+                  <strong>
+                    ${
+                      model.suitability
+                        .exhaustAllowed
+                        ? "✓"
+                        : "×"
+                    }
+                  </strong>
+
+                  <span>
+                    排烟条件
+                  </span>
+                </article>
+
+                <article>
+                  <strong>
+                    ${property.floorCount}
+                  </strong>
+
+                  <span>
+                    可装修楼层
+                  </span>
+                </article>
+
+                <article>
+                  <strong>
+                    ${
+                      property.floors
+                        ?.reduce(
+                          (
+                            sum,
+                            floor
+                          ) =>
+                            sum +
+                            (
+                              floor
+                                .entranceCount ??
+                              0
+                            ),
+                          0
+                        ) ??
+                      0
+                    }
+                  </strong>
+
+                  <span>
+                    出入口
+                  </span>
+                </article>
+
+              </div>
+
+            </section>
+
+
+            <section class="property-detail-panel">
+
+              <header>
+                <strong>
+                  房源标签
+                </strong>
+              </header>
+
+              <div class="property-detail-tags">
+
+                ${
+                  model.suitability
+                    .tags
+                    .length
+                    ? model.suitability
+                        .tags
+                        .map(
+                          tag => `
+                            <span>
+                              ${escapeHtml(
+                                tag
+                              )}
+                            </span>
+                          `
+                        )
+                        .join("")
+                    : `
+                      <span>
+                        标准商用房源
+                      </span>
+                    `
+                }
+
+              </div>
+
+            </section>
+
+          </div>
+
+
+          <aside class="property-contract-panel">
+
+            <header>
+              <strong>
+                租赁方案
+              </strong>
+
+              <span>
+                当前
+                ${quote.months}
+                个月
+              </span>
+            </header>
+
+
+            <section class="property-contract-items">
+
+              <article>
+                <span>
+                  月租
+                </span>
+
+                <strong>
+                  ${money(
+                    quote.monthlyRent
+                  )}
+                </strong>
+              </article>
+
+              <article>
+                <span>
+                  押金
+                </span>
+
+                <strong>
+                  ${money(
+                    quote.deposit
+                  )}
+                </strong>
+              </article>
+
+              <article>
+                <span>
+                  物业费/月
+                </span>
+
+                <strong>
+                  ${money(
+                    quote.propertyFeeMonthly
+                  )}
+                </strong>
+              </article>
+
+              <article>
+                <span>
+                  转让费
+                </span>
+
+                <strong>
+                  ${money(
+                    quote.transferFee
+                  )}
+                </strong>
+              </article>
+
+              <article>
+                <span>
+                  免租期
+                </span>
+
+                <strong>
+                  ${quote.rentFreeDays}
+                  天
+                </strong>
+              </article>
+
+            </section>
+
+
+            ${
+              model.activeOffer
+                ? `
+                  <section
+                    class="
+                      property-negotiation-result
+                      is-${escapeHtml(
+                        model.activeOffer
+                          .status
+                      )}
+                    "
+                  >
+
+                    <strong>
+                      ${
+                        model.activeOffer
+                          .status ===
+                        "accepted"
+                          ? "房东已接受报价"
+                          : "房东提出还价"
+                      }
+                    </strong>
+
+                    <span>
+                      月租
+                      ${money(
+                        model.activeOffer
+                          .monthlyRent
+                      )}
+                    </span>
+
+                  </section>
+                `
+                : ""
+            }
+
+
+            <section class="property-upfront-cost">
+
+              <span>
+                签约首付
+              </span>
+
+              <strong>
+                ${money(
+                  quote.upfront
+                )}
+              </strong>
+
+              <small>
+                ${
+                  quote.affordable ===
+                  false
+                    ? "当前资金不足"
+                    : "资金可承担"
+                }
+              </small>
+
+            </section>
+
+
+            <div class="property-contract-actions">
+
+              ${
+                model.leaseState
+                  .canNegotiate &&
+                !model.activeOffer
+                  ? `
+                    <button
+                      type="button"
+                      class="property-negotiate-button"
+                      data-negotiate
+                    >
+                      与房东议价
+                    </button>
+                  `
+                  : ""
+              }
+
+              ${
+                model.activeOffer
+                  ?.status ===
+                "countered"
+                  ? `
+                    <button
+                      type="button"
+                      class="property-counter-button"
+                      data-accept-counter
+                    >
+                      接受房东还价
+                    </button>
+                  `
+                  : ""
+              }
+
+              <button
+                type="button"
+                class="property-sign-button"
+                data-sign-lease
+                ${
+                  !this.restaurantId ||
+                  !model.leaseState
+                    .canSign ||
+                  model.activeOffer
+                    ?.status ===
+                    "countered"
+                    ? "disabled"
+                    : ""
+                }
+              >
+                ${
+                  model.leaseState
+                    .hasActiveLease
+                    ? "当前门店已有租约"
+                    : quote
+                        .affordable ===
+                        false
+                      ? "资金不足"
+                      : "确认签约"
+                }
+              </button>
+
+            </div>
+
+          </aside>
+
+        </section>
+
+
+        ${renderBottomNavigation(
+          this.getBottomNavigation()
+        )}
+
+      </main>
+    `;
+
+    this.bindDetail(model);
+
+    return model;
+  }
+
+
+  bindDetail(model) {
+    this.root
+      .querySelector(
+        "[data-back-properties]"
+      )
+      ?.addEventListener(
+        "click",
+        () =>
+          this.renderMarketplace()
+      );
+
+
+    this.root
+      .querySelector(
+        "[data-negotiate]"
+      )
+      ?.addEventListener(
+        "click",
+        () =>
+          this.negotiateSelected(
+            model
+          )
+      );
+
+
+    this.root
+      .querySelector(
+        "[data-accept-counter]"
+      )
+      ?.addEventListener(
+        "click",
+        () => {
+          const offer =
+            this.pageSystem
+              .acceptCounter(
+                model.activeOffer.id
+              );
+
+          this.offerId =
+            offer.id;
+
+          this.renderDetail(
+            this.selectedPropertyId,
+            offer.id
+          );
+        }
+      );
+
+
+    this.root
+      .querySelector(
+        "[data-sign-lease]"
+      )
+      ?.addEventListener(
+        "click",
+        () =>
+          this.signSelected()
+      );
+
+
+    this.root
+      .querySelectorAll(
+        "[data-page-target]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              this.onNavigate?.(
+                button.dataset
+                  .pageTarget
+              );
+            }
+          );
+        }
+      );
+  }
+
+
+  negotiateSelected(model) {
+    if (
+      !this.restaurantId ||
+      !this.selectedPropertyId
+    ) {
+      throw new Error(
+        "Restaurant and property must be selected before negotiation"
+      );
+    }
+
+    const requestedRent =
+      Math.round(
+        model.property
+          .monthlyRent *
+        0.97
+      );
+
+    const requestedRentFreeDays =
+      Math.min(
+        7,
+        model.leaseTerms
+          .rentFreeMaxDays ??
+        0
+      );
+
+    const result =
+      this.pageSystem
+        .negotiateLease({
+          restaurantId:
+            this.restaurantId,
+
+          propertyId:
+            this.selectedPropertyId,
+
+          months:
+            this.months,
+
+          requestedRent,
+
+          requestedRentFreeDays
+        });
+
+    this.offerId =
+      result.offer.status ===
+      "accepted"
+        ? result.offer.id
+        : null;
+
+    this.renderDetail(
+      this.selectedPropertyId,
+      this.offerId
     );
+
+    return result;
+  }
+
+
+  signSelected() {
+    if (
+      !this.restaurantId ||
+      !this.selectedPropertyId
+    ) {
+      throw new Error(
+        "Restaurant and property must be selected before lease signing"
+      );
+    }
+
+    const detail =
+      this.pageSystem
+        .getPropertyDetail(
+          this.selectedPropertyId,
+          this.restaurantId,
+          this.months,
+          this.offerId
+        );
+
+    const offerId =
+      detail.activeOffer
+        ?.status ===
+        "accepted"
+        ? detail.activeOffer.id
+        : null;
+
+    const result =
+      this.pageSystem
+        .signLease({
+          restaurantId:
+            this.restaurantId,
+
+          propertyId:
+            this.selectedPropertyId,
+
+          months:
+            this.months,
+
+          offerId
+        });
+
+    this.onNavigate?.(
+      result.nextPage,
+      this.restaurantId,
+      result
+    );
+
+    return result;
   }
 }
 
-export const cityPropertyView = new CityPropertyView();
+
+export const cityPropertyView =
+  new CityPropertyView();
+
+export {
+  CityPropertyView
+};

@@ -107,7 +107,7 @@ test(
         .getLandingPage(
           "city"
         ),
-      "properties"
+      "city"
     );
 
 

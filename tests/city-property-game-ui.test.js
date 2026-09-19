@@ -2,15 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
-  CityPropertyGameView
-} from "../src/ui/pages/city/CityPropertyGameView.js";
+  CityPropertyView
+} from "../src/ui/pages/city/CityPropertyView.js";
 
 
 test(
   "正式房源UI包含商圈筛选实景经营数据和租赁入口",
   () => {
     const view =
-      new CityPropertyGameView();
+      new CityPropertyView();
 
     view.filters = {};
 

@@ -83,9 +83,6 @@ const BACK_OVERRIDES =
     employee_recruitment:
       "employee_roster",
 
-    members:
-      "more",
-
     chain:
       "more",
 

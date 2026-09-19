@@ -9,7 +9,7 @@ import "../registry/gameplayPages.js";
 const MAIN_LANDINGS =
   Object.freeze({
     city:
-      "properties",
+      "city",
 
     restaurant:
       "operating-command-center",
@@ -76,9 +76,6 @@ const ACTION_TARGETS =
 
     customers:
       "customers",
-
-    members:
-      "member-marketing",
 
     "member-marketing":
       "member-marketing",

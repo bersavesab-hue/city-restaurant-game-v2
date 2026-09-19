@@ -4,23 +4,13 @@ export {
 } from "./RenovationMobilePageSystem.js";
 
 export {
-  RenovationMobileView as BaseRenovationMobileView,
-  gridPointFromClient,
-  placementStyle
-} from "./RenovationMobileView.js";
-
-export {
-  RenovationFloorplanMobileView,
-  mountRenovationFloorplanMobilePage,
-  renderFloorplanLayer
-} from "./RenovationFloorplanMobileView.js";
-
-export {
   RenovationGameView,
-  RenovationGameView as RenovationMobileView,
-  mountRenovationGamePage,
-  mountRenovationGamePage as mountRenovationMobilePage
+  mountRenovationGamePage
 } from "./RenovationGameView.js";
+
+export {
+  renderFloorplanLayer
+} from "./RenovationFloorplanBaseView.js";
 
 export {
   RENOVATION_UTILITY_META,

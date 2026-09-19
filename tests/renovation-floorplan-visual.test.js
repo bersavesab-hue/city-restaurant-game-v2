@@ -6,7 +6,7 @@ import {
 } from "../src/ui/renovation/RenovationFloorplanVisualModel.js";
 import {
   renderFloorplanLayer
-} from "../src/ui/renovation/RenovationFloorplanMobileView.js";
+} from "../src/ui/renovation/RenovationFloorplanBaseView.js";
 
 test("装修画布显示真实户型轮廓窗柱固定结构和水电燃气排烟点", () => {
   const floor = {

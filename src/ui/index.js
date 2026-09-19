@@ -20,9 +20,8 @@ export {
 export {
   renovationMobilePageSystem,
   RenovationMobilePageSystem,
-  RenovationMobileView,
-  BaseRenovationMobileView,
-  mountRenovationMobilePage,
+  RenovationGameView,
+  mountRenovationGamePage,
   renderFloorplanLayer,
   buildFloorplanVisualModel
 } from "./renovation/index.js";
@@ -202,8 +201,6 @@ export {
   navigationHistorySystem,
   NavigationHistorySystem
 } from "./navigation/NavigationHistorySystem.js";
-
-export { cityPropertyView } from "./pages/city/CityPropertyView.js";
 
 
 export {

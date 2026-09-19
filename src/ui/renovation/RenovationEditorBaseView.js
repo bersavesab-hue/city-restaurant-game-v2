@@ -74,7 +74,7 @@ function normalizedRectStyle(rect, width, height) {
   ].join(";");
 }
 
-class RenovationMobileView {
+class RenovationEditorBaseView {
   constructor({
     root,
     restaurantId,
@@ -83,7 +83,7 @@ class RenovationMobileView {
     onClose = null
   }) {
     if (!root) {
-      throw new Error("Renovation mobile view requires a root element");
+      throw new Error("Renovation editor base view requires a root element");
     }
 
     this.root = root;
@@ -874,13 +874,8 @@ class RenovationMobileView {
   }
 }
 
-function mountRenovationMobilePage(options) {
-  return new RenovationMobileView(options).mount();
-}
-
 export {
-  RenovationMobileView,
-  mountRenovationMobilePage,
+  RenovationEditorBaseView,
   gridPointFromClient,
   placementStyle
 };
