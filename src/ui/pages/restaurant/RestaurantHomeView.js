@@ -130,7 +130,8 @@ function renderImageSlot({
   className = "",
   source = null,
   fallback = null,
-  fit = "cover"
+  fit = "cover",
+  customDishId = null
 }) {
   return `
     <div
@@ -149,6 +150,11 @@ function renderImageSlot({
       ${fallback
         ? `data-image-fallback="${escapeHtml(
             fallback
+          )}"`
+        : ""}
+      ${customDishId
+        ? `data-custom-dish-id="${escapeHtml(
+            customDishId
           )}"`
         : ""}
       data-image-fit="${escapeHtml(
@@ -1050,7 +1056,12 @@ class RestaurantHomeView {
 
                     source:
                       dish?.image ??
-                      null
+                      null,
+
+                    customDishId:
+                      dish?.custom
+                        ? dish.dishId
+                        : null
                   })}
 
                   <div class="store-signature-card__body">
