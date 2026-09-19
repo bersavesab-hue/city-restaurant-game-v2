@@ -18,6 +18,10 @@ import {
   storeProgressSystem
 } from "../../../systems/StoreProgressSystem.js";
 
+import {
+  chainSystem
+} from "../../../systems/ChainSystem.js";
+
 
 const MORE_GROUPS =
   Object.freeze([
@@ -74,11 +78,12 @@ const MORE_GROUPS =
 
         {
           id: "chain",
-          title: "连锁管理",
-          description: "多门店、品牌扩张与连锁经营",
+          title: "扩张与连锁",
+          description: "第二门店、品牌管理、中央厨房与区域扩张",
           target: "chain",
-          state: "placeholder",
-          unlockFeature: "chain_management"
+          state: "ready",
+          unlockFeature: "second_store",
+          unlockScope: "chain"
         }
       ]
     },
@@ -178,12 +183,20 @@ class MoreHubPageSystem {
                     }
 
                     const unlocked =
-                      storeProgressSystem
-                        .isUnlocked(
-                          restaurantId,
-                          entry
-                            .unlockFeature
-                        );
+                      entry.unlockScope ===
+                        "chain"
+                        ? chainSystem
+                            .isFeatureUnlocked(
+                              restaurantId,
+                              entry
+                                .unlockFeature
+                            )
+                        : storeProgressSystem
+                            .isUnlocked(
+                              restaurantId,
+                              entry
+                                .unlockFeature
+                            );
 
                     return {
                       ...entry,
