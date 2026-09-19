@@ -6,6 +6,11 @@ import {
 } from "esbuild";
 
 
+import {
+  RELEASE_INFO
+} from "../src/release/ReleaseInfo.js";
+
+
 const outputDirectory =
   path.resolve(
     "android/app/src/main/assets"
@@ -102,7 +107,7 @@ const index = `<!doctype html>
   >
 
   <title>
-    城市餐厅测试版
+    ${RELEASE_INFO.appName}
   </title>
 
   <link
@@ -141,7 +146,7 @@ const index = `<!doctype html>
         color:#175481;
       "
     >
-      正在启动餐厅经营系统……
+      正在启动${RELEASE_INFO.appName}……
     </div>
   </div>
 
