@@ -45,13 +45,29 @@ function safeBalance(
 export function buildFormalPageChrome(
   restaurantId,
   {
-    notices = []
+    notices = [],
+    restaurant:
+      restaurantOverride =
+      null,
+    balance:
+      balanceOverride =
+      null
   } = {}
 ) {
   const restaurant =
+    restaurantOverride ??
     restaurantSystem.get(
       restaurantId
     );
+
+  const balance =
+    Number.isFinite(
+      balanceOverride
+    )
+      ? balanceOverride
+      : safeBalance(
+          restaurantId
+        );
 
   return {
     restaurant,
@@ -61,10 +77,7 @@ export function buildFormalPageChrome(
         restaurantName:
           restaurant.name,
 
-        balance:
-          safeBalance(
-            restaurantId
-          ),
+        balance,
 
         storeLevel:
           restaurant.level ??
