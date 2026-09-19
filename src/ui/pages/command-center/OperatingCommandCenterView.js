@@ -5,6 +5,380 @@ import {
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
+function escapeHtml(
+  value
+) {
+  return String(
+    value ??
+    ""
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    );
+}
+
+
+function employeeStatusName(
+  status
+) {
+  return {
+    active:
+      "工作中",
+    resting:
+      "休息中",
+    off_duty:
+      "未排班"
+  }[status] ??
+    "待命";
+}
+
+
+function marketAlertName(
+  alert
+) {
+  return {
+    critical_share:
+      "份额偏低",
+    losing_share:
+      "份额下滑",
+    dominant:
+      "优势明显",
+    gaining_share:
+      "份额上升",
+    stable:
+      "整体稳定"
+  }[alert] ??
+    "数据更新中";
+}
+
+
+function renderTopDishes(
+  page
+) {
+  const dishes =
+    page.topDishPreview ??
+    [];
+
+  const body =
+    dishes.length
+      ? dishes
+          .map(
+            (dish, index) =>
+              '<article class="command-center__dish-card">' +
+                '<div class="command-center__dish-image" data-image-slot="command-dish-' +
+                  escapeHtml(
+                    dish.dishId ??
+                    dish.id
+                  ) +
+                '">' +
+                  '<span>TOP' +
+                    (index + 1) +
+                  '</span>' +
+                '</div>' +
+                '<div>' +
+                  '<strong>' +
+                    escapeHtml(
+                      dish.name
+                    ) +
+                  '</strong>' +
+                  '<small>' +
+                    escapeHtml(
+                      dish.classification
+                    ) +
+                  '</small>' +
+                  '<p>销量 <b>' +
+                    Number(
+                      dish.sold ??
+                      0
+                    ) +
+                  '</b> · 品质 <b>' +
+                    (
+                      dish.quality ||
+                      "-"
+                    ) +
+                  '</b></p>' +
+                '</div>' +
+              '</article>'
+          )
+          .join("")
+      : '<div class="command-center__empty">营业产生订单后，这里会自动展示热销菜品。</div>';
+
+  return (
+    '<section class="command-center__visual-panel command-center__top-dishes">' +
+      '<header class="command-center__section-title">' +
+        '<div><span>顾客实际选择</span><h2>热销菜品</h2></div>' +
+        '<button type="button" data-page-target="dishes">更多菜品 ›</button>' +
+      '</header>' +
+      '<div class="command-center__dish-grid">' +
+        body +
+      '</div>' +
+    '</section>'
+  );
+}
+
+
+function renderStaffPreview(
+  page
+) {
+  const summary =
+    page.staffPreview ??
+    {
+      available: 0,
+      total: 0,
+      averageFatigue: 0,
+      highFatigue: 0,
+      preview: []
+    };
+
+  const people =
+    summary.preview ??
+    [];
+
+  const body =
+    people.length
+      ? people
+          .map(
+            employee =>
+              '<article>' +
+                '<div class="command-center__staff-avatar" data-image-slot="command-employee-' +
+                  escapeHtml(
+                    employee.id
+                  ) +
+                '">' +
+                  escapeHtml(
+                    employee.name
+                      ?.slice(
+                        0,
+                        1
+                      ) ??
+                    "员"
+                  ) +
+                '</div>' +
+                '<strong>' +
+                  escapeHtml(
+                    employee.name
+                  ) +
+                '</strong>' +
+                '<span>' +
+                  escapeHtml(
+                    employee.roleName
+                  ) +
+                  ' · Lv.' +
+                  Number(
+                    employee.level ??
+                    1
+                  ) +
+                '</span>' +
+                '<small>' +
+                  employeeStatusName(
+                    employee.status
+                  ) +
+                  ' · 疲劳 ' +
+                  Number(
+                    employee.fatigue ??
+                    0
+                  ) +
+                  '%' +
+                '</small>' +
+              '</article>'
+          )
+          .join("")
+      : '<div class="command-center__empty">当前门店还没有可展示员工。</div>';
+
+  return (
+    '<section class="command-center__visual-panel command-center__staff">' +
+      '<header class="command-center__section-title">' +
+        '<div><span>实时员工状态</span><h2>员工状态</h2></div>' +
+        '<button type="button" data-page-target="employee_roster">查看全部 ›</button>' +
+      '</header>' +
+      '<div class="command-center__staff-summary">' +
+        '<article><span>可用员工</span><strong>' +
+          Number(
+            summary.available ??
+            0
+          ) +
+          ' / ' +
+          Number(
+            summary.total ??
+            0
+          ) +
+        '</strong></article>' +
+        '<article><span>平均疲劳</span><strong>' +
+          Number(
+            summary.averageFatigue ??
+            0
+          ) +
+        '%</strong></article>' +
+        '<article><span>高疲劳</span><strong>' +
+          Number(
+            summary.highFatigue ??
+            0
+          ) +
+        '人</strong></article>' +
+      '</div>' +
+      '<div class="command-center__staff-grid">' +
+        body +
+      '</div>' +
+    '</section>'
+  );
+}
+
+
+function renderInventoryPreview(
+  page
+) {
+  const items =
+    page.inventoryPreview ??
+    [];
+
+  const body =
+    items.length
+      ? items
+          .map(
+            item =>
+              '<article data-stock-state="' +
+                escapeHtml(
+                  item.state
+                ) +
+              '">' +
+                '<div class="command-center__ingredient-image" data-image-slot="command-ingredient-' +
+                  escapeHtml(
+                    item.ingredientId
+                  ) +
+                '">食材</div>' +
+                '<strong>' +
+                  escapeHtml(
+                    item.name
+                  ) +
+                '</strong>' +
+                '<span>' +
+                  escapeHtml(
+                    item.stateLabel
+                  ) +
+                '</span>' +
+                '<div class="command-center__stock-track"><i style="width:' +
+                  Number(
+                    item.levelPercent ??
+                    0
+                  ) +
+                '%"></i></div>' +
+                '<small>可用 ' +
+                  Number(
+                    item.usableQuantity ??
+                    0
+                  ).toLocaleString(
+                    "zh-CN"
+                  ) +
+                  ' ' +
+                  escapeHtml(
+                    item.unit
+                  ) +
+                '</small>' +
+                '<button type="button" data-page-target="supply">去采购</button>' +
+              '</article>'
+          )
+          .join("")
+      : '<div class="command-center__empty">当前还没有库存批次，采购后这里会显示库存风险。</div>';
+
+  return (
+    '<section class="command-center__visual-panel command-center__inventory-preview">' +
+      '<header class="command-center__section-title">' +
+        '<div><span>及时补货 · 减少断货</span><h2>库存与采购预警</h2></div>' +
+        '<button type="button" data-page-target="supply">查看库存 ›</button>' +
+      '</header>' +
+      '<div class="command-center__inventory-grid">' +
+        body +
+      '</div>' +
+    '</section>'
+  );
+}
+
+
+function renderMarketPreview(
+  page
+) {
+  const market =
+    page.marketPreview ??
+    {};
+
+  const share =
+    Number.isFinite(
+      market.marketShare
+    )
+      ? market.marketShare + "%"
+      : "--";
+
+  const change =
+    Number(
+      market.marketShareChange ??
+      0
+    );
+
+  return (
+    '<section class="command-center__visual-panel command-center__market-preview">' +
+      '<header class="command-center__section-title">' +
+        '<div><span>商圈竞争与顾客反馈</span><h2>市场与口碑</h2></div>' +
+        '<button type="button" data-page-target="market-competition">商圈分析 ›</button>' +
+      '</header>' +
+      '<div class="command-center__market-grid">' +
+        '<article><span>市场份额</span><strong>' +
+          share +
+        '</strong><small>' +
+          (
+            change >= 0
+              ? "+"
+              : ""
+          ) +
+          change +
+        '%</small></article>' +
+        '<article><span>周边竞店</span><strong>' +
+          Number(
+            market.competitorCount ??
+            0
+          ) +
+        '家</strong><small>' +
+          marketAlertName(
+            market.competitionAlert
+          ) +
+        '</small></article>' +
+        '<article><span>顾客复购率</span><strong>' +
+          Number(
+            market.repeatRate ??
+            0
+          ) +
+        '%</strong><small>长期顾客表现</small></article>' +
+        '<article><span>口碑评分</span><strong>' +
+          Number(
+            market.reviewScore ??
+            0
+          ).toFixed(
+            1
+          ) +
+        '</strong><small>声望 ' +
+          Number(
+            market.reputation ??
+            0
+          ) +
+        '</small></article>' +
+      '</div>' +
+    '</section>'
+  );
+}
+
+
 function money(value) {
   return (
     "¥" +
@@ -127,7 +501,7 @@ class OperatingCommandCenterView {
             <span>第${page.day}天 · 今日经营</span>
 
             <h1>
-              ${page.restaurant.name}
+              ${escapeHtml(page.restaurant.name)}
             </h1>
           </div>
 
@@ -364,6 +738,14 @@ class OperatingCommandCenterView {
               </section>
             `
         }
+
+        <section class="command-center__insight-grid">
+          ${renderTopDishes(page)}
+          ${renderStaffPreview(page)}
+          ${renderInventoryPreview(page)}
+          ${renderMarketPreview(page)}
+        </section>
+
 
         <section class="command-center__awards-feedback">
 
