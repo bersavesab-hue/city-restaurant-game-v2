@@ -27,7 +27,7 @@ test(
 
     assert.equal(
       city.pageId,
-      "properties"
+      "city"
     );
 
 
@@ -71,7 +71,7 @@ test(
 
     assert.equal(
       back2.pageId,
-      "properties"
+      "city"
     );
 
 
