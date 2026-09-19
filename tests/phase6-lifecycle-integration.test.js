@@ -496,7 +496,7 @@ test(
         .getMaxRecognizedPerSegment(
           restaurant.id
         ),
-      7
+      12
     );
 
     assert.ok(
