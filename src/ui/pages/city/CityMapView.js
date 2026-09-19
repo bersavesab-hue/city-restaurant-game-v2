@@ -4,6 +4,8 @@ import {
 
 import {
   renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
@@ -212,80 +214,34 @@ class CityMapView {
   renderNotice(
     page
   ) {
-    const current =
+    return renderNoticeTicker(
       page.noticeTicker
-        .current;
-
-    return `
-      <button
-        type="button"
-        class="
-          city-notice
-          city-notice--${
-            current?.type ??
-            "info"
-          }
-        "
-        ${
-          current?.action
-            ? `data-action="navigate" data-page-id="${escapeHtml(
-                current.action
-              )}"`
-            : ""
-        }
-      >
-
-        <b>
-          城市快报
-        </b>
-
-        <strong>
-          ${
-            escapeHtml(
-              current?.title ??
-              "市场动态"
-            )
-          }
-        </strong>
-
-        <span>
-          ${
-            escapeHtml(
-              current?.message ??
-              "当前暂无新的城市经营信息"
-            )
-          }
-        </span>
-
-      </button>
-    `;
+    );
   }
 
 
-  renderTitle() {
-    return `
-      <section class="city-page-title">
+  renderTitle(
+    page
+  ) {
+    return renderPageTitle({
+      title:
+        "商圈与房源",
 
-        <div>
-          <strong>
-            商圈与房源
-          </strong>
+      subtitle:
+        `开放${page.citySummary.districtCount}个商圈 · ${page.citySummary.propertyCount}套可租房源`,
 
-          <span>
-            先看城市，再决定把第一家店开在哪里
-          </span>
-        </div>
-
-        <button
-          type="button"
-          data-action="navigate"
-          data-page-id="properties"
-        >
-          房源列表
-        </button>
-
-      </section>
-    `;
+      rightHtml:
+        `
+          <button
+            type="button"
+            class="city-title-property-button"
+            data-action="navigate"
+            data-page-id="properties"
+          >
+            房源列表
+          </button>
+        `
+    });
   }
 
 
@@ -1098,7 +1054,9 @@ class CityMapView {
           page
         )}
 
-        ${this.renderTitle()}
+        ${this.renderTitle(
+          page
+        )}
 
         ${this.renderSummary(
           page
