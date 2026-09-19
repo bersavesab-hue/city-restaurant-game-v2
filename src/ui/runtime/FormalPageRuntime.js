@@ -236,6 +236,15 @@ import {
 } from "../pages/progress/StoreProgressView.js";
 
 
+import {
+  chainManagementPageSystem
+} from "../pages/chain/ChainManagementPageSystem.js";
+
+import {
+  chainManagementView
+} from "../pages/chain/ChainManagementView.js";
+
+
 const FORMAL_PAGE_DEFINITIONS =
   Object.freeze({
     supply: {
@@ -540,6 +549,28 @@ const FORMAL_PAGE_DEFINITIONS =
       refreshEvents: [
         "store:experienceGained",
         "store:levelUp"
+      ]
+    },
+
+
+    chain: {
+      pageSystem:
+        chainManagementPageSystem,
+
+      view:
+        chainManagementView,
+
+      mode:
+        "mount",
+
+      refreshEvents: [
+        "chain:created",
+        "chain:branchCreated",
+        "chain:brandRenamed",
+        "chain:centralKitchenOpened",
+        "chain:kitchenStockReceived",
+        "chain:kitchenStockDispatched",
+        "chain:regionUnlocked"
       ]
     }
   });
