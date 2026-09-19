@@ -24,6 +24,22 @@ export const VISUAL_ASSET_SPECS =
         format: "webp"
       }),
 
+    cityMap:
+      Object.freeze({
+        width: 1536,
+        height: 864,
+        aspectRatio: "16:9",
+        format: "webp"
+      }),
+
+    propertyCard:
+      Object.freeze({
+        width: 1024,
+        height: 576,
+        aspectRatio: "16:9",
+        format: "webp"
+      }),
+
     dishSquare:
       Object.freeze({
         width: 1024,
@@ -77,6 +93,9 @@ export const VISUAL_SLOT_SPEC_MAP =
     "command-center-hero":
       "commandCenterHero",
 
+    "city-main-map":
+      "cityMap",
+
     "renovation-construction-site":
       "renovationConstruction"
   });
@@ -90,6 +109,15 @@ export function getVisualAssetSpec(
       "string"
   ) {
     return null;
+  }
+
+  if (
+    slot.startsWith(
+      "property-"
+    )
+  ) {
+    return VISUAL_ASSET_SPECS
+      .propertyCard;
   }
 
   if (
