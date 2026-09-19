@@ -10,6 +10,17 @@ import {
   getIngredientSpriteStyle
 } from "../../../data/ingredientVisuals.js";
 
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
 function money(value) {
   return (
     "¥" +
@@ -89,10 +100,16 @@ function riskName(level) {
 class SupplyManagementView {
   constructor({
     pageSystem =
-      supplyManagementPageSystem
+      supplyManagementPageSystem,
+
+    onNavigate =
+      null
   } = {}) {
     this.pageSystem =
       pageSystem;
+
+    this.onNavigate =
+      onNavigate;
 
     this.root =
       null;
@@ -107,7 +124,9 @@ class SupplyManagementView {
   mount(
     root,
     {
-      restaurantId
+      restaurantId,
+      onNavigate =
+        this.onNavigate
     } = {}
   ) {
     if (!root) {
@@ -122,6 +141,9 @@ class SupplyManagementView {
     this.restaurantId =
       restaurantId;
 
+    this.onNavigate =
+      onNavigate;
+
     this.render();
 
     return this;
@@ -134,9 +156,6 @@ class SupplyManagementView {
           this.restaurantId
         );
 
-    this.root.className =
-      "supply-management-page";
-
     this.root.style
       ?.setProperty?.(
         "--ingredient-atlas",
@@ -144,27 +163,30 @@ class SupplyManagementView {
       );
 
     this.root.innerHTML = `
-      <header class="supply-header">
-        <div>
-          <span>门店供应链</span>
-          <h1>采购与库存</h1>
-          <p>
-            ${page.summary.supplierCount}家供应商
-            ·
-            ${page.summary.shortageCount}项库存预警
-          </p>
-        </div>
+      <main class="rg-screen supply-management-page">
 
-        <strong>
-          ${
-            page.balance === null
-              ? "-"
-              : money(
-                  page.balance
-                )
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "采购 · 库存 · 供应商"
           }
-        </strong>
-      </header>
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "供应链",
+
+          subtitle:
+            `${page.summary.supplierCount}家供应商 · ${page.summary.shortageCount}项库存预警`,
+
+          backTarget:
+            "operations"
+        })}
 
       <section class="supply-summary">
         <div>
@@ -225,8 +247,21 @@ class SupplyManagementView {
         ).join("")}
       </nav>
 
-      <main>
+      <section class="supply-content">
         ${this.renderSection(page)}
+      </section>
+
+      ${renderBottomNavigation(
+        gameChromeSystem
+          .getNavigation({
+            restaurantId:
+              this.restaurantId,
+
+            activePageId:
+              "supply"
+          })
+      )}
+
       </main>
     `;
 
@@ -682,6 +717,26 @@ class SupplyManagementView {
   }
 
   bind() {
+    this.root
+      .querySelectorAll(
+        "[data-page-target]"
+      )
+      .forEach(
+        button => {
+          button.addEventListener(
+            "click",
+            () => {
+              this.onNavigate?.(
+                button.dataset
+                  .pageTarget,
+
+                this.restaurantId
+              );
+            }
+          );
+        }
+      );
+
     this.root
       .querySelectorAll(
         "[data-section]"
