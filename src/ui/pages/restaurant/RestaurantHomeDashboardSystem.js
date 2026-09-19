@@ -19,6 +19,19 @@ import {
 } from "../../../systems/OperatingScheduleSystem.js";
 
 import {
+  menuSystem
+} from "../../../systems/MenuSystem.js";
+
+import {
+  restaurantDishSystem
+} from "../../../systems/RestaurantDishSystem.js";
+
+import {
+  getDishVisualSource,
+  getDishVisualSlot
+} from "../../assets/DishVisualResolver.js";
+
+import {
   restaurantHomePageSystem
 } from "./RestaurantHomePageSystem.js";
 
@@ -134,28 +147,110 @@ class RestaurantHomeDashboardSystem {
   }
 
 
-  getTopDishes(
+  getFeaturedDishes(
     restaurantId
   ) {
-    const orders =
-      this.getOrders(
-        restaurantId
+    const day =
+      gameState.getSection(
+        "time"
+      ).day;
+
+    const recentStartDay =
+      day - 6;
+
+    const menu =
+      menuSystem
+        .listByRestaurant(
+          restaurantId,
+          {
+            activeOnly:
+              true
+          }
+        );
+
+    const menuMap =
+      new Map(
+        menu.map(
+          item => [
+            item.dishId,
+            item
+          ]
+        )
       );
 
-    const map =
+    const progressMap =
+      new Map(
+        restaurantDishSystem
+          .listByRestaurant(
+            restaurantId
+          )
+          .map(
+            item => [
+              item.dishId,
+              item
+            ]
+          )
+      );
+
+    const performance =
       new Map();
 
     for (
-      const order
-      of orders
+      const item
+      of menu
     ) {
+      performance.set(
+        item.dishId,
+        {
+          dishId:
+            item.dishId,
+
+          sold:
+            0,
+
+          revenue:
+            0,
+
+          qualityTotal:
+            0,
+
+          qualityCount:
+            0
+        }
+      );
+    }
+
+    for (
+      const order
+      of this.getOrders(
+        restaurantId
+      )
+    ) {
+      if (
+        !Number.isFinite(
+          order.day
+        ) ||
+        order.day <
+          recentStartDay
+      ) {
+        continue;
+      }
+
       for (
         const item
         of order.items ??
         []
       ) {
+        if (
+          !menuMap.has(
+            item.dishId
+          )
+        ) {
+          continue;
+        }
+
         const current =
-          map.get(
+          performance.get(
             item.dishId
           ) ?? {
             dishId:
@@ -174,13 +269,20 @@ class RestaurantHomeDashboardSystem {
               0
           };
 
+        const quantity =
+          Number(
+            item.quantity ??
+            0
+          );
+
         current.sold +=
-          item.quantity ??
-          0;
+          quantity;
 
         current.revenue +=
-          item.revenue ??
-          0;
+          Number(
+            item.revenue ??
+            0
+          );
 
         if (
           Number.isFinite(
@@ -189,17 +291,19 @@ class RestaurantHomeDashboardSystem {
         ) {
           current.qualityTotal +=
             item.qualityScore *
-            (
-              item.quantity ??
-              1
+            Math.max(
+              1,
+              quantity
             );
 
           current.qualityCount +=
-            item.quantity ??
-            1;
+            Math.max(
+              1,
+              quantity
+            );
         }
 
-        map.set(
+        performance.set(
           item.dishId,
           current
         );
@@ -207,12 +311,22 @@ class RestaurantHomeDashboardSystem {
     }
 
     return [
-      ...map.values()
+      ...performance.values()
     ]
       .map(
         item => {
           const dish =
             safeDish(
+              item.dishId
+            );
+
+          const menuItem =
+            menuMap.get(
+              item.dishId
+            );
+
+          const progress =
+            progressMap.get(
               item.dishId
             );
 
@@ -227,6 +341,11 @@ class RestaurantHomeDashboardSystem {
               dish?.category ??
               null,
 
+            custom:
+              Boolean(
+                dish?.custom
+              ),
+
             quality:
               item.qualityCount >
               0
@@ -234,10 +353,63 @@ class RestaurantHomeDashboardSystem {
                     item.qualityTotal /
                     item.qualityCount
                   )
+                : (
+                    progress
+                      ?.recipeQualityScore ??
+                    null
+                  ),
+
+            lifetimeSold:
+              progress
+                ?.lifetimeSold ??
+              menuItem
+                ?.soldCount ??
+              0,
+
+            lifetimeRevenue:
+              progress
+                ?.lifetimeRevenue ??
+              menuItem
+                ?.totalRevenue ??
+              0,
+
+            dishRankId:
+              progress
+                ?.dishRankId ??
+              null,
+
+            dishRankName:
+              progress
+                ?.dishRankName ??
+              "家常",
+
+            dishRankOrder:
+              progress
+                ?.dishRankOrder ??
+              0,
+
+            image:
+              dish
+                ? getDishVisualSource(
+                    dish
+                  )
                 : null,
 
             imageSlot:
-              `dish-${item.dishId}`
+              dish
+                ? getDishVisualSlot(
+                    dish
+                  )
+                : (
+                    "dish-" +
+                    item.dishId
+                  ),
+
+            rankingSource:
+              item.sold >
+              0
+                ? "recent_7d"
+                : "menu_fallback"
           };
         }
       )
@@ -245,16 +417,48 @@ class RestaurantHomeDashboardSystem {
         (
           a,
           b
-        ) =>
-          b.sold -
-          a.sold
+        ) => {
+          if (
+            b.sold !==
+            a.sold
+          ) {
+            return (
+              b.sold -
+              a.sold
+            );
+          }
+
+          if (
+            b.revenue !==
+            a.revenue
+          ) {
+            return (
+              b.revenue -
+              a.revenue
+            );
+          }
+
+          if (
+            b.dishRankOrder !==
+            a.dishRankOrder
+          ) {
+            return (
+              b.dishRankOrder -
+              a.dishRankOrder
+            );
+          }
+
+          return (
+            b.lifetimeSold -
+            a.lifetimeSold
+          );
+        }
       )
       .slice(
         0,
         3
       );
   }
-
 
   getOperatingPeriods(
     restaurantId
@@ -417,7 +621,7 @@ class RestaurantHomeDashboardSystem {
       );
 
     const topDishes =
-      this.getTopDishes(
+      this.getFeaturedDishes(
         restaurantId
       );
 
@@ -618,22 +822,24 @@ class RestaurantHomeDashboardSystem {
             true
         },
 
-        ...Array.from(
-          {
-            length: 3
-          },
-          (
-            _,
-            index
-          ) => ({
+        ...topDishes.map(
+          dish => ({
             id:
-              `signature-dish-${index + 1}`,
+              dish.imageSlot,
+
+            dishId:
+              dish.dishId,
+
+            source:
+              dish.image,
 
             type:
-              "dish",
+              dish.custom
+                ? "custom-dish"
+                : "dish",
 
             static:
-              true
+              false
           })
         )
       ]
