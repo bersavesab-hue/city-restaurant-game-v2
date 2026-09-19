@@ -1,3 +1,10 @@
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
 function money(value) {
   return (
     "¥" +
@@ -52,11 +59,74 @@ class OperatingCommandCenterView {
       };
 
 
+    const topBarHtml =
+      page.topBar
+        ? renderGameTopBar(
+            page.topBar,
+            {
+              subtitle:
+                "门店经营总览",
+
+              showSpeedControls:
+                true
+            }
+          )
+        : "";
+
+
+    const noticeHtml =
+      page.noticeTicker
+        ? renderNoticeTicker(
+            page.noticeTicker
+          )
+        : "";
+
+
+    const pageTitleHtml =
+      renderPageTitle({
+        title:
+          "经营总控",
+
+        subtitle:
+          "掌握门店经营全局 · 实时数据驱动决策",
+
+        backTarget:
+          "restaurant",
+
+        helpLabel:
+          "经营攻略",
+
+        helpTarget:
+          "analytics"
+      });
+
+
+    const bottomNavHtml =
+      renderBottomNavigation(
+        page.navigation ??
+        []
+      );
+
+
     return `
-      <main class="command-center">
+      <main class="rg-screen command-center-screen">
+
+        ${topBarHtml}
+        ${noticeHtml}
+        ${pageTitleHtml}
+
+        <section class="command-center">
 
         <header class="command-center__header">
-          <div>
+          <div
+            class="command-center__hero-image"
+            data-image-slot="command-center-hero"
+            aria-label="门店经营场景图片槽位"
+          >
+            <span>门店经营场景</span>
+          </div>
+
+          <div class="command-center__identity">
             <span>第${page.day}天 · 今日经营</span>
 
             <h1>
@@ -469,7 +539,7 @@ class OperatingCommandCenterView {
         <section class="command-center__priority">
 
           <h2>
-            今天最该处理
+            今日待办 · 今天最该处理
           </h2>
 
           ${
@@ -653,6 +723,58 @@ class OperatingCommandCenterView {
         </section>
 
 
+        <section class="command-center__quick">
+
+          <header class="command-center__section-title">
+            <div>
+              <span>快捷入口</span>
+              <h2>高效管理门店</h2>
+            </div>
+          </header>
+
+          <div class="command-center__quick-grid">
+
+            <button type="button" data-page-target="dishes">
+              <b>菜</b>
+              <strong>菜品中心</strong>
+              <span>研发 · 定价</span>
+            </button>
+
+            <button type="button" data-page-target="supply">
+              <b>供</b>
+              <strong>供应链</strong>
+              <span>采购 · 库存</span>
+            </button>
+
+            <button type="button" data-page-target="analytics">
+              <b>数</b>
+              <strong>经营数据</strong>
+              <span>报表 · 分析</span>
+            </button>
+
+            <button type="button" data-page-target="employee_roster">
+              <b>员</b>
+              <strong>员工管理</strong>
+              <span>排班 · 培养</span>
+            </button>
+
+            <button type="button" data-page-target="renovation">
+              <b>装</b>
+              <strong>装修布局</strong>
+              <span>布局 · 升级</span>
+            </button>
+
+            <button type="button" data-page-target="ranking-center">
+              <b>榜</b>
+              <strong>排行榜</strong>
+              <span>排名 · 荣誉</span>
+            </button>
+
+          </div>
+
+        </section>
+
+
         <section>
 
           <h2>
@@ -688,6 +810,10 @@ class OperatingCommandCenterView {
           }
 
         </section>
+
+        </section>
+
+        ${bottomNavHtml}
 
       </main>
     `;
