@@ -36,7 +36,6 @@ const NATIVE_RUNTIME_PAGE_IDS =
 const INTENTIONAL_PLACEHOLDER_PAGE_IDS =
   Object.freeze([
     "lease",
-    "members",
     "settings"
   ]);
 
