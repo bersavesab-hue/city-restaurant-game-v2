@@ -1,0 +1,60 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+
+import {
+  getSlotAssetCandidates
+} from "../src/ui/assets/VisualAssetBinder.js";
+
+
+test(
+  "图片槽位按固定目录自动解析正式资产候选路径",
+  () => {
+    assert.deepEqual(
+      getSlotAssetCandidates(
+        "command-center-hero"
+      ).slice(
+        0,
+        2
+      ),
+      [
+        "assets/images/scenes/restaurants/command-center-hero.webp",
+        "assets/images/scenes/restaurants/command-center-hero.png"
+      ]
+    );
+
+    assert.equal(
+      getSlotAssetCandidates(
+        "command-dish-dish_001"
+      ).includes(
+        "assets/images/dishes/official/dish_001.webp"
+      ),
+      true
+    );
+
+    assert.equal(
+      getSlotAssetCandidates(
+        "command-employee-chef_01"
+      ).includes(
+        "assets/images/ui/employees/avatars/chef_01.webp"
+      ),
+      true
+    );
+  }
+);
+
+
+test(
+  "显式图片路径优先于自动候选路径",
+  () => {
+    const candidates =
+      getSlotAssetCandidates(
+        "command-employee-chef_09",
+        "assets/images/ui/employees/avatars/custom.webp"
+      );
+
+    assert.equal(
+      candidates[0],
+      "assets/images/ui/employees/avatars/custom.webp"
+    );
+  }
+);
