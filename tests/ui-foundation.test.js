@@ -30,6 +30,8 @@ test("UI基础框架支持时间倍速动态命名通报和可扩展页面注册
   assert.equal(topbar.restaurantName, "张老板秘制爆辣牛肉饭旗舰总店");
   assert.equal(topbar.clock.statusText, "已暂停");
   assert.equal(topbar.actions.canRename, true);
+  assert.equal(topbar.actions.canSwitchStore, false);
+  assert.equal(topbar.scope.type, "store");
 
   const notices = buildNoticeTickerModel([
     { id: "a", message: "牛肉库存偏低", priority: 10 },

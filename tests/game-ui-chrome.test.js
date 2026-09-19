@@ -81,6 +81,36 @@ test(
       html,
       /晴/
     );
+
+    assert.match(
+      html,
+      /data-page-target="settings"/
+    );
+  }
+);
+
+
+test(
+  "GameChrome 仅在多门店时显示集团与门店作用域",
+  () => {
+    const html = renderGameTopBar({
+      restaurantName: "东门小馆",
+      scope: {
+        type: "group",
+        canSwitch: true,
+        storeId: "store_1",
+        stores: [
+          { id: "store_1", name: "东门小馆" },
+          { id: "store_2", name: "滨河店" }
+        ]
+      },
+      clock: {}
+    });
+
+    assert.match(html, /集团视角/);
+    assert.match(html, /东门小馆/);
+    assert.match(html, /滨河店/);
+    assert.match(html, /switch-management-scope/);
   }
 );
 

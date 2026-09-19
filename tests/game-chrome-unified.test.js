@@ -233,7 +233,13 @@ test(
 
     assert.ok(
       html.includes(
-        'data-ui-icon="store"'
+        'data-page-target="settings"'
+      )
+    );
+
+    assert.ok(
+      html.includes(
+        'data-ui-icon="employees"'
       )
     );
 

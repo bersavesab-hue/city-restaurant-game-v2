@@ -1,5 +1,7 @@
 import { buildGameClockModel } from "./GameClockModel.js";
 
+import { managementScopeSystem } from "./ManagementScopeSystem.js";
+
 function safeName(value, fallback) {
   const text = String(value ?? "").trim();
   return text || fallback;
@@ -14,14 +16,31 @@ export function buildGlobalTopBarModel({
   time,
   runtime,
   weather = null,
-  currentStoreId = null
+  currentStoreId = null,
+  stores = []
 }) {
   const clock = buildGameClockModel(time, runtime);
+  const normalizedStores = stores
+    .filter(store => store?.id)
+    .map(store => ({
+      id: store.id,
+      name: safeName(store.name, "未命名门店")
+    }));
+  const scope = managementScopeSystem.normalize(
+    normalizedStores,
+    currentStoreId
+  );
+  const canSwitchScope = normalizedStores.length > 1;
 
   return {
     restaurantName: safeName(restaurantName, "未命名餐厅"),
     brandName: brandName ? safeName(brandName, null) : null,
     currentStoreId,
+    scope: {
+      ...scope,
+      canSwitch: canSwitchScope,
+      stores: normalizedStores
+    },
     balance,
     storeLevel,
     reputation,
@@ -35,7 +54,7 @@ export function buildGlobalTopBarModel({
       : null,
     actions: {
       canRename: true,
-      canSwitchStore: true,
+      canSwitchStore: canSwitchScope,
       canPause: true,
       speeds: clock.speedOptions
     }

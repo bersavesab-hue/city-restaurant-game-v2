@@ -89,29 +89,32 @@ export function renderGameTopBar(
       aria-label="门店 天气 资金 等级"
     >
 <section class="rg-topbar__identity">
-<div
+<button
+          type="button"
           class="rg-topbar__avatar"
-          aria-hidden="true"
+          data-page-target="settings"
+          aria-label="打开玩家与设置"
         >
           ${renderUiIcon(
-            "store",
+            "employees",
             "rg-topbar__avatar-icon"
           )}
-        </div>
+        </button>
 
         <div class="rg-topbar__identity-copy">
 
           <strong>
             ${escapeHtml(
-              model
-                ?.restaurantName ??
+              model?.scope?.type === "group"
+                ? model?.brandName ?? "集团总览"
+                : model?.restaurantName ??
               "未命名餐厅"
             )}
           </strong>
 
           ${
-            model?.actions
-              ?.canRename
+            model?.actions?.canRename &&
+            model?.scope?.type !== "group"
               ? `
                 <button
                   type="button"
@@ -126,12 +129,26 @@ export function renderGameTopBar(
 
 
           <span>
-            ${escapeHtml(
-              subtitle ??
-              locationLabel ??
-              model?.brandName ??
-              "餐饮经营"
-            )}
+            ${model?.scope?.canSwitch
+              ? `
+                <label class="rg-scope-select">
+                  <span class="rg-visually-hidden">当前管理范围</span>
+                  <select data-action="switch-management-scope">
+                    <option value="group" ${model.scope.type === "group" ? "selected" : ""}>集团视角</option>
+                    ${model.scope.stores.map(store => `
+                      <option value="store:${escapeHtml(store.id)}" ${model.scope.type === "store" && model.scope.storeId === store.id ? "selected" : ""}>
+                        ${escapeHtml(store.name)}
+                      </option>
+                    `).join("")}
+                  </select>
+                </label>
+              `
+              : escapeHtml(
+                  subtitle ??
+                  locationLabel ??
+                  model?.brandName ??
+                  "单店经营"
+                )}
           </span>
 
         </div>

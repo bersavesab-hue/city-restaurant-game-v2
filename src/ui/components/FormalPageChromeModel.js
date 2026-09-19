@@ -91,6 +91,17 @@ export function buildFormalPageChrome(
           restaurantId
         );
 
+  let stores = [restaurant];
+
+  try {
+    const allRestaurants = restaurantSystem.list();
+    stores = restaurant.chainId
+      ? allRestaurants.filter(item => item.chainId === restaurant.chainId)
+      : allRestaurants.filter(item => item.id === restaurant.id);
+  } catch {
+    stores = [restaurant];
+  }
+
   return {
     restaurant,
 
@@ -120,7 +131,9 @@ export function buildFormalPageChrome(
           ),
 
         currentStoreId:
-          restaurantId
+          restaurantId,
+
+        stores
       }),
 
     noticeTicker:

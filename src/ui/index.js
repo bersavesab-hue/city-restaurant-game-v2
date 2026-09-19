@@ -10,6 +10,11 @@ export {
   buildNoticeTickerModel
 } from "./components/GlobalChromeModel.js";
 export {
+  managementScopeSystem,
+  ManagementScopeSystem,
+  SCOPE_TYPE
+} from "./components/ManagementScopeSystem.js";
+export {
   PageRegistry,
   pageRegistry
 } from "./registry/PageRegistry.js";

@@ -108,6 +108,10 @@ import {
 } from "../components/GameChromeView.js";
 
 import {
+  managementScopeSystem
+} from "../components/ManagementScopeSystem.js";
+
+import {
   bindVisualAsset,
   bindVisualAssets
 } from "../assets/VisualAssetBinder.js";
@@ -1040,6 +1044,39 @@ window.restaurantGameBack =
 
     return true;
   };
+
+
+root.addEventListener(
+  "change",
+  event => {
+    const select = event.target?.closest?.(
+      '[data-action="switch-management-scope"]'
+    );
+
+    if (!select || !root.contains(select)) {
+      return;
+    }
+
+    const value = String(select.value ?? "");
+
+    if (value === "group") {
+      managementScopeSystem.setGroup(restaurantId);
+    } else if (value.startsWith("store:")) {
+      const nextRestaurantId = value.slice(6);
+      managementScopeSystem.setStore(nextRestaurantId);
+      restaurantId = nextRestaurantId;
+    } else {
+      return;
+    }
+
+    navigate(
+      currentRoute?.pageId ?? "restaurant",
+      restaurantId,
+      currentRoute?.params ?? {}
+    );
+  },
+  true
+);
 
 
 root.addEventListener(
