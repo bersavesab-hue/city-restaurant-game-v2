@@ -204,7 +204,12 @@ function buildStaffPreview(
                 "assets/images/ui/employees/avatars/" +
                   employee.roleId +
                   "_01.webp"
-              )
+              ),
+
+            avatarFallbackPath:
+              "assets/images/ui/employees/avatars/" +
+              employee.roleId +
+              "_01.webp"
           })
         )
   };
