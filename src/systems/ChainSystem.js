@@ -48,6 +48,10 @@ import {
   getMaxChainStoresForLevel
 } from "../data/chainRules.js";
 
+import {
+  lateGameInvestmentSystem
+} from "./LateGameInvestmentSystem.js";
+
 
 function clamp(
   value,
@@ -794,9 +798,23 @@ class ChainSystem {
       return chain;
     }
 
+    const regionCostMultiplier =
+      lateGameInvestmentSystem
+        .getModifiers(
+          anchor.id
+        )
+        .regionUnlockCostMultiplier ??
+      1;
+
     const cost =
-      CHAIN_EXPANSION_POLICY
-        .regionUnlockCost;
+      Math.max(
+        1,
+        Math.round(
+          CHAIN_EXPANSION_POLICY
+            .regionUnlockCost *
+          regionCostMultiplier
+        )
+      );
 
     financeSystem.expense(
       anchor.id,
@@ -1123,6 +1141,14 @@ class ChainSystem {
         100
       );
 
+    const shelfLifeMultiplier =
+      lateGameInvestmentSystem
+        .getModifiers(
+          chain.anchorRestaurantId
+        )
+        .centralKitchenShelfLifeMultiplier ??
+      1;
+
     const remainingDays =
       Math.max(
         1,
@@ -1130,7 +1156,8 @@ class ChainSystem {
           ingredient
             .shelfLifeDays *
           averageFreshness /
-          100
+          100 *
+          shelfLifeMultiplier
         )
       );
 
@@ -1736,8 +1763,21 @@ class ChainSystem {
                 ),
 
             unlockCost:
-              CHAIN_EXPANSION_POLICY
-                .regionUnlockCost
+              Math.max(
+                1,
+                Math.round(
+                  CHAIN_EXPANSION_POLICY
+                    .regionUnlockCost *
+                  (
+                    lateGameInvestmentSystem
+                      .getModifiers(
+                        anchor.id
+                      )
+                      .regionUnlockCostMultiplier ??
+                    1
+                  )
+                )
+              )
           })
         )
     };
