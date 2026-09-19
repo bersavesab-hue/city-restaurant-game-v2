@@ -388,14 +388,27 @@ class WorkforceCapacitySystem {
       restaurantId
     );
 
+    const allEmployees =
+      employeeSystem
+        .listByRestaurant(
+          restaurantId,
+          {
+            includeFired: true
+          }
+        );
+
     const employees =
       employeeSystem
         .listByRestaurant(
           restaurantId
         );
 
+    // Pure capacity tests and legacy isolated contexts can still
+    // operate without an employee model. Once a restaurant has
+    // actually created employees, missing operational roles must
+    // not receive phantom capacity.
     if (
-      employees.length === 0
+      allEmployees.length === 0
     ) {
       return {
         restaurantId,
@@ -706,7 +719,7 @@ class WorkforceCapacitySystem {
 
       kitchenGuests:
         Math.max(
-          1,
+          0,
           Math.floor(
             kitchenPerHour *
             factor
@@ -715,7 +728,7 @@ class WorkforceCapacitySystem {
 
       serviceGuests:
         Math.max(
-          1,
+          0,
           Math.floor(
             servicePerHour *
             factor
