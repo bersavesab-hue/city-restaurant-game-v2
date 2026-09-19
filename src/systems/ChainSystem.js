@@ -567,7 +567,7 @@ class ChainSystem {
 
     financeSystem.createAccount(
       branch.id,
-      0
+      initialCapital
     );
 
     try {
@@ -576,13 +576,6 @@ class ChainSystem {
         initialCapital,
         FINANCE_CATEGORY.OTHER,
         `连锁扩张：拨付${name.trim()}启动资金`
-      );
-
-      financeSystem.income(
-        branch.id,
-        initialCapital,
-        FINANCE_CATEGORY.OTHER,
-        "连锁总部拨付启动资金"
       );
     } catch (error) {
       const account =
