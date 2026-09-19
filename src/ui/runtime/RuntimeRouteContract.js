@@ -34,10 +34,7 @@ const NATIVE_RUNTIME_PAGE_IDS =
  * 后面真正做出页面时，必须从这里删除。
  */
 const INTENTIONAL_PLACEHOLDER_PAGE_IDS =
-  Object.freeze([
-    "lease",
-    "settings"
-  ]);
+  Object.freeze([]);
 
 
 const LEGACY_PAGE_IDS =
