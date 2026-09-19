@@ -27,6 +27,7 @@ on:
       - "PRIVACY.md"
       - "docs/PUBLISHING.md"
       - "docs/STORE_LISTING_DRAFT.md"
+      - "docs/PLAYTEST_ACCEPTANCE.md"
       - ".github/test-signing/**"
       - ".github/workflows/android-release-smoke.yml"
 
@@ -126,5 +127,6 @@ jobs:
             PRIVACY.md
             docs/PUBLISHING.md
             docs/STORE_LISTING_DRAFT.md
+            docs/PLAYTEST_ACCEPTANCE.md
           if-no-files-found: error
           retention-days: 30
