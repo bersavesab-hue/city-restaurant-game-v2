@@ -24,6 +24,7 @@ import { equipmentMaintenanceSystem } from "./EquipmentMaintenanceSystem.js";
 import { awardSystem } from "./AwardSystem.js";
 import { customerLoyaltySystem } from "./CustomerLoyaltySystem.js";
 import { wordOfMouthSystem } from "./WordOfMouthSystem.js";
+import { chainSystem } from "./ChainSystem.js";
 
 class OperatingCycleSystem {
   constructor() {
@@ -159,6 +160,11 @@ class OperatingCycleSystem {
 
           wordOfMouthSystem
             .pruneHistory(
+              current.day
+            );
+
+          chainSystem
+            .processDay(
               current.day
             );
 
