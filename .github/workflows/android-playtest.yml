@@ -17,6 +17,7 @@ on:
       - "scripts/phase3-longrun-gate.mjs"
       - "scripts/phase3-performance-gate.mjs"
       - "scripts/save-compatibility-gate.mjs"
+      - "scripts/chain-expansion-gate.mjs"
       - "scripts/stress-20year.mjs"
       - "scripts/aging-performance.mjs"
       - "tests/**"
@@ -50,6 +51,9 @@ jobs:
 
       - name: Run save compatibility gate
         run: npm run test:save-compat
+
+      - name: Run chain expansion gate
+        run: npm run test:phase5:chain
 
       - name: Run phase3 performance gate
         run: npm run test:phase3:performance
