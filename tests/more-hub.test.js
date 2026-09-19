@@ -76,18 +76,37 @@ test("更多主页只保留已经接入的正式功能入口", () => {
     "member-marketing",
     "honor-hall",
     "awards-center",
-    "chain"
+    "lease",
+    "chain",
+    "brand-investments",
+    "settings"
   ]){
     assert.ok(
       targets.includes(target),
       target
     );
   }
+
+  const investmentEntry =
+    page.groups
+      .flatMap(
+        group =>
+          group.entries
+      )
+      .find(
+        item =>
+          item.id ===
+          "brand-investments"
+      );
+
   assert.equal(
-    targets.includes(
-      "settings"
-    ),
-    false
+    investmentEntry.state,
+    "locked"
+  );
+
+  assert.equal(
+    investmentEntry.unlockLevel,
+    7
   );
 
 });
