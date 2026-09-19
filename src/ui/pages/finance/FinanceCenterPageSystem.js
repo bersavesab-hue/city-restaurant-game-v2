@@ -14,6 +14,15 @@ import {
   economicBalanceSystem
 } from "../../../systems/EconomicBalanceSystem.js";
 
+import {
+  restaurantSystem
+} from "../../../systems/RestaurantSystem.js";
+
+import {
+  buildGlobalTopBarModel,
+  buildNoticeTickerModel
+} from "../../components/GlobalChromeModel.js";
+
 const PERIOD_DAYS = {
   day: 1,
   week: 7,
@@ -273,6 +282,11 @@ class FinanceCenterPageSystem {
       period = "month"
     } = {}
   ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
     const account =
       financeSystem.getAccount(
         restaurantId
@@ -315,9 +329,98 @@ class FinanceCenterPageSystem {
             )
         });
 
+    const payables =
+      this.getPayables(
+        restaurantId
+      );
+
+    const notices =
+      [];
+
+    if (
+      health.status ===
+      "warning" ||
+      health.status ===
+      "danger"
+    ) {
+      notices.push({
+        id:
+          "finance_health",
+
+        type:
+          "warning",
+
+        title:
+          "资金预警",
+
+        message:
+          `当前财务健康状态：${health.status === "danger" ? "危险" : "预警"}`,
+
+        priority:
+          100
+      });
+    }
+
+    if (
+      payables.overdueCount >
+      0
+    ) {
+      notices.push({
+        id:
+          "finance_overdue",
+
+        type:
+          "danger",
+
+        title:
+          "应付逾期",
+
+        message:
+          `${payables.overdueCount}笔供应商账款已经逾期`,
+
+        priority:
+          120
+      });
+    }
+
     return {
       pageId:
         "finance",
+
+      topBar:
+        buildGlobalTopBarModel({
+          restaurantName:
+            restaurant.name,
+
+          balance:
+            account.balance,
+
+          storeLevel:
+            restaurant.level ??
+            1,
+
+          reputation:
+            restaurant.reputation ??
+            0,
+
+          time:
+            gameState.getSection(
+              "time"
+            ),
+
+          runtime:
+            gameState.getSection(
+              "runtime"
+            ),
+
+          currentStoreId:
+            restaurantId
+        }),
+
+      noticeTicker:
+        buildNoticeTickerModel(
+          notices
+        ),
 
       title:
         "财务中心",
@@ -363,10 +466,7 @@ class FinanceCenterPageSystem {
 
       health,
 
-      payables:
-        this.getPayables(
-          restaurantId
-        ),
+      payables,
 
       categories,
 
