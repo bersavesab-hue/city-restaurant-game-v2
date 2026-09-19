@@ -20,6 +20,11 @@ const FAILURE_CACHE =
 
 const SLOT_PREFIXES =
   Object.freeze({
+    "property-":
+      [
+        "assets/images/ui/properties"
+      ],
+
     "command-dish-":
       [
         "assets/images/dishes/official",
@@ -102,6 +107,21 @@ export function getSlotAssetCandidates(
   ) {
     candidates.push(
       explicitSource
+    );
+  }
+
+  if (
+    slot ===
+    "city-main-map"
+  ) {
+    candidates.push(
+      ...withExtensions(
+        "assets/images/ui/city/city-main-map"
+      )
+    );
+
+    return unique(
+      candidates
     );
   }
 
