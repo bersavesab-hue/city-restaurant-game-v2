@@ -6,7 +6,7 @@
 
   margin: 0 auto;
 
-  padding-bottom: 78px;
+  padding-bottom: calc(78px + env(safe-area-inset-bottom));
 
   overflow-x: hidden;
 
