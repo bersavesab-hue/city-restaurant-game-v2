@@ -32,6 +32,7 @@ import { employeeCareerSystem } from "./systems/EmployeeCareerSystem.js";
 import { employeeDynamicsSystem } from "./systems/EmployeeDynamicsSystem.js";
 import { staffingRecommendationSystem } from "./systems/StaffingRecommendationSystem.js";
 import { storeProgressSystem } from "./systems/StoreProgressSystem.js";
+import { chainSystem } from "./systems/ChainSystem.js";
 
 import { ingredientCatalogSystem } from "./systems/IngredientCatalogSystem.js";
 import { dishRecipeBootstrapSystem } from "./systems/DishRecipeBootstrapSystem.js";
@@ -149,6 +150,7 @@ function bootstrap() {
       employeeDynamicsSystem,
       staffingRecommendationSystem,
       storeProgressSystem,
+      chainSystem,
 
       ingredientCatalogSystem,
       dishRecipeBootstrapSystem,
