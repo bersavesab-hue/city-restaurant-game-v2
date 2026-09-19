@@ -7,6 +7,13 @@ import {
 } from "../../components/GameChromeSystem.js";
 
 import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
@@ -154,16 +161,34 @@ class LeaseManagementView {
 
 
   renderMarkup(page) {
+    const chrome =
+      buildFormalPageChrome(
+        page.restaurantId ??
+        this.restaurantId
+      );
+
     return [
       '<main class="rg-screen lease-page">',
-      '<header class="lease-page__header">',
-      "<h1>租约管理</h1>",
-      "<p>" +
-        esc(page.restaurant.name) +
-        " · 可用资金 " +
-        money(page.balance) +
-        "</p>",
-      "</header>",
+      renderGameTopBar(
+        chrome.topBar,
+        {
+          subtitle:
+            "租金 · 押金 · 续租"
+        }
+      ),
+      renderNoticeTicker(
+        chrome.noticeTicker
+      ),
+      renderPageTitle({
+        title:
+          "租约管理",
+        subtitle:
+          esc(page.restaurant.name) +
+          " · 可用资金 " +
+          money(page.balance),
+        backTarget:
+          "more-home"
+      }),
 
       this.message
         ? '<p class="lease-page__message">' +
