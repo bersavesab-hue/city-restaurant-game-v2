@@ -303,18 +303,3 @@
 
   font-size: 8px;
 }
-
-
-@media (
-  max-width: 390px
-) {
-  .operations-hub__grid {
-    grid-template-columns:
-      1fr;
-  }
-
-
-  .operations-hub__primary {
-    min-height: 82px;
-  }
-}
