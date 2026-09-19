@@ -91,7 +91,6 @@ import { layoutFlowSystem } from "./systems/LayoutFlowSystem.js";
 import { renovationPlanningSystem } from "./systems/RenovationPlanningSystem.js";
 import { renovationEditorSystem } from "./systems/RenovationEditorSystem.js";
 import { renovationMobilePageSystem } from "./ui/renovation/RenovationMobilePageSystem.js";
-import { restaurantHomePageSystem } from "./ui/pages/restaurant/RestaurantHomePageSystem.js";
 import { openingSetupPageSystem } from "./ui/pages/opening/OpeningSetupPageSystem.js";
 import { cityPropertyPageSystem } from "./ui/pages/city/CityPropertyPageSystem.js";
 import { dishCenterPageSystem } from "./ui/pages/dishes/DishCenterPageSystem.js";
@@ -231,7 +230,6 @@ function bootstrap() {
 
     ui: {
       pageRegistry,
-      restaurantHomePageSystem,
       openingSetupPageSystem,
       cityPropertyPageSystem,
       employeeManagementPageSystem,
