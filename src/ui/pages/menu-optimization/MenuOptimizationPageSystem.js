@@ -10,6 +10,7 @@ import {
   buildFormalPageChrome
 } from "../../components/FormalPageChromeModel.js";
 
+
 class MenuOptimizationPageSystem {
   getPage(
     restaurantId
@@ -55,52 +56,11 @@ class MenuOptimizationPageSystem {
         }
       );
 
-    const dashboard =
-      menuOptimizationSystem
-        .getDashboard(
-          restaurantId
-        );
-
-    const engineering =
-      menuEngineeringSystem
-        .analyze(
-          restaurantId
-        );
-
-    const chrome =
-      buildFormalPageChrome(
-        restaurantId,
-        {
-          notices:
-            dashboard.activePromotions >
-            0
-              ? [
-                  {
-                    id:
-                      "menu_promotion_active",
-                    type:
-                      "info",
-                    title:
-                      "菜单活动",
-                    message:
-                      `当前有${dashboard.activePromotions}个菜品促销正在执行`,
-                    priority:
-                      40
-                  }
-                ]
-              : []
-        }
-      );
-
     return {
       pageId:
         "menu-optimization",
 
-      topBar:
-        chrome.topBar,
-
-      noticeTicker:
-        chrome.noticeTicker,
+      restaurantId,
 
       topBar:
         chrome.topBar,
@@ -111,8 +71,6 @@ class MenuOptimizationPageSystem {
       title:
         "菜单调整",
 
-      restaurantId,
-
       dashboard,
 
       engineering
@@ -120,8 +78,10 @@ class MenuOptimizationPageSystem {
   }
 }
 
+
 export const menuOptimizationPageSystem =
   new MenuOptimizationPageSystem();
+
 
 export {
   MenuOptimizationPageSystem
