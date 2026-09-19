@@ -17,6 +17,11 @@ import {
   workforceCapacitySystem
 } from "../src/systems/WorkforceCapacitySystem.js";
 
+
+import {
+  employeeWorkSystem
+} from "../src/systems/EmployeeWorkSystem.js";
+
 import {
   serviceCapacitySystem
 } from "../src/systems/ServiceCapacitySystem.js";
@@ -378,6 +383,15 @@ test(
       "没有收银员时保留老板临时收银1单/小时"
     );
 
+    assert.equal(
+      employeeWorkSystem
+        .getServiceCapacity(
+          restaurant.id
+        ),
+      0,
+      "整日快速模拟也不能在无服务员时产生幽灵前厅产能"
+    );
+
     const server =
       createEmployee(
         restaurant.id,
@@ -398,6 +412,14 @@ test(
 
     assert.ok(
       capacity.serviceGuests >
+      0
+    );
+
+    assert.ok(
+      employeeWorkSystem
+        .getServiceCapacity(
+          restaurant.id
+        ) >
       0
     );
 
@@ -442,6 +464,14 @@ test(
 
     assert.equal(
       capacity.serviceGuests,
+      0
+    );
+
+    assert.equal(
+      employeeWorkSystem
+        .getServiceCapacity(
+          restaurant.id
+        ),
       0
     );
 
