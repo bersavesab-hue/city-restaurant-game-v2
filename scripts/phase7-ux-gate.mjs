@@ -4,7 +4,7 @@ import {
 
 const tests = [
   "tests/phase7-ux-integration.test.js",
-  "tests/restaurant-home-formal-ui.test.js",
+  "tests/operating-command-center-formal-ui.test.js",
   "tests/game-chrome-unified.test.js",
   "tests/game-ui-chrome.test.js",
   "tests/renovation-mobile-page.test.js",
