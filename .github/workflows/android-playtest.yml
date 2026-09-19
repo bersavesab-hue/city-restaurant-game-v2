@@ -20,6 +20,10 @@ on:
       - "scripts/chain-expansion-gate.mjs"
       - "scripts/phase6-lifecycle-gate.mjs"
       - "scripts/phase7-ux-gate.mjs"
+      - "scripts/phase8-release-gate.mjs"
+      - "scripts/generate-release-metadata.mjs"
+      - "PRIVACY.md"
+      - "docs/PUBLISHING.md"
       - "scripts/stress-20year.mjs"
       - "scripts/aging-performance.mjs"
       - "tests/**"
@@ -62,6 +66,9 @@ jobs:
 
       - name: Run phase7 ux gate
         run: npm run test:phase7:ux
+
+      - name: Run phase8 release gate
+        run: npm run test:phase8:release
 
       - name: Run phase3 performance gate
         run: npm run test:phase3:performance
@@ -117,19 +124,29 @@ jobs:
           cd android
           ./gradlew --no-daemon clean assembleDebug --stacktrace
 
-      - name: Prepare APK artifact
+      - name: Prepare APK release package
         shell: bash
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/debug/app-debug.apk"
           test -s "$APK"
-          cp "$APK" city-restaurant-test.apk
-          ls -lh city-restaurant-test.apk
+          VERSION="$(node -p "require('./package.json').version")"
+          APK_NAME="city-restaurant-v${VERSION}-playtest.apk"
+          cp "$APK" "$APK_NAME"
+          sha256sum "$APK_NAME" > SHA256SUMS.txt
+          node scripts/generate-release-metadata.mjs "$APK_NAME" release-metadata.json
+          echo "APK_ARTIFACT_NAME=$APK_NAME" >> "$GITHUB_ENV"
+          ls -lh "$APK_NAME" release-metadata.json SHA256SUMS.txt
 
-      - name: Upload APK
+      - name: Upload playtest release package
         uses: actions/upload-artifact@v4
         with:
-          name: city-restaurant-test-apk
-          path: city-restaurant-test.apk
+          name: city-restaurant-playtest-package
+          path: |
+            ${{ env.APK_ARTIFACT_NAME }}
+            release-metadata.json
+            SHA256SUMS.txt
+            PRIVACY.md
+            docs/PUBLISHING.md
           if-no-files-found: error
           retention-days: 30
