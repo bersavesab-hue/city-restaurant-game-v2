@@ -1065,3 +1065,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* 图片绑定成功后只隐藏占位文字，保留真实数据徽章 */
+.command-center__hero-image[data-image-state="loaded"] > span {
+  display: none;
+}
+
+.command-center__staff-avatar[data-image-state="loaded"] {
+  color: transparent;
+  text-shadow: none;
+}
+
+.command-center__ingredient-image[data-image-state="loaded"],
+.command-center__ingredient-image[data-image-state="atlas"] {
+  color: transparent;
+  text-shadow: none;
+}
