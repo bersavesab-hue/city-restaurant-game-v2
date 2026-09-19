@@ -1418,13 +1418,9 @@
 }
 
 
-.employee-avatar-slot > small {
-  margin-top: 2px;
 
-  color:
-    rgba(255,255,255,.72);
-
-  font-size: 7px;
+.employee-avatar-slot[data-image-state="loaded"] > span {
+  display: none;
 }
 
 
