@@ -6,6 +6,10 @@ import {
   getCustomDishVisualUrl
 } from "./CustomDishVisualService.js";
 
+import {
+  getVisualAssetSpec
+} from "./VisualAssetSpecs.js";
+
 
 const SUCCESS_CACHE =
   new Map();
@@ -36,6 +40,11 @@ const SLOT_PREFIXES =
     "employee-avatar-":
       [
         "assets/images/ui/employees/avatars"
+      ],
+
+    "renovation-furniture-":
+      [
+        "assets/images/ui/renovation/furniture"
       ]
   });
 
@@ -145,6 +154,27 @@ export function getSlotAssetCandidates(
       ),
       ...withExtensions(
         "assets/images/scenes/restaurants/command-center-hero"
+      ),
+      ...withExtensions(
+        "assets/images/scenes/restaurants/default"
+      )
+    );
+
+    return unique(
+      candidates
+    );
+  }
+
+  if (
+    slot ===
+    "renovation-construction-site"
+  ) {
+    candidates.push(
+      ...withExtensions(
+        "assets/images/scenes/renovation/construction-site"
+      ),
+      ...withExtensions(
+        "assets/images/scenes/restaurants/restaurant-live"
       ),
       ...withExtensions(
         "assets/images/scenes/restaurants/default"
@@ -505,6 +535,29 @@ export async function bindVisualAsset(
     element.dataset
       .imageFallback ??
     null;
+
+  const spec =
+    getVisualAssetSpec(
+      slot
+    );
+
+  if (spec) {
+    element.dataset
+      .expectedWidth =
+      String(
+        spec.width
+      );
+
+    element.dataset
+      .expectedHeight =
+      String(
+        spec.height
+      );
+
+    element.dataset
+      .expectedAspectRatio =
+      spec.aspectRatio;
+  }
 
   element.dataset
     .imageBinding =
