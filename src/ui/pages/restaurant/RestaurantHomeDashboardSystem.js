@@ -35,6 +35,14 @@ import {
   restaurantHomePageSystem
 } from "./RestaurantHomePageSystem.js";
 
+import {
+  onboardingSystem
+} from "../../../systems/OnboardingSystem.js";
+
+import {
+  operatingAdvisorSystem
+} from "../../../systems/OperatingAdvisorSystem.js";
+
 
 function safeDish(
   dishId
@@ -635,6 +643,18 @@ class RestaurantHomeDashboardSystem {
         restaurantId
       );
 
+    const onboarding =
+      onboardingSystem
+        .getState(
+          restaurantId
+        );
+
+    const advisor =
+      operatingAdvisorSystem
+        .getAdvice(
+          restaurantId
+        );
+
     const grossProfit =
       (
         base.today.revenue ??
@@ -791,13 +811,15 @@ class RestaurantHomeDashboardSystem {
 
       topDishes,
 
+      onboarding,
+
+      advisor,
+
       reminders:
-        base.noticeTicker
-          .items
-          .slice(
-            0,
-            3
-          ),
+        advisor.slice(
+          0,
+          3
+        ),
 
       imageSlots: [
         {
