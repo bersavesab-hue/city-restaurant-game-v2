@@ -45,6 +45,35 @@ function money(value) {
 class RenovationGameView
   extends RenovationFloorplanMobileView {
 
+  handleClick(
+    event
+  ) {
+    const pageTarget =
+      event.target.closest?.(
+        "[data-page-target]"
+      );
+
+    if (
+      pageTarget &&
+      this.root.contains(
+        pageTarget
+      )
+    ) {
+      event.preventDefault();
+
+      this.commit(
+        false
+      );
+
+      return;
+    }
+
+    super.handleClick(
+      event
+    );
+  }
+
+
   getChromeModel() {
     const restaurant =
       restaurantSystem.get(
