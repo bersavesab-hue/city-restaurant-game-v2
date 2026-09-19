@@ -329,8 +329,7 @@ button.is-active {
   display: grid;
 
   grid-template-columns:
-    minmax(0,1.45fr)
-    minmax(145px,.78fr);
+    1fr;
 
   gap: 5px;
 
@@ -358,9 +357,12 @@ button.is-active {
 .store-hero__image {
   position: relative;
 
-  min-height: 215px;
-
   overflow: hidden;
+
+  aspect-ratio:
+    16 / 9;
+
+  min-height: 0;
 }
 
 
@@ -444,17 +446,26 @@ button.is-active {
 
 
 .restaurant-image-slot--hero {
-  min-height: 215px;
+  min-height: 0;
+
+  aspect-ratio:
+    16 / 9;
 }
 
 
 .restaurant-image-slot--live {
-  min-height: 165px;
+  min-height: 0;
+
+  aspect-ratio:
+    16 / 9;
 }
 
 
 .restaurant-image-slot--dish {
-  min-height: 94px;
+  min-height: 0;
+
+  aspect-ratio:
+    1 / 1;
 }
 
 
@@ -587,7 +598,7 @@ button.is-active {
   display: grid;
 
   grid-template-columns:
-    repeat(2,1fr);
+    repeat(3,1fr);
 
   gap: 3px;
 
@@ -962,8 +973,7 @@ button:disabled {
   display: grid;
 
   grid-template-columns:
-    minmax(0,1.35fr)
-    minmax(145px,.75fr);
+    1fr;
 
   gap: 5px;
 
@@ -1421,12 +1431,6 @@ button.is-active {
       .67fr;
   }
 
-  .store-hero {
-    grid-template-columns:
-      minmax(0,1.25fr)
-      minmax(130px,.75fr);
-  }
-
   .store-kpis strong {
     font-size: 12px;
   }
@@ -1436,11 +1440,6 @@ button.is-active {
     font-size: 8px;
   }
 
-  .store-middle-grid {
-    grid-template-columns:
-      minmax(0,1.25fr)
-      minmax(130px,.75fr);
-  }
 }
 
 
@@ -1456,4 +1455,24 @@ button.is-active {
 .restaurant-image-slot[data-image-state="loaded"]
 .restaurant-image-slot__placeholder {
   display: none;
+}
+
+
+@media (
+  max-width: 350px
+) {
+  .store-summary-grid {
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+
+  .store-signature-grid {
+    gap: 4px;
+
+    padding: 4px;
+  }
+
+  .store-signature-card__body {
+    padding: 5px 4px;
+  }
 }
