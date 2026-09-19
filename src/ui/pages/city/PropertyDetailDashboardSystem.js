@@ -14,6 +14,11 @@ import {
   cityPropertyPageSystem
 } from "./CityPropertyPageSystem.js";
 
+import {
+  buildGlobalTopBarModel,
+  buildNoticeTickerModel
+} from "../../components/GlobalChromeModel.js";
+
 
 function safeBalance(
   restaurantId
@@ -782,6 +787,11 @@ class PropertyDetailDashboardSystem {
         "time"
       );
 
+    const runtime =
+      gameState.getSection(
+        "runtime"
+      );
+
     const structures =
       this.getStructureSummary(
         detail.layout
@@ -824,33 +834,68 @@ class PropertyDetailDashboardSystem {
           }
         : null,
 
-      topBar: {
-        restaurantName:
-          restaurant?.name ??
-          "城市餐饮创业",
+      topBar:
+        buildGlobalTopBarModel({
+          restaurantName:
+            restaurant?.name ??
+            "城市餐饮创业",
 
-        balance,
+          balance:
+            balance ??
+            0,
 
-        level:
-          restaurant?.level ??
-          1,
+          storeLevel:
+            restaurant?.level ??
+            1,
 
-        reputation:
-          restaurant?.reputation ??
-          0,
+          reputation:
+            restaurant?.reputation ??
+            0,
 
-        day:
-          time?.day ??
-          1,
+          time,
 
-        hour:
-          time?.hour ??
-          0,
+          runtime,
 
-        minute:
-          time?.minute ??
-          0
-      },
+          currentStoreId:
+            restaurantId
+        }),
+
+      noticeTicker:
+        buildNoticeTickerModel(
+          risks
+            .filter(
+              risk =>
+                risk.level ===
+                  "danger" ||
+                risk.level ===
+                  "warning"
+            )
+            .slice(
+              0,
+              4
+            )
+            .map(
+              risk => ({
+                id:
+                  `property_${risk.id}`,
+
+                type:
+                  risk.level,
+
+                title:
+                  risk.title,
+
+                message:
+                  risk.description,
+
+                priority:
+                  risk.level ===
+                    "danger"
+                    ? 110
+                    : 80
+              })
+            )
+        ),
 
       property:
         detail.property,
