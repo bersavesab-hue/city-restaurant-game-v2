@@ -13,6 +13,10 @@ import {
 } from "../../core/SaveSystem.js";
 
 import {
+  feedbackSystem
+} from "../../systems/FeedbackSystem.js";
+
+import {
   gameState
 } from "../../core/GameState.js";
 
@@ -443,6 +447,12 @@ function startRuntimeSystems() {
     },
 
     onError(error) {
+      feedbackSystem
+        .captureRuntimeError(
+          error,
+          "simulation-loop"
+        );
+
       console.error(
         "经营模拟循环错误",
         error
@@ -1023,9 +1033,32 @@ root.addEventListener(
 window.addEventListener(
   "error",
   event => {
+    feedbackSystem
+      .captureRuntimeError(
+        event.error ??
+        event.message,
+        "window-error"
+      );
+
     console.error(
       event.error ??
       event.message
+    );
+  }
+);
+
+
+window.addEventListener(
+  "unhandledrejection",
+  event => {
+    feedbackSystem
+      .captureRuntimeError(
+        event.reason,
+        "unhandled-rejection"
+      );
+
+    console.error(
+      event.reason
     );
   }
 );
