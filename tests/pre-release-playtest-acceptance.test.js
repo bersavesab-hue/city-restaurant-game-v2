@@ -323,3 +323,44 @@ test(
     );
   }
 );
+
+
+test(
+  "Android宿主关闭调试、内容提供器和跨域文件访问",
+  () => {
+    const source =
+      read(
+        "android/app/src/main/java/com/cityrestaurant/game/MainActivity.java"
+      );
+
+    assert.match(
+      source,
+      /setWebContentsDebuggingEnabled\(false\)/
+    );
+
+    assert.match(
+      source,
+      /setAllowContentAccess\(false\)/
+    );
+
+    assert.match(
+      source,
+      /setAllowFileAccessFromFileURLs\(false\)/
+    );
+
+    assert.match(
+      source,
+      /setAllowUniversalAccessFromFileURLs\(false\)/
+    );
+
+    assert.match(
+      source,
+      /MIXED_CONTENT_NEVER_ALLOW/
+    );
+
+    assert.match(
+      source,
+      /setJavaScriptCanOpenWindowsAutomatically\(false\)/
+    );
+  }
+);
