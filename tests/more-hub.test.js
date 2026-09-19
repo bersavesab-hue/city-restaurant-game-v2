@@ -79,6 +79,7 @@ test("更多主页只保留已经接入的正式功能入口", () => {
     "lease",
     "chain",
     "brand-investments",
+    "feedback",
     "settings"
   ]){
     assert.ok(
