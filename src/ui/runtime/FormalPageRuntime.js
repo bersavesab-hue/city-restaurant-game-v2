@@ -272,6 +272,15 @@ import {
 } from "../pages/brand-investments/BrandInvestmentView.js";
 
 
+import {
+  feedbackPageSystem
+} from "../pages/feedback/FeedbackPageSystem.js";
+
+import {
+  feedbackView
+} from "../pages/feedback/FeedbackView.js";
+
+
 const FORMAL_PAGE_DEFINITIONS =
   Object.freeze({
     supply: {
@@ -647,6 +656,18 @@ const FORMAL_PAGE_DEFINITIONS =
       refreshEvents: [
         "brandInvestment:purchased"
       ]
+    },
+
+
+    feedback: {
+      pageSystem:
+        feedbackPageSystem,
+
+      view:
+        feedbackView,
+
+      mode:
+        "mount"
     }
   });
 
