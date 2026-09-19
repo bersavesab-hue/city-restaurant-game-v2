@@ -97,30 +97,14 @@ function renderImageSlot(
         city-image-slot
         ${className}
       "
+      role="img"
+      aria-label="${escapeHtml(
+        label
+      )}"
       data-image-slot="${escapeHtml(
         id
       )}"
-    >
-
-      <div class="city-image-slot__placeholder">
-
-        <span>
-          ▦
-        </span>
-
-        <strong>
-          ${escapeHtml(
-            label
-          )}
-        </strong>
-
-        <small>
-          图片槽位
-        </small>
-
-      </div>
-
-    </div>
+    ></div>
   `;
 }
 
