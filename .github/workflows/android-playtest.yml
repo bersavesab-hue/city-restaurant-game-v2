@@ -47,14 +47,14 @@ jobs:
       - name: Run playable-flow gate
         run: npm run test:phase2
 
+      - name: Run phase3 performance gate
+        run: npm run test:phase3:performance
+
       - name: Run phase3 90-day balance gate
         run: npm run test:phase3:balance
 
       - name: Run phase3 365-day longrun gate
         run: npm run test:phase3:longrun
-
-      - name: Run phase3 performance gate
-        run: npm run test:phase3:performance
 
       - name: Build Android web bundle
         run: npm run build:android-js
