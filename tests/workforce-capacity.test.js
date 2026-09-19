@@ -75,6 +75,11 @@ test(
           "员工产能测试店"
       });
 
+    restaurantSystem.setLevel(
+      restaurant.id,
+      6
+    );
+
     serviceCapacitySystem
       .configure(
         restaurant.id,
@@ -317,6 +322,11 @@ test(
         name:
           "岗位缺失产能测试店"
       });
+
+    restaurantSystem.setLevel(
+      restaurant.id,
+      6
+    );
 
     serviceCapacitySystem
       .configure(
