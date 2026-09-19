@@ -155,9 +155,15 @@ function renderStaffPreview(
               '<article>' +
                 '<div class="command-center__staff-avatar" data-image-slot="command-employee-' +
                   escapeHtml(
+                    employee.avatarId ??
                     employee.id
                   ) +
-                '">' +
+                  '" data-image-src="' +
+                  escapeHtml(
+                    employee.avatarPath ??
+                    ""
+                  ) +
+                  '" data-image-fit="cover">' +
                   escapeHtml(
                     employee.name
                       ?.slice(
@@ -258,7 +264,11 @@ function renderInventoryPreview(
                   escapeHtml(
                     item.ingredientId
                   ) +
-                '">食材</div>' +
+                  '" data-ingredient-id="' +
+                  escapeHtml(
+                    item.ingredientId
+                  ) +
+                  '">食材</div>' +
                 '<strong>' +
                   escapeHtml(
                     item.name
@@ -492,6 +502,8 @@ class OperatingCommandCenterView {
           <div
             class="command-center__hero-image"
             data-image-slot="command-center-hero"
+            data-image-src="assets/images/scenes/restaurants/command-center-hero.webp"
+            data-image-fit="cover"
             aria-label="门店经营场景图片槽位"
           >
             <span>门店经营场景</span>
