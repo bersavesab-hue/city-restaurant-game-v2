@@ -6,6 +6,19 @@ import {
   salesChannelSystem
 } from "../../../systems/SalesChannelSystem.js";
 
+import {
+  financeSystem
+} from "../../../systems/FinanceSystem.js";
+
+import {
+  gameState
+} from "../../../core/GameState.js";
+
+import {
+  buildGlobalTopBarModel,
+  buildNoticeTickerModel
+} from "../../components/GlobalChromeModel.js";
+
 function clamp(
   value,
   min,
@@ -35,9 +48,92 @@ class ChannelManagementPageSystem {
           restaurantId
         );
 
+    let balance =
+      0;
+
+    try {
+      balance =
+        financeSystem.getBalance(
+          restaurantId
+        );
+    } catch {
+      balance =
+        0;
+    }
+
+    const notices =
+      [];
+
+    const saturated =
+      dashboard.channels
+        .filter(
+          channel =>
+            channel.unlocked &&
+            channel.active &&
+            channel.capacityStatus
+              .remaining <=
+              0
+        );
+
+    if (
+      saturated.length >
+      0
+    ) {
+      notices.push({
+        id:
+          "channel_capacity",
+
+        type:
+          "warning",
+
+        title:
+          "渠道容量",
+
+        message:
+          `${saturated.length}个营业渠道本小时已达到接单上限`,
+
+        priority:
+          90
+      });
+    }
+
     return {
       pageId:
         "channels",
+
+      topBar:
+        buildGlobalTopBarModel({
+          restaurantName:
+            restaurant.name,
+
+          balance,
+
+          storeLevel:
+            restaurant.level ??
+            1,
+
+          reputation:
+            restaurant.reputation ??
+            0,
+
+          time:
+            gameState.getSection(
+              "time"
+            ),
+
+          runtime:
+            gameState.getSection(
+              "runtime"
+            ),
+
+          currentStoreId:
+            restaurantId
+        }),
+
+      noticeTicker:
+        buildNoticeTickerModel(
+          notices
+        ),
 
       title:
         "销售渠道",
