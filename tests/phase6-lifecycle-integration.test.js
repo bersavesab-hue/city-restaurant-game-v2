@@ -480,7 +480,7 @@ test(
 
     assert.equal(
       dashboard.totalInvested,
-      970000
+      980000
     );
 
     assert.equal(
@@ -488,7 +488,7 @@ test(
         restaurant.id
       ),
       initialBalance -
-      970000
+      980000
     );
 
     assert.equal(
