@@ -1,11 +1,44 @@
+import {
+  renderGameTopBar,
+  renderNoticeTicker,
+  renderPageTitle,
+  renderBottomNavigation
+} from "../../components/GameChromeView.js";
+
+import {
+  gameChromeSystem
+} from "../../components/GameChromeSystem.js";
+
+
 class ReputationView {
   renderMarkup(page) {
     return `
-      <section class="reputation-page">
-        <header>
-          <span>顾客反馈</span>
-          <h1>评价与口碑</h1>
-        </header>
+      <main class="rg-screen reputation-formal-page">
+
+        ${renderGameTopBar(
+          page.topBar,
+          {
+            subtitle:
+              "顾客反馈 · 复购 · 菜品讨论"
+          }
+        )}
+
+        ${renderNoticeTicker(
+          page.noticeTicker
+        )}
+
+        ${renderPageTitle({
+          title:
+            "评价与口碑",
+
+          subtitle:
+            "顾客反馈 · 复购 · 菜品讨论",
+
+          backTarget:
+            "operations"
+        })}
+
+        <section class="reputation-page">
 
         <section>
           <article>
@@ -115,6 +148,19 @@ class ReputationView {
           }
         </section>
       </section>
+
+        ${renderBottomNavigation(
+          gameChromeSystem
+            .getNavigation({
+              restaurantId:
+                page.restaurantId,
+
+              activePageId:
+                "operations"
+            })
+        )}
+
+      </main>
     `;
   }
 }
