@@ -36,6 +36,7 @@ import { chainSystem } from "./systems/ChainSystem.js";
 import { lateGameInvestmentSystem } from "./systems/LateGameInvestmentSystem.js";
 import { onboardingSystem } from "./systems/OnboardingSystem.js";
 import { operatingAdvisorSystem } from "./systems/OperatingAdvisorSystem.js";
+import { feedbackSystem } from "./systems/FeedbackSystem.js";
 
 import { ingredientCatalogSystem } from "./systems/IngredientCatalogSystem.js";
 import { dishRecipeBootstrapSystem } from "./systems/DishRecipeBootstrapSystem.js";
@@ -158,6 +159,7 @@ function bootstrap() {
       lateGameInvestmentSystem,
       onboardingSystem,
       operatingAdvisorSystem,
+      feedbackSystem,
 
       ingredientCatalogSystem,
       dishRecipeBootstrapSystem,
