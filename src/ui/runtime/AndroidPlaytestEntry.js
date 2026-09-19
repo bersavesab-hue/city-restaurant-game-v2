@@ -874,6 +874,15 @@ function navigate(
 
     if (
       pageId ===
+      "members"
+    ) {
+      pageId =
+        "member-marketing";
+    }
+
+
+    if (
+      pageId ===
       "dishes"
     ) {
       currentView =
