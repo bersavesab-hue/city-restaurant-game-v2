@@ -379,7 +379,7 @@ class FinanceCenterView {
 
           <header>
             <strong>
-              成本健康
+              经营健康
             </strong>
 
             <span>
@@ -542,7 +542,7 @@ class FinanceCenterView {
 
             <header>
               <strong>
-                最近流水
+                资金流水
               </strong>
 
               <span>
