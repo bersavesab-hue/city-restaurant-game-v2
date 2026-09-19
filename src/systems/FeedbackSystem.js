@@ -102,6 +102,10 @@ class FeedbackSystem {
 
     this.storageKey =
       storageKey;
+
+    this.errorStorageKey =
+      storageKey +
+      ":errors";
   }
 
 
@@ -218,6 +222,14 @@ class FeedbackSystem {
         structuredClone(
           RELEASE_INFO
         ),
+
+      recentErrors:
+        this
+          .getRecentErrors()
+          .slice(
+            0,
+            5
+          ),
 
       time: {
         day:
@@ -460,6 +472,108 @@ class FeedbackSystem {
   }
 
 
+  readErrors() {
+    const raw =
+      this.storage
+        .getItem(
+          this.errorStorageKey
+        );
+
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed =
+        JSON.parse(raw);
+
+      return Array.isArray(
+        parsed
+      )
+        ? parsed
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+
+  captureRuntimeError(
+    error,
+    context =
+      "runtime"
+  ) {
+    const items =
+      this.readErrors();
+
+    const message =
+      String(
+        error?.message ??
+        error ??
+        "Unknown error"
+      )
+        .slice(
+          0,
+          1000
+        );
+
+    const stack =
+      typeof error?.stack ===
+        "string"
+        ? error.stack
+            .slice(
+              0,
+              3000
+            )
+        : null;
+
+    items.push({
+      occurredAt:
+        new Date()
+          .toISOString(),
+      context:
+        String(
+          context ??
+          "runtime"
+        )
+          .slice(
+            0,
+            80
+          ),
+      message,
+      stack
+    });
+
+    while (
+      items.length >
+      20
+    ) {
+      items.shift();
+    }
+
+    this.storage
+      .setItem(
+        this.errorStorageKey,
+        JSON.stringify(
+          items
+        )
+      );
+
+    return items[
+      items.length -
+      1
+    ];
+  }
+
+
+  getRecentErrors() {
+    return this
+      .readErrors()
+      .slice()
+      .reverse();
+  }
+
+
   exportReport() {
     const report = {
       app:
@@ -483,6 +597,11 @@ class FeedbackSystem {
     this.storage
       .removeItem(
         this.storageKey
+      );
+
+    this.storage
+      .removeItem(
+        this.errorStorageKey
       );
   }
 }
