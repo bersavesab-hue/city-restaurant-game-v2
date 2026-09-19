@@ -3,6 +3,10 @@ import {
   RANKING_DEFINITIONS
 } from "../../../systems/RankingCenterSystem.js";
 
+import {
+  buildFormalPageChrome
+} from "../../components/FormalPageChromeModel.js";
+
 
 const RANKING_PERIODS =
   Object.freeze([
@@ -123,9 +127,64 @@ class RankingCenterPageSystem {
         : null;
 
 
+    const playerRow =
+      selectedBoard
+        ?.rows
+        ?.find(
+          row =>
+            row.isPlayer
+        ) ??
+      null;
+
+    const notices =
+      [];
+
+    if (
+      playerRow
+    ) {
+      notices.push({
+        id:
+          "ranking_player_position",
+
+        type:
+          playerRow.rank <=
+            3
+            ? "success"
+            : "info",
+
+        title:
+          "当前榜单",
+
+        message:
+          `${selectedBoard.title}当前第${playerRow.rank}名，共${selectedBoard.totalCandidates}位参榜对象`,
+
+        priority:
+          playerRow.rank <=
+            3
+            ? 90
+            : 50
+      });
+    }
+
+    const chrome =
+      buildFormalPageChrome(
+        restaurantId,
+        {
+          notices
+        }
+      );
+
     return {
       pageId:
         "ranking-center",
+
+      restaurantId,
+
+      topBar:
+        chrome.topBar,
+
+      noticeTicker:
+        chrome.noticeTicker,
 
       title:
         "排行榜中心",
