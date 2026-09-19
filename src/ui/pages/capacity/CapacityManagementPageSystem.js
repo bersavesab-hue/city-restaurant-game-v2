@@ -50,9 +50,51 @@ class CapacityManagementPageSystem {
         }
       );
 
+    const dashboard =
+      serviceCapacitySystem
+        .getDashboard(
+          restaurantId
+        );
+
+    const notices =
+      [];
+
+    if (
+      dashboard.last7Days
+        .abandoned >
+      0
+    ) {
+      notices.push({
+        id:
+          "capacity_abandonment",
+        type:
+          "warning",
+        title:
+          "排队流失",
+        message:
+          `近7天已有${dashboard.last7Days.abandoned}位顾客因等待离开`,
+        priority:
+          90
+      });
+    }
+
+    const chrome =
+      buildFormalPageChrome(
+        restaurantId,
+        {
+          notices
+        }
+      );
+
     return {
       pageId:
         "capacity",
+
+      topBar:
+        chrome.topBar,
+
+      noticeTicker:
+        chrome.noticeTicker,
 
       topBar:
         chrome.topBar,
