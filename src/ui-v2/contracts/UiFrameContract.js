@@ -447,21 +447,35 @@ const UI_TYPOGRAPHY =
       Object.freeze({
         hudPrimary:
           Object.freeze({
-            size: 20,
+            size: 18,
             weight: 800,
             lineHeight: 1.1
           }),
 
+        hudMoney:
+          Object.freeze({
+            size: 17,
+            weight: 800,
+            lineHeight: 1
+          }),
+
+        hudLevel:
+          Object.freeze({
+            size: 16,
+            weight: 800,
+            lineHeight: 1
+          }),
+
         hudSecondary:
           Object.freeze({
-            size: 13,
+            size: 12,
             weight: 600,
             lineHeight: 1.2
           }),
 
         hudTime:
           Object.freeze({
-            size: 27,
+            size: 25,
             weight: 900,
             lineHeight: 1
           }),
