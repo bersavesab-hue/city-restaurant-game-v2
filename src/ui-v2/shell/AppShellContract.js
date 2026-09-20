@@ -9,11 +9,9 @@ const MIN_SUPPORTED_VIEWPORT = Object.freeze({
 });
 
 const APP_SHELL_REGIONS = Object.freeze([
-  "safe-top",
   "global-hud",
   "page-content",
-  "global-nav",
-  "safe-bottom"
+  "global-nav"
 ]);
 
 function classifyWindow({
