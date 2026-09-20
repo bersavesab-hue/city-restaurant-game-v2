@@ -227,7 +227,7 @@ test(
 
     assert.equal(
       UI_TYPOGRAPHY.roles.hudPrimary.size,
-      20
+      18
     );
 
     assert.equal(
