@@ -90,18 +90,28 @@
   /* Locked typography roles. */
   --ui-font-hud-primary:
     min(
-      2.8944vw,
-      1.3021dvh
+      2.6049vw,
+      1.1719dvh
+    );
+  --ui-font-hud-money:
+    min(
+      2.4602vw,
+      1.1068dvh
+    );
+  --ui-font-hud-level:
+    min(
+      2.3155vw,
+      1.0417dvh
     );
   --ui-font-hud-secondary:
     min(
-      1.8813vw,
-      .8464dvh
+      1.7366vw,
+      .7812dvh
     );
   --ui-font-hud-time:
     min(
-      3.9074vw,
-      1.7578dvh
+      3.6179vw,
+      1.6276dvh
     );
   --ui-font-page-title:
     min(
