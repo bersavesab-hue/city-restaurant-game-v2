@@ -4,11 +4,16 @@ const DESIGN_REFERENCE = Object.freeze({
   orientation: "portrait"
 });
 
-const VIEWPORT_PROFILES = Object.freeze({
-  TALL_PHONE: "tall-phone",
-  STANDARD_PHONE: "standard-phone",
-  WIDE_PHONE_TABLET: "wide-phone-tablet",
-  LANDSCAPE: "landscape"
+const WINDOW_WIDTH_CLASS = Object.freeze({
+  COMPACT: "compact",
+  MEDIUM: "medium",
+  EXPANDED: "expanded"
+});
+
+const WINDOW_HEIGHT_CLASS = Object.freeze({
+  COMPACT: "compact",
+  MEDIUM: "medium",
+  EXPANDED: "expanded"
 });
 
 const UI_COLORS = Object.freeze({
@@ -59,13 +64,14 @@ const UI_TYPOGRAPHY = Object.freeze({
 });
 
 const UI_HIT_TARGET = Object.freeze({
-  minimum: 44,
-  comfortable: 48
+  minimum: 48,
+  comfortable: 52
 });
 
 export {
   DESIGN_REFERENCE,
-  VIEWPORT_PROFILES,
+  WINDOW_WIDTH_CLASS,
+  WINDOW_HEIGHT_CLASS,
   UI_COLORS,
   UI_SPACING,
   UI_RADII,

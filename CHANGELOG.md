@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.9.2 - 2026-09-21
+
+- UI V2第二步一次完成Global HUD与五项Global Nav，不拆分后续补丁；仍不创建五个一级正式页面、不接正式图片、不恢复任何旧入口。
+- 纠正0.9.1适配基线：Android最小触摸目标由44改为48，舒适目标改为52；窗口适配不再只按长宽比，改为Compact(<600)、Medium(600-839)、Expanded(>=840)宽度分级，并同时记录高度分级。
+- Global HUD采用主流经营/模拟游戏的信息层级：仅保留管理范围、日期时间、暂停/1x/2x/4x、现金、等级、评分；天气、任务、库存、活动等页面信息禁止常驻顶部，解决旧版顶部长期拥挤问题。
+- Compact手机HUD使用两行结构避免320-599宽度下强塞单行；600px以上自动切换单行三分区。关键时间、金额、等级评分禁止省略号截断。
+- Global Nav固定城市/门店/经营/员工/更多五个同级入口，使用新语义ID city/store/operations/employees/more，不建立任何旧ID映射或兼容。
+- Compact/Medium窗口采用五等分底部Navigation Bar；Expanded窗口>=840px自动切换左侧Navigation Rail，避免平板上把手机底栏无限拉宽。
+- 导航和HUD只建立正式图片槽位，不使用emoji、Unicode字符或临时CSS图形冒充最终游戏图标；正式图标等待统一视觉资源阶段接入。
+- Android宿主新增Native Safe Insets桥接：读取systemBars、displayCutout、mandatorySystemGestures并换算CSS px注入四个--ui-native-safe-*变量；CSS与env(safe-area-inset-*)取较大值，防止刘海/挖孔/圆角/手势区遮挡关键按钮。
+- 新增Global HUD/Nav、Window Size Class、Navigation Rail、48px点击目标和Native Safe Insets契约测试；版本提升至0.9.2 (902)。
+
 ## 0.9.1 - 2026-09-21
 
 - UI重建第一步完成：建立唯一新目录src/ui-v2，旧src/ui继续保持不存在；当前不创建城市、门店、经营、员工、更多任何正式页面。

@@ -2,8 +2,10 @@ package com.cityrestaurant.game;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.Insets;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.DisplayCutout;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
@@ -11,9 +13,16 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.util.Locale;
+
 public class MainActivity extends Activity {
 
     private WebView gameView;
+
+    private float nativeSafeTop = 0f;
+    private float nativeSafeRight = 0f;
+    private float nativeSafeBottom = 0f;
+    private float nativeSafeLeft = 0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +44,6 @@ public class MainActivity extends Activity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
 
-        // The game is packaged entirely under android_asset.
-        // Keep local asset loading enabled, but do not expose
-        // content providers or cross-origin file access.
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(false);
         settings.setAllowFileAccessFromFileURLs(false);
@@ -53,7 +59,32 @@ public class MainActivity extends Activity {
         settings.setMediaPlaybackRequiresUserGesture(true);
 
         gameView.setWebViewClient(
-                new WebViewClient()
+                new WebViewClient() {
+                    @Override
+                    public void onPageFinished(
+                            WebView view,
+                            String url
+                    ) {
+                        super.onPageFinished(
+                                view,
+                                url
+                        );
+
+                        applyNativeSafeInsetsToWebView();
+                    }
+                }
+        );
+
+        gameView.setOnApplyWindowInsetsListener(
+                (view, insets) -> {
+                    updateNativeSafeInsets(
+                            insets
+                    );
+
+                    applyNativeSafeInsetsToWebView();
+
+                    return insets;
+                }
         );
 
         gameView.setVerticalScrollBarEnabled(false);
@@ -64,6 +95,142 @@ public class MainActivity extends Activity {
 
         gameView.loadUrl(
                 "file:///android_asset/index.html"
+        );
+
+        gameView.requestApplyInsets();
+    }
+
+    private void updateNativeSafeInsets(
+            WindowInsets windowInsets
+    ) {
+        int left = 0;
+        int top = 0;
+        int right = 0;
+        int bottom = 0;
+
+        if (
+                Build.VERSION.SDK_INT >=
+                        Build.VERSION_CODES.R
+        ) {
+            Insets safeInsets =
+                    windowInsets.getInsets(
+                            WindowInsets.Type.systemBars()
+                                    | WindowInsets.Type.displayCutout()
+                                    | WindowInsets.Type.mandatorySystemGestures()
+                    );
+
+            left = safeInsets.left;
+            top = safeInsets.top;
+            right = safeInsets.right;
+            bottom = safeInsets.bottom;
+        } else {
+            left =
+                    windowInsets
+                            .getSystemWindowInsetLeft();
+
+            top =
+                    windowInsets
+                            .getSystemWindowInsetTop();
+
+            right =
+                    windowInsets
+                            .getSystemWindowInsetRight();
+
+            bottom =
+                    windowInsets
+                            .getSystemWindowInsetBottom();
+
+            if (
+                    Build.VERSION.SDK_INT >=
+                            Build.VERSION_CODES.P
+            ) {
+                DisplayCutout cutout =
+                        windowInsets
+                                .getDisplayCutout();
+
+                if (cutout != null) {
+                    left =
+                            Math.max(
+                                    left,
+                                    cutout
+                                            .getSafeInsetLeft()
+                            );
+
+                    top =
+                            Math.max(
+                                    top,
+                                    cutout
+                                            .getSafeInsetTop()
+                            );
+
+                    right =
+                            Math.max(
+                                    right,
+                                    cutout
+                                            .getSafeInsetRight()
+                            );
+
+                    bottom =
+                            Math.max(
+                                    bottom,
+                                    cutout
+                                            .getSafeInsetBottom()
+                            );
+                }
+            }
+        }
+
+        float density =
+                getResources()
+                        .getDisplayMetrics()
+                        .density;
+
+        if (density <= 0f) {
+            density = 1f;
+        }
+
+        nativeSafeLeft =
+                left /
+                        density;
+
+        nativeSafeTop =
+                top /
+                        density;
+
+        nativeSafeRight =
+                right /
+                        density;
+
+        nativeSafeBottom =
+                bottom /
+                        density;
+    }
+
+    private void applyNativeSafeInsetsToWebView() {
+        if (gameView == null) {
+            return;
+        }
+
+        String script =
+                String.format(
+                        Locale.US,
+                        "(function(){"
+                                + "var root=document.documentElement;"
+                                + "if(!root){return;}"
+                                + "root.style.setProperty('--ui-native-safe-top','%.2fpx');"
+                                + "root.style.setProperty('--ui-native-safe-right','%.2fpx');"
+                                + "root.style.setProperty('--ui-native-safe-bottom','%.2fpx');"
+                                + "root.style.setProperty('--ui-native-safe-left','%.2fpx');"
+                                + "})();",
+                        nativeSafeTop,
+                        nativeSafeRight,
+                        nativeSafeBottom,
+                        nativeSafeLeft
+                );
+
+        gameView.evaluateJavascript(
+                script,
+                null
         );
     }
 
@@ -115,6 +282,10 @@ public class MainActivity extends Activity {
 
         if (hasFocus) {
             applyImmersiveMode();
+
+            if (gameView != null) {
+                gameView.requestApplyInsets();
+            }
         }
     }
 
@@ -127,6 +298,7 @@ public class MainActivity extends Activity {
         if (gameView != null) {
             gameView.resumeTimers();
             gameView.onResume();
+            gameView.requestApplyInsets();
         }
     }
 

@@ -51,55 +51,74 @@
   --ui-text-title: 24px;
   --ui-text-display: 32px;
 
-  --ui-hit-min: 44px;
-  --ui-hit-comfortable: 48px;
+  --ui-hit-min: 48px;
+  --ui-hit-comfortable: 52px;
 
-  --ui-page-gutter:
-    clamp(
-      12px,
-      4vw,
-      24px
-    );
-
-  --ui-hud-height:
-    clamp(
-      56px,
-      16vw,
-      68px
-    );
-
-  --ui-nav-height:
-    clamp(
-      64px,
-      18vw,
-      78px
-    );
-
+  --ui-page-gutter: 16px;
+  --ui-hud-height: 104px;
+  --ui-nav-height: 72px;
+  --ui-nav-rail-width: 88px;
   --ui-content-max-width: 960px;
 
+  --ui-native-safe-top: 0px;
+  --ui-native-safe-right: 0px;
+  --ui-native-safe-bottom: 0px;
+  --ui-native-safe-left: 0px;
+
   --ui-safe-top:
-    env(
-      safe-area-inset-top,
-      0px
+    max(
+      env(
+        safe-area-inset-top,
+        0px
+      ),
+      var(--ui-native-safe-top)
     );
 
   --ui-safe-right:
-    env(
-      safe-area-inset-right,
-      0px
+    max(
+      env(
+        safe-area-inset-right,
+        0px
+      ),
+      var(--ui-native-safe-right)
     );
 
   --ui-safe-bottom:
-    env(
-      safe-area-inset-bottom,
-      0px
+    max(
+      env(
+        safe-area-inset-bottom,
+        0px
+      ),
+      var(--ui-native-safe-bottom)
     );
 
   --ui-safe-left:
-    env(
-      safe-area-inset-left,
-      0px
+    max(
+      env(
+        safe-area-inset-left,
+        0px
+      ),
+      var(--ui-native-safe-left)
     );
+}
+
+@media (min-width: 600px) {
+  :root {
+    --ui-page-gutter: 24px;
+    --ui-hud-height: 76px;
+    --ui-nav-height: 76px;
+    --ui-content-max-width: 1120px;
+  }
+}
+
+@media (min-width: 840px) {
+  :root {
+    --ui-page-gutter: 32px;
+    --ui-hud-height: 80px;
+    --ui-nav-height: 0px;
+    --ui-nav-rail-width: 96px;
+    --ui-content-max-width: 1280px;
+  }
 }
 
 *,

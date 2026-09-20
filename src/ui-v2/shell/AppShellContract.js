@@ -1,5 +1,6 @@
 import {
-  VIEWPORT_PROFILES
+  WINDOW_WIDTH_CLASS,
+  WINDOW_HEIGHT_CLASS
 } from "../tokens/tokens.js";
 
 const MIN_SUPPORTED_VIEWPORT = Object.freeze({
@@ -15,7 +16,7 @@ const APP_SHELL_REGIONS = Object.freeze([
   "safe-bottom"
 ]);
 
-function classifyViewport({
+function classifyWindow({
   width,
   height
 }) {
@@ -32,39 +33,55 @@ function classifyViewport({
     h <= 0
   ) {
     throw new TypeError(
-      "Viewport width and height must be positive finite numbers"
+      "Window width and height must be positive finite numbers"
     );
   }
 
-  if (
-    w >
-    h
-  ) {
-    return VIEWPORT_PROFILES.LANDSCAPE;
-  }
+  const widthClass =
+    w < 600
+      ? WINDOW_WIDTH_CLASS.COMPACT
+      : w < 840
+        ? WINDOW_WIDTH_CLASS.MEDIUM
+        : WINDOW_WIDTH_CLASS.EXPANDED;
 
-  const heightToWidth =
-    h / w;
+  const heightClass =
+    h < 480
+      ? WINDOW_HEIGHT_CLASS.COMPACT
+      : h < 900
+        ? WINDOW_HEIGHT_CLASS.MEDIUM
+        : WINDOW_HEIGHT_CLASS.EXPANDED;
 
-  if (
-    heightToWidth >=
-    2.1
-  ) {
-    return VIEWPORT_PROFILES.TALL_PHONE;
-  }
+  return Object.freeze({
+    widthClass,
+    heightClass,
+    orientation:
+      w > h
+        ? "landscape"
+        : "portrait"
+  });
+}
 
-  if (
-    heightToWidth >=
-    1.9
-  ) {
-    return VIEWPORT_PROFILES.STANDARD_PHONE;
-  }
+function getPrimaryNavigationMode(
+  metrics
+) {
+  const {
+    widthClass
+  } =
+    classifyWindow(
+      metrics
+    );
 
-  return VIEWPORT_PROFILES.WIDE_PHONE_TABLET;
+  return (
+    widthClass ===
+    WINDOW_WIDTH_CLASS.EXPANDED
+  )
+    ? "rail"
+    : "bottom";
 }
 
 export {
   MIN_SUPPORTED_VIEWPORT,
   APP_SHELL_REGIONS,
-  classifyViewport
+  classifyWindow,
+  getPrimaryNavigationMode
 };

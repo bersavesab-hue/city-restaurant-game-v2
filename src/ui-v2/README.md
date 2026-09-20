@@ -2,29 +2,35 @@
 
 这是 0.9.x 之后唯一允许使用的新 UI 根目录。
 
-当前阶段只包含 Design System 1.0，不包含任何正式游戏页面。
+当前已经建立：
 
-## 固定规则
+- Design System 1.1
+- Global HUD
+- Global Navigation Bar
+- Expanded Window Navigation Rail
+- AppShell
+- Native Safe Insets 契约
 
-- 设计参考稿使用 864×1536 竖屏坐标系。
-- 864×1536 不是运行时强制分辨率，不允许整页按设计稿比例拉伸。
-- AppShell 永远只有五个纵向区域：顶部安全区、Global HUD、Page Content、Global Nav、底部安全区。
-- HUD 与 Nav 使用受宽度约束的逻辑尺寸；Page Content 自动吸收不同手机的高度差。
-- 页面不得自行创建第二套顶部栏或底部导航。
-- 页面不得用 fixed 覆盖 Global Nav。
-- 页面不得使用“所有纵向区域百分比分割到100%”的方案。
-- 图片保持比例裁切，不允许为了适配屏幕拉伸变形。
-- 动态金额、时间、关键数字禁止用省略号截断。
-- 所有可点击控件最小 44×44 CSS px。
-- 只允许新增 src/ui-v2；禁止恢复 src/ui 或旧入口兼容层。
+暂时没有任何正式一级页面。
 
-## 屏幕档位
+## 设计与适配
 
-运行时按 height / width 分类：
+- 设计稿基准：864×1536 竖屏。
+- 运行时按实际窗口宽度/高度分类，不按具体手机型号。
+- Compact <600px；Medium 600–839px；Expanded >=840px。
+- Expanded 使用左侧 Navigation Rail；Compact/Medium 使用底部 Navigation Bar。
+- Android最小触摸目标48×48。
+- HUD只放管理范围、时间、速度、资金、等级评分。
+- 天气、任务、活动、库存等页面信息不得塞进全局HUD。
+- 五个一级页只允许填充 Page Content。
 
-- tall-phone：>= 2.1
-- standard-phone：1.9–2.1
-- wide-phone-tablet：< 1.9
-- landscape：width > height
+## 禁止事项
 
-三档的差异只用于留白、列数、内容密度和主视觉可视面积，不允许建立三套完全不同的页面。
+- 禁止恢复 src/ui。
+- 禁止旧入口兼容层。
+- 禁止页面自建HUD/Nav。
+- 禁止整页 transform: scale()。
+- 禁止 fixed 底栏。
+- 禁止图片非等比拉伸。
+- 禁止关键金额、时间、数量省略号截断。
+- 禁止用 emoji / Unicode 字符冒充正式游戏图标。

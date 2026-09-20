@@ -1,0 +1,325 @@
+.ui-v2-hud {
+  display: grid;
+  grid-template-columns:
+    minmax(0,1fr)
+    auto;
+  grid-template-areas:
+    "identity resources"
+    "simulation simulation";
+  grid-template-rows:
+    52px
+    52px;
+  align-items: stretch;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      180deg,
+      var(--ui-brand-deep),
+      var(--ui-brand-dark)
+    );
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.12);
+  box-shadow:
+    0 4px 12px
+    rgba(0,29,55,.18);
+  overflow: hidden;
+}
+
+.ui-v2-hud button {
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ui-v2-hud__identity {
+  grid-area: identity;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding-left:
+    var(--ui-page-gutter);
+}
+
+.ui-v2-hud__scope {
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns:
+    36px
+    minmax(0,1fr)
+    12px;
+  align-items: center;
+  gap: 8px;
+  padding:
+    0
+    8px
+    0
+    0;
+  background: transparent;
+  text-align: left;
+}
+
+.ui-v2-hud__avatar-slot {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background:
+    rgba(255,255,255,.16);
+}
+
+.ui-v2-hud__scope-copy {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.ui-v2-hud__scope-copy strong,
+.ui-v2-hud__scope-copy small {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ui-v2-hud__scope-copy strong {
+  font-size: 14px;
+  line-height: 1.15;
+  font-weight: 800;
+}
+
+.ui-v2-hud__scope-copy small {
+  color:
+    rgba(255,255,255,.68);
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+.ui-v2-hud__scope-indicator {
+  width: 8px;
+  height: 8px;
+  border-right:
+    2px solid
+    rgba(255,255,255,.72);
+  border-bottom:
+    2px solid
+    rgba(255,255,255,.72);
+  transform:
+    rotate(45deg)
+    translateY(-2px);
+}
+
+.ui-v2-hud__resources {
+  grid-area: resources;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-right:
+    var(--ui-page-gutter);
+}
+
+.ui-v2-hud__resource,
+.ui-v2-hud__progress {
+  min-width: 0;
+}
+
+.ui-v2-hud__resource {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ui-v2-hud__resource-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background-image:
+    var(
+      --ui-hud-resource-icon-image,
+      none
+    );
+  background-repeat:
+    no-repeat;
+  background-position:
+    center;
+  background-size:
+    contain;
+}
+
+.ui-v2-hud__resource strong {
+  font-size:
+    clamp(
+      11px,
+      3.6vw,
+      14px
+    );
+  font-weight: 900;
+}
+
+.ui-v2-hud__progress {
+  display: grid;
+  gap: 1px;
+  justify-items: end;
+}
+
+.ui-v2-hud__progress strong {
+  color:
+    var(--ui-accent);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.ui-v2-hud__progress small {
+  color:
+    rgba(255,255,255,.72);
+  font-size: 10px;
+}
+
+.ui-v2-hud__simulation {
+  grid-area: simulation;
+  min-width: 0;
+  display: grid;
+  grid-template-columns:
+    minmax(72px,1fr)
+    auto;
+  align-items: center;
+  gap: 8px;
+  padding:
+    2px
+    var(--ui-page-gutter)
+    4px;
+  border-top:
+    1px solid
+    rgba(255,255,255,.08);
+}
+
+.ui-v2-hud__clock {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.ui-v2-hud__clock small {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color:
+    rgba(255,255,255,.68);
+  font-size: 11px;
+}
+
+.ui-v2-hud__clock strong {
+  font-size: 19px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: .01em;
+}
+
+.ui-v2-hud__time-controls {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(48px,auto);
+  gap: 4px;
+}
+
+.ui-v2-hud__pause,
+.ui-v2-hud__speed {
+  min-width: 48px;
+  min-height: 48px;
+  padding:
+    0
+    8px;
+  border-radius:
+    var(--ui-radius-md);
+  background:
+    rgba(255,255,255,.10);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ui-v2-hud__pause.is-active,
+.ui-v2-hud__speed.is-active {
+  color:
+    var(--ui-brand-dark);
+  background:
+    var(--ui-accent);
+}
+
+/*
+ * 600px以上的中等窗口有足够横向空间，
+ * HUD改为单排三分区，减少竖向占用。
+ */
+@media (min-width: 600px) {
+  .ui-v2-hud {
+    grid-template-columns:
+      minmax(220px,1fr)
+      auto
+      minmax(220px,1fr);
+    grid-template-areas:
+      "identity simulation resources";
+    grid-template-rows:
+      1fr;
+  }
+
+  .ui-v2-hud__simulation {
+    grid-template-columns:
+      auto
+      auto;
+    border-top: 0;
+    padding:
+      0
+      12px;
+  }
+
+  .ui-v2-hud__resources {
+    gap: 12px;
+  }
+
+  .ui-v2-hud__scope-copy strong {
+    font-size: 15px;
+  }
+
+  .ui-v2-hud__resource strong {
+    font-size: 15px;
+  }
+}
+
+/*
+ * 320px级极窄屏仍保留所有关键值，
+ * 优先压缩说明文字与间距，不截断金额/时间。
+ */
+@media (max-width: 359px) {
+  .ui-v2-hud__resources {
+    gap: 4px;
+    padding-right: 8px;
+  }
+
+  .ui-v2-hud__identity {
+    padding-left: 8px;
+  }
+
+  .ui-v2-hud__simulation {
+    padding-inline: 8px;
+  }
+
+  .ui-v2-hud__scope-copy small,
+  .ui-v2-hud__progress small {
+    display: none;
+  }
+
+  .ui-v2-hud__time-controls {
+    grid-auto-columns:
+      minmax(48px,1fr);
+    gap: 2px;
+  }
+
+  .ui-v2-hud__pause,
+  .ui-v2-hud__speed {
+    padding-inline: 5px;
+  }
+}

@@ -10,11 +10,21 @@ import {
 
 import {
   APP_SHELL_REGIONS,
-  classifyViewport
+  classifyWindow,
+  getPrimaryNavigationMode
 } from "../src/ui-v2/shell/AppShellContract.js";
 
+import {
+  PRIMARY_NAV_ITEMS,
+  renderGlobalNav
+} from "../src/ui-v2/components/GlobalNav.js";
+
+import {
+  renderGlobalHud
+} from "../src/ui-v2/components/GlobalHud.js";
+
 test(
-  "UI V2 Design System锁定864x1536设计基准和44px最小点击区",
+  "UI V2采用864x1536设计参考但Android触摸目标固定48",
   () => {
     assert.deepEqual(
       DESIGN_REFERENCE,
@@ -27,7 +37,7 @@ test(
 
     assert.equal(
       UI_HIT_TARGET.minimum,
-      44
+      48
     );
 
     assert.deepEqual(
@@ -48,7 +58,7 @@ test(
 );
 
 test(
-  "AppShell固定安全区HUD内容导航安全区五层结构",
+  "AppShell保持安全区HUD内容导航安全区五层结构",
   () => {
     assert.deepEqual(
       APP_SHELL_REGIONS,
@@ -64,48 +74,165 @@ test(
 );
 
 test(
-  "不同手机按宽高比分档而不是按具体机型分叉",
+  "窗口按Android主流宽高Size Class分类",
   () => {
-    assert.equal(
-      classifyViewport({
-        width: 720,
-        height: 1600
+    assert.deepEqual(
+      classifyWindow({
+        width: 412,
+        height: 915
       }),
-      "tall-phone"
+      {
+        widthClass: "compact",
+        heightClass: "expanded",
+        orientation: "portrait"
+      }
+    );
+
+    assert.deepEqual(
+      classifyWindow({
+        width: 700,
+        height: 1000
+      }),
+      {
+        widthClass: "medium",
+        heightClass: "expanded",
+        orientation: "portrait"
+      }
+    );
+
+    assert.deepEqual(
+      classifyWindow({
+        width: 900,
+        height: 1200
+      }),
+      {
+        widthClass: "expanded",
+        heightClass: "expanded",
+        orientation: "portrait"
+      }
     );
 
     assert.equal(
-      classifyViewport({
-        width: 1080,
-        height: 2160
+      getPrimaryNavigationMode({
+        width: 412,
+        height: 915
       }),
-      "standard-phone"
+      "bottom"
     );
 
     assert.equal(
-      classifyViewport({
-        width: 1200,
-        height: 2000
+      getPrimaryNavigationMode({
+        width: 900,
+        height: 1200
       }),
-      "wide-phone-tablet"
-    );
-
-    assert.equal(
-      classifyViewport({
-        width: 1600,
-        height: 900
-      }),
-      "landscape"
+      "rail"
     );
   }
 );
 
 test(
-  "AppShell禁止整页百分比切割和fixed底栏旧模式",
+  "五项Global Nav是唯一一级导航并使用新ID",
+  () => {
+    assert.deepEqual(
+      PRIMARY_NAV_ITEMS.map(
+        item =>
+          item.id
+      ),
+      [
+        "city",
+        "store",
+        "operations",
+        "employees",
+        "more"
+      ]
+    );
+
+    const html =
+      renderGlobalNav({
+        activeId:
+          "operations"
+      });
+
+    assert.match(
+      html,
+      /aria-label="主导航"/
+    );
+
+    assert.match(
+      html,
+      /data-ui-destination="operations"/
+    );
+
+    assert.doesNotMatch(
+      html,
+      /operating-command-center|operations-home|employee_roster|more-home|restaurant-home/
+    );
+  }
+);
+
+test(
+  "Global HUD只保留高频全局状态且关键数字不省略",
+  () => {
+    const html =
+      renderGlobalHud({
+        scopeTitle:
+          "测试集团",
+        scopeSubtitle:
+          "2家门店",
+        dateLabel:
+          "第12天",
+        timeLabel:
+          "18:30",
+        moneyLabel:
+          "¥128,500",
+        levelLabel:
+          "Lv.6",
+        ratingLabel:
+          "4.8",
+        speed:
+          2
+      });
+
+    for (
+      const action
+      of [
+        "change-scope",
+        "toggle-pause",
+        "set-speed"
+      ]
+    ) {
+      assert.match(
+        html,
+        new RegExp(
+          action
+        )
+      );
+    }
+
+    assert.match(
+      html,
+      /ui-v2-no-truncate-number/
+    );
+
+    assert.doesNotMatch(
+      html,
+      /天气|任务|库存|活动/
+    );
+  }
+);
+
+test(
+  "AppShell无fixed底栏且大屏切Navigation Rail",
   () => {
     const shell =
       fs.readFileSync(
         "src/ui-v2/shell/app-shell.css",
+        "utf8"
+      );
+
+    const nav =
+      fs.readFileSync(
+        "src/ui-v2/components/global-nav.css",
         "utf8"
       );
 
@@ -116,22 +243,64 @@ test(
 
     assert.match(
       shell,
-      /safe-area-inset-top/
+      /@media \(min-width: 840px\)/
     );
 
     assert.match(
-      shell,
-      /safe-area-inset-bottom/
+      nav,
+      /@media \(min-width: 840px\)/
     );
 
     assert.doesNotMatch(
-      shell,
+      shell + nav,
       /position\s*:\s*fixed/
     );
 
     assert.doesNotMatch(
-      shell,
+      shell + nav,
       /transform\s*:\s*scale\(/
+    );
+  }
+);
+
+test(
+  "Safe Area同时读取CSS env与Android Native Insets",
+  () => {
+    const tokens =
+      fs.readFileSync(
+        "src/ui-v2/tokens/tokens.css",
+        "utf8"
+      );
+
+    const activity =
+      fs.readFileSync(
+        "android/app/src/main/java/com/cityrestaurant/game/MainActivity.java",
+        "utf8"
+      );
+
+    assert.match(
+      tokens,
+      /safe-area-inset-top/
+    );
+
+    assert.match(
+      tokens,
+      /--ui-native-safe-top/
+    );
+
+    assert.match(
+      activity,
+      /WindowInsets\.Type\.displayCutout\(\)/
+    );
+
+    assert.match(
+      activity,
+      /WindowInsets\.Type\.mandatorySystemGestures\(\)/
+    );
+
+    assert.match(
+      activity,
+      /--ui-native-safe-bottom/
     );
   }
 );
