@@ -1150,6 +1150,93 @@ class EmployeeManagementPageSystem {
     }
 
 
+    const roleTabs = [
+      {
+        id: "all",
+        label: "全部",
+        count: employees.length
+      },
+      {
+        id: "chef",
+        label: "厨师",
+        count: employees.filter(
+          item =>
+            [
+              "chef",
+              "kitchen_assistant"
+            ].includes(
+              item.roleId
+            )
+        ).length
+      },
+      {
+        id: "server",
+        label: "服务",
+        count: employees.filter(
+          item =>
+            [
+              "server",
+              "cleaner",
+              "delivery"
+            ].includes(
+              item.roleId
+            )
+        ).length
+      },
+      {
+        id: "cashier",
+        label: "收银",
+        count: employees.filter(
+          item =>
+            item.roleId ===
+            "cashier"
+        ).length
+      },
+      {
+        id: "manager",
+        label: "管理",
+        count: employees.filter(
+          item =>
+            item.roleId ===
+            "manager"
+        ).length
+      }
+    ];
+
+
+    const primaryAlert =
+      vacancies.length > 0
+        ? {
+            title:
+              "当前缺口" +
+              staffing.totalShortage +
+              "人",
+
+            message:
+              vacancies
+                .slice(
+                  0,
+                  2
+                )
+                .map(
+                  item =>
+                    item.name +
+                    " " +
+                    item.shortage +
+                    "人"
+                )
+                .join(
+                  " · "
+                ),
+
+            target:
+              "employee_recruitment"
+          }
+        : null;
+
+
+
+
     return {
       pageId:
         "employees",
@@ -1186,10 +1273,10 @@ class EmployeeManagementPageSystem {
       metrics: [
         {
           label:
-            "员工总数",
+            "在岗人数",
 
           value:
-            `${employees.length}/${limits.employees}`,
+            `${scheduleSummary.active}人`,
 
           tone:
             "primary"
@@ -1197,13 +1284,27 @@ class EmployeeManagementPageSystem {
 
         {
           label:
-            "当前在岗",
+            "当前缺口",
 
           value:
-            `${scheduleSummary.active}人`,
+            `${staffing.totalShortage}人`,
 
           tone:
-            "success"
+            staffing.totalShortage ===
+            0
+              ? "success"
+              : "danger"
+        },
+
+        {
+          label:
+            "人力成本",
+
+          value:
+            `¥${payroll.toLocaleString("zh-CN")}/月`,
+
+          tone:
+            "warning"
         },
 
         {
@@ -1211,10 +1312,7 @@ class EmployeeManagementPageSystem {
             "平均满意度",
 
           value:
-            `${satisfactionAverage}`,
-
-          suffix:
-            "/100",
+            `${satisfactionAverage}%`,
 
           tone:
             satisfactionAverage >=
@@ -1224,35 +1322,18 @@ class EmployeeManagementPageSystem {
                 50
                 ? "warning"
                 : "danger"
-        },
-
-        {
-          label:
-            "月工资",
-
-          value:
-            `¥${payroll.toLocaleString("zh-CN")}`,
-
-          tone:
-            "primary"
-        },
-
-        {
-          label:
-            "建议缺员",
-
-          value:
-            `${staffing.totalShortage}人`,
-
-          tone:
-            staffing.totalShortage ===
-            0
-              ? "success"
-              : "warning"
         }
       ],
 
       employees,
+
+      roleTabs,
+
+      primaryAlert,
+
+      payroll,
+
+      satisfactionAverage,
 
       scheduleSummary,
 
