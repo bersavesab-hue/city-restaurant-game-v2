@@ -13,7 +13,7 @@ const ONBOARDING_STEPS =
       id: "location",
       title: "完成选址",
       description: "先为门店签下正式经营铺位。",
-      pageId: "properties"
+      pageId: "city"
     }),
 
     Object.freeze({

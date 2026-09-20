@@ -179,7 +179,7 @@ test(
         .getRecommendedPage(
           restaurant.id
         ),
-      "properties"
+      "city"
     );
 
 

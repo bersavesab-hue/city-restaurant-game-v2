@@ -46,7 +46,7 @@ function buildSystem(
 
 
 test(
-  "没有签约时自动进入房源选择",
+  "没有签约时先进入城市主页",
   () => {
     const system =
       buildSystem({});
@@ -56,7 +56,7 @@ test(
       system.getRecommendedPage(
         "restaurant"
       ),
-      "properties"
+      "city"
     );
   }
 );

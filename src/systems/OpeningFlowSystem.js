@@ -266,7 +266,7 @@ class OpeningFlowSystem {
           hasLease,
 
         target:
-          "properties",
+          "city",
 
         icon:
           "1"
@@ -746,7 +746,7 @@ class OpeningFlowSystem {
 
 
     if (!hasLease) {
-      return "properties";
+      return "city";
     }
 
 
