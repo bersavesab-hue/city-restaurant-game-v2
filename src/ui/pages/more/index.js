@@ -1,7 +1,6 @@
 export {
   moreHubPageSystem,
-  MoreHubPageSystem,
-  MORE_GROUPS
+  MoreHubPageSystem
 } from "./MoreHubPageSystem.js";
 
 export {

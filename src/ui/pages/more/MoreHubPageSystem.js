@@ -361,6 +361,9 @@ function buildGroups(restaurantId) {
               ? "ready"
               : "locked",
 
+          unlockLevel:
+            chainUnlockLevel,
+
           lockText:
             chainUnlockLevel
               ? (
@@ -521,6 +524,9 @@ function buildGroups(restaurantId) {
             membershipUnlocked
               ? "ready"
               : "locked",
+
+          unlockLevel:
+            membershipUnlockLevel,
 
           lockText:
             membershipUnlockLevel

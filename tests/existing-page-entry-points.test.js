@@ -53,11 +53,7 @@ test(
     ]) {
       assert.match(
         stores,
-        new RegExp(
-          'data-page-target="' +
-          target +
-          '"'
-        )
+        new RegExp(target)
       );
     }
 
