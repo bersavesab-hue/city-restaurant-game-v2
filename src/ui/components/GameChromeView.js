@@ -78,6 +78,17 @@ export function renderGameTopBar(
     model?.scope?.stores?.length ??
     0;
 
+  const rating =
+    Number.isFinite(
+      Number(
+        model?.rating
+      )
+    )
+      ? Number(
+          model.rating
+        ).toFixed(1)
+      : null;
+
 
   const speeds =
     model?.actions
@@ -149,6 +160,10 @@ export function renderGameTopBar(
                     `).join("")}
                   </select>
                 </label>
+                ${groupScope
+                  ? '<small class="rg-topbar__store-count">管理旗下 ' + scopeStoreCount + ' 家门店</small>'
+                  : ""
+                }
               `
               : escapeHtml(
                   subtitle ??
@@ -213,21 +228,17 @@ export function renderGameTopBar(
       <section class="rg-topbar__level">
 
         <span>
-          ${groupScope ? "门店数量" : "门店等级"}
+          门店等级
         </span>
 
         <strong>
-          ${
-            groupScope
-              ? scopeStoreCount + "家"
-              : "Lv." + level
-          }
+          ${"Lv." + level}
         </strong>
 
         <small>
           ${
-            groupScope
-              ? "集团视角"
+            rating !== null
+              ? "★ " + rating
               : "声望 " + (model?.reputation ?? 0)
           }
         </small>
