@@ -19,7 +19,8 @@ const styleSources =
     "src/ui-v2/tokens/tokens.css",
     "src/ui-v2/shell/app-shell.css",
     "src/ui-v2/components/global-hud.css",
-    "src/ui-v2/components/global-nav.css"
+    "src/ui-v2/components/global-nav.css",
+    "src/ui-v2/pages/city/city-page.css"
   ]);
 
 fs.rmSync(
