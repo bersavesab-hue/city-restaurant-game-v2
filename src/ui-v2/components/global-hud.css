@@ -1,9 +1,9 @@
 .ui-v2-hud {
   display: grid;
   grid-template-columns:
-    minmax(0,1.15fr)
-    minmax(0,1.3fr)
-    minmax(0,.95fr);
+    minmax(100px,.95fr)
+    minmax(0,2.25fr)
+    minmax(92px,.9fr);
   grid-template-areas:
     "identity simulation resources";
   align-items: stretch;
@@ -40,20 +40,20 @@
   grid-area: identity;
   display: grid;
   grid-template-columns:
-    48px
+    38px
     minmax(0,1fr);
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   padding:
-    6px
-    6px
-    6px
-    var(--ui-page-gutter);
+    4px
+    4px
+    4px
+    8px;
 }
 
 .ui-v2-hud__avatar-slot {
-  width: 48px;
-  height: 48px;
+  width: 38px;
+  height: 38px;
   border-radius:
     var(--ui-radius-md);
   overflow: hidden;
@@ -146,22 +146,21 @@
   grid-area: simulation;
   display: grid;
   grid-template-columns:
-    32px
-    minmax(62px,.85fr)
-    minmax(148px,1.5fr);
+    24px
+    48px
+    minmax(0,1fr);
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding:
-    6px
-    8px;
+    4px;
   border-inline:
     1px solid
     rgba(255,255,255,.10);
 }
 
 .ui-v2-hud__weather {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   background-image:
     var(
       --ui-hud-weather-image,
@@ -178,7 +177,7 @@
 .ui-v2-hud__clock {
   min-width: 0;
   display: grid;
-  gap: 2px;
+  gap: 0;
   justify-items: center;
 }
 
@@ -210,19 +209,20 @@
   grid-template-columns:
     repeat(
       4,
-      minmax(34px,1fr)
+      minmax(30px,1fr)
     );
-  gap: 3px;
+  gap: 4px;
 }
 
 .ui-v2-hud__pause,
 .ui-v2-hud__speed {
   position: relative;
   min-width: 0;
-  height: 40px;
+  min-height: 34px;
+  height: 34px;
   padding:
     0
-    4px;
+    2px;
   border-radius:
     var(--ui-radius-md);
   background:
@@ -245,13 +245,13 @@
   content: "";
   position: absolute;
   inset:
-    -4px
-    0;
+    -5px
+    -2px;
 }
 
 .ui-v2-hud__pause-icon {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   display: block;
   margin: auto;
   background-image:
@@ -282,12 +282,12 @@
     1fr
     1fr;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
   padding:
-    4px
-    var(--ui-page-gutter)
-    4px
-    8px;
+    3px
+    6px
+    3px
+    4px;
 }
 
 .ui-v2-hud__money,
@@ -296,7 +296,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 5px;
+  gap: 3px;
 }
 
 .ui-v2-hud__money-icon,
@@ -314,8 +314,8 @@
 }
 
 .ui-v2-hud__money-icon {
-  width: 26px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   background-image:
     var(
       --ui-hud-money-image,
@@ -331,10 +331,10 @@
 }
 
 .ui-v2-hud__money-action {
-  width: 48px;
-  min-width: 48px;
-  height: 48px;
-  min-height: 48px;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  min-height: 34px;
   display: grid;
   place-items: center;
   padding: 0;
@@ -347,8 +347,8 @@
 }
 
 .ui-v2-hud__money-action-visual {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   display: block;
   border-radius:
     var(--ui-radius-sm);
@@ -369,8 +369,8 @@
 }
 
 .ui-v2-hud__crown-icon {
-  width: 24px;
-  height: 20px;
+  width: 20px;
+  height: 18px;
   background-image:
     var(
       --ui-hud-level-image,
@@ -379,8 +379,8 @@
 }
 
 .ui-v2-hud__star-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   background-image:
     var(
       --ui-hud-rating-image,
@@ -415,42 +415,42 @@
       "identity resources"
       "simulation simulation";
     grid-template-rows:
-      52px
-      52px;
+      44px
+      44px;
   }
 
   .ui-v2-hud__identity {
     grid-template-columns:
-      40px
+      34px
       minmax(0,1fr);
     padding:
+      3px
       4px
-      4px
-      4px
-      8px;
+      3px
+      6px;
   }
 
   .ui-v2-hud__avatar-slot {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
   }
 
   .ui-v2-hud__resources {
     padding:
-      3px
-      8px
-      3px
+      2px
+      6px
+      2px
       4px;
   }
 
   .ui-v2-hud__simulation {
     grid-template-columns:
-      28px
-      minmax(62px,.75fr)
-      minmax(176px,1.8fr);
+      22px
+      48px
+      minmax(0,1fr);
     padding:
-      4px
-      8px;
+      3px
+      6px;
     border-inline: 0;
     border-top:
       1px solid
@@ -458,44 +458,45 @@
   }
 
   .ui-v2-hud__weather {
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
   }
 }
 
 @media (min-width: 600px) {
   .ui-v2-hud {
     grid-template-columns:
-      minmax(230px,1fr)
-      minmax(360px,1.35fr)
-      minmax(210px,.9fr);
+      minmax(150px,1fr)
+      minmax(280px,1.7fr)
+      minmax(140px,.95fr);
   }
 
   .ui-v2-hud__identity {
     grid-template-columns:
-      54px
+      42px
       minmax(0,1fr);
   }
 
   .ui-v2-hud__avatar-slot {
-    width: 54px;
-    height: 54px;
+    width: 42px;
+    height: 42px;
   }
 
   .ui-v2-hud__simulation {
     grid-template-columns:
-      38px
-      minmax(90px,.8fr)
-      minmax(196px,1.3fr);
+      26px
+      58px
+      minmax(0,1fr);
   }
 
   .ui-v2-hud__weather {
-    width: 38px;
-    height: 38px;
+    width: 26px;
+    height: 26px;
   }
 
   .ui-v2-hud__pause,
   .ui-v2-hud__speed {
-    height: 44px;
+    height: 36px;
+    min-height: 36px;
   }
 }
