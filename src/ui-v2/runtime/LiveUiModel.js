@@ -1144,6 +1144,20 @@ function buildCityModel(
                 .opportunityScore >=
               66,
 
+            opened:
+              selected.opened,
+
+            unlocked:
+              selected.unlocked,
+
+            availablePropertyCount:
+              selected
+                .availablePropertyCount,
+
+            opportunityScore:
+              selected
+                .opportunityScore,
+
             description:
               (
                 selected.event
