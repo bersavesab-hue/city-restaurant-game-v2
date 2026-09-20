@@ -2,6 +2,15 @@ import {
   escapeHtml
 } from "../../utils/escapeHtml.js";
 
+const FEATURED_CITY_DISTRICT_IDS =
+  Object.freeze([
+    "university",
+    "cbd",
+    "nightlife",
+    "old_town",
+    "waterfront_leisure"
+  ]);
+
 import {
   FILTER_IDS,
   formatInteger,
@@ -190,7 +199,7 @@ function renderMap(
   activeFilter,
   selectedId
 ) {
-  const visible =
+  const filtered =
     model.districts
       .filter(
         district =>
@@ -198,36 +207,70 @@ function renderMap(
             district,
             activeFilter
           )
-      )
-      .sort(
-        (a,b) => {
-          const selectedWeight =
-            Number(
-              b.id ===
-              selectedId
-            ) -
-            Number(
-              a.id ===
-              selectedId
-            );
-
-          if (
-            selectedWeight !==
-            0
-          ) {
-            return selectedWeight;
-          }
-
-          return (
-            b.opportunityScore -
-            a.opportunityScore
-          );
-        }
-      )
-      .slice(
-        0,
-        7
       );
+
+  const visible =
+    activeFilter ===
+      "all"
+      ? (
+          FEATURED_CITY_DISTRICT_IDS
+            .map(
+              id =>
+                filtered.find(
+                  district =>
+                    district.id ===
+                    id
+                )
+            )
+            .filter(
+              Boolean
+            )
+            .concat(
+              filtered.find(
+                district =>
+                  district.id ===
+                  selectedId &&
+                  !FEATURED_CITY_DISTRICT_IDS.includes(
+                    district.id
+                  )
+              ) ??
+              []
+            )
+            .slice(
+              0,
+              6
+            )
+        )
+      : filtered
+          .sort(
+            (a,b) => {
+              const selectedWeight =
+                Number(
+                  b.id ===
+                  selectedId
+                ) -
+                Number(
+                  a.id ===
+                  selectedId
+                );
+
+              if (
+                selectedWeight !==
+                0
+              ) {
+                return selectedWeight;
+              }
+
+              return (
+                b.opportunityScore -
+                a.opportunityScore
+              );
+            }
+          )
+          .slice(
+            0,
+            5
+          );
 
   return (
     '<section class="ui-v2-city-map-stage" data-ui="city-map">' +
