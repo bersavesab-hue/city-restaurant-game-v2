@@ -98,17 +98,14 @@
   z-index: 120;
   width: 100%;
   height:
-    calc(
-      min(11.1vw,96px) +
-      env(safe-area-inset-top)
-    );
+    6.25dvh;
   display: grid;
   grid-template-columns:
     minmax(0,34%)
     minmax(0,43%)
     minmax(0,23%);
   padding-top:
-    env(safe-area-inset-top);
+    0;
   overflow: hidden;
   color: #fff;
   background:
@@ -525,14 +522,14 @@
   bottom: 0;
   z-index: 500;
   width: min(100%, var(--rg-shell-max));
-  height: calc(min(15.3vw,132px) + env(safe-area-inset-bottom));
+  height: 9.7dvh;
   display: grid;
   grid-template-columns: repeat(5,minmax(0,1fr));
   gap: 0;
   padding:
     min(.55vw,5px)
     min(.8vw,7px)
-    env(safe-area-inset-bottom);
+    0;
   transform: translateX(-50%);
   border-top: 1px solid #42c4fc;
   background:

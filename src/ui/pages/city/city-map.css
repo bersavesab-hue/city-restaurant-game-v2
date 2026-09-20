@@ -4,17 +4,18 @@
   --city-gold: #ffd744;
   width: 100%;
   max-width: var(--rg-shell-max, 864px);
-  min-height: 100dvh;
+  height: 100dvh;
+  min-height: 0;
   margin: 0 auto;
-  padding-bottom: calc(min(15.3vw,132px) + env(safe-area-inset-bottom));
-  overflow-x: hidden;
+  padding-bottom: 9.7dvh;
+  overflow: hidden;
   color: #103e73;
   background: #dff4ff;
 }
 
 .city-map-heading {
   position: relative;
-  height: min(14.9vw,129px);
+  height: 8.4dvh;
   display: grid;
   grid-template-columns: minmax(0,1fr) min(32vw,277px);
   align-items: center;
@@ -98,7 +99,7 @@
 }
 
 .city-map-filters {
-  height: min(8.1vw,70px);
+  height: 4.55dvh;
   display: grid;
   grid-template-columns: repeat(5,minmax(0,1fr));
   gap: min(.65vw,6px);
@@ -148,7 +149,7 @@
 
 .city-map-viewport {
   position: relative;
-  height: min(75.8vw,655px);
+  height: 42.65dvh;
   overflow: hidden;
   background: #7ebde6;
 }
@@ -457,7 +458,7 @@
 .city-district-sheet {
   position: relative;
   z-index: 10;
-  height: min(50.2vw,434px);
+  height: 28.25dvh;
   padding:
     min(3.35vw,29px)
     min(2.1vw,18px)

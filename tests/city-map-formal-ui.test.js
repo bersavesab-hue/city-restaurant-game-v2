@@ -396,6 +396,17 @@ test(
       );
     }
 
+
+    assert.equal(
+      view.handleClick
+        .toString()
+        .includes(
+          "this.refresh()"
+        ),
+      false,
+      "城市商圈点击不得再次触发整页refresh"
+    );
+
     assert.equal(
       (
         html.match(

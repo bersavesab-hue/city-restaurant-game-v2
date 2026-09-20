@@ -28,8 +28,8 @@ android {
         minSdk 23
         targetSdk 36
 
-        versionCode 883
-        versionName '0.8.83'
+        versionCode 884
+        versionName '0.8.84'
     }
 
     buildTypes {

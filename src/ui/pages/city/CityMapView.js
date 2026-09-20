@@ -669,9 +669,134 @@ class CityMapView {
 
   render() {
     if (this.page) {
-      this.root.innerHTML = this.renderMarkup(this.page);
+      this.root.innerHTML =
+        this.renderMarkup(
+          this.page
+        );
     }
   }
+
+
+  replaceSection(
+    selector,
+    markup
+  ) {
+    const current =
+      this.root
+        .querySelector?.(
+          selector
+        );
+
+    if (!current) {
+      this.render();
+      return;
+    }
+
+    current.outerHTML =
+      markup;
+  }
+
+
+  renderFiltersOnly() {
+    this.replaceSection(
+      ".city-map-filters",
+      this.renderFilters(
+        this.page
+      )
+    );
+  }
+
+
+  renderMapOnly() {
+    this.replaceSection(
+      ".city-map-viewport",
+      this.renderMap(
+        this.page
+      )
+    );
+  }
+
+
+  renderDetailOnly() {
+    const current =
+      this.root
+        .querySelector?.(
+          ".city-district-sheet"
+        );
+
+    const markup =
+      this.renderDetail(
+        this.page
+      );
+
+    if (current) {
+      current.outerHTML =
+        markup;
+      return;
+    }
+
+    const map =
+      this.root
+        .querySelector?.(
+          ".city-map-viewport"
+        );
+
+    if (
+      map &&
+      markup
+    ) {
+      map.insertAdjacentHTML(
+        "afterend",
+        markup
+      );
+    }
+  }
+
+
+  selectDistrict(
+    districtId
+  ) {
+    const district =
+      this.page?.map?.districts
+        ?.find(
+          item =>
+            item.id ===
+            districtId &&
+            !item.locked
+        );
+
+    if (!district) {
+      return;
+    }
+
+    this.selectedDistrictId =
+      district.id;
+
+    this.page.map.selectedDistrictId =
+      district.id;
+
+    this.page.selectedDistrict =
+      district;
+
+    if (
+      typeof this.pageSystem
+        ?.getOpportunities ===
+      "function"
+    ) {
+      this.page.opportunities =
+        this.pageSystem
+          .getOpportunities(
+            this.page
+              .recommendedProperties ??
+              [],
+            district.id
+          );
+    }
+
+    this.renderMapOnly();
+    this.renderDetailOnly();
+  }
+
 
   handleClick(event) {
     const target =
@@ -684,14 +809,20 @@ class CityMapView {
     const action = target.dataset.action;
 
     if (action === "set-filter") {
-      this.filter = target.dataset.filter ?? "all";
-      this.render();
+      this.filter =
+        target.dataset.filter ??
+        "all";
+
+      this.renderFiltersOnly();
+      this.renderMapOnly();
       return;
     }
 
     if (action === "select-district") {
-      this.selectedDistrictId = target.dataset.districtId;
-      this.refresh();
+      this.selectDistrict(
+        target.dataset
+          .districtId
+      );
       return;
     }
 
@@ -713,24 +844,40 @@ class CityMapView {
     if (action === "zoom-in") {
       this.zoom = Math.min(
         1.3,
-        Number((this.zoom + 0.1).toFixed(2))
+        Number(
+          (
+            this.zoom +
+            0.1
+          ).toFixed(
+            2
+          )
+        )
       );
-      this.render();
+
+      this.renderMapOnly();
       return;
     }
 
     if (action === "zoom-out") {
       this.zoom = Math.max(
         1,
-        Number((this.zoom - 0.1).toFixed(2))
+        Number(
+          (
+            this.zoom -
+            0.1
+          ).toFixed(
+            2
+          )
+        )
       );
-      this.render();
+
+      this.renderMapOnly();
       return;
     }
 
     if (action === "locate") {
       this.zoom = 1;
-      this.render();
+      this.renderMapOnly();
       return;
     }
 

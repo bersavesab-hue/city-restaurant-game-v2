@@ -190,10 +190,7 @@
 .construction-page,
 .opening-setup-page {
   padding-bottom:
-    calc(
-      min(15.3vw, 132px) +
-      env(safe-area-inset-bottom)
-    ) !important;
+    9.7dvh !important;
 }
 
 

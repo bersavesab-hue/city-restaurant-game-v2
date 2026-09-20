@@ -903,6 +903,15 @@ class CityMapDashboardSystem {
     restaurantId = null,
     selectedDistrictId = null
   } = {}) {
+    const hasExistingListings =
+      propertySystem
+        .list({
+          availableOnly:
+            true
+        })
+        .length >
+      0;
+
     const marketplace =
       cityPropertyPageSystem
         .getMarketplace({
@@ -914,8 +923,13 @@ class CityMapDashboardSystem {
           availableOnly:
             true,
 
+          /*
+           * 城市首页只在市场完全为空时做一次初始化。
+           * 之后的商圈点击、筛选与缩放都不得再次遍历
+           * 20个商圈去补齐房源库存。
+           */
           generateListings:
-            true
+            !hasExistingListings
         });
 
     const districts =

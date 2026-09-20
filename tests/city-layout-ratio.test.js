@@ -4,7 +4,7 @@ import fs from "node:fs";
 
 
 test(
-  "城市确认稿纵向结构按864设计宽度等比缩放",
+  "城市确认稿使用1536高视口的固定纵向比例",
   () => {
     const city =
       fs.readFileSync(
@@ -19,10 +19,11 @@ test(
       );
 
     for (const token of [
-      "height: min(14.9vw,129px)",
-      "height: min(8.1vw,70px)",
-      "height: min(75.8vw,655px)",
-      "height: min(50.2vw,434px)"
+      "height: 8.4dvh",
+      "height: 4.55dvh",
+      "height: 42.65dvh",
+      "height: 28.25dvh",
+      "padding-bottom: 9.7dvh"
     ]) {
       assert.equal(
         city.includes(token),
@@ -33,28 +34,67 @@ test(
 
     assert.equal(
       chrome.includes(
-        "clamp(76px,11.1vw,96px)"
+        "height:\n    6.25dvh"
       ),
-      false
+      true
     );
 
     assert.equal(
       chrome.includes(
-        "@media (max-width: 520px)"
+        "height: 9.7dvh"
       ),
-      false
-    );
-
-    assert.equal(
-      city.includes(
-        "@media (max-width: 560px)"
-      ),
-      false
+      true
     );
 
     assert.equal(
       chrome.includes(
-        "height: calc(min(15.3vw,132px) + env(safe-area-inset-bottom))"
+        "safe-area-inset-top"
+      ),
+      false
+    );
+  }
+);
+
+
+test(
+  "城市交互避免重复重建完整页面",
+  () => {
+    const view =
+      fs.readFileSync(
+        "src/ui/pages/city/CityMapView.js",
+        "utf8"
+      );
+
+    const dashboard =
+      fs.readFileSync(
+        "src/ui/pages/city/CityMapDashboardSystem.js",
+        "utf8"
+      );
+
+    assert.equal(
+      view.includes(
+        "this.refresh();\n      return;\n    }\n\n    if (action === \"open-district-properties\")"
+      ),
+      false
+    );
+
+    assert.equal(
+      view.includes(
+        "renderMapOnly()"
+      ),
+      true
+    );
+
+    assert.equal(
+      view.includes(
+        "renderDetailOnly()"
+      ),
+      true
+    );
+
+    assert.equal(
+      dashboard.includes(
+        "generateListings:\n            !hasExistingListings"
       ),
       true
     );
