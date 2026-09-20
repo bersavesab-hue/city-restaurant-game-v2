@@ -189,7 +189,7 @@
 
 @media (max-width: 399px) {
   :root {
-    --ui-hud-height: 88px;
+    --ui-hud-height: 54px;
     --ui-nav-height: 72px;
     --ui-page-gutter: 10px;
     --ui-city-hero-min-height: 64px;
