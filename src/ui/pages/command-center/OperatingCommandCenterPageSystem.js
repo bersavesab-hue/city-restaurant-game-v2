@@ -24,45 +24,36 @@ import {
 } from "../../../systems/EmployeeSystem.js";
 
 import {
-  inventorySystem
-} from "../../../systems/InventorySystem.js";
-
-import {
-  ingredientCatalogSystem
-} from "../../../systems/IngredientCatalogSystem.js";
-
-import {
-  marketInsightSystem
-} from "../../../systems/MarketInsightSystem.js";
-
-import {
   employeeDynamicsSystem
 } from "../../../systems/EmployeeDynamicsSystem.js";
 
 import {
-  dishCatalogSystem
-} from "../../../systems/DishCatalogSystem.js";
+  restaurantSystem
+} from "../../../systems/RestaurantSystem.js";
 
 import {
-  getDishVisualSource
-} from "../../assets/DishVisualResolver.js";
+  financeSystem
+} from "../../../systems/FinanceSystem.js";
 
-import { restaurantSystem } from "../../../systems/RestaurantSystem.js";
-import { financeSystem } from "../../../systems/FinanceSystem.js";
-import { managementScopeSystem } from "../../components/ManagementScopeSystem.js";
+import {
+  propertySystem
+} from "../../../systems/PropertySystem.js";
 
+import {
+  districtSystem
+} from "../../../systems/DistrictSystem.js";
 
+import {
+  chainSystem
+} from "../../../systems/ChainSystem.js";
 
-function noticeType(
-  severity
-) {
-  return {
-    critical: "danger",
-    high: "warning",
-    medium: "warning",
-    low: "info"
-  }[severity] ?? "info";
-}
+import {
+  openingFlowSystem
+} from "../../../systems/OpeningFlowSystem.js";
+
+import {
+  managementScopeSystem
+} from "../../components/ManagementScopeSystem.js";
 
 
 function safe(
@@ -77,25 +68,117 @@ function safe(
 }
 
 
-function employeeRoleName(
-  roleId
+function severityScore(
+  severity
 ) {
-  return safe(
-    () =>
-      employeeSystem
-        .getRole(
-          roleId
-        )
-        .name,
-    roleId ??
-      "员工"
+  return {
+    critical:
+      4,
+
+    high:
+      3,
+
+    medium:
+      2,
+
+    low:
+      1
+  }[
+    severity
+  ] ??
+  0;
+}
+
+
+function stableArtIndex(
+  id
+) {
+  let value =
+    0;
+
+  for (
+    const char
+    of String(
+      id ??
+      ""
+    )
+  ) {
+    value =
+      (
+        value *
+        31 +
+        char
+          .charCodeAt(
+            0
+          )
+      ) %
+      3;
+  }
+
+  return value;
+}
+
+
+function getLocationLabel(
+  restaurant
+) {
+  if (
+    !restaurant
+      .locationId
+  ) {
+    return (
+      restaurant
+        .plannedRegionId
+        ? "规划区域 · 待选址"
+        : "尚未完成选址"
+    );
+  }
+
+  const property =
+    safe(
+      () =>
+        propertySystem
+          .get(
+            restaurant.locationId
+          ),
+      null
+    );
+
+  if (!property) {
+    return "当前经营地址";
+  }
+
+  const district =
+    safe(
+      () =>
+        districtSystem
+          .get(
+            property.districtId
+          ),
+      null
+    );
+
+  if (
+    district?.name &&
+    property.name
+  ) {
+    return (
+      district.name +
+      " · " +
+      property.name
+    );
+  }
+
+  return (
+    district?.name ??
+    property.name ??
+    "当前经营地址"
   );
 }
 
 
-function buildStaffPreview(
-  restaurantId,
-  dashboard
+function getManager(
+  restaurantId
 ) {
   const employees =
     safe(
@@ -105,420 +188,606 @@ function buildStaffPreview(
             restaurantId
           ),
       []
-    )
-      .filter(
-        item =>
-          item.status !==
-          "fired"
-      )
+    );
+
+  const manager =
+    employees.find(
+      item =>
+        [
+          "manager",
+          "store_manager"
+        ].includes(
+          item.roleId
+        )
+    ) ??
+    employees
+      .slice()
       .sort(
-        (a, b) => {
-          const activeDiff =
-            Number(
-              b.status ===
-              "active"
-            ) -
-            Number(
-              a.status ===
-              "active"
-            );
+        (
+          a,
+          b
+        ) =>
+          (
+            b.level ??
+            1
+          ) -
+          (
+            a.level ??
+            1
+          )
+      )[0] ??
+    null;
 
-          if (
-            activeDiff !==
-            0
-          ) {
-            return activeDiff;
-          }
-
-          return (
-            (b.level ?? 1) -
-            (a.level ?? 1)
-          );
-        }
-      );
+  if (!manager) {
+    return null;
+  }
 
   return {
-    available:
-      dashboard.workforce
-        .availableEmployees ??
-      0,
+    id:
+      manager.id,
 
-    total:
-      employees.length,
+    name:
+      manager.name,
 
-    averageFatigue:
-      dashboard
-        .workforcePulse
-        .averageFatigue ??
-      0,
+    roleName:
+      safe(
+        () =>
+          employeeSystem
+            .getRole(
+              manager.roleId
+            )
+            .name,
+        "负责人"
+      ),
 
-    highFatigue:
-      dashboard
-        .workforcePulse
-        .highFatigue ??
-      0,
+    level:
+      manager.level ??
+      1,
 
-    preview:
-      employees
-        .slice(
-          0,
-          3
-        )
-        .map(
-          employee => ({
-            id:
-              employee.id,
-
-            name:
-              employee.name,
-
-            roleId:
-              employee.roleId,
-
-            roleName:
-              employeeRoleName(
-                employee.roleId
-              ),
-
-            level:
-              employee.level ??
-              1,
-
-            fatigue:
-              employee.fatigue ??
-              0,
-
-            mood:
-              employee.mood ??
-              0,
-
-            status:
-              employee.status,
-
-            avatarId:
-              safe(
-                () =>
-                  employeeDynamicsSystem
-                    .getAvatarId(
-                      employee
-                    ),
-                employee.roleId +
-                  "_01"
-              ),
-
-            avatarPath:
-              safe(
-                () =>
-                  employeeDynamicsSystem
-                    .getAvatarPath(
-                      employee
-                    ),
-                "assets/images/ui/employees/avatars/" +
-                  employee.roleId +
-                  "_01.webp"
-              ),
-
-            avatarFallbackPath:
-              "assets/images/ui/employees/avatars/" +
-              employee.roleId +
-              "_01.webp"
-          })
-        )
+    avatarPath:
+      safe(
+        () =>
+          employeeDynamicsSystem
+            .getAvatarPath(
+              manager
+            ),
+        null
+      )
   };
 }
 
 
-function buildInventoryPreview(
-  restaurantId
+function getPreparation(
+  restaurant
 ) {
-  const rows =
+  if (
+    Number.isFinite(
+      restaurant
+        .firstOpenedAt
+    )
+  ) {
+    return {
+      percent:
+        100,
+
+      nextAction:
+        null
+    };
+  }
+
+  const status =
     safe(
       () =>
-        inventorySystem
-          .getSummary(
-            restaurantId
+        openingFlowSystem
+          .getStatus(
+            restaurant.id
           ),
-      []
-    )
-      .sort(
-        (a, b) =>
-          (
-            a.usableQuantity ??
-            0
-          ) -
-          (
-            b.usableQuantity ??
-            0
-          )
-      )
-      .slice(
+      null
+    );
+
+  return {
+    percent:
+      Math.max(
         0,
-        3
-      );
-
-  return rows.map(
-    item => {
-      const ingredient =
-        safe(
-          () =>
-            ingredientCatalogSystem
-              .get(
-                item.ingredientId
-              ),
-          null
-        );
-
-      const usable =
-        Number(
-          item.usableQuantity ??
-          0
-        );
-
-      const state =
-        usable <= 0
-          ? "out"
-          : usable <= 5
-            ? "low"
-            : "ok";
-
-      return {
-        ingredientId:
-          item.ingredientId,
-
-        name:
-          ingredient
-            ?.name ??
-          item.ingredientId,
-
-        unit:
-          ingredient
-            ?.unit ??
-          "",
-
-        usableQuantity:
-          usable,
-
-        spoiledQuantity:
-          Number(
-            item.spoiledQuantity ??
+        Math.min(
+          100,
+          Math.round(
+            status
+              ?.preparation
+              ?.percent ??
             0
-          ),
-
-        state,
-
-        stateLabel:
-          {
-            out:
-              "缺货",
-            low:
-              "库存偏低",
-            ok:
-              "库存正常"
-          }[state],
-
-        levelPercent:
-          Math.max(
-            0,
-            Math.min(
-              100,
-              Math.round(
-                usable /
-                5 *
-                100
-              )
-            )
           )
-      };
-    }
-  );
+        )
+      ),
+
+    nextAction:
+      status
+        ?.nextAction ??
+      null
+  };
 }
 
 
-function buildTopDishPreview(
-  dashboard
+function normalizeStoreState(
+  restaurant,
+  dashboard,
+  preparation
 ) {
-  return (
-    dashboard.menu
-      .dishes ??
-    []
-  )
-    .slice()
-    .sort(
-      (a, b) =>
-        (
-          b.quantity ??
-          0
-        ) -
-        (
-          a.quantity ??
-          0
-        )
+  const priorities =
+    dashboard
+      ?.priorities ??
+    [];
+
+  const abnormal =
+    restaurant.status ===
+      "paused" ||
+    priorities.some(
+      item =>
+        severityScore(
+          item.severity
+        ) >=
+        3
+    );
+
+  if (
+    !Number.isFinite(
+      restaurant
+        .firstOpenedAt
     )
-    .slice(
-      0,
-      3
-    )
-    .map(
-      item => {
-        const dish =
+  ) {
+    return {
+      state:
+        "preparing",
+
+      label:
+        "筹备中"
+    };
+  }
+
+  if (abnormal) {
+    return {
+      state:
+        "abnormal",
+
+      label:
+        "异常"
+    };
+  }
+
+  if (
+    restaurant.status ===
+    "open"
+  ) {
+    return {
+      state:
+        "open",
+
+      label:
+        "营业中"
+    };
+  }
+
+  return {
+    state:
+      "closed",
+
+    label:
+      "已歇业"
+  };
+}
+
+
+function buildStorePortfolio(
+  restaurantId
+) {
+  const current =
+    restaurantSystem
+      .get(
+        restaurantId
+      );
+
+  const chainDashboard =
+    safe(
+      () =>
+        chainSystem
+          .getDashboard(
+            restaurantId
+          ),
+      null
+    );
+
+  const stores =
+    chainDashboard
+      ?.stores ??
+    [
+      current
+    ];
+
+  const cards =
+    stores.map(
+      store => {
+        const dashboard =
           safe(
             () =>
-              dishCatalogSystem
-                .get(
-                  item.dishId
+              operatingCommandCenterSystem
+                .getDashboard(
+                  store.id
                 ),
             null
           );
 
+        const preparation =
+          getPreparation(
+            store
+          );
+
+        const normalized =
+          normalizeStoreState(
+            store,
+            dashboard,
+            preparation
+          );
+
+        const priorities =
+          dashboard
+            ?.priorities ??
+          [];
+
         return {
           id:
-            item.menuItemId ??
-            item.dishId,
-
-          dishId:
-            item.dishId,
+            store.id,
 
           name:
-            item.name,
+            store.name,
 
-          custom:
-            Boolean(
-              dish?.custom
+          active:
+            store.id ===
+            restaurantId,
+
+          state:
+            normalized.state,
+
+          statusLabel:
+            normalized.label,
+
+          level:
+            store.level ??
+            1,
+
+          reviewScore:
+            Number(
+              store.reviewScore ??
+              dashboard
+                ?.restaurant
+                ?.reviewScore ??
+              0
             ),
 
-          image:
-            dish
-              ? getDishVisualSource(
-                  dish
-                )
-              : null,
-
-          sold:
-            item.quantity ??
+          revenue:
+            dashboard
+              ?.sales
+              ?.revenue ??
             0,
 
-          salesShare:
-            item.salesShare ??
+          profit:
+            dashboard
+              ?.sales
+              ?.profit ??
             0,
 
-          quality:
-            item.averageQuality ??
+          guests:
+            dashboard
+              ?.capacity
+              ?.served ??
+            dashboard
+              ?.sales
+              ?.orderCount ??
             0,
 
-          classification:
-            item.classificationName ??
-            "在售菜品"
+          satisfaction:
+            dashboard
+              ?.restaurant
+              ?.customerSatisfaction ??
+            store
+              .customerSatisfaction ??
+            0,
+
+          balance:
+            safe(
+              () =>
+                financeSystem
+                  .getBalance(
+                    store.id
+                  ),
+              0
+            ),
+
+          issueCount:
+            priorities
+              .length,
+
+          locationLabel:
+            getLocationLabel(
+              store
+            ),
+
+          manager:
+            getManager(
+              store.id
+            ),
+
+          preparationProgress:
+            preparation
+              .percent,
+
+          preparationNextAction:
+            preparation
+              .nextAction,
+
+          artIndex:
+            stableArtIndex(
+              store.id
+            )
         };
       }
     );
-}
 
+  const totals =
+    cards.reduce(
+      (
+        result,
+        store
+      ) => {
+        result.revenue +=
+          store.revenue;
 
-function buildMarketPreview(
-  restaurantId,
-  dashboard
-) {
-  const market =
-    safe(
-      () =>
-        marketInsightSystem
-          .getSummary(
-            restaurantId
-          ),
+        result.profit +=
+          store.profit;
+
+        result.guests +=
+          store.guests;
+
+        result.balance +=
+          store.balance;
+
+        result.issueCount +=
+          store.issueCount;
+
+        result.satisfaction +=
+          store.satisfaction;
+
+        result.reviewScore +=
+          store.reviewScore;
+
+        return result;
+      },
       {
-        marketShare:
-          null,
-
-        change:
+        revenue:
           0,
 
-        competitorCount:
+        profit:
           0,
 
-        competitionFactor:
-          100,
+        guests:
+          0,
 
-        alert:
-          "stable"
+        balance:
+          0,
+
+        issueCount:
+          0,
+
+        satisfaction:
+          0,
+
+        reviewScore:
+          0
       }
     );
 
-  return {
-    marketShare:
-      market.marketShare,
+  if (
+    cards.length >
+    0
+  ) {
+    totals.satisfaction =
+      Math.round(
+        totals.satisfaction /
+        cards.length
+      );
 
-    marketShareChange:
-      market.change ??
-      0,
+    totals.reviewScore =
+      Number(
+        (
+          totals.reviewScore /
+          cards.length
+        ).toFixed(
+          1
+        )
+      );
+  }
 
-    competitorCount:
-      market.competitorCount ??
-      0,
+  const filterCounts = {
+    all:
+      cards.length,
 
-    competitionFactor:
-      market.competitionFactor ??
-      100,
+    open:
+      cards.filter(
+        item =>
+          item.state ===
+          "open"
+      ).length,
 
-    competitionAlert:
-      market.alert ??
-      "stable",
+    preparing:
+      cards.filter(
+        item =>
+          item.state ===
+          "preparing"
+      ).length,
 
-    repeatRate:
-      dashboard
-        .restaurant
-        .repeatRate ??
-      0,
-
-    reviewScore:
-      dashboard
-        .restaurant
-        .reviewScore ??
-      0,
-
-    reputation:
-      dashboard
-        .restaurant
-        .reputation ??
-      0
+    abnormal:
+      cards.filter(
+        item =>
+          item.state ===
+          "abnormal"
+      ).length
   };
-}
 
-function buildStorePortfolio(restaurantId) {
-  const current = restaurantSystem.get(restaurantId);
-  const stores = restaurantSystem.list()
-    .filter(store => current.chainId ? store.chainId === current.chainId : store.id === current.id)
-    .sort((a,b) => (a.branchNumber ?? 1) - (b.branchNumber ?? 1));
+  const todos =
+    [];
 
-  const cards = stores.map(store => {
-    const dashboard = safe(() => operatingCommandCenterSystem.getDashboard(store.id), null);
-    return {
-      id: store.id,
-      name: store.name,
-      active: store.id === restaurantId,
-      status: store.status ?? "closed",
-      statusLabel: { open:"营业中", paused:"暂停营业", closed:"未营业" }[store.status] ?? "筹备中",
-      level: store.level ?? 1,
-      reviewScore: store.reviewScore ?? 0,
-      revenue: dashboard?.sales?.revenue ?? 0,
-      profit: dashboard?.sales?.profit ?? 0,
-      orders: dashboard?.sales?.orderCount ?? 0,
-      balance: safe(() => financeSystem.getBalance(store.id), 0),
-      issueCount: dashboard?.priorities?.length ?? 0
-    };
-  });
+  for (
+    const store
+    of stores
+  ) {
+    const dashboard =
+      safe(
+        () =>
+          operatingCommandCenterSystem
+            .getDashboard(
+              store.id
+            ),
+        null
+      );
+
+    for (
+      const item
+      of (
+        dashboard
+          ?.priorities ??
+        []
+      )
+    ) {
+      todos.push({
+        id:
+          store.id +
+          ":" +
+          item.id,
+
+        storeId:
+          store.id,
+
+        storeName:
+          store.name,
+
+        title:
+          item.title,
+
+        description:
+          item.description,
+
+        severity:
+          item.severity,
+
+        target:
+          item.target,
+
+        score:
+          severityScore(
+            item.severity
+          )
+      });
+    }
+
+    const card =
+      cards.find(
+        item =>
+          item.id ===
+          store.id
+      );
+
+    if (
+      card
+        ?.state ===
+        "preparing" &&
+      card
+        .preparationNextAction
+    ) {
+      todos.push({
+        id:
+          store.id +
+          ":opening",
+
+        storeId:
+          store.id,
+
+        storeName:
+          store.name,
+
+        title:
+          card
+            .preparationNextAction
+            .label ??
+          "继续开店准备",
+
+        description:
+          card
+            .preparationNextAction
+            .description ??
+          "继续完成开店准备",
+
+        severity:
+          "medium",
+
+        target:
+          card
+            .preparationNextAction
+            .target ??
+          "opening-setup",
+
+        score:
+          2
+      });
+    }
+  }
+
+  todos.sort(
+    (
+      a,
+      b
+    ) =>
+      b.score -
+      a.score
+  );
+
+  const capacity =
+    Math.max(
+      cards.length,
+      chainDashboard
+        ?.maxStores ??
+      cards.length
+    );
 
   return {
-    scope: managementScopeSystem.getCurrent(),
-    canSwitch: cards.length > 1,
-    storeCount: cards.length,
+    scope:
+      managementScopeSystem
+        .getCurrent(),
+
+    canSwitch:
+      cards.length >
+      0,
+
+    storeCount:
+      cards.length,
+
+    capacity,
+
+    canCreateBranch:
+      chainDashboard
+        ?.canCreateBranch ===
+        true,
+
+    brandName:
+      chainDashboard
+        ?.brandName ??
+      current.name,
+
     cards,
-    totals: cards.reduce((result,store) => ({
-      revenue: result.revenue + store.revenue,
-      profit: result.profit + store.profit,
-      orders: result.orders + store.orders,
-      balance: result.balance + store.balance,
-      issueCount: result.issueCount + store.issueCount
-    }), { revenue:0, profit:0, orders:0, balance:0, issueCount:0 })
+
+    totals,
+
+    filterCounts,
+
+    todos
   };
 }
 
@@ -527,11 +796,10 @@ class OperatingCommandCenterPageSystem {
   getPage(
     restaurantId
   ) {
-    const storePortfolio = buildStorePortfolio(restaurantId);
-
-    const groupScope =
-      storePortfolio.scope?.type === "group" &&
-      storePortfolio.canSwitch;
+    const storePortfolio =
+      buildStorePortfolio(
+        restaurantId
+      );
 
     const dashboard =
       operatingCommandCenterSystem
@@ -556,16 +824,21 @@ class OperatingCommandCenterPageSystem {
       );
 
     const notices =
-      dashboard.priorities
+      dashboard
+        .priorities
         .map(
           item => ({
             id:
               item.id,
 
             type:
-              noticeType(
-                item.severity
-              ),
+              item.severity ===
+                "critical"
+                ? "danger"
+                : item.severity ===
+                    "high"
+                  ? "warning"
+                  : "info",
 
             title:
               item.title,
@@ -574,14 +847,10 @@ class OperatingCommandCenterPageSystem {
               item.description,
 
             priority:
-              {
-                critical: 100,
-                high: 80,
-                medium: 60,
-                low: 40
-              }[
+              severityScore(
                 item.severity
-              ] ?? 20,
+              ) *
+              20,
 
             action:
               item.target
@@ -589,52 +858,21 @@ class OperatingCommandCenterPageSystem {
         );
 
     if (
-      awardFeedback
-        .notifications
-        .length >
-      0
-    ) {
-      const awardNotice =
-        awardFeedback
-          .notifications[0];
-
-      notices.push({
-        id:
-          "award_feedback",
-
-        type:
-          "info",
-
-        title:
-          awardNotice.title,
-
-        message:
-          awardNotice.message,
-
-        priority:
-          55,
-
-        action:
-          awardNotice.action
-      });
-    }
-
-    if (
       notices.length ===
       0
     ) {
       notices.push({
         id:
-          "command_center_normal",
+          "store_hub_normal",
 
         type:
           "success",
 
         title:
-          "经营通报",
+          "门店经营",
 
         message:
-          "当前门店经营正常，可继续关注客流、库存和员工状态",
+          "当前门店经营状态正常",
 
         priority:
           10,
@@ -644,48 +882,107 @@ class OperatingCommandCenterPageSystem {
       });
     }
 
+    const baseTopBar =
+      buildGlobalTopBarModel({
+        restaurantName:
+          dashboard
+            .restaurant
+            .name,
+
+        brandName:
+          storePortfolio
+            .brandName,
+
+        balance:
+          storePortfolio
+            .totals
+            .balance,
+
+        storeLevel:
+          Math.max(
+            1,
+            ...storePortfolio
+              .cards
+              .map(
+                item =>
+                  item.level
+              )
+          ),
+
+        reputation:
+          dashboard
+            .restaurant
+            .reputation,
+
+        time,
+
+        runtime,
+
+        currentStoreId:
+          restaurantId,
+
+        stores:
+          storePortfolio
+            .cards
+            .map(
+              item => ({
+                id:
+                  item.id,
+
+                name:
+                  item.name
+              })
+            )
+      });
+
     return {
       pageId:
         "restaurant",
 
       title:
-        "经营总控",
+        "门店管理",
 
       ...dashboard,
 
-      topBar:
-        buildGlobalTopBarModel({
-          restaurantName:
-            dashboard
-              .restaurant
-              .name,
+      topBar: {
+        ...baseTopBar,
 
-          balance:
-            groupScope
-              ? storePortfolio.totals.balance
-              : dashboard
-                  .finance
-                  .balance,
+        brandName:
+          storePortfolio
+            .brandName,
 
-          storeLevel:
-            dashboard
-              .restaurant
-              .level,
+        rating:
+          storePortfolio
+            .totals
+            .reviewScore,
 
-          reputation:
-            dashboard
-              .restaurant
-              .reputation,
+        scope: {
+          ...baseTopBar
+            .scope,
 
-          time,
-          runtime,
+          type:
+            "group",
 
-          currentStoreId:
-            restaurantId,
+          canSwitch:
+            storePortfolio
+              .cards
+              .length >
+            0,
 
           stores:
-            storePortfolio.cards
-        }),
+            storePortfolio
+              .cards
+              .map(
+                item => ({
+                  id:
+                    item.id,
+
+                  name:
+                    item.name
+                })
+              )
+        }
+      },
 
       noticeTicker:
         buildNoticeTickerModel(
@@ -710,28 +1007,6 @@ class OperatingCommandCenterPageSystem {
             })
           ),
 
-      staffPreview:
-        buildStaffPreview(
-          restaurantId,
-          dashboard
-        ),
-
-      inventoryPreview:
-        buildInventoryPreview(
-          restaurantId
-        ),
-
-      topDishPreview:
-        buildTopDishPreview(
-          dashboard
-        ),
-
-      marketPreview:
-        buildMarketPreview(
-          restaurantId,
-          dashboard
-        ),
-
       awardFeedback,
 
       storePortfolio
@@ -742,6 +1017,7 @@ class OperatingCommandCenterPageSystem {
 
 export const operatingCommandCenterPageSystem =
   new OperatingCommandCenterPageSystem();
+
 
 export {
   OperatingCommandCenterPageSystem
