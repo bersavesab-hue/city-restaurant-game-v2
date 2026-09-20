@@ -2,6 +2,10 @@ import {
   spawnSync
 } from "node:child_process";
 
+import {
+  existsSync
+} from "node:fs";
+
 
 const tests = [
   "tests/foundation-v2-smoke.test.js",
@@ -33,15 +37,12 @@ const tests = [
   "tests/opening-journey-e2e.test.js",
 
 
-  "tests/operating-command-center.test.js",
   "tests/operating-command-center-formal-ui.test.js",
   "tests/operating-cycle.test.js",
   "tests/operating-day-e2e.test.js",
   "tests/formal-runtime-live-refresh.test.js",
   "tests/formal-runtime-navigation-params.test.js",
   "tests/analytics-live-refresh.test.js",
-  "tests/operating-feedback-ui.test.js",
-  "tests/operating-live-visualization.test.js",
   "tests/operating-live-snapshot.test.js",
   "tests/operating-analytics.test.js",
   "tests/finance-settlement.test.js",
@@ -107,7 +108,6 @@ const tests = [
   "tests/ranking-awards-pages.test.js",
   "tests/award-feedback.test.js",
   "tests/award-ceremony.test.js",
-  "tests/award-feedback-command-center.test.js",
   "tests/more-hub.test.js",
   "tests/market-strategy-ui.test.js",
   "tests/store-progress-ui.test.js",
@@ -130,6 +130,39 @@ console.log(
 console.log(
   "========================================"
 );
+
+
+const missingTests =
+  tests.filter(
+    path =>
+      !existsSync(
+        path
+      )
+  );
+
+
+if (
+  missingTests.length >
+  0
+) {
+  console.error(
+    "Phase2 Gate contains missing test files:"
+  );
+
+  for (
+    const path
+    of missingTests
+  ) {
+    console.error(
+      " - " +
+      path
+    );
+  }
+
+  process.exit(
+    1
+  );
+}
 
 
 const result =
