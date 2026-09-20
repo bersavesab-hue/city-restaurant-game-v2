@@ -141,6 +141,7 @@
   --ui-city-map-control-size: 48px;
   --ui-city-marker-icon-size: 28px;
   --ui-city-detail-thumb-size: 64px;
+  --ui-city-detail-height: 218px;
   --ui-city-metric-min-height: 52px;
   --ui-city-opportunity-min-height: 52px;
 
@@ -195,6 +196,7 @@
     --ui-city-filter-height: 46px;
     --ui-city-map-min-height: 150px;
     --ui-city-detail-thumb-size: 60px;
+    --ui-city-detail-height: 214px;
   }
 }
 
@@ -215,6 +217,7 @@
     --ui-city-filter-height: 50px;
     --ui-city-map-min-height: 220px;
     --ui-city-detail-thumb-size: 70px;
+    --ui-city-detail-height: 232px;
   }
 }
 
