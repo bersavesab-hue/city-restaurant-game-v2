@@ -336,7 +336,6 @@ test(
       });
 
     for (const text of [
-      "美味餐饮集团",
       "集团视角",
       "管理旗下 2 家门店",
       "¥288,000",
@@ -356,6 +355,31 @@ test(
         "门店数量"
       ),
       false
+    );
+
+
+    assert.equal(
+      html.includes(
+        "当前资金"
+      ),
+      false
+    );
+
+    assert.equal(
+      html.includes(
+        "门店等级"
+      ),
+      false
+    );
+
+    assert.equal(
+      (
+        html.match(
+          /class="rg-topbar__speed"/g
+        ) ??
+        []
+      ).length,
+      1
     );
   }
 );

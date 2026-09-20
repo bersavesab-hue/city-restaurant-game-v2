@@ -65,18 +65,25 @@ export function renderGameTopBar(
     model?.clock ??
     {};
 
-
   const level =
     model?.storeLevel ??
     model?.level ??
     1;
 
   const groupScope =
-    model?.scope?.type === "group";
+    model?.scope?.type ===
+    "group";
+
+  const stores =
+    model?.scope?.stores ??
+    [];
 
   const scopeStoreCount =
-    model?.scope?.stores?.length ??
-    0;
+    stores.length;
+
+  const canSwitchScope =
+    model?.scope?.canSwitch ===
+    true;
 
   const rating =
     Number.isFinite(
@@ -86,9 +93,10 @@ export function renderGameTopBar(
     )
       ? Number(
           model.rating
-        ).toFixed(1)
+        ).toFixed(
+          1
+        )
       : null;
-
 
   const speeds =
     model?.actions
@@ -100,18 +108,37 @@ export function renderGameTopBar(
       4
     ];
 
+  const identityTitle =
+    groupScope
+      ? "集团视角"
+      : model?.restaurantName ??
+        "未命名餐厅";
+
+  const identityMeta =
+    groupScope
+      ? (
+          "管理旗下 " +
+          scopeStoreCount +
+          " 家门店"
+        )
+      : (
+          subtitle ??
+          locationLabel ??
+          model?.brandName ??
+          "单店经营"
+        );
 
   return `
     <header
       class="rg-topbar"
-      aria-label="门店 天气 资金 等级"
+      aria-label="经营状态栏"
     >
-<section class="rg-topbar__identity">
-<button
+      <section class="rg-topbar__identity">
+        <button
           type="button"
           class="rg-topbar__avatar"
           data-page-target="settings"
-          aria-label="打开玩家与设置"
+          aria-label="打开设置"
         >
           ${renderUiIcon(
             "employees",
@@ -120,19 +147,47 @@ export function renderGameTopBar(
         </button>
 
         <div class="rg-topbar__identity-copy">
+          ${
+            canSwitchScope
+              ? `
+                <label class="rg-scope-select">
+                  <span class="rg-visually-hidden">当前管理范围</span>
+                  <select data-action="switch-management-scope">
+                    <option
+                      value="group"
+                      ${groupScope ? "selected" : ""}
+                    >
+                      集团视角
+                    </option>
+                    ${stores.map(store => `
+                      <option
+                        value="store:${escapeHtml(store.id)}"
+                        ${!groupScope && model.scope.storeId === store.id ? "selected" : ""}
+                      >
+                        ${escapeHtml(store.name)}
+                      </option>
+                    `).join("")}
+                  </select>
+                </label>
+              `
+              : `
+                <strong>
+                  ${escapeHtml(
+                    identityTitle
+                  )}
+                </strong>
+              `
+          }
 
-          <strong>
+          <small class="rg-topbar__identity-meta">
             ${escapeHtml(
-              model?.scope?.type === "group"
-                ? model?.brandName ?? "集团总览"
-                : model?.restaurantName ??
-              "未命名餐厅"
+              identityMeta
             )}
-          </strong>
+          </small>
 
           ${
-            model?.actions?.canRename &&
-            model?.scope?.type !== "group"
+            !groupScope &&
+            model?.actions?.canRename
               ? `
                 <button
                   type="button"
@@ -144,152 +199,126 @@ export function renderGameTopBar(
               `
               : ""
           }
-
-
-          <span>
-            ${model?.scope?.canSwitch
-              ? `
-                <label class="rg-scope-select">
-                  <span class="rg-visually-hidden">当前管理范围</span>
-                  <select data-action="switch-management-scope">
-                    <option value="group" ${model.scope.type === "group" ? "selected" : ""}>集团视角</option>
-                    ${model.scope.stores.map(store => `
-                      <option value="store:${escapeHtml(store.id)}" ${model.scope.type === "store" && model.scope.storeId === store.id ? "selected" : ""}>
-                        ${escapeHtml(store.name)}
-                      </option>
-                    `).join("")}
-                  </select>
-                </label>
-                ${groupScope
-                  ? '<small class="rg-topbar__store-count">管理旗下 ' + scopeStoreCount + ' 家门店</small>'
-                  : ""
-                }
-              `
-              : escapeHtml(
-                  subtitle ??
-                  locationLabel ??
-                  model?.brandName ??
-                  "单店经营"
-                )}
-          </span>
-
         </div>
-
       </section>
-
 
       <section class="rg-topbar__clock">
-<i class="rg-topbar__weather-label">天气</i>
-
-        <span>
-          ${
-            model?.weather
-              ?.label
-              ? escapeHtml(
-                  model.weather
-                    .label
-                )
-              : "经营时间"
-          }
-        </span>
-
-        <strong>
+        <span
+          class="rg-topbar__weather-symbol"
+          aria-hidden="true"
+        >
           ${escapeHtml(
-            clock.clockText ??
-            "--:--"
+            model?.weather?.icon ??
+            "☀"
           )}
-        </strong>
-
-        <small>
-          ${escapeHtml(
-            clock.dateText ??
-            ""
-          )}
-        </small>
-
-      </section>
-
-
-      <section class="rg-topbar__money">
-
-        <span>
-          当前资金
         </span>
 
-        <strong>
-          ${money(
-            model?.balance
-          )}
-        </strong>
+        <div class="rg-topbar__datetime">
+          <small>
+            ${escapeHtml(
+              clock.dateText ??
+              ""
+            )}
+          </small>
 
+          <strong>
+            ${escapeHtml(
+              clock.clockText ??
+              "--:--"
+            )}
+          </strong>
+        </div>
+
+        ${
+          showSpeedControls
+            ? `
+              <div class="rg-topbar__speed">
+                <button
+                  type="button"
+                  data-action="pause"
+                  aria-label="暂停或继续"
+                >
+                  ${
+                    clock.paused
+                      ? "▶"
+                      : "Ⅱ"
+                  }
+                </button>
+
+                ${speeds.map(speed => `
+                  <button
+                    type="button"
+                    data-action="speed"
+                    data-speed="${speed}"
+                    class="${
+                      !clock.paused &&
+                      clock.speed === speed
+                        ? "is-active"
+                        : ""
+                    }"
+                  >
+                    ${speed}x
+                  </button>
+                `).join("")}
+              </div>
+            `
+            : ""
+        }
       </section>
 
+      <section class="rg-topbar__status">
+        <div class="rg-topbar__money">
+          <span
+            class="rg-topbar__money-icon"
+            aria-hidden="true"
+          >
+            ${renderUiIcon(
+              "cash",
+              "rg-topbar__money-svg"
+            )}
+          </span>
 
-      <section class="rg-topbar__level">
+          <strong>
+            ${money(
+              model?.balance
+            )}
+          </strong>
 
-        <span>
-          门店等级
-        </span>
+          <button
+            type="button"
+            class="rg-topbar__money-add"
+            data-page-target="finance"
+            aria-label="打开财务"
+          >
+            +
+          </button>
+        </div>
 
-        <strong>
-          ${"Lv." + level}
-        </strong>
+        <div class="rg-topbar__level">
+          <span
+            class="rg-topbar__level-icon"
+            aria-hidden="true"
+          >
+            ♛
+          </span>
 
-        <small>
-          ${
-            rating !== null
-              ? "★ " + rating
-              : "声望 " + (model?.reputation ?? 0)
-          }
-        </small>
+          <strong>
+            ${"Lv." + level}
+          </strong>
 
-      </section>
-
-
-      ${
-        showSpeedControls
-          ? `
-            <section class="rg-topbar__speed">
-
-              <button
-                type="button"
-                data-action="pause"
-              >
-                ${
-                  clock.paused
-                    ? "▶"
-                    : "Ⅱ"
-                }
-              </button>
-
-              ${
-                speeds
-                  .map(
-                    speed => `
-                      <button
-                        type="button"
-                        data-action="speed"
-                        data-speed="${speed}"
-                        class="${
-                          !clock.paused &&
-                          clock.speed ===
-                            speed
-                            ? "is-active"
-                            : ""
-                        }"
-                      >
-                        ${speed}×
-                      </button>
-                    `
+          <small>
+            ${
+              rating !== null
+                ? "★ " + rating
+                : "声望 " +
+                  (
+                    model?.reputation ??
+                    0
                   )
-                  .join("")
-              }
-
-            </section>
-          `
-          : ""
-      }
-
+            }
+          </small>
+        </div>
+      </section>
     </header>
   `;
 }
