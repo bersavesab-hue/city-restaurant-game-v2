@@ -19,7 +19,7 @@ import {
 
 
 test(
-  "经营入口展示七个正式经营分类",
+  "经营入口使用确认版六个经营模块加排行榜和研发入口",
   () => {
     const page =
       operationsHubPageSystem
@@ -27,7 +27,7 @@ test(
 
     assert.equal(
       page.entries.length,
-      7
+      8
     );
 
     assert.deepEqual(
@@ -37,12 +37,13 @@ test(
       ),
       [
         "菜品与菜单",
-        "供应链",
-        "客流与渠道",
-        "经营分析",
-        "财务",
-        "市场与竞争",
-        "榜单与荣誉"
+        "供应链与库存",
+        "财务资金",
+        "顾客与会员",
+        "营销与渠道",
+        "经营数据",
+        "排行榜与荣誉",
+        "研发菜品"
       ]
     );
 
@@ -54,54 +55,50 @@ test(
         page
       );
 
-    assert.match(
-      html,
-      /菜品与菜单/
-    );
-
-    assert.match(
-      html,
-      /供应链/
-    );
-
-    assert.match(
-      html,
-      /客流与渠道/
-    );
-
-    assert.match(
-      html,
-      /经营分析/
-    );
-
-    assert.match(
-      html,
-      /财务/
-    );
-
-    assert.match(
-      html,
-      /市场与竞争/
-    );
-
-    assert.match(
-      html,
-      /榜单与荣誉/
-    );
+    for (
+      const text
+      of [
+        "经营中心",
+        "今日营业额",
+        "今日利润",
+        "今日订单",
+        "顾客满意度",
+        "今日待办",
+        "菜品与菜单",
+        "供应链与库存",
+        "财务资金",
+        "顾客与会员",
+        "营销与渠道",
+        "经营数据",
+        "排行榜与荣誉",
+        "研发菜品"
+      ]
+    ) {
+      assert.match(
+        html,
+        new RegExp(
+          text
+        )
+      );
+    }
 
     assert.match(
       html,
       /rg-bottom-nav/
     );
 
-    assert.match(
-      html,
-      /data-page-target="menu-optimization"/
+    assert.equal(
+      html.includes(
+        "经营分析"
+      ),
+      false
     );
 
-    assert.match(
-      html,
-      /data-page-target="capacity"/
+    assert.equal(
+      html.includes(
+        "市场与竞争"
+      ),
+      false
     );
   }
 );
