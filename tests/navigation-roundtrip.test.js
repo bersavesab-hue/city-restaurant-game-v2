@@ -15,7 +15,7 @@ test(
 
     assert.equal(
       navigation.getCurrentPage().id,
-      "operating-command-center"
+      "restaurant"
     );
 
 
@@ -39,7 +39,7 @@ test(
 
     assert.equal(
       employees.pageId,
-      "employee_roster"
+      "employees"
     );
 
 
@@ -51,7 +51,7 @@ test(
 
     assert.equal(
       operations.pageId,
-      "operations-home"
+      "operations"
     );
 
 
@@ -61,7 +61,7 @@ test(
 
     assert.equal(
       back1.pageId,
-      "employee_roster"
+      "employees"
     );
 
 
@@ -81,7 +81,7 @@ test(
 
     assert.equal(
       back3.pageId,
-      "operating-command-center"
+      "restaurant"
     );
   }
 );
@@ -105,7 +105,7 @@ test(
         "supply",
 
       employees:
-        "employee_roster",
+        "employees",
 
       workforce:
         "workforce-capacity",
@@ -123,7 +123,7 @@ test(
         "channels",
 
       restaurant:
-        "operating-command-center"
+        "restaurant"
     };
 
 

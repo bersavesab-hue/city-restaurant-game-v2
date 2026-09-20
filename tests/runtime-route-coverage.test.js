@@ -116,7 +116,7 @@ test(
         .getLandingPage(
           "restaurant"
         ),
-      "operating-command-center"
+      "restaurant"
     );
 
 
@@ -125,7 +125,7 @@ test(
         .getLandingPage(
           "operations"
         ),
-      "operations-home"
+      "operations"
     );
 
 
@@ -134,7 +134,7 @@ test(
         .getLandingPage(
           "employees"
         ),
-      "employee_roster"
+      "employees"
     );
 
 
@@ -143,7 +143,7 @@ test(
         .getLandingPage(
           "more"
         ),
-      "more-home"
+      "more"
     );
   }
 );
@@ -165,7 +165,7 @@ test(
         .resolveNavigationTarget(
           "restaurant"
         ),
-      "operating-command-center"
+      "restaurant"
     );
 
     assert.equal(
@@ -173,7 +173,7 @@ test(
         .resolveNavigationTarget(
           "operations"
         ),
-      "operations-home"
+      "operations"
     );
 
     assert.equal(
@@ -181,7 +181,7 @@ test(
         .resolveNavigationTarget(
           "employees"
         ),
-      "employee_roster"
+      "employees"
     );
 
     assert.equal(
@@ -189,7 +189,7 @@ test(
         .resolveNavigationTarget(
           "more"
         ),
-      "more-home"
+      "more"
     );
   }
 );

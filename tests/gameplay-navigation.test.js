@@ -15,7 +15,7 @@ import {
 
 
 test(
-  "门店主入口默认进入经营总控且问题可以解析到真实功能页面",
+  "五个一级入口使用唯一正式ID且常用动作解析到真实功能页面",
   () => {
     gameplayNavigationSystem
       .reset();
@@ -25,7 +25,7 @@ test(
         .getLandingPage(
           "restaurant"
         ),
-      "operating-command-center"
+      "restaurant"
     );
 
     assert.equal(
@@ -33,7 +33,7 @@ test(
         .resolveActionTarget(
           "employees"
         ),
-      "employee_roster"
+      "employees"
     );
 
     assert.equal(
@@ -60,14 +60,14 @@ test(
 
     assert.equal(
       nav.pageId,
-      "operating-command-center"
+      "restaurant"
     );
 
     assert.equal(
       gameplayNavigationSystem
         .getCurrentPage()
         .id,
-      "operating-command-center"
+      "restaurant"
     );
 
     assert.ok(
