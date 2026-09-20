@@ -2,6 +2,10 @@ import { cityMapDashboardSystem } from "./CityMapDashboardSystem.js";
 import { renderGameTopBar, renderNoticeTicker, renderBottomNavigation } from "../../components/GameChromeView.js";
 import { gameChromeSystem } from "../../components/GameChromeSystem.js";
 
+import {
+  getDistrictThumbnailStyle
+} from "./DistrictVisualRegistry.js";
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -501,7 +505,12 @@ class CityMapView {
       '" data-action="open-district-properties" data-district-id="' +
       escapeHtml(item.districtId ?? "") +
       '">' +
-        '<span class="city-opportunity-card__image" aria-hidden="true"></span>' +
+        '<span class="city-opportunity-card__image" aria-hidden="true" style="' +
+          getDistrictThumbnailStyle(
+            item.districtId ??
+            this.selectedDistrictId
+          ) +
+        '"></span>' +
         '<span class="city-opportunity-card__copy">' +
           '<span class="city-opportunity-card__title">' +
             '<strong>' +
@@ -540,30 +549,6 @@ class CityMapView {
         )
       );
 
-    const thumbX =
-      Math.max(
-        0,
-        Math.min(
-          100,
-          Number(
-            district.position?.x ??
-            50
-          )
-        )
-      );
-
-    const thumbY =
-      Math.max(
-        0,
-        Math.min(
-          100,
-          Number(
-            district.position?.y ??
-            50
-          )
-        )
-      );
-
     const rentPerSquareMetre =
       Number(
         district.averageRentPerSquareMetre
@@ -580,11 +565,11 @@ class CityMapView {
         '<div class="city-district-sheet__handle" aria-hidden="true"></div>' +
         '<span class="city-district-sheet__close" aria-hidden="true">×</span>' +
         '<header class="city-district-sheet__header">' +
-          '<div class="city-district-sheet__thumb" aria-hidden="true" style="--district-thumb-x:' +
-            thumbX +
-            '%;--district-thumb-y:' +
-            thumbY +
-            '%"></div>' +
+          '<div class="city-district-sheet__thumb" aria-hidden="true" style="' +
+            getDistrictThumbnailStyle(
+              district.id
+            ) +
+          '"></div>' +
           '<div class="city-district-sheet__identity">' +
             '<div><h2>' +
               escapeHtml(

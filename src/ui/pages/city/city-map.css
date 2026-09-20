@@ -516,20 +516,29 @@
 .city-district-sheet__thumb {
   width: 100%;
   height: min(11.9vw,103px);
+  overflow: hidden;
   border-radius: min(1vw,9px);
-  background:
-    linear-gradient(
-      rgba(13,95,149,.02),
-      rgba(13,95,149,.02)
-    ),
-    url("../../../../assets/images/ui/city/city-main-map.webp")
-      var(--district-thumb-x,50%)
-      var(--district-thumb-y,50%)
-      / 280%
-      no-repeat;
+  background-image:
+    var(
+      --district-thumbnail-image
+    );
+  background-size:
+    var(
+      --district-thumbnail-size,
+      400% 500%
+    );
+  background-position:
+    var(
+      --district-thumbnail-position,
+      66.6667% 25%
+    );
+  background-repeat:
+    no-repeat;
   box-shadow:
     inset 0 0 0 1px
-    rgba(0,77,127,.12);
+    rgba(0,77,127,.12),
+    0 1px 4px
+    rgba(0,57,99,.10);
 }
 
 .city-district-sheet__identity {
@@ -759,20 +768,27 @@
   width: 100%;
   height: 100%;
   min-height: min(9.7vw,84px);
+  overflow: hidden;
   border-radius: min(.75vw,6px);
-  background:
-    url("../../../../assets/images/ui/city/city-main-map.webp")
-    35% 45%
-    / 280%
+  background-image:
+    var(
+      --district-thumbnail-image
+    );
+  background-size:
+    var(
+      --district-thumbnail-size,
+      400% 500%
+    );
+  background-position:
+    var(
+      --district-thumbnail-position,
+      66.6667% 25%
+    );
+  background-repeat:
     no-repeat;
-}
-
-.city-opportunity-card--1 .city-opportunity-card__image {
-  background-position: 55% 58%;
-}
-
-.city-opportunity-card--2 .city-opportunity-card__image {
-  background-position: 74% 38%;
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(0,74,120,.08);
 }
 
 .city-opportunity-card__copy {

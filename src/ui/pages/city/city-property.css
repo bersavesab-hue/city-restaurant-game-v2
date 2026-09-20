@@ -104,9 +104,14 @@
 
 
 .property-district-card {
-  min-height: 76px;
+  min-height: 118px;
 
-  padding: 6px;
+  display: grid;
+  grid-template-rows:
+    48px auto auto auto;
+  gap: 3px;
+
+  padding: 5px;
 
   border:
     1px solid #a8d9f1;
@@ -138,6 +143,34 @@
   box-shadow:
     0 0 8px
     rgba(255,193,0,.35);
+}
+
+
+.property-district-card__thumb {
+  display: block;
+  width: 100%;
+  height: 48px;
+  overflow: hidden;
+  border-radius: 5px;
+  background-image:
+    var(
+      --district-thumbnail-image
+    );
+  background-size:
+    var(
+      --district-thumbnail-size,
+      400% 500%
+    );
+  background-position:
+    var(
+      --district-thumbnail-position,
+      66.6667% 25%
+    );
+  background-repeat:
+    no-repeat;
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(0,68,116,.10);
 }
 
 
@@ -382,8 +415,24 @@
       #668ca5
     );
 
-  background-size: cover;
-  background-position: center;
+  background-size:
+    cover,
+    var(
+      --property-image-size,
+      cover
+    ),
+    cover;
+
+  background-position:
+    center,
+    var(
+      --property-image-position,
+      center
+    ),
+    center;
+
+  background-repeat:
+    no-repeat;
 }
 
 
@@ -839,8 +888,24 @@ span.is-gold {
       #607d91
     );
 
-  background-size: cover;
-  background-position: center;
+  background-size:
+    cover,
+    var(
+      --property-image-size,
+      cover
+    ),
+    cover;
+
+  background-position:
+    center,
+    var(
+      --property-image-position,
+      center
+    ),
+    center;
+
+  background-repeat:
+    no-repeat;
 }
 
 

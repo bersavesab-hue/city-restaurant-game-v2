@@ -22,6 +22,10 @@ import {
   renderBottomNavigation
 } from "../../components/GameChromeView.js";
 
+import {
+  getDistrictThumbnailStyle
+} from "./DistrictVisualRegistry.js";
+
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -62,14 +66,37 @@ function scoreTone(value) {
 }
 
 
-function getPropertyImage(
-  property,
-  index = 0
+function getPropertyImageStyle(
+  property
 ) {
-  return (
+  const image =
     property.image ??
     property.coverImage ??
-    `assets/images/ui/properties/property-${index % 6 + 1}.webp`
+    null;
+
+  if (image) {
+    return (
+      "--property-image:url('" +
+      image +
+      "');" +
+      "--property-image-size:cover;" +
+      "--property-image-position:center;"
+    );
+  }
+
+  return getDistrictThumbnailStyle(
+    property.districtId ??
+    property.district?.id,
+    {
+      imageVar:
+        "--property-image",
+
+      sizeVar:
+        "--property-image-size",
+
+      positionVar:
+        "--property-image-position"
+    }
   );
 }
 
@@ -338,6 +365,14 @@ class CityPropertyView {
                     )}"
                   >
 
+                    <span
+                      class="property-district-card__thumb"
+                      aria-hidden="true"
+                      style="${getDistrictThumbnailStyle(
+                        district.id
+                      )}"
+                    ></span>
+
                     <strong>
                       ${escapeHtml(
                         district.name
@@ -516,13 +551,9 @@ class CityPropertyView {
 
         <div
           class="property-game-card__image"
-          style="
-            --property-image:
-              url('${getPropertyImage(
-                property,
-                index
-              )}');
-          "
+          style="${getPropertyImageStyle(
+            property
+          )}"
         >
 
           <div class="property-card-badges">
@@ -1186,13 +1217,9 @@ class CityPropertyView {
 
           <div
             class="property-detail-hero__image"
-            style="
-              --property-image:
-                url('${getPropertyImage(
-                  property,
-                  0
-                )}');
-            "
+            style="${getPropertyImageStyle(
+              property
+            )}"
           >
 
             <button
