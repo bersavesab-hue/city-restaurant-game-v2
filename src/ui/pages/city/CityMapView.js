@@ -169,18 +169,21 @@ class CityMapView {
     return (
       '<section class="city-map-heading">' +
         '<div class="city-map-heading__copy">' +
-          '<h1>城市地图</h1>' +
+          '<h1><span class="city-map-heading__title-icon" aria-hidden="true"></span><span>城市地图</span></h1>' +
           '<p>发现优质商圈，拓展门店版图，让美食走进更多地方</p>' +
         '</div>' +
         '<div class="city-map-heading__summary">' +
-          '<strong>' +
-            count +
-            ' 个商圈' +
-          '</strong>' +
-          '<small>' +
-            areaCount +
-            ' 大区域 · 等待你的探索' +
-          '</small>' +
+          '<span class="city-map-heading__summary-icon" aria-hidden="true"></span>' +
+          '<span class="city-map-heading__summary-copy">' +
+            '<strong>' +
+              count +
+              ' 个商圈' +
+            '</strong>' +
+            '<small>' +
+              areaCount +
+              ' 大区域 · 等待你的探索' +
+            '</small>' +
+          '</span>' +
         '</div>' +
       '</section>'
     );
@@ -224,14 +227,9 @@ class CityMapView {
               '" data-action="set-filter" data-filter="' +
               id +
               '">' +
-              (
-                index ===
-                0
-                  ? ""
-                  : '<span class="city-map-filter__dot city-map-filter__dot--' +
-                    index +
-                    '" aria-hidden="true"></span>'
-              ) +
+              '<span class="city-map-filter__icon city-map-filter__icon--' +
+                id +
+                '" aria-hidden="true"></span>' +
               '<strong>' +
                 escapeHtml(
                   label
@@ -523,7 +521,15 @@ class CityMapView {
       page.selectedDistrict;
 
     if (!district) {
-      return "";
+      return (
+        '<section class="city-district-sheet city-district-sheet--empty">' +
+          '<div class="city-district-sheet__handle" aria-hidden="true"></div>' +
+          '<div class="city-district-sheet__empty-copy">' +
+            '<strong>请选择一个商圈</strong>' +
+            '<small>点击地图上的可用商圈查看经营数据与房源机会</small>' +
+          '</div>' +
+        '</section>'
+      );
     }
 
     const opportunities =
