@@ -3,10 +3,6 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 import {
-  MORE_GROUPS
-} from "../src/ui/pages/more/MoreHubPageSystem.js";
-
-import {
   PRIMARY_ENTRIES
 } from "../src/ui/pages/operations-hub/OperationsHubPageSystem.js";
 
@@ -20,9 +16,20 @@ import {
 } from "../src/ui/runtime/RuntimeRouteContract.js";
 
 
-function read(
-  relativePath
-) {
+const MORE_TARGETS = Object.freeze([
+  "chain",
+  "brand-investments",
+  "ranking-center",
+  "honor-hall",
+  "member-marketing",
+  "reputation",
+  "compliance-center",
+  "settings",
+  "feedback"
+]);
+
+
+function read(relativePath) {
   return fs.readFileSync(
     new URL(
       relativePath,
@@ -34,77 +41,58 @@ function read(
 
 
 test(
-  "第三阶段第五批页面统一使用正式游戏外壳",
+  "第五批二级页继续使用完整游戏外壳，更多一级页使用确认版根页面外壳",
   () => {
-    const paths = [
-      [
-        "会员营销",
-        "../src/ui/pages/marketing/MemberMarketingView.js"
-      ],
-      [
-        "合规中心",
-        "../src/ui/pages/compliance/ComplianceCenterView.js"
-      ],
-      [
-        "成长与解锁",
-        "../src/ui/pages/progress/StoreProgressView.js"
-      ],
-      [
-        "连锁管理",
-        "../src/ui/pages/chain/ChainManagementView.js"
-      ],
-      [
-        "更多主页",
-        "../src/ui/pages/more/MoreHubView.js"
-      ]
+    const formalPaths = [
+      ["会员营销","../src/ui/pages/marketing/MemberMarketingView.js"],
+      ["合规中心","../src/ui/pages/compliance/ComplianceCenterView.js"],
+      ["成长与解锁","../src/ui/pages/progress/StoreProgressView.js"],
+      ["连锁管理","../src/ui/pages/chain/ChainManagementView.js"]
     ];
 
-    for (
-      const [
-        name,
-        path
-      ]
-      of paths
-    ) {
-      const source =
-        read(
-          path
+    for (const [name,path] of formalPaths) {
+      const source = read(path);
+
+      for (const symbol of [
+        "renderGameTopBar",
+        "renderNoticeTicker",
+        "renderPageTitle",
+        "renderBottomNavigation"
+      ]) {
+        assert.ok(
+          source.includes(symbol),
+          name + "缺少" + symbol
         );
-
-      assert.ok(
-        source.includes(
-          "renderGameTopBar"
-        ),
-        `${name}缺少统一顶部栏`
-      );
-
-      assert.ok(
-        source.includes(
-          "renderNoticeTicker"
-        ),
-        `${name}缺少统一公告栏`
-      );
-
-      assert.ok(
-        source.includes(
-          "renderPageTitle"
-        ),
-        `${name}缺少统一标题栏`
-      );
-
-      assert.ok(
-        source.includes(
-          "renderBottomNavigation"
-        ),
-        `${name}缺少统一底部导航`
-      );
+      }
     }
+
+    const more =
+      read(
+        "../src/ui/pages/more/MoreHubView.js"
+      );
+
+    assert.ok(
+      more.includes("renderGameTopBar")
+    );
+
+    assert.ok(
+      more.includes("renderBottomNavigation")
+    );
+
+    assert.ok(
+      more.includes("more-home-hero")
+    );
+
+    assert.equal(
+      more.includes("renderPageTitle"),
+      false
+    );
   }
 );
 
 
 test(
-  "会员合规成长连锁页面模型统一提供动态顶部数据",
+  "会员合规成长连锁页面模型继续提供动态顶部数据",
   () => {
     const paths = [
       "../src/ui/pages/marketing/MemberMarketingPageSystem.js",
@@ -113,40 +101,23 @@ test(
       "../src/ui/pages/chain/ChainManagementPageSystem.js"
     ];
 
-    for (
-      const path
-      of paths
-    ) {
-      const source =
-        read(
-          path
-        );
+    for (const path of paths) {
+      const source = read(path);
 
       assert.ok(
-        source.includes(
-          "buildFormalPageChrome"
-        ),
-        `${path}未接入统一页面模型`
+        source.includes("buildFormalPageChrome"),
+        path + "未接入统一页面模型"
       );
 
-      assert.ok(
-        source.includes(
-          "topBar:"
-        )
-      );
-
-      assert.ok(
-        source.includes(
-          "noticeTicker:"
-        )
-      );
+      assert.ok(source.includes("topBar:"));
+      assert.ok(source.includes("noticeTicker:"));
     }
   }
 );
 
 
 test(
-  "经营和更多全部可见入口都有真实运行时目标",
+  "经营和更多确认版可见入口都有真实运行时目标",
   () => {
     const supported =
       new Set([
@@ -155,48 +126,32 @@ test(
         ...MAIN_ROOT_PAGE_IDS
       ]);
 
-    const moreTargets =
-      MORE_GROUPS
-        .flatMap(
-          group =>
-            group.entries
-        )
-        .map(
-          entry =>
-            entry.target
-        );
-
     const operationTargets =
-      PRIMARY_ENTRIES
-        .flatMap(
-          entry => [
-            entry.target,
-            ...entry.secondary
-              .map(
-                item =>
-                  item.target
-              )
-          ]
-        );
+      PRIMARY_ENTRIES.flatMap(
+        entry => [
+          entry.target,
+          ...entry.secondary.map(
+            item => item.target
+          )
+        ]
+      );
 
     const missing =
       [
         ...new Set([
-          ...moreTargets,
+          ...MORE_TARGETS,
           ...operationTargets
         ])
-      ]
-        .filter(
-          target =>
-            !supported.has(
-              target
-            )
-        );
+      ].filter(
+        target =>
+          !supported.has(target)
+      );
 
     assert.deepEqual(
       missing,
       [],
-      `正式入口存在无运行时目标：${missing.join(", ")}`
+      "正式入口存在无运行时目标：" +
+      missing.join(", ")
     );
   }
 );
@@ -213,31 +168,20 @@ test(
       "../src/ui/pages/more/MoreHubView.js"
     ];
 
-    for (
-      const path
-      of paths
-    ) {
-      const source =
-        read(
-          path
-        );
+    for (const path of paths) {
+      const source = read(path);
 
-      for (
-        const forbidden
-        of [
-          "图片槽位",
-          "头像槽位",
-          "待正式页面",
-          "页面尚未接入",
-          "后续接入"
-        ]
-      ) {
+      for (const forbidden of [
+        "图片槽位",
+        "头像槽位",
+        "待正式页面",
+        "页面尚未接入",
+        "后续接入"
+      ]) {
         assert.equal(
-          source.includes(
-            forbidden
-          ),
+          source.includes(forbidden),
           false,
-          `${path}仍包含开发期文案：${forbidden}`
+          path + "仍包含开发期文案：" + forbidden
         );
       }
     }
@@ -253,21 +197,16 @@ test(
         "../src/ui/theme/theme.css"
       );
 
-    for (
-      const file
-      of [
-        "member-marketing.css",
-        "compliance-center.css",
-        "store-progress.css",
-        "chain-management.css",
-        "more-hub.css"
-      ]
-    ) {
+    for (const file of [
+      "member-marketing.css",
+      "compliance-center.css",
+      "store-progress.css",
+      "chain-management.css",
+      "more-hub.css"
+    ]) {
       assert.ok(
-        theme.includes(
-          file
-        ),
-        `主主题缺少：${file}`
+        theme.includes(file),
+        "主主题缺少：" + file
       );
     }
   }

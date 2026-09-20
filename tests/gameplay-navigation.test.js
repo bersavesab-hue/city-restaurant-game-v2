@@ -112,84 +112,48 @@ test(
 
 
 test(
-  "经营总控的去处理按钮携带真实页面目标",
+  "门店一级页管理按钮携带真实页面目标",
   () => {
     const view =
       new OperatingCommandCenterView();
 
     const html =
       view.renderMarkup({
-        day: 1,
-
-        restaurant: {
-          name:
-            "导航测试店",
-
-          reviewScore: 4
+        storePortfolio: {
+          totals: {
+            revenue: 0,
+            profit: 0,
+            guests: 0,
+            satisfaction: 0
+          },
+          cards: [],
+          filterCounts: {
+            all: 0,
+            open: 0,
+            preparing: 0,
+            abnormal: 0
+          },
+          capacity: 0,
+          canCreateBranch: false,
+          todos: []
         },
-
-        sales: {
-          revenue: 0,
-          profit: 0,
-          orderCount: 0,
-          channels: []
-        },
-
-        finance: {
-          balance: 10000
-        },
-
-        capacity: {
-          arrivals: 0,
-          served: 0,
-          abandonmentRate: 0,
-          lostRevenue: 0
-        },
-
-        menu: {
-          counts: {
-            star: 0,
-            cash_cow: 0,
-            puzzle: 0,
-            dog: 0
-          }
-        },
-
-        inventory: {
-          lowStockCount: 1,
-          outOfStockCount: 0
-        },
-
-        workforce: {
-          availableEmployees: 2,
-          exhaustedEmployees: []
-        },
-
-        priorities: [
-          {
-            severity:
-              "high",
-
-            title:
-              "库存即将不足",
-
-            description:
-              "1种食材库存偏低",
-
-            target:
-              "supply"
-          }
-        ]
+        navigation: []
       });
 
-    assert.match(
-      html,
-      /data-page-target="supply"/
-    );
-
-    assert.match(
-      html,
-      /去处理/
-    );
+    for (const target of [
+      "renovation",
+      "equipment-management",
+      "lease",
+      "opening-setup"
+    ]) {
+      assert.match(
+        html,
+        new RegExp(
+          'data-page-target="' +
+          target +
+          '"'
+        )
+      );
+    }
   }
 );

@@ -17,10 +17,6 @@ import {
 } from "../src/ui/runtime/RuntimeRouteContract.js";
 
 import {
-  MORE_GROUPS
-} from "../src/ui/pages/more/MoreHubPageSystem.js";
-
-import {
   PRIMARY_ENTRIES
 } from "../src/ui/pages/operations-hub/OperationsHubPageSystem.js";
 
@@ -128,33 +124,42 @@ const FORMAL_VIEW_FILES =
 
 
 test(
-  "第三阶段所有正式运行时页面统一使用全局游戏外壳",
+  "第三阶段正式运行时页面统一使用全局外壳，一级页允许确认版专属标题结构",
   () => {
-    for (
-      const file
-      of FORMAL_VIEW_FILES
-    ) {
+    const primaryRoots =
+      new Set([
+        "command-center/OperatingCommandCenterView.js",
+        "operations-hub/OperationsHubView.js",
+        "more/MoreHubView.js"
+      ]);
+
+    for (const file of FORMAL_VIEW_FILES) {
       const source =
         read(
           "../src/ui/pages/" +
           file
         );
 
-      for (
-        const symbol
-        of [
-          "renderGameTopBar",
-          "renderNoticeTicker",
-          "renderPageTitle",
-          "renderBottomNavigation"
-        ]
-      ) {
+      for (const symbol of [
+        "renderGameTopBar",
+        "renderBottomNavigation"
+      ]) {
         assert.ok(
-          source.includes(
-            symbol
-          ),
-          `${file} 缺少 ${symbol}`
+          source.includes(symbol),
+          file + " 缺少 " + symbol
         );
+      }
+
+      if (!primaryRoots.has(file)) {
+        for (const symbol of [
+          "renderNoticeTicker",
+          "renderPageTitle"
+        ]) {
+          assert.ok(
+            source.includes(symbol),
+            file + " 缺少 " + symbol
+          );
+        }
       }
     }
   }
@@ -162,7 +167,7 @@ test(
 
 
 test(
-  "第三阶段正式入口全部指向真实运行时页面",
+  "确认版一级页全部可见入口指向真实运行时页面",
   () => {
     assert.deepEqual(
       INTENTIONAL_PLACEHOLDER_PAGE_IDS,
@@ -176,43 +181,38 @@ test(
         ...MAIN_ROOT_PAGE_IDS
       ]);
 
-    const targets =
-      [
-        ...MORE_GROUPS
-          .flatMap(
-            group =>
-              group.entries
-          )
-          .map(
-            entry =>
-              entry.target
-          ),
+    const moreTargets = [
+      "chain",
+      "brand-investments",
+      "ranking-center",
+      "honor-hall",
+      "member-marketing",
+      "reputation",
+      "compliance-center",
+      "settings",
+      "feedback"
+    ];
 
-        ...PRIMARY_ENTRIES
-          .flatMap(
-            entry => [
-              entry.target,
-              ...entry.secondary
-                .map(
-                  item =>
-                    item.target
-                )
-            ]
+    const operationTargets =
+      PRIMARY_ENTRIES.flatMap(
+        entry => [
+          entry.target,
+          ...entry.secondary.map(
+            item => item.target
           )
-      ];
+        ]
+      );
 
     const missing =
       [
-        ...new Set(
-          targets
-        )
-      ]
-        .filter(
-          target =>
-            !supported.has(
-              target
-            )
-        );
+        ...new Set([
+          ...moreTargets,
+          ...operationTargets
+        ])
+      ].filter(
+        target =>
+          !supported.has(target)
+      );
 
     assert.deepEqual(
       missing,

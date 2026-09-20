@@ -19,17 +19,10 @@ test(
         restaurant: {
           get() {
             return {
-              id:
-                "restaurant_a",
-
-              name:
-                "成长测试店",
-
-              level:
-                3,
-
-              experience:
-                2200
+              id: "restaurant_a",
+              name: "成长测试店",
+              level: 3,
+              experience: 2200
             };
           }
         },
@@ -37,26 +30,13 @@ test(
         progress: {
           getProgress() {
             return {
-              level:
-                3,
-
-              experience:
-                2200,
-
-              nextLevel:
-                4,
-
-              requiredExperience:
-                3500,
-
-              remainingExperience:
-                1300,
-
-              progress:
-                0.35,
-
-              maxLevel:
-                false
+              level: 3,
+              experience: 2200,
+              nextLevel: 4,
+              requiredExperience: 3500,
+              remainingExperience: 1300,
+              progress: 0.35,
+              maxLevel: false
             };
           },
 
@@ -73,107 +53,65 @@ test(
           getAllLevelConfigs() {
             return [
               {
-                level:
-                  3,
-
-                requiredExperience:
-                  1500,
-
+                level: 3,
+                requiredExperience: 1500,
                 limits: {
-                  employees:
-                    8,
-
-                  menuItems:
-                    16,
-
-                  tables:
-                    10,
-
-                  kitchenStations:
-                    4
+                  employees: 8,
+                  menuItems: 16,
+                  tables: 10,
+                  kitchenStations: 4
                 },
-
-                unlocks: [
-                  "marketing"
-                ]
+                unlocks: ["marketing"]
               },
-
               {
-                level:
-                  4,
-
-                requiredExperience:
-                  3500,
-
+                level: 4,
+                requiredExperience: 3500,
                 limits: {
-                  employees:
-                    10,
-
-                  menuItems:
-                    20,
-
-                  tables:
-                    14,
-
-                  kitchenStations:
-                    5
+                  employees: 10,
+                  menuItems: 20,
+                  tables: 14,
+                  kitchenStations: 5
                 },
-
-                unlocks: [
-                  "advanced_renovation"
-                ]
+                unlocks: ["advanced_renovation"]
               }
             ];
           },
 
           getLimits() {
             return {
-              employees:
-                8,
-
-              menuItems:
-                16,
-
-              tables:
-                10,
-
-              kitchenStations:
-                4
+              employees: 8,
+              menuItems: 16,
+              tables: 10,
+              kitchenStations: 4
             };
           }
         }
       });
-
 
     const page =
       system.getPage(
         "restaurant_a"
       );
 
-
     assert.equal(
       page.pageId,
       "store-progress"
     );
-
 
     assert.equal(
       page.restaurant.level,
       3
     );
 
-
     assert.equal(
       page.progress.remainingExperience,
       1300
     );
 
-
     assert.equal(
       page.currentLimits.employees,
       8
     );
-
 
     assert.equal(
       page.next.unlockItems[0].name,
@@ -184,7 +122,7 @@ test(
 
 
 test(
-  "成长页已经接入更多主页和正式运行时",
+  "成长页保留正式运行时但不再占用确认版更多一级卡位",
   () => {
     assert.equal(
       formalPageRuntime.has(
@@ -192,7 +130,6 @@ test(
       ),
       true
     );
-
 
     const source =
       fs.readFileSync(
@@ -203,10 +140,11 @@ test(
         "utf8"
       );
 
-
-    assert.match(
-      source,
-      /store-progress/
+    assert.equal(
+      source.includes(
+        'id:\n            "store-progress"'
+      ),
+      false
     );
   }
 );

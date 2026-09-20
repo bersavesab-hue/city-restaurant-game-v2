@@ -327,7 +327,7 @@ test(
       page.entries.find(
         item =>
           item.id ===
-          "market"
+          "marketing"
       );
 
     assert.equal(
@@ -355,7 +355,7 @@ test(
       page.entries.find(
         item =>
           item.id ===
-          "market"
+          "marketing"
       );
 
     assert.equal(

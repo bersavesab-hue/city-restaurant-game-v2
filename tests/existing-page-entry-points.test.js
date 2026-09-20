@@ -15,13 +15,13 @@ function source(path) {
 
 
 test(
-  "已完成页面都有可见入口",
+  "确认版一级页保留真实二级功能入口",
   () => {
     const operations = source(
       "src/ui/pages/operations-hub/OperationsHubPageSystem.js"
     );
 
-    const command = source(
+    const stores = source(
       "src/ui/pages/command-center/OperatingCommandCenterView.js"
     );
 
@@ -29,32 +29,65 @@ test(
       "src/ui/pages/employees/EmployeeManagementView.js"
     );
 
-    const customers = source(
-      "src/ui/pages/customers/CustomerManagementView.js"
+    const more = source(
+      "src/ui/pages/more/MoreHubPageSystem.js"
     );
 
+    for (const target of [
+      "menu-engineering",
+      "customers",
+      "market-strategy",
+      "ranking-center"
+    ]) {
+      assert.match(
+        operations,
+        new RegExp(target)
+      );
+    }
 
-    assert.match(operations, /menu-engineering/);
-    assert.match(operations, /customers/);
+    for (const target of [
+      "renovation",
+      "equipment-management",
+      "lease",
+      "opening-setup"
+    ]) {
+      assert.match(
+        stores,
+        new RegExp(
+          'data-page-target="' +
+          target +
+          '"'
+        )
+      );
+    }
 
-    assert.match(
-      command,
-      /data-page-target="equipment-management"/
-    );
+    for (const target of [
+      "employee_recruitment",
+      "workforce-capacity",
+      "employee_training",
+      "employee_promotion"
+    ]) {
+      assert.match(
+        employees,
+        new RegExp(target)
+      );
+    }
 
-    assert.match(
-      command,
-      /data-page-target="equipment-maintenance"/
-    );
-
-    assert.match(
-      employees,
-      /data-page-target="workforce-capacity"/
-    );
-
-    assert.match(
-      customers,
-      /data-page-target="member-marketing"/
-    );
+    for (const target of [
+      "chain",
+      "brand-investments",
+      "ranking-center",
+      "honor-hall",
+      "member-marketing",
+      "reputation",
+      "compliance-center",
+      "settings",
+      "feedback"
+    ]) {
+      assert.match(
+        more,
+        new RegExp(target)
+      );
+    }
   }
 );
