@@ -87,6 +87,12 @@ test(
         "utf8"
       );
 
+    const registry =
+      fs.readFileSync(
+        "src/ui/pages/city/DistrictVisualRegistry.js",
+        "utf8"
+      );
+
     for (
       const obsolete
       of [
@@ -112,10 +118,33 @@ test(
       );
     }
 
+    assert.equal(
+      registry.includes(
+        "city-labels.webp"
+      ),
+      true,
+      "商圈标签资源必须由DistrictVisualRegistry统一管理"
+    );
+
+    assert.equal(
+      css.includes(
+        "--district-label-image"
+      ),
+      true,
+      "城市CSS必须使用注册表下发的商圈标签图片变量"
+    );
+
+    assert.equal(
+      view.includes(
+        "getDistrictLabelStyle"
+      ),
+      true,
+      "城市地图必须通过注册表选择标签美术"
+    );
+
     for (
       const asset
       of [
-        "city-labels.webp",
         "city-metric-icons.webp",
         "city-map-controls.webp",
         "city-state-badges.webp"
