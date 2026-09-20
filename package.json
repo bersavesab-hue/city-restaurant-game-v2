@@ -37,7 +37,7 @@
     "test:phase3:performance": "node scripts/phase3-performance-gate.mjs",
     "test:save-compat": "node scripts/save-compatibility-gate.mjs",
     "test:phase5:chain": "node scripts/chain-expansion-gate.mjs",
-    "test:ui-v2:framework": "node --test tests/ui-v2-framework.test.js tests/ui-v2-placement-lock.test.js"
+    "test:ui-v2:framework": "node --test tests/ui-v2-framework.test.js tests/ui-v2-placement-lock.test.js tests/ui-v2-live-data.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
