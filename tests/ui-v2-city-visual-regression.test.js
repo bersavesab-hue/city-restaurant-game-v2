@@ -40,14 +40,14 @@ test(
         "utf8"
       );
 
-    assert.match(
+    assert.doesNotMatch(
       css,
-      /var\(--ui-safe-top\)/
+      /var\(--ui-hud-height\)\s*\+\s*var\(--ui-safe-top\)/
     );
 
-    assert.match(
+    assert.doesNotMatch(
       css,
-      /var\(--ui-safe-bottom\)/
+      /var\(--ui-nav-height\)\s*\+\s*var\(--ui-safe-bottom\)/
     );
   }
 );
@@ -166,6 +166,40 @@ test(
     assert.match(
       css,
       /data-image-key="cbd"/
+    );
+  }
+);
+
+test(
+  "默认地图只显示五个母版核心商圈并允许选中项补位",
+  () => {
+    const page =
+      fs.readFileSync(
+        "src/ui-v2/pages/city/CityPage.js",
+        "utf8"
+      );
+
+    for (
+      const id
+      of [
+        "university",
+        "cbd",
+        "nightlife",
+        "old_town",
+        "waterfront_leisure"
+      ]
+    ) {
+      assert.match(
+        page,
+        new RegExp(
+          id
+        )
+      );
+    }
+
+    assert.doesNotMatch(
+      page,
+      /\.slice\(\s*0,\s*7\s*\)/
     );
   }
 );
