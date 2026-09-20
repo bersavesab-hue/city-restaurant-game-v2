@@ -23,190 +23,851 @@ import {
 } from "../../../systems/ChainSystem.js";
 
 import {
-  buildFormalPageChrome
-} from "../../components/FormalPageChromeModel.js";
+  lateGameInvestmentSystem
+} from "../../../systems/LateGameInvestmentSystem.js";
+
+import {
+  customerLoyaltySystem
+} from "../../../systems/CustomerLoyaltySystem.js";
+
+import {
+  memberBenefitSystem
+} from "../../../systems/MemberBenefitSystem.js";
+
+import {
+  wordOfMouthSystem
+} from "../../../systems/WordOfMouthSystem.js";
+
+import {
+  openingPermitSystem
+} from "../../../systems/OpeningPermitSystem.js";
+
+import {
+  rankingCenterSystem
+} from "../../../systems/RankingCenterSystem.js";
+
+import {
+  feedbackSystem
+} from "../../../systems/FeedbackSystem.js";
+
+import {
+  gameState
+} from "../../../core/GameState.js";
+
+import {
+  saveSystem
+} from "../../../core/SaveSystem.js";
+
+import {
+  buildGlobalTopBarModel
+} from "../../components/GlobalChromeModel.js";
 
 
-const MORE_GROUPS =
-  Object.freeze([
+function safe(fn, fallback) {
+  try {
+    return fn();
+  } catch {
+    return fallback;
+  }
+}
+
+
+function getStores(restaurantId) {
+  const current =
+    restaurantSystem.get(
+      restaurantId
+    );
+
+  const chain =
+    safe(
+      () =>
+        chainSystem.getDashboard(
+          restaurantId
+        ),
+      null
+    );
+
+  return chain?.stores ?? [current];
+}
+
+
+function getBrandGrowth(restaurantId) {
+  const dashboard =
+    safe(
+      () =>
+        lateGameInvestmentSystem.getDashboard(
+          restaurantId
+        ),
+      {
+        projects: []
+      }
+    );
+
+  const projects =
+    dashboard.projects ?? [];
+
+  const owned =
+    projects.filter(
+      item =>
+        item.owned
+    ).length;
+
+  return {
+    total:
+      projects.length,
+
+    owned,
+
+    progress:
+      projects.length > 0
+        ? owned / projects.length * 100
+        : 0
+  };
+}
+
+
+function getRankingStatus(restaurantId) {
+  const overview =
+    safe(
+      () =>
+        rankingCenterSystem.getOverview(
+          restaurantId
+        ),
+      null
+    );
+
+  const best =
+    overview?.playerHighlights?.[0] ??
+    null;
+
+  return {
+    text:
+      best
+        ? (
+            best.boardTitle +
+            " 第" +
+            best.rank +
+            "名"
+          )
+        : "查看各类排行榜",
+    badge:
+      best && best.rank <= 3
+        ? "TOP " + best.rank
+        : ""
+  };
+}
+
+
+function getMemberStatus(restaurantId) {
+  const loyalty =
+    safe(
+      () =>
+        customerLoyaltySystem.getDashboard(
+          restaurantId
+        ),
+      null
+    );
+
+  const marketing =
+    safe(
+      () =>
+        memberBenefitSystem.getDashboard(
+          restaurantId
+        ),
+      null
+    );
+
+  return {
+    members:
+      loyalty?.members ?? 0,
+
+    campaignCount:
+      marketing?.campaigns?.length ?? 0
+  };
+}
+
+
+function getReputationStatus(restaurantId) {
+  const dashboard =
+    safe(
+      () =>
+        wordOfMouthSystem.getDashboard(
+          restaurantId
+        ),
+      null
+    );
+
+  return {
+    score:
+      dashboard?.reviewScore ?? 0,
+
+    positives:
+      dashboard?.positives ?? 0,
+
+    negatives:
+      dashboard?.negatives ?? 0,
+
+    unread:
+      dashboard?.latestReviews?.length ?? 0
+  };
+}
+
+
+function getComplianceStatus(restaurantId) {
+  const dashboard =
+    safe(
+      () =>
+        openingPermitSystem.getDashboard(
+          restaurantId
+        ),
+      null
+    );
+
+  return {
+    violations:
+      dashboard?.openViolations?.length ?? 0,
+
+    renewalDue:
+      dashboard?.renewalDueCount ?? 0
+  };
+}
+
+
+function buildGroups(restaurantId) {
+  const restaurant =
+    restaurantSystem.get(
+      restaurantId
+    );
+
+  const growth =
+    getBrandGrowth(
+      restaurantId
+    );
+
+  const ranking =
+    getRankingStatus(
+      restaurantId
+    );
+
+  const honor =
+    honorArchiveSystem.getSummary(
+      restaurantId
+    );
+
+  const awards =
+    awardFeedbackSystem.getUnreadCount(
+      restaurantId
+    );
+
+  const member =
+    getMemberStatus(
+      restaurantId
+    );
+
+  const reputation =
+    getReputationStatus(
+      restaurantId
+    );
+
+  const compliance =
+    getComplianceStatus(
+      restaurantId
+    );
+
+  const feedback =
+    safe(
+      () =>
+        feedbackSystem.getSummary(),
+      {}
+    );
+
+  const chainUnlocked =
+    safe(
+      () =>
+        chainSystem.isFeatureUnlocked(
+          restaurantId,
+          "second_store"
+        ),
+      false
+    );
+
+  const chainUnlockLevel =
+    safe(
+      () =>
+        storeProgressSystem.getUnlockLevel(
+          "second_store"
+        ),
+      null
+    );
+
+  const membershipUnlocked =
+    safe(
+      () =>
+        storeProgressSystem.isUnlocked(
+          restaurantId,
+          "membership"
+        ),
+      false
+    );
+
+  const membershipUnlockLevel =
+    safe(
+      () =>
+        storeProgressSystem.getUnlockLevel(
+          "membership"
+        ),
+      null
+    );
+
+  const brandUnlocked =
+    (restaurant.level ?? 1) >= 7;
+
+  return [
     {
-      id: "customer",
-      title: "顾客与品牌",
+      id:
+        "brand-growth",
+
+      icon:
+        "♛",
+
+      title:
+        "品牌与成长",
+
+      subtitle:
+        "打造更优秀的餐饮品牌，让美味走进更多城市",
 
       entries: [
         {
-          id: "member-marketing",
-          title: "会员营销",
-          description: "会员等级、权益、营销活动与顾客维护",
-          target: "member-marketing",
-          state: "ready",
-          unlockFeature: "membership"
+          id:
+            "chain",
+
+          title:
+            "连锁管理",
+
+          description:
+            "开设新店，管理多城门店",
+
+          target:
+            "chain",
+
+          art:
+            "chain",
+
+          icon:
+            "▥",
+
+          state:
+            chainUnlocked
+              ? "ready"
+              : "locked",
+
+          lockText:
+            chainUnlockLevel
+              ? (
+                  "店铺" +
+                  chainUnlockLevel +
+                  "级解锁"
+                )
+              : "达成条件后解锁",
+
+          statusText:
+            chainUnlocked
+              ? "管理连锁门店"
+              : ""
         },
+
         {
-          id: "honor-hall",
-          title: "荣誉馆",
-          description: "查看门店、菜品与员工获得的永久荣誉",
-          target: "honor-hall",
-          state: "ready"
+          id:
+            "brand-investments",
+
+          title:
+            "长期品牌基建",
+
+          description:
+            "提升品牌影响力与核心能力\n解锁更多经营玩法",
+
+          target:
+            "brand-investments",
+
+          art:
+            "brand",
+
+          icon:
+            "↗",
+
+          state:
+            brandUnlocked
+              ? "ready"
+              : "locked",
+
+          lockText:
+            brandUnlocked
+              ? ""
+              : "店铺7级解锁",
+
+          progress:
+            growth.progress,
+
+          progressLabel:
+            growth.owned +
+            "/" +
+            growth.total
         },
+
         {
-          id: "awards-center",
-          title: "奖项中心",
-          description: "查看月度、季度、年度奖项和评审进度",
-          target: "awards-center",
-          state: "ready"
+          id:
+            "ranking-center",
+
+          title:
+            "排行榜",
+
+          description:
+            "查看各类排行榜\n与其他店长一较高下",
+
+          target:
+            "ranking-center",
+
+          art:
+            "ranking",
+
+          icon:
+            "♛",
+
+          state:
+            "ready",
+
+          statusText:
+            ranking.text,
+
+          badge:
+            ranking.badge,
+
+          badgeTone:
+            "gold"
+        },
+
+        {
+          id:
+            "honor-hall",
+
+          title:
+            "荣誉殿堂",
+
+          description:
+            "收集荣誉，记录成长历程\n见证小馆的每一个里程碑",
+
+          target:
+            "honor-hall",
+
+          art:
+            "honor",
+
+          icon:
+            "★",
+
+          state:
+            "ready",
+
+          statusText:
+            "已获得 " +
+            honor.totalHonors +
+            " 项荣誉",
+
+          badge:
+            awards > 0
+              ? String(awards)
+              : "",
+
+          badgeTone:
+            "danger"
         }
       ]
     },
 
     {
-      id: "growth",
-      title: "扩张与管理",
+      id:
+        "customer-safety",
+
+      icon:
+        "♟",
+
+      title:
+        "顾客与安全",
+
+      subtitle:
+        "用心服务每一位顾客，营造安心的用餐环境",
 
       entries: [
         {
-          id: "store-progress",
-          title: "成长与解锁",
-          description: "查看等级、经验、经营上限和后续功能解锁",
-          target: "store-progress",
-          state: "ready"
+          id:
+            "member-marketing",
+
+          title:
+            "会员营销",
+
+          description:
+            "开展会员活动\n提升顾客粘性",
+
+          target:
+            "member-marketing",
+
+          art:
+            "member",
+
+          icon:
+            "♛",
+
+          state:
+            membershipUnlocked
+              ? "ready"
+              : "locked",
+
+          lockText:
+            membershipUnlockLevel
+              ? (
+                  "店铺" +
+                  membershipUnlockLevel +
+                  "级解锁"
+                )
+              : "达成条件后解锁",
+
+          statusText:
+            membershipUnlocked
+              ? (
+                  member.members +
+                  " 位会员 · " +
+                  member.campaignCount +
+                  " 个活动"
+                )
+              : ""
         },
 
         {
-          id: "compliance-center",
-          title: "合规中心",
-          description: "证照申请、续期、抽查、整改与处罚管理",
-          target: "compliance-center",
-          state: "ready"
+          id:
+            "reputation",
+
+          title:
+            "评价反馈",
+
+          description:
+            "倾听顾客声音\n持续优化体验",
+
+          target:
+            "reputation",
+
+          art:
+            "feedback",
+
+          icon:
+            "●",
+
+          state:
+            "ready",
+
+          statusText:
+            "评分 " +
+            Number(
+              reputation.score
+            ).toFixed(1),
+
+          badge:
+            reputation.negatives >
+            reputation.positives
+              ? "!"
+              : "",
+
+          badgeTone:
+            "danger"
         },
 
         {
-          id: "lease",
-          title: "租约管理",
-          description: "查看租金、物业费、押金、欠款与续租",
-          target: "lease",
-          state: "ready"
-        },
+          id:
+            "compliance-center",
 
-        {
-          id: "chain",
-          title: "扩张与连锁",
-          description: "第二门店、品牌管理、中央厨房与区域扩张",
-          target: "chain",
-          state: "ready",
-          unlockFeature: "second_store",
-          unlockScope: "chain"
-        },
+          title:
+            "合规中心",
 
-        {
-          id: "brand-investments",
-          title: "长期品牌基建",
-          description: "CRM、会员服务、冷链仓配与区域品牌总部",
-          target: "brand-investments",
-          state: "ready",
-          minLevel: 7
+          description:
+            "食品安全与经营合规\n守护安心餐饮",
+
+          target:
+            "compliance-center",
+
+          art:
+            "compliance",
+
+          icon:
+            "✓",
+
+          state:
+            "ready",
+
+          statusText:
+            compliance.violations > 0
+              ? (
+                  compliance.violations +
+                  " 项整改"
+                )
+              : compliance.renewalDue > 0
+                ? (
+                    compliance.renewalDue +
+                    " 项待续期"
+                  )
+                : "当前合规正常",
+
+          badge:
+            (
+              compliance.violations +
+              compliance.renewalDue
+            ) > 0
+              ? String(
+                  compliance.violations +
+                  compliance.renewalDue
+                )
+              : "",
+
+          badgeTone:
+            "danger"
         }
       ]
     },
 
     {
-      id: "system",
-      title: "系统",
+      id:
+        "game-service",
+
+      icon:
+        "⚙",
+
+      title:
+        "游戏服务",
+
+      subtitle:
+        "为您提供更好的游戏体验",
 
       entries: [
         {
-          id: "feedback",
-          title: "测试反馈",
-          description: "记录问题、评分与建议，并生成可复制诊断报告",
-          target: "feedback",
-          state: "ready"
+          id:
+            "settings",
+
+          title:
+            "设置",
+
+          description:
+            "声音、画面、\n通知等个性化设置",
+
+          target:
+            "settings",
+
+          art:
+            "settings",
+
+          icon:
+            "⚙",
+
+          state:
+            "ready",
+
+          statusText:
+            "随时调整游戏设置"
         },
 
         {
-          id: "settings",
-          title: "设置",
-          description: "运行速度、暂停与存档控制",
-          target: "settings",
-          state: "ready"
+          id:
+            "save-management",
+
+          title:
+            "存档管理",
+
+          description:
+            "管理游戏进度\n保障数据安全",
+
+          target:
+            "settings",
+
+          art:
+            "save",
+
+          icon:
+            "↑",
+
+          state:
+            "ready",
+
+          statusText:
+            saveSystem.has(
+              "auto"
+            )
+              ? "自动存档可用"
+              : "尚无自动存档"
+        },
+
+        {
+          id:
+            "help-feedback",
+
+          title:
+            "帮助与反馈",
+
+          description:
+            "游戏指南与常见问题\n联系客服反馈",
+
+          target:
+            "feedback",
+
+          art:
+            "help",
+
+          icon:
+            "?",
+
+          state:
+            "ready",
+
+          statusText:
+            (feedback.total ?? 0) > 0
+              ? (
+                  "已提交 " +
+                  feedback.total +
+                  " 条反馈"
+                )
+              : "查看帮助与反馈"
         }
       ]
     }
-  ]);
+  ];
+}
 
 
 class MoreHubPageSystem {
-  getPage(
-    restaurantId
-  ) {
+  getPage(restaurantId) {
     const restaurant =
       restaurantSystem.get(
         restaurantId
       );
 
-    const honor =
-      honorArchiveSystem
-        .getSummary(
-          restaurantId
-        );
-
-    const notices =
-      [];
-
-    const unreadAwards =
-      awardFeedbackSystem
-        .getUnreadCount(
-          restaurantId
-        );
-
-    if (
-      unreadAwards >
-      0
-    ) {
-      notices.push({
-        id:
-          "more_awards",
-
-        type:
-          "success",
-
-        title:
-          "奖项消息",
-
-        message:
-          `有${unreadAwards}条新的奖项反馈`,
-
-        priority:
-          70
-      });
-    }
-
-    const chrome =
-      buildFormalPageChrome(
-        restaurantId,
-        {
-          notices,
-          restaurant,
-          balance:
-            financeSystem.getBalance(
-              restaurantId
-            )
-        }
+    const stores =
+      getStores(
+        restaurantId
       );
+
+    const totalBalance =
+      stores.reduce(
+        (sum, store) =>
+          sum +
+          safe(
+            () =>
+              financeSystem.getBalance(
+                store.id
+              ),
+            0
+          ),
+        0
+      );
+
+    const rating =
+      stores.length > 0
+        ? stores.reduce(
+            (sum, store) =>
+              sum +
+              (
+                Number(
+                  store.reviewScore
+                ) ||
+                0
+              ),
+            0
+          ) /
+          stores.length
+        : 0;
+
+    const baseTopBar =
+      buildGlobalTopBarModel({
+        restaurantName:
+          restaurant.name,
+
+        brandName:
+          safe(
+            () =>
+              chainSystem.getDashboard(
+                restaurantId
+              ).brandName,
+            restaurant.name
+          ),
+
+        balance:
+          totalBalance,
+
+        storeLevel:
+          Math.max(
+            1,
+            ...stores.map(
+              item =>
+                item.level ?? 1
+            )
+          ),
+
+        reputation:
+          restaurant.reputation ?? 0,
+
+        time:
+          gameState.getSection(
+            "time"
+          ),
+
+        runtime:
+          gameState.getSection(
+            "runtime"
+          ),
+
+        currentStoreId:
+          restaurantId,
+
+        stores:
+          stores.map(
+            item => ({
+              id:
+                item.id,
+              name:
+                item.name
+            })
+          )
+      });
 
     return {
       pageId:
         "more",
 
-      topBar:
-        chrome.topBar,
-
-      noticeTicker:
-        chrome.noticeTicker,
-
       title:
         "更多",
 
       restaurantId,
+
+      topBar: {
+        ...baseTopBar,
+
+        rating,
+
+        scope: {
+          ...baseTopBar.scope,
+
+          type:
+            "group",
+
+          canSwitch:
+            stores.length > 0,
+
+          stores:
+            stores.map(
+              item => ({
+                id:
+                  item.id,
+                name:
+                  item.name
+              })
+            )
+        }
+      },
 
       restaurant: {
         id:
@@ -216,12 +877,10 @@ class MoreHubPageSystem {
           restaurant.name,
 
         level:
-          restaurant.level ??
-          1,
+          restaurant.level ?? 1,
 
         reputation:
-          restaurant.reputation ??
-          0,
+          restaurant.reputation ?? 0,
 
         balance:
           financeSystem.getBalance(
@@ -229,101 +888,9 @@ class MoreHubPageSystem {
           )
       },
 
-      badges: {
-        awards:
-          unreadAwards,
-
-        honors:
-          honor.totalHonors,
-
-        prestige:
-          honor.prestigePoints
-      },
-
       groups:
-        structuredClone(
-          MORE_GROUPS
-        ).map(
-          group => ({
-            ...group,
-
-            entries:
-              group.entries
-                .map(
-                  entry => {
-                    if (
-                      Number.isInteger(
-                        entry.minLevel
-                      )
-                    ) {
-                      const anchorRestaurant =
-                        chainSystem
-                          .getAnchorRestaurant(
-                            restaurantId
-                          );
-
-                      const unlocked =
-                        (
-                          anchorRestaurant
-                            .level ??
-                          1
-                        ) >=
-                        entry.minLevel;
-
-                      return {
-                        ...entry,
-
-                        state:
-                          unlocked
-                            ? entry.state
-                            : "locked",
-
-                        unlockLevel:
-                          entry.minLevel
-                      };
-                    }
-
-                    if (
-                      !entry
-                        .unlockFeature
-                    ) {
-                      return entry;
-                    }
-
-                    const unlocked =
-                      entry.unlockScope ===
-                        "chain"
-                        ? chainSystem
-                            .isFeatureUnlocked(
-                              restaurantId,
-                              entry
-                                .unlockFeature
-                            )
-                        : storeProgressSystem
-                            .isUnlocked(
-                              restaurantId,
-                              entry
-                                .unlockFeature
-                            );
-
-                    return {
-                      ...entry,
-
-                      state:
-                        unlocked
-                          ? entry.state
-                          : "locked",
-
-                      unlockLevel:
-                        storeProgressSystem
-                          .getUnlockLevel(
-                            entry
-                              .unlockFeature
-                          )
-                    };
-                  }
-                )
-          })
+        buildGroups(
+          restaurantId
         )
     };
   }
@@ -335,6 +902,5 @@ export const moreHubPageSystem =
 
 
 export {
-  MoreHubPageSystem,
-  MORE_GROUPS
+  MoreHubPageSystem
 };
