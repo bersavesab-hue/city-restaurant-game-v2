@@ -27,16 +27,16 @@ import {
 } from "../src/ui/navigation/GameplayNavigationSystem.js";
 
 
-test("更多主入口落到正式more-home", () => {
+test("更多主入口直接落到唯一正式more", () => {
   assert.equal(
     gameplayNavigationSystem
       .getLandingPage("more"),
-    "more-home"
+    "more"
   );
 
   assert.equal(
     formalPageRuntime.has(
-      "more-home"
+      "more"
     ),
     true
   );
@@ -113,7 +113,7 @@ test("更多主页只保留已经接入的正式功能入口", () => {
 });
 
 
-test("Android运行时通过统一导航解析器进入more-home", () => {
+test("Android运行时通过统一导航解析器进入more", () => {
   const source=
     fs.readFileSync(
       new URL(
@@ -128,7 +128,7 @@ test("Android运行时通过统一导航解析器进入more-home", () => {
       .resolveNavigationTarget(
         "more"
       ),
-    "more-home"
+    "more"
   );
 
   assert.match(

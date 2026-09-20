@@ -183,7 +183,7 @@ test(
 
     assert.equal(
       advice[0].action,
-      "properties"
+      "city"
     );
 
     propertyLeaseMarketSystem
