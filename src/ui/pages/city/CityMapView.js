@@ -3,21 +3,49 @@ import { renderGameTopBar, renderNoticeTicker, renderBottomNavigation } from "..
 import { gameChromeSystem } from "../../components/GameChromeSystem.js";
 
 function escapeHtml(value) {
-  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function money(value) {
   return "¥" + Math.round(Number(value) || 0).toLocaleString("zh-CN");
 }
 
+function levelLabel(value, low = 40, high = 70) {
+  const number = Number(value) || 0;
+  if (number >= high) return "高";
+  if (number >= low) return "中等";
+  return "低";
+}
+
+const FILTERS = Object.freeze([
+  ["all", "全部"],
+  ["opened", "已开店"],
+  ["available", "可选址"],
+  ["potential", "高潜力"],
+  ["locked", "待解锁"]
+]);
+
 class CityMapView {
-  constructor({ root, restaurantId = null, pageSystem = cityMapDashboardSystem, onNavigate = null }) {
+  constructor({
+    root,
+    restaurantId = null,
+    pageSystem = cityMapDashboardSystem,
+    onNavigate = null
+  }) {
     if (!root) throw new Error("CityMapView requires a root element");
+
     this.root = root;
     this.restaurantId = restaurantId;
     this.pageSystem = pageSystem;
     this.onNavigate = onNavigate;
     this.selectedDistrictId = null;
+    this.filter = "all";
+    this.zoom = 1;
     this.page = null;
     this.boundClick = event => this.handleClick(event);
   }
@@ -34,118 +62,405 @@ class CityMapView {
   }
 
   refresh() {
-    this.page = this.pageSystem.getPage({ restaurantId: this.restaurantId, selectedDistrictId: this.selectedDistrictId });
-    this.selectedDistrictId = this.page.map.selectedDistrictId;
+    this.page = this.pageSystem.getPage({
+      restaurantId: this.restaurantId,
+      selectedDistrictId: this.selectedDistrictId
+    });
+
+    this.selectedDistrictId =
+      this.page.map.selectedDistrictId;
+
     this.render();
     return this.page;
   }
 
+  getFilteredDistricts(page) {
+    const districts = page.map.districts ?? [];
+
+    if (this.filter === "opened") {
+      return districts.filter(item => item.hasOpenStore);
+    }
+
+    if (this.filter === "available") {
+      return districts.filter(
+        item => !item.locked && item.propertyCount > 0
+      );
+    }
+
+    if (this.filter === "potential") {
+      return districts.filter(
+        item => !item.locked && item.highPotential
+      );
+    }
+
+    if (this.filter === "locked") {
+      return districts.filter(item => item.locked);
+    }
+
+    return districts;
+  }
+
+  renderHeader(page) {
+    const count =
+      page.citySummary?.districtCount ??
+      page.map?.totalDistrictCount ??
+      0;
+
+    const areaCount =
+      page.map?.districts?.length ??
+      0;
+
+    return (
+      '<section class="city-map-heading">' +
+        '<div class="city-map-heading__copy">' +
+          '<h1><span aria-hidden="true">●</span>城市地图</h1>' +
+          '<p>发现优质商圈，拓展门店版图，让美食走进更多地方</p>' +
+        '</div>' +
+        '<div class="city-map-heading__summary">' +
+          '<span class="city-map-heading__building" aria-hidden="true">▥</span>' +
+          '<div><strong>' + count + ' 个商圈</strong>' +
+          '<small>' + areaCount + ' 大区域 · 等待你的探索</small></div>' +
+        '</div>' +
+      '</section>'
+    );
+  }
+
+  renderFilters(page) {
+    const counts =
+      page.filterCounts ?? {
+        all: page.map?.districts?.length ?? 0,
+        opened: 0,
+        available: 0,
+        potential: 0,
+        locked: 0
+      };
+
+    return (
+      '<nav class="city-map-filters" aria-label="城市商圈筛选">' +
+      FILTERS.map(([id, label], index) =>
+        '<button type="button" class="' +
+          (this.filter === id ? "is-active" : "") +
+          '" data-action="set-filter" data-filter="' +
+          id +
+          '">' +
+          '<span class="city-map-filter__icon city-map-filter__icon--' +
+          index +
+          '" aria-hidden="true">' +
+          (index === 0 ? "" : index === 4 ? "▣" : "●") +
+          '</span>' +
+          '<strong>' +
+          escapeHtml(label) +
+          ' (' +
+          (counts[id] ?? 0) +
+          ')</strong>' +
+        '</button>'
+      ).join("") +
+      '</nav>'
+    );
+  }
+
   renderMap(page) {
-    return `
-      <section class="city-home-hero">
-        <div class="city-home-map city-map-panel__canvas">
-          <div class="city-map-artwork city-image-slot--map" role="img" aria-label="城市发展地图"></div>
-          <div class="city-home-hero-copy">
-            <span>城市经营版图</span><h1>城市发展</h1>
-            <p>选择商圈、查看房源、分析客流，拓展你的美食版图。</p>
-          </div>
-          <div class="city-map-pins">
-            ${page.map.districts.map(district => `
-              <button type="button" class="city-map-pin ${page.map.selectedDistrictId === district.id ? "is-active" : ""}"
-                data-action="select-district" data-district-id="${escapeHtml(district.id)}"
-                style="left:${district.position.x}%;top:${district.position.y}%">
-                <i></i><strong>${escapeHtml(district.name)}</strong>
-              </button>
-            `).join("")}
-          </div>
-        </div>
-      </section>`;
+    const visible =
+      this.getFilteredDistricts(page);
+
+    const pins =
+      visible.map((district, index) => {
+        const locked = district.locked === true;
+        const selected =
+          page.map.selectedDistrictId === district.id;
+
+        const icon =
+          locked
+            ? "▣"
+            : index === 0
+              ? "▦"
+              : index === 1
+                ? "◆"
+                : index === 2
+                  ? "◇"
+                  : index === 3
+                    ? "▤"
+                    : "◉";
+
+        return (
+          '<button type="button" class="city-map-pin city-map-pin--' +
+          (index % 5) +
+          " " +
+          (selected ? "is-active " : "") +
+          (locked ? "is-locked" : "") +
+          '" data-action="' +
+          (locked ? "locked-district" : "select-district") +
+          '" data-district-id="' +
+          escapeHtml(district.id) +
+          '" style="left:' +
+          district.position.x +
+          "%;top:" +
+          district.position.y +
+          '%">' +
+            '<span class="city-map-pin__icon" aria-hidden="true">' +
+            icon +
+            '</span>' +
+            '<span class="city-map-pin__copy">' +
+              '<strong>' +
+              escapeHtml(district.name) +
+              '</strong>' +
+              '<small>' +
+              (locked
+                ? "待解锁"
+                : (district.propertyCount ?? 0) + " 个商圈") +
+              '</small>' +
+            '</span>' +
+          '</button>'
+        );
+      }).join("");
+
+    return (
+      '<section class="city-map-viewport">' +
+        '<div class="city-map-stage" style="--city-map-zoom:' +
+        this.zoom +
+        '">' +
+          '<div class="city-map-artwork city-image-slot--map" role="img" aria-label="城市发展地图"></div>' +
+          '<div class="city-map-slogan" aria-hidden="true">让美食<br>点亮这座城市 ♡</div>' +
+          '<div class="city-map-pins">' + pins + '</div>' +
+        '</div>' +
+        '<div class="city-map-controls" aria-label="地图控制">' +
+          '<button type="button" data-action="zoom-in" aria-label="放大地图">＋</button>' +
+          '<button type="button" data-action="zoom-out" aria-label="缩小地图">－</button>' +
+          '<button type="button" data-action="locate" aria-label="重置地图">⌾</button>' +
+        '</div>' +
+      '</section>'
+    );
   }
 
-  renderSummary(page) {
-    const summary = page.citySummary;
-    const values = [
-      ["🔥", "今日商圈热度", summary.averageTraffic, "客流指数"],
-      ["⌂", "可租房源", summary.propertyCount, "实时房源"],
-      ["▣", "开放商圈", summary.districtCount, "经营区域"],
-      ["♟", "平均消费力", summary.averageSpending, "消费指数"]
-    ];
-    return `<section class="city-home-metrics">${values.map(([icon, label, value, detail]) => `
-      <article><b>${icon}</b><div><span>${label}</span><strong>${value}</strong><small>${detail}</small></div></article>
-    `).join("")}</section>`;
+  renderMetric(icon, label, value, sub = "") {
+    return (
+      '<article class="city-district-metric">' +
+        '<span class="city-district-metric__icon" aria-hidden="true">' +
+        icon +
+        '</span>' +
+        '<small>' + escapeHtml(label) + '</small>' +
+        '<strong>' + escapeHtml(value) + '</strong>' +
+        (sub ? '<b>' + escapeHtml(sub) + '</b>' : "") +
+      '</article>'
+    );
   }
 
-  renderRecommendation(page) {
+  renderOpportunity(item, index) {
+    const tag =
+      item.tag ??
+      (
+        item.qualityScore >= 80
+          ? "高潜力"
+          : item.affordable
+            ? "可选址"
+            : "关注"
+      );
+
+    const description =
+      item.description ??
+      (
+        (item.districtName ?? "当前商圈") +
+        " · " +
+        (item.area ?? "--") +
+        "㎡ · " +
+        money(item.monthlyRent ?? 0) +
+        "/月"
+      );
+
+    return (
+      '<button type="button" class="city-opportunity-card city-opportunity-card--' +
+      (index % 3) +
+      '" data-action="open-district-properties" data-district-id="' +
+      escapeHtml(item.districtId ?? "") +
+      '">' +
+        '<span class="city-opportunity-card__image" aria-hidden="true"></span>' +
+        '<span class="city-opportunity-card__copy">' +
+          '<span class="city-opportunity-card__title">' +
+            '<strong>' +
+            escapeHtml(item.name ?? item.districtName ?? "商圈机会") +
+            '</strong>' +
+            '<b>' + escapeHtml(tag) + '</b>' +
+          '</span>' +
+          '<small>' + escapeHtml(description) + '</small>' +
+        '</span>' +
+        '<span class="city-opportunity-card__arrow" aria-hidden="true">›</span>' +
+      '</button>'
+    );
+  }
+
+  renderDetail(page) {
     const district = page.selectedDistrict;
     if (!district) return "";
-    return `
-      <section class="city-home-recommendation">
-        <header><strong>城市发展推荐</strong><b>1</b></header>
-        <div>
-          <span class="city-home-recommendation__badge">${escapeHtml(district.name)}</span>
-          <section><strong>推荐在 ${escapeHtml(district.name)} 考察新铺位</strong>
-            <p>客流 ${district.trafficIndex} · 消费力 ${district.spendingPower} · 当前可租 ${district.propertyCount} 套</p></section>
-          <button type="button" data-action="open-district-properties" data-district-id="${escapeHtml(district.id)}">前往考察 ›</button>
-        </div>
-      </section>`;
-  }
 
-  renderActions(page) {
-    const property = page.recommendedProperties[0] ?? null;
-    const actions = [
-      ["商圈地图", "查看全城商圈分布", "map", "city"],
-      ["房源推荐", property ? `${escapeHtml(property.districtName)} · ${money(property.monthlyRent)}/月` : "精选优质铺位", "property", "properties"],
-      ["客流分析", "洞察客流趋势变化", "traffic", "analytics"],
-      ["周边竞店", "了解附近竞争对手", "competition", "market-strategy"],
-      ["城区扩展", `已开放 ${page.citySummary.districtCount} 个商圈`, "expansion", "properties"],
-      ["营销活动", "提升区域和品牌知名度", "marketing", "member-marketing"]
-    ];
-    return `<section class="city-home-actions">${actions.map(([title, subtitle, tone, target]) => `
-      <button type="button" data-action="navigate" data-page-id="${target}" data-tone="${tone}">
-        <span><strong>${title}</strong><small>${subtitle}</small></span><b>›</b>
-      </button>`).join("")}</section>`;
+    const opportunities =
+      page.opportunities ?? [];
+
+    const trafficPerDay =
+      Math.max(
+        0,
+        Math.round((district.trafficIndex ?? 0) * 160)
+      );
+
+    return (
+      '<section class="city-district-sheet">' +
+        '<div class="city-district-sheet__handle" aria-hidden="true"></div>' +
+        '<header class="city-district-sheet__header">' +
+          '<div class="city-district-sheet__thumb" aria-hidden="true"></div>' +
+          '<div class="city-district-sheet__identity">' +
+            '<div><h2>' +
+            escapeHtml(district.name) +
+            '</h2>' +
+            (district.highPotential ? '<b>高潜力</b>' : "") +
+            '</div>' +
+            '<p>城市重点商圈，客流与消费能力随经营环境动态变化。</p>' +
+          '</div>' +
+          '<button type="button" class="city-district-sheet__properties" data-action="open-district-properties" data-district-id="' +
+          escapeHtml(district.id) +
+          '"><span aria-hidden="true">⌕</span>查看房源</button>' +
+        '</header>' +
+        '<div class="city-district-metrics">' +
+          this.renderMetric("♟", "客流量", trafficPerDay.toLocaleString("zh-CN") + "人/天", district.trafficIndex >= 60 ? "▲ 活跃" : "平稳") +
+          this.renderMetric("●", "消费力", String(district.spendingPower ?? 0), district.spendingPower >= 60 ? "▲ 较强" : "中等") +
+          this.renderMetric("⌂", "平均租金", money(district.averageRent ?? 0) + "/月") +
+          this.renderMetric("▥", "竞争度", levelLabel(district.competition)) +
+          this.renderMetric("◉", "外卖需求", levelLabel(district.deliveryDemand)) +
+          this.renderMetric("▦", "可租房源", (district.propertyCount ?? 0) + "套") +
+        '</div>' +
+        '<section class="city-opportunities">' +
+          '<header><div><span aria-hidden="true">♛</span>' +
+          '<strong>今日机会 (' +
+          opportunities.length +
+          ')</strong></div>' +
+          '<button type="button" data-action="navigate" data-page-id="properties">查看全部 ›</button></header>' +
+          '<div class="city-opportunities__grid">' +
+          (
+            opportunities.length
+              ? opportunities
+                  .slice(0, 3)
+                  .map((item, index) => this.renderOpportunity(item, index))
+                  .join("")
+              : '<div class="city-opportunities__empty">当前商圈暂无新的房源机会</div>'
+          ) +
+          '</div>' +
+        '</section>' +
+      '</section>'
+    );
   }
 
   renderBottomNav() {
-    return renderBottomNavigation(gameChromeSystem.getNavigation({ restaurantId: this.restaurantId, activePageId: "city" }));
+    return renderBottomNavigation(
+      gameChromeSystem.getNavigation({
+        restaurantId: this.restaurantId,
+        activePageId: "city"
+      })
+    );
   }
 
   renderMarkup(page) {
-    return `<main class="rg-screen city-map-game">
-      ${renderGameTopBar(page.topBar, { subtitle: "城市发展中心" })}
-      ${renderNoticeTicker(page.noticeTicker)}
-      ${this.renderMap(page)}
-      ${this.renderSummary(page)}
-      ${this.renderRecommendation(page)}
-      ${this.renderActions(page)}
-      <aside class="city-home-tip"><b>💡</b><div><strong>城市小贴士</strong><span>优先选择人流稳定、交通便利的商圈，更容易获得长期稳定客流。</span></div></aside>
-      ${this.renderBottomNav()}
-    </main>`;
+    return (
+      '<main class="rg-screen city-map-game">' +
+        renderGameTopBar(
+          page.topBar,
+          {
+            subtitle: "城市经营版图"
+          }
+        ) +
+        this.renderHeader(page) +
+        this.renderFilters(page) +
+        this.renderMap(page) +
+        this.renderDetail(page) +
+        this.renderBottomNav() +
+      '</main>'
+    );
   }
 
   render() {
-    if (this.page) this.root.innerHTML = this.renderMarkup(this.page);
+    if (this.page) {
+      this.root.innerHTML = this.renderMarkup(this.page);
+    }
   }
 
   handleClick(event) {
-    const target = event.target.closest?.("[data-action]");
-    if (!target || !this.root.contains(target)) return;
+    const target =
+      event.target.closest?.("[data-action]");
+
+    if (!target || !this.root.contains(target)) {
+      return;
+    }
+
     const action = target.dataset.action;
+
+    if (action === "set-filter") {
+      this.filter = target.dataset.filter ?? "all";
+      this.render();
+      return;
+    }
+
     if (action === "select-district") {
       this.selectedDistrictId = target.dataset.districtId;
       this.refresh();
       return;
     }
+
     if (action === "open-district-properties") {
-      this.onNavigate?.("properties", this.restaurantId, { districtId: target.dataset.districtId });
+      const districtId =
+        target.dataset.districtId ||
+        this.selectedDistrictId;
+
+      this.onNavigate?.(
+        "properties",
+        this.restaurantId,
+        districtId
+          ? { districtId }
+          : {}
+      );
       return;
     }
+
+    if (action === "zoom-in") {
+      this.zoom = Math.min(
+        1.3,
+        Number((this.zoom + 0.1).toFixed(2))
+      );
+      this.render();
+      return;
+    }
+
+    if (action === "zoom-out") {
+      this.zoom = Math.max(
+        1,
+        Number((this.zoom - 0.1).toFixed(2))
+      );
+      this.render();
+      return;
+    }
+
+    if (action === "locate") {
+      this.zoom = 1;
+      this.render();
+      return;
+    }
+
     if (action === "navigate") {
       const pageId = target.dataset.pageId;
-      if (pageId !== "city" && pageId) this.onNavigate?.(pageId, this.restaurantId);
+
+      if (
+        pageId &&
+        pageId !== "city"
+      ) {
+        this.onNavigate?.(
+          pageId,
+          this.restaurantId
+        );
+      }
     }
   }
 }
 
-export const cityMapView = { mount(options) { return new CityMapView(options).mount(); } };
+export const cityMapView = {
+  mount(options) {
+    return new CityMapView(options).mount();
+  }
+};
+
 export { CityMapView };

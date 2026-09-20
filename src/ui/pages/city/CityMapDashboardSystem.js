@@ -15,6 +15,10 @@ import {
 } from "../../../systems/FinanceSystem.js";
 
 import {
+  propertySystem
+} from "../../../systems/PropertySystem.js";
+
+import {
   cityPropertyPageSystem
 } from "./CityPropertyPageSystem.js";
 
@@ -26,45 +30,45 @@ import {
 
 const FALLBACK_POSITIONS =
   Object.freeze([
-    { x: 20, y: 26 },
-    { x: 48, y: 18 },
-    { x: 73, y: 28 },
-    { x: 30, y: 50 },
-    { x: 58, y: 47 },
-    { x: 82, y: 54 },
-    { x: 18, y: 74 },
-    { x: 46, y: 78 },
-    { x: 72, y: 76 },
-    { x: 88, y: 80 }
+    { x: 48, y: 19 },
+    { x: 33, y: 43 },
+    { x: 74, y: 44 },
+    { x: 22, y: 72 },
+    { x: 72, y: 72 },
+    { x: 88, y: 18 },
+    { x: 10, y: 25 },
+    { x: 50, y: 84 },
+    { x: 87, y: 86 },
+    { x: 9, y: 88 }
   ]);
 
 
 const HOME_MAP_DISTRICT_LAYOUT =
   Object.freeze([
     {
-      id: "old_town",
-      x: 35,
-      y: 60
+      id: "university",
+      x: 48,
+      y: 18
     },
     {
       id: "cbd",
-      x: 52,
-      y: 27
-    },
-    {
-      id: "university",
-      x: 78,
-      y: 27
-    },
-    {
-      id: "residential",
-      x: 59,
-      y: 56
+      x: 34,
+      y: 43
     },
     {
       id: "tourist_scenic",
-      x: 82,
-      y: 69
+      x: 74,
+      y: 43
+    },
+    {
+      id: "old_town",
+      x: 22,
+      y: 72
+    },
+    {
+      id: "residential",
+      x: 72,
+      y: 72
     }
   ]);
 
@@ -182,6 +186,27 @@ class CityMapDashboardSystem {
     district,
     index
   ) {
+    const fixed =
+      HOME_MAP_DISTRICT_LAYOUT
+        .find(
+          item =>
+            item.id ===
+            district.id
+        );
+
+    if (fixed) {
+      return {
+        x:
+          fixed.x,
+
+        y:
+          fixed.y,
+
+        source:
+          "city-home-layout"
+      };
+    }
+
     const custom =
       district.mapPosition ??
       district.uiMapPosition ??
@@ -226,12 +251,83 @@ class CityMapDashboardSystem {
         FALLBACK_POSITIONS.length
       ];
 
+    const cycle =
+      Math.floor(
+        index /
+        FALLBACK_POSITIONS.length
+      );
+
     return {
-      ...fallback,
+      x:
+        Math.max(
+          7,
+          Math.min(
+            93,
+            fallback.x +
+            (
+              cycle % 2 === 0
+                ? cycle * 2
+                : -cycle * 2
+            )
+          )
+        ),
+
+      y:
+        Math.max(
+          9,
+          Math.min(
+            91,
+            fallback.y +
+            (
+              cycle % 3 -
+              1
+            ) *
+            5
+          )
+        ),
 
       source:
         "layout-fallback"
     };
+  }
+
+
+  getStoreDistrictCounts() {
+    const counts =
+      new Map();
+
+    for (
+      const restaurant
+      of restaurantSystem.list()
+    ) {
+      if (
+        !restaurant.locationId
+      ) {
+        continue;
+      }
+
+      try {
+        const property =
+          propertySystem.get(
+            restaurant.locationId
+          );
+
+        counts.set(
+          property.districtId,
+          (
+            counts.get(
+              property.districtId
+            ) ??
+            0
+          ) +
+          1
+        );
+      } catch {
+        // A removed property must not break the city overview.
+      }
+    }
+
+    return counts;
   }
 
 
@@ -240,6 +336,9 @@ class CityMapDashboardSystem {
   ) {
     const raw =
       districtSystem.getAll();
+
+    const storeCounts =
+      this.getStoreDistrictCounts();
 
     return marketplace
       .districts
@@ -255,12 +354,6 @@ class CityMapDashboardSystem {
                 district.id
             ) ??
             district;
-
-          const position =
-            this.getDistrictPosition(
-              source,
-              index
-            );
 
           const properties =
             marketplace.properties
@@ -290,10 +383,34 @@ class CityMapDashboardSystem {
                 )
               : 0;
 
+          const opportunityScore =
+            districtSystem
+              .getOpportunityScore(
+                source
+              );
+
+          const openStoreCount =
+            storeCounts.get(
+              district.id
+            ) ??
+            0;
+
+          const locked =
+            source.unlocked ===
+              false ||
+            source.locked ===
+              true ||
+            source.isLocked ===
+              true;
+
           return {
             ...district,
 
-            position,
+            position:
+              this.getDistrictPosition(
+                source,
+                index
+              ),
 
             averageRent,
 
@@ -308,63 +425,35 @@ class CityMapDashboardSystem {
 
             recommendedPropertyName:
               properties[0]?.name ??
-              null
+              null,
+
+            openStoreCount,
+
+            hasOpenStore:
+              openStoreCount >
+              0,
+
+            opportunityScore,
+
+            highPotential:
+              opportunityScore >=
+              70,
+
+            locked,
+
+            deliveryDemand:
+              source.deliveryDemand ??
+              district.deliveryDemand ??
+              50
           };
         }
-      );
-  }
-
-
-  getHomeMapDistricts(
-    districts
-  ) {
-    const byId =
-      new Map(
-        districts.map(
-          item => [
-            item.id,
-            item
-          ]
-        )
-      );
-
-    return HOME_MAP_DISTRICT_LAYOUT
-      .map(
-        layout => {
-          const district =
-            byId.get(
-              layout.id
-            );
-
-          if (!district) {
-            return null;
-          }
-
-          return {
-            ...district,
-
-            position: {
-              x:
-                layout.x,
-
-              y:
-                layout.y,
-
-              source:
-                "city-home-layout"
-            }
-          };
-        }
-      )
-      .filter(
-        Boolean
       );
   }
 
 
   getRecommendedProperties(
     marketplace,
-    limit = 6
+    limit = 9
   ) {
     return marketplace
       .properties
@@ -525,6 +614,125 @@ class CityMapDashboardSystem {
   }
 
 
+  getFilterCounts(
+    districts
+  ) {
+    return {
+      all:
+        districts.length,
+
+      opened:
+        districts.filter(
+          item =>
+            item.hasOpenStore
+        ).length,
+
+      available:
+        districts.filter(
+          item =>
+            !item.locked &&
+            item.propertyCount >
+            0
+        ).length,
+
+      potential:
+        districts.filter(
+          item =>
+            !item.locked &&
+            item.highPotential
+        ).length,
+
+      locked:
+        districts.filter(
+          item =>
+            item.locked
+        ).length
+    };
+  }
+
+
+  getOpportunities(
+    properties,
+    selectedDistrictId
+  ) {
+    return [
+      ...properties
+    ]
+      .sort(
+        (
+          a,
+          b
+        ) => {
+          const selectedA =
+            a.districtId ===
+            selectedDistrictId
+              ? 1
+              : 0;
+
+          const selectedB =
+            b.districtId ===
+            selectedDistrictId
+              ? 1
+              : 0;
+
+          if (
+            selectedA !==
+            selectedB
+          ) {
+            return (
+              selectedB -
+              selectedA
+            );
+          }
+
+          return (
+            (
+              b.qualityScore ??
+              0
+            ) -
+            (
+              a.qualityScore ??
+              0
+            )
+          );
+        }
+      )
+      .slice(
+        0,
+        6
+      )
+      .map(
+        item => ({
+          ...item,
+
+          tag:
+            (
+              item.qualityScore ??
+              0
+            ) >=
+            80
+              ? "高潜力"
+              : item.affordable
+                ? "可选址"
+                : "关注",
+
+          description:
+            item.districtName +
+            " · " +
+            item.area +
+            "㎡ · " +
+            Math.round(
+              item.monthlyRent ??
+              0
+            ).toLocaleString(
+              "zh-CN"
+            ) +
+            "元/月"
+        })
+      );
+  }
+
+
   getPage({
     restaurantId = null,
     selectedDistrictId = null
@@ -549,31 +757,35 @@ class CityMapDashboardSystem {
         marketplace
       );
 
-    const homeMapDistricts =
-      this.getHomeMapDistricts(
-        districts
-      );
-
     const selectedDistrict =
       districts.find(
         item =>
           item.id ===
-          selectedDistrictId
+          selectedDistrictId &&
+          !item.locked
       ) ??
-      homeMapDistricts[0] ??
+      districts.find(
+        item =>
+          !item.locked
+      ) ??
       districts[0] ??
       null;
 
     const recommended =
       this.getRecommendedProperties(
         marketplace,
-        6
+        9
       );
+
+    const allRestaurants =
+      restaurantSystem.list();
 
     const restaurant =
       safeRestaurant(
         restaurantId
-      );
+      ) ??
+      allRestaurants[0] ??
+      null;
 
     const time =
       gameState.getSection(
@@ -585,10 +797,26 @@ class CityMapDashboardSystem {
         "runtime"
       );
 
-    const balance =
-      safeBalance(
-        restaurantId
-      );
+    const groupBalance =
+      allRestaurants.length >
+      0
+        ? allRestaurants.reduce(
+            (
+              sum,
+              item
+            ) =>
+              sum +
+              safeBalance(
+                item.id
+              ),
+            0
+          )
+        : safeBalance(
+            restaurantId
+          );
+
+    const notices =
+      [];
 
     const urgentProperties =
       marketplace
@@ -606,8 +834,6 @@ class CityMapDashboardSystem {
               3
         );
 
-    const notices = [];
-
     if (
       urgentProperties.length >
       0
@@ -623,7 +849,8 @@ class CityMapDashboardSystem {
           "房源动态",
 
         message:
-          `${urgentProperties.length}套热门铺位将在3天内面临抢租风险`,
+          urgentProperties.length +
+          "套热门铺位将在3天内面临抢租风险",
 
         priority:
           100,
@@ -644,7 +871,11 @@ class CityMapDashboardSystem {
         "城市市场",
 
       message:
-        `当前开放${districts.length}个商圈，共${marketplace.properties.length}套可租房源`,
+        "当前开放" +
+        districts.length +
+        "个商圈，共" +
+        marketplace.properties.length +
+        "套可租房源",
 
       priority:
         30,
@@ -659,33 +890,114 @@ class CityMapDashboardSystem {
         marketplace
       );
 
+    const baseTopBar =
+      buildGlobalTopBarModel({
+        restaurantName:
+          restaurant?.name ??
+          "城市餐饮创业",
+
+        brandName:
+          "集团视角",
+
+        balance:
+          groupBalance,
+
+        storeLevel:
+          Math.max(
+            1,
+            ...allRestaurants.map(
+              item =>
+                item.level ??
+                1
+            )
+          ),
+
+        reputation:
+          restaurant?.reputation ??
+          0,
+
+        time,
+
+        runtime,
+
+        currentStoreId:
+          restaurant?.id ??
+          null,
+
+        stores:
+          allRestaurants
+            .map(
+              item => ({
+                id:
+                  item.id,
+
+                name:
+                  item.name
+              })
+            )
+      });
+
+    const averageRating =
+      allRestaurants.length >
+      0
+        ? allRestaurants.reduce(
+            (
+              sum,
+              item
+            ) =>
+              sum +
+              (
+                Number(
+                  item.reviewScore
+                ) ||
+                0
+              ),
+            0
+          ) /
+          allRestaurants.length
+        : (
+            Number(
+              restaurant?.reviewScore
+            ) ||
+            0
+          );
+
     return {
       pageId:
         "city",
 
-      topBar:
-        buildGlobalTopBarModel({
-          restaurantName:
-            restaurant?.name ??
-            "城市餐饮创业",
+      topBar: {
+        ...baseTopBar,
 
-          balance,
+        brandName:
+          "集团视角",
 
-          storeLevel:
-            restaurant?.level ??
-            1,
+        rating:
+          averageRating,
 
-          reputation:
-            restaurant?.reputation ??
+        scope: {
+          ...baseTopBar.scope,
+
+          type:
+            "group",
+
+          canSwitch:
+            allRestaurants.length >
             0,
 
-          time,
+          stores:
+            allRestaurants
+              .map(
+                item => ({
+                  id:
+                    item.id,
 
-          runtime,
-
-          currentStoreId:
-            restaurantId
-        }),
+                  name:
+                    item.name
+                })
+              )
+        }
+      },
 
       noticeTicker:
         buildNoticeTickerModel(
@@ -697,8 +1009,7 @@ class CityMapDashboardSystem {
           selectedDistrict?.id ??
           null,
 
-        districts:
-          homeMapDistricts,
+        districts,
 
         totalDistrictCount:
           districts.length
@@ -707,27 +1018,22 @@ class CityMapDashboardSystem {
       citySummary:
         summary,
 
+      filterCounts:
+        this.getFilterCounts(
+          districts
+        ),
+
       selectedDistrict,
 
       recommendedProperties:
         recommended,
 
-      filters: {
-        areaMin:
-          30,
-
-        areaMax:
-          10000,
-
-        rentMax:
-          null,
-
-        foodService:
-          false,
-
-        exhaust:
-          false
-      },
+      opportunities:
+        this.getOpportunities(
+          recommended,
+          selectedDistrict?.id ??
+          null
+        ),
 
       navigation:
         marketplace
