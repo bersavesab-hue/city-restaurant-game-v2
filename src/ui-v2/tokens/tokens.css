@@ -46,58 +46,58 @@
   --ui-font-body: 14px;
   --ui-font-label: 14px;
   --ui-font-card-title: 18px;
-  --ui-font-section-title: 18px;
+  --ui-font-section-title: 14px;
   --ui-font-title-small: 20px;
   --ui-font-title: 24px;
   --ui-font-display: 32px;
 
-  --ui-font-hud-title: 15px;
-  --ui-font-hud-subtitle: 11px;
-  --ui-font-hud-date: 11px;
-  --ui-font-hud-time: 22px;
-  --ui-font-hud-value: 16px;
-  --ui-font-hud-level: 14px;
-  --ui-font-hud-speed: 12px;
+  --ui-font-hud-title: 12px;
+  --ui-font-hud-subtitle: 9px;
+  --ui-font-hud-date: 9px;
+  --ui-font-hud-time: 16px;
+  --ui-font-hud-value: 12px;
+  --ui-font-hud-level: 11px;
+  --ui-font-hud-speed: 10px;
 
   --ui-font-page-title:
     clamp(
-      28px,
-      7.2vw,
-      34px
+      22px,
+      5.8vw,
+      26px
     );
   --ui-font-page-subtitle:
     clamp(
-      12px,
-      3.2vw,
-      15px
+      10px,
+      2.8vw,
+      12px
     );
-  --ui-font-summary-value: 14px;
-  --ui-font-summary-caption: 11px;
+  --ui-font-summary-value: 13px;
+  --ui-font-summary-caption: 9px;
   --ui-font-filter:
     clamp(
-      12px,
-      3.25vw,
-      15px
+      10px,
+      2.8vw,
+      12px
     );
-  --ui-font-marker-title: 13px;
-  --ui-font-marker-meta: 10px;
+  --ui-font-marker-title: 11px;
+  --ui-font-marker-meta: 9px;
   --ui-font-detail-title:
     clamp(
-      20px,
-      5.4vw,
-      24px
+      15px,
+      4vw,
+      18px
     );
-  --ui-font-detail-body: 12px;
-  --ui-font-detail-button: 15px;
-  --ui-font-metric-label: 10px;
+  --ui-font-detail-body: 10px;
+  --ui-font-detail-button: 13px;
+  --ui-font-metric-label: 9px;
   --ui-font-metric-value:
     clamp(
-      13px,
-      3.4vw,
-      17px
+      11px,
+      3vw,
+      13px
     );
   --ui-font-metric-trend: 9px;
-  --ui-font-opportunity-title: 11px;
+  --ui-font-opportunity-title: 10px;
   --ui-font-opportunity-body: 9px;
   --ui-font-nav-label: 13px;
 
@@ -130,19 +130,19 @@
   --ui-hit-comfortable: 52px;
 
   --ui-page-gutter: 16px;
-  --ui-hud-height: 78px;
-  --ui-nav-height: 76px;
+  --ui-hud-height: 52px;
+  --ui-nav-height: 74px;
   --ui-nav-rail-width: 88px;
   --ui-content-max-width: 960px;
 
-  --ui-city-hero-min-height: 124px;
-  --ui-city-filter-height: 56px;
-  --ui-city-map-min-height: 390px;
-  --ui-city-map-control-size: 52px;
-  --ui-city-marker-icon-size: 38px;
-  --ui-city-detail-thumb-size: 116px;
-  --ui-city-metric-min-height: 76px;
-  --ui-city-opportunity-min-height: 90px;
+  --ui-city-hero-min-height: 68px;
+  --ui-city-filter-height: 48px;
+  --ui-city-map-min-height: 160px;
+  --ui-city-map-control-size: 48px;
+  --ui-city-marker-icon-size: 28px;
+  --ui-city-detail-thumb-size: 64px;
+  --ui-city-metric-min-height: 52px;
+  --ui-city-opportunity-min-height: 52px;
 
   --ui-native-safe-top: 0px;
   --ui-native-safe-right: 0px;
@@ -188,33 +188,33 @@
 
 @media (max-width: 399px) {
   :root {
-    --ui-hud-height: 104px;
-    --ui-nav-height: 74px;
+    --ui-hud-height: 88px;
+    --ui-nav-height: 72px;
     --ui-page-gutter: 10px;
-    --ui-city-hero-min-height: 118px;
-    --ui-city-filter-height: 52px;
-    --ui-city-map-min-height: 360px;
-    --ui-city-detail-thumb-size: 104px;
+    --ui-city-hero-min-height: 64px;
+    --ui-city-filter-height: 46px;
+    --ui-city-map-min-height: 150px;
+    --ui-city-detail-thumb-size: 60px;
   }
 }
 
 @media (min-width: 600px) {
   :root {
-    --ui-page-gutter: 24px;
-    --ui-hud-height: 80px;
-    --ui-nav-height: 80px;
+    --ui-page-gutter: 20px;
+    --ui-hud-height: 58px;
+    --ui-nav-height: 78px;
     --ui-content-max-width: 1120px;
 
-    --ui-font-hud-title: 16px;
-    --ui-font-hud-subtitle: 12px;
-    --ui-font-hud-time: 23px;
-    --ui-font-hud-value: 17px;
+    --ui-font-hud-title: 13px;
+    --ui-font-hud-subtitle: 10px;
+    --ui-font-hud-time: 17px;
+    --ui-font-hud-value: 13px;
     --ui-font-nav-label: 14px;
 
-    --ui-city-hero-min-height: 132px;
-    --ui-city-filter-height: 60px;
-    --ui-city-map-min-height: 500px;
-    --ui-city-detail-thumb-size: 132px;
+    --ui-city-hero-min-height: 72px;
+    --ui-city-filter-height: 50px;
+    --ui-city-map-min-height: 220px;
+    --ui-city-detail-thumb-size: 70px;
   }
 }
 
