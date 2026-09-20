@@ -1,7 +1,10 @@
 package com.cityrestaurant.game;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.WindowInsets;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -15,6 +18,31 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         gameView = new WebView(this);
+        gameView.setBackgroundColor(
+                Color.rgb(4, 75, 145)
+        );
+
+        gameView.setOnApplyWindowInsetsListener(
+                (view, insets) -> {
+                    int top;
+                    int bottom;
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        android.graphics.Insets bars =
+                                insets.getInsets(
+                                        WindowInsets.Type.systemBars()
+                                );
+                        top = bars.top;
+                        bottom = bars.bottom;
+                    } else {
+                        top = insets.getSystemWindowInsetTop();
+                        bottom = insets.getSystemWindowInsetBottom();
+                    }
+
+                    view.setPadding(0, top, 0, bottom);
+                    return insets;
+                }
+        );
 
         WebSettings settings =
                 gameView.getSettings();

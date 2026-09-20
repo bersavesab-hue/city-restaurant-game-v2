@@ -73,7 +73,7 @@ test(
 
 
 test(
-  "城市与房源正式页使用统一标题和公告",
+  "城市首页使用新版主视觉，房源页保留统一标题",
   () => {
     const city =
       read(
@@ -90,20 +90,19 @@ test(
         "../src/ui/pages/city/PropertyDetailView.js"
       );
 
-    for (
-      const source
-      of [
-        city,
-        properties,
-        detail
-      ]
-    ) {
+    for (const source of [city, properties, detail]) {
       assert.ok(
         source.includes(
           "renderNoticeTicker"
         )
       );
+    }
 
+    assert.ok(city.includes("city-home-hero"));
+    assert.ok(city.includes("城市发展"));
+    assert.ok(!city.includes("renderPageTitle"));
+
+    for (const source of [properties, detail]) {
       assert.ok(
         source.includes(
           "renderPageTitle"

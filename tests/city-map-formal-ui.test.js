@@ -7,7 +7,7 @@ import {
 
 
 test(
-  "城市正式主页包含地图槽位商圈针与房源入口",
+  "城市正式主页使用唯一成稿结构与本地直连地图",
   () => {
     const root = {
       addEventListener() {},
@@ -314,20 +314,23 @@ test(
       );
 
     const expected = [
-      "商圈与房源",
+      "城市发展",
       "开放商圈",
       "可租房源",
-      "城市地图底图",
+      "城市发展地图",
       "东门商圈",
       "大学城商圈",
-      "当前商圈",
       "客流",
       "消费力",
-      "竞争",
-      "客群结构",
-      "今日推荐房源",
-      "东门临街旺铺",
-      "查看房源详情",
+      "城市发展推荐",
+      "前往考察",
+      "商圈地图",
+      "房源推荐",
+      "客流分析",
+      "周边竞店",
+      "城区扩展",
+      "营销活动",
+      "城市小贴士",
       "城市",
       "门店",
       "经营",
@@ -348,15 +351,11 @@ test(
 
     assert.ok(
       html.includes(
-        'data-image-slot="city-main-map"'
+        'class="city-map-artwork city-image-slot--map"'
       )
     );
 
-    assert.ok(
-      html.includes(
-        'data-image-slot="property-p1"'
-      )
-    );
+    assert.equal(html.includes("data-image-slot="), false);
 
     assert.ok(
       html.includes(

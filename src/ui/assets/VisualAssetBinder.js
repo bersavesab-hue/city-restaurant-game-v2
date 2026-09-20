@@ -110,21 +110,6 @@ export function getSlotAssetCandidates(
     );
   }
 
-  if (
-    slot ===
-    "city-main-map"
-  ) {
-    candidates.push(
-      ...withExtensions(
-        "assets/images/ui/city/city-main-map"
-      )
-    );
-
-    return unique(
-      candidates
-    );
-  }
-
   if (slot === "store-home-hero") {
     candidates.push(
       "assets/images/ui/store-home/hero/store-hero.webp"

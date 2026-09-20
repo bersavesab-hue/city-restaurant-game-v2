@@ -93,9 +93,6 @@ export const VISUAL_SLOT_SPEC_MAP =
     "store-home-hero":
       "commandCenterHero",
 
-    "city-main-map":
-      "cityMap",
-
     "renovation-construction-site":
       "renovationConstruction"
   });

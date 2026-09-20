@@ -433,8 +433,8 @@ class CityMapDashboardSystem {
               .exhaustAllowed !==
             false,
 
-          imageSlot:
-            `property-${property.id}`
+          propertyStatus:
+            "available"
         })
       );
   }
@@ -693,9 +693,6 @@ class CityMapDashboardSystem {
         ),
 
       map: {
-        imageSlot:
-          "city-main-map",
-
         selectedDistrictId:
           selectedDistrict?.id ??
           null,
@@ -731,35 +728,6 @@ class CityMapDashboardSystem {
         exhaust:
           false
       },
-
-      imageSlots: [
-        {
-          id:
-            "city-main-map",
-
-          type:
-            "city-map",
-
-          static:
-            true
-        },
-
-        ...recommended.map(
-          property => ({
-            id:
-              property.imageSlot,
-
-            type:
-              "property",
-
-            static:
-              true,
-
-            entityId:
-              property.id
-          })
-        )
-      ],
 
       navigation:
         marketplace
