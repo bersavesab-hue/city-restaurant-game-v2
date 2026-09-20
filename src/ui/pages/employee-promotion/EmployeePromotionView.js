@@ -485,7 +485,7 @@ class EmployeePromotionView {
                   "查看编制",
 
                 actionTarget:
-                  "employee_roster"
+                  "employees"
               })}
 
 
@@ -525,7 +525,7 @@ class EmployeePromotionView {
 
                           <button
                             type="button"
-                            data-page-target="employee_roster"
+                            data-page-target="employees"
                           >
                             ${
                               item.vacancy >

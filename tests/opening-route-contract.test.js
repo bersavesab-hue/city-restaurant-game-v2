@@ -38,13 +38,13 @@ test(
   () => {
     assert.match(
       openingFlowSource,
-      /hasOpened[\s\S]*?"operating-command-center"/
+      /hasOpened[\s\S]*?"restaurant"/
     );
 
 
     assert.match(
       openingPageSource,
-      /nextPage:\s*"operating-command-center"/
+      /nextPage:\s*"restaurant"/
     );
   }
 );

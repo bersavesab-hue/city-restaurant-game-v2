@@ -323,7 +323,7 @@ class OpeningSetupPageSystem {
         ),
 
       nextPage:
-        "operating-command-center"
+        "restaurant"
     };
   }
 }

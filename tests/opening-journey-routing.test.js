@@ -188,7 +188,7 @@ test(
       system.getRecommendedPage(
         "restaurant"
       ),
-      "operating-command-center"
+      "restaurant"
     );
   }
 );
