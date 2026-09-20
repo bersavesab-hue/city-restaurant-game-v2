@@ -73,7 +73,7 @@ test(
 
 
 test(
-  "城市首页使用新版主视觉，房源页保留统一标题",
+  "城市首页使用确认版地图结构，房源页保留统一标题",
   () => {
     const city =
       read(
@@ -98,8 +98,10 @@ test(
       );
     }
 
-    assert.ok(city.includes("city-home-hero"));
-    assert.ok(city.includes("城市发展"));
+    assert.ok(city.includes("city-map-heading"));
+    assert.ok(city.includes("城市地图"));
+    assert.ok(city.includes("city-map-filters"));
+    assert.ok(city.includes("city-district-sheet"));
     assert.ok(!city.includes("renderPageTitle"));
 
     for (const source of [properties, detail]) {
