@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.9.1 - 2026-09-21
+
+- UI重建第一步完成：建立唯一新目录src/ui-v2，旧src/ui继续保持不存在；当前不创建城市、门店、经营、员工、更多任何正式页面。
+- 锁定UI Design System 1.0：设计稿统一以864×1536竖屏为视觉基准，但明确禁止运行时整页缩放到该分辨率。
+- 建立唯一AppShell契约：Safe Top / Global HUD / Page Content / Global Nav / Safe Bottom五层；HUD和Nav独占布局行，中间Page Content自动吸收不同手机高度差。
+- 建立三档竖屏适配规则：height/width >=2.1为窄长屏，1.9–2.1为普通手机，<1.9为宽屏手机/平板；横屏单独识别但不作为第一版主布局。
+- 建立统一设计Token：蓝金主色、系统字体、4/8/12/16/20/24/32间距、8/12/16/20圆角、44px最小点击区、48px舒适点击区。
+- 明确禁止fixed底栏、整页transform:scale、纵向百分比强切100%、关键金额/数量省略号截断、页面自建第二套HUD/Nav和图片非等比拉伸。
+- 新增UI_DESIGN_SYSTEM_V1.md与ui-v2-design-system自动契约测试，后续一级页面必须遵循同一规范。
+- 清除android/app/build.gradle中0.8.x遗留的旧图片过滤任务，避免未来新资源接入后被历史脚本误删。
+- 版本提升至0.9.1 (901)。
+
 ## 0.9.0 - 2026-09-21
 
 - UI正式归零：物理删除整个src/ui目录，旧页面、旧View、旧PageSystem、旧导航、旧页面注册表、旧CSS主题、旧AndroidPlaytestEntry与FormalPageRuntime全部不再保留。

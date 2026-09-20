@@ -1,0 +1,165 @@
+.ui-v2-app {
+  width:
+    100%;
+  height:
+    100%;
+  height:
+    100dvh;
+  min-width:
+    320px;
+  min-height:
+    568px;
+  margin:
+    0;
+  overflow:
+    hidden;
+  color:
+    var(--ui-text);
+  background:
+    var(--ui-surface-soft);
+  font-family:
+    var(--ui-font-family);
+  -webkit-text-size-adjust:
+    100%;
+  text-size-adjust:
+    100%;
+}
+
+.ui-v2-app-shell {
+  width:
+    100%;
+  height:
+    100%;
+  display:
+    grid;
+  grid-template-rows:
+    var(--ui-safe-top)
+    var(--ui-hud-height)
+    minmax(0,1fr)
+    var(--ui-nav-height)
+    var(--ui-safe-bottom);
+  padding-inline:
+    var(--ui-safe-left)
+    var(--ui-safe-right);
+  overflow:
+    hidden;
+}
+
+.ui-v2-global-hud {
+  grid-row:
+    2;
+  min-width:
+    0;
+  min-height:
+    0;
+}
+
+.ui-v2-page-content {
+  grid-row:
+    3;
+  min-width:
+    0;
+  min-height:
+    0;
+  width:
+    min(
+      100%,
+      var(--ui-content-max-width)
+    );
+  margin-inline:
+    auto;
+  overflow:
+    auto;
+  overscroll-behavior:
+    contain;
+}
+
+.ui-v2-global-nav {
+  grid-row:
+    4;
+  min-width:
+    0;
+  min-height:
+    0;
+}
+
+.ui-v2-hit-target {
+  min-width:
+    var(--ui-hit-min);
+  min-height:
+    var(--ui-hit-min);
+}
+
+.ui-v2-no-truncate-number {
+  white-space:
+    nowrap;
+  overflow:
+    visible;
+  text-overflow:
+    clip;
+  font-variant-numeric:
+    tabular-nums;
+}
+
+/*
+ * 窄长屏只压缩留白，不压缩点击区域，不改变HUD/Nav结构。
+ * 中间PageContent吸收额外或不足的纵向空间。
+ */
+@media (
+  max-aspect-ratio:
+  10 / 21
+) {
+  :root {
+    --ui-page-gutter:
+      12px;
+
+    --ui-hud-height:
+      clamp(
+        56px,
+        15vw,
+        64px
+      );
+
+    --ui-nav-height:
+      clamp(
+        64px,
+        17vw,
+        72px
+      );
+  }
+}
+
+/*
+ * 宽屏手机与平板增加两侧留白；页面内容本身不被整页放大。
+ */
+@media (
+  min-aspect-ratio:
+  10 / 19
+) {
+  :root {
+    --ui-page-gutter:
+      clamp(
+        20px,
+        5vw,
+        36px
+      );
+  }
+}
+
+/*
+ * 横屏不是当前正式游玩方向，但保持核心区域可见，
+ * 不使用强制旋转或整体拉伸。
+ */
+@media (
+  orientation:
+  landscape
+) {
+  .ui-v2-app-shell {
+    grid-template-rows:
+      var(--ui-safe-top)
+      56px
+      minmax(0,1fr)
+      64px
+      var(--ui-safe-bottom);
+  }
+}
