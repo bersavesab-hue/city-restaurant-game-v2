@@ -64,7 +64,7 @@ function formatCompactMoney(
     return (
       "¥" +
       (
-        wan >= 100
+        wan >= 1000
           ? Math.round(
               wan
             )
