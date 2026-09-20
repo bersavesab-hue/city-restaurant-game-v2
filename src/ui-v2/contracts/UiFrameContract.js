@@ -51,10 +51,22 @@ const UI_BOXES =
         height: 68
       }),
 
-    hudAction:
+    hudWeather:
+      Object.freeze({
+        width: 36,
+        height: 36
+      }),
+
+    hudSpeedAction:
       Object.freeze({
         width: 40,
         height: 40
+      }),
+
+    hudResourceAction:
+      Object.freeze({
+        width: 32,
+        height: 32
       }),
 
     hudIcon:
@@ -89,7 +101,7 @@ const UI_BOXES =
 
     mapMarker:
       Object.freeze({
-        width: 160,
+        width: 176,
         height: 60
       }),
 
@@ -103,6 +115,18 @@ const UI_BOXES =
       Object.freeze({
         width: 54,
         height: 54
+      }),
+
+    detailHandle:
+      Object.freeze({
+        width: 48,
+        height: 4
+      }),
+
+    detailClose:
+      Object.freeze({
+        width: 28,
+        height: 28
       }),
 
     detailThumbnail:
@@ -154,6 +178,251 @@ const UI_BOXES =
       })
   });
 
+const UI_PLACEMENTS =
+  Object.freeze({
+    hud:
+      Object.freeze({
+        identity:
+          Object.freeze({
+            x: 12,
+            y: 17,
+            width: 211,
+            height: 69
+          }),
+
+        simulation:
+          Object.freeze({
+            x: 231,
+            y: 17,
+            width: 298,
+            height: 69
+          }),
+
+        resources:
+          Object.freeze({
+            x: 537,
+            y: 17,
+            width: 142,
+            height: 69
+          })
+      }),
+
+    hero:
+      Object.freeze({
+        icon:
+          Object.freeze({
+            x: 20,
+            y: 35
+          }),
+
+        copy:
+          Object.freeze({
+            x: 73,
+            y: 26,
+            width: 370,
+            height: 78
+          }),
+
+        summary:
+          Object.freeze({
+            x: 461,
+            y: 35,
+            width: 218,
+            height: 79
+          })
+      }),
+
+    filters:
+      Object.freeze({
+        x: 12,
+        y: 5,
+        width: 667,
+        height: 48,
+        gap: 4
+      }),
+
+    map:
+      Object.freeze({
+        markers:
+          Object.freeze({
+            university:
+              Object.freeze({
+                x: 366,
+                y: 79
+              }),
+
+            cbd:
+              Object.freeze({
+                x: 276,
+                y: 193
+              }),
+
+            nightlife:
+              Object.freeze({
+                x: 553,
+                y: 243
+              }),
+
+            oldTown:
+              Object.freeze({
+                x: 152,
+                y: 458
+              }),
+
+            waterfront:
+              Object.freeze({
+                x: 511,
+                y: 501
+              })
+          }),
+
+        controls:
+          Object.freeze({
+            x: 625,
+            y: 507,
+            width: 54,
+            height: 180,
+            gap: 9
+          })
+      }),
+
+    detail:
+      Object.freeze({
+        handle:
+          Object.freeze({
+            x: 321,
+            y: 7,
+            width: 48,
+            height: 4
+          }),
+
+        close:
+          Object.freeze({
+            x: 648,
+            y: 9,
+            width: 28,
+            height: 28
+          }),
+
+        thumbnail:
+          Object.freeze({
+            x: 20,
+            y: 22,
+            width: 110,
+            height: 90
+          }),
+
+        copy:
+          Object.freeze({
+            x: 145,
+            y: 23,
+            width: 314,
+            height: 86
+          }),
+
+        primaryAction:
+          Object.freeze({
+            x: 479,
+            y: 31,
+            width: 184,
+            height: 68
+          }),
+
+        metrics:
+          Object.freeze({
+            x: 18,
+            y: 119,
+            width: 655,
+            height: 112,
+            gap: 4
+          }),
+
+        opportunityHeader:
+          Object.freeze({
+            x: 18,
+            y: 242,
+            width: 655,
+            height: 34
+          }),
+
+        opportunities:
+          Object.freeze({
+            x: 18,
+            y: 284,
+            width: 655,
+            height: 86,
+            gap: 8
+          })
+      }),
+
+    navigation:
+      Object.freeze({
+        iconY: 22,
+        labelY: 88,
+        activeInsetX: 14,
+        activeInsetY: 8,
+        activeWidth: 110,
+        activeHeight: 121
+      })
+  });
+
+const UI_TEXT_SLOTS =
+  Object.freeze({
+    hudIdentityTitle:
+      Object.freeze({
+        x: 88,
+        y: 27,
+        width: 130,
+        height: 25
+      }),
+
+    hudIdentitySubtitle:
+      Object.freeze({
+        x: 88,
+        y: 57,
+        width: 130,
+        height: 18
+      }),
+
+    heroTitle:
+      Object.freeze({
+        x: 73,
+        y: 26,
+        width: 370,
+        height: 42
+      }),
+
+    heroSubtitle:
+      Object.freeze({
+        x: 73,
+        y: 77,
+        width: 370,
+        height: 24
+      }),
+
+    detailTitle:
+      Object.freeze({
+        x: 145,
+        y: 23,
+        width: 314,
+        height: 31
+      }),
+
+    detailBody:
+      Object.freeze({
+        x: 145,
+        y: 60,
+        width: 314,
+        height: 43
+      }),
+
+    navLabel:
+      Object.freeze({
+        y: 88,
+        height: 28
+      })
+  });
+
 const UI_TYPOGRAPHY =
   Object.freeze({
     family:
@@ -178,21 +447,21 @@ const UI_TYPOGRAPHY =
       Object.freeze({
         hudPrimary:
           Object.freeze({
-            size: 22,
+            size: 20,
             weight: 800,
             lineHeight: 1.1
           }),
 
         hudSecondary:
           Object.freeze({
-            size: 14,
+            size: 13,
             weight: 600,
             lineHeight: 1.2
           }),
 
         hudTime:
           Object.freeze({
-            size: 28,
+            size: 27,
             weight: 900,
             lineHeight: 1
           }),
@@ -220,7 +489,7 @@ const UI_TYPOGRAPHY =
 
         markerTitle:
           Object.freeze({
-            size: 18,
+            size: 17,
             weight: 900,
             lineHeight: 1.05
           }),
@@ -255,14 +524,14 @@ const UI_TYPOGRAPHY =
 
         metricLabel:
           Object.freeze({
-            size: 14,
+            size: 13,
             weight: 700,
             lineHeight: 1.1
           }),
 
         metricValue:
           Object.freeze({
-            size: 18,
+            size: 17,
             weight: 900,
             lineHeight: 1.05
           }),
@@ -276,14 +545,14 @@ const UI_TYPOGRAPHY =
 
         opportunityTitle:
           Object.freeze({
-            size: 14,
+            size: 13,
             weight: 800,
             lineHeight: 1.1
           }),
 
         opportunityBody:
           Object.freeze({
-            size: 12,
+            size: 11,
             weight: 600,
             lineHeight: 1.25
           }),
@@ -329,6 +598,8 @@ export {
   UI_REFERENCE,
   UI_REGIONS,
   UI_BOXES,
+  UI_PLACEMENTS,
+  UI_TEXT_SLOTS,
   UI_TYPOGRAPHY,
   PRIMARY_NAV_ITEMS
 };
