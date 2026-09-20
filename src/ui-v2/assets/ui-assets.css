@@ -1,0 +1,443 @@
+:root {
+  --ui-asset-shared-atlas:
+    url("ui-v2/shared/shared-ui-atlas.webp");
+  --ui-asset-city-map-atlas:
+    url("ui-v2/city/city-map-atlas.webp");
+  --ui-asset-city-metric-atlas:
+    url("ui-v2/city/city-metric-atlas.webp");
+  --ui-city-map-image:
+    url("ui-v2/city/city-map-master.webp");
+}
+
+/* Shared HUD sprites: 512×512 atlas */
+.ui-v2-hud__avatar-slot {
+  background-image:
+    var(--ui-asset-shared-atlas);
+  background-size:
+    400%
+    400%;
+  background-position:
+    4.1667%
+    4.1667%;
+}
+
+.ui-v2-hud__money-icon {
+  width: 24px;
+  height: 24px;
+  background-image:
+    var(--ui-asset-shared-atlas);
+  background-size:
+    711.111%
+    711.111%;
+  background-position:
+    38.6364%
+    4.5455%;
+}
+
+.ui-v2-hud__money-action-visual {
+  background-color:
+    transparent;
+  background-image:
+    var(--ui-asset-shared-atlas);
+  background-size:
+    711.111%
+    711.111%;
+  background-position:
+    57.2727%
+    4.5455%;
+}
+
+.ui-v2-hud__crown-icon {
+  width: 24px;
+  height: 24px;
+  background-image:
+    var(--ui-asset-shared-atlas);
+  background-size:
+    711.111%
+    711.111%;
+  background-position:
+    75.9091%
+    4.5455%;
+}
+
+.ui-v2-hud__star-icon {
+  width: 20px;
+  height: 20px;
+  background-image:
+    var(--ui-asset-shared-atlas);
+  background-size:
+    711.111%
+    711.111%;
+  background-position:
+    94.5455%
+    4.5455%;
+}
+
+/* Primary navigation: normalized 82×82 sprites */
+.ui-v2-nav__indicator {
+  width: 44px;
+  height: 40px;
+}
+
+.ui-v2-nav__icon-slot {
+  width: 34px;
+  height: 34px;
+  background-image:
+    var(--ui-asset-shared-atlas);
+  background-size:
+    624.3902%
+    624.3902%;
+  background-repeat:
+    no-repeat;
+}
+
+.ui-v2-nav__item[data-ui-destination="city"]
+.ui-v2-nav__icon-slot {
+  background-position:
+    4.1860%
+    41.8605%;
+}
+
+.ui-v2-nav__item[data-ui-destination="store"]
+.ui-v2-nav__icon-slot {
+  background-position:
+    26.5116%
+    41.8605%;
+}
+
+.ui-v2-nav__item[data-ui-destination="operations"]
+.ui-v2-nav__icon-slot {
+  background-position:
+    48.8372%
+    41.8605%;
+}
+
+.ui-v2-nav__item[data-ui-destination="employees"]
+.ui-v2-nav__icon-slot {
+  background-position:
+    71.1628%
+    41.8605%;
+}
+
+.ui-v2-nav__item[data-ui-destination="more"]
+.ui-v2-nav__icon-slot {
+  background-position:
+    93.4884%
+    41.8605%;
+}
+
+.ui-v2-nav__item.is-active
+.ui-v2-nav__indicator {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,226,86,.32),
+      rgba(255,194,25,.16)
+    );
+}
+
+/* City hero + summary */
+.ui-v2-city-hero__map-icon,
+.ui-v2-city-summary-card
+[data-image-slot="district-count"],
+.ui-v2-city-summary-card
+[data-image-slot="opened-store-count"] {
+  background-image:
+    var(--ui-asset-shared-atlas);
+  background-repeat:
+    no-repeat;
+}
+
+.ui-v2-city-hero__map-icon,
+.ui-v2-city-summary-card
+[data-image-slot="district-count"] {
+  background-size:
+    624.3902%
+    624.3902%;
+  background-position:
+    4.1860%
+    41.8605%;
+}
+
+.ui-v2-city-summary-card
+[data-image-slot="opened-store-count"] {
+  background-size:
+    624.3902%
+    624.3902%;
+  background-position:
+    26.5116%
+    41.8605%;
+}
+
+/* City map control sprites: 1024×768 atlas, 96×96 cells */
+.ui-v2-city-map-control {
+  border: 0;
+  background-color:
+    transparent;
+  background-image:
+    var(--ui-asset-city-map-atlas);
+  background-size:
+    1066.6667%
+    800%;
+  background-repeat:
+    no-repeat;
+  box-shadow:
+    none;
+}
+
+.ui-v2-city-map-control
+[data-image-slot] {
+  display: none;
+}
+
+.ui-v2-city-map-control[data-city-map-action="zoom-in"] {
+  background-position:
+    1.7241%
+    2.3810%;
+}
+
+.ui-v2-city-map-control[data-city-map-action="zoom-out"] {
+  background-position:
+    13.7931%
+    2.3810%;
+}
+
+.ui-v2-city-map-control[data-city-map-action="locate"] {
+  background-position:
+    25.8621%
+    2.3810%;
+}
+
+/* Four art overlays give the approved map its color-zoned hierarchy. */
+.ui-v2-city-region-overlays {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ui-v2-city-region-art {
+  position: absolute;
+  width:
+    clamp(
+      132px,
+      36%,
+      228px
+    );
+  aspect-ratio:
+    1;
+  opacity: .82;
+  background-image:
+    var(--ui-asset-city-map-atlas);
+  background-size:
+    465.4545%
+    349.0909%;
+  background-repeat:
+    no-repeat;
+  filter:
+    drop-shadow(
+      0
+      0
+      5px
+      rgba(255,255,255,.28)
+    );
+}
+
+.ui-v2-city-region-art.is-campus {
+  left: 34%;
+  top: 5%;
+  background-position:
+    94.5274%
+    91.2409%;
+}
+
+.ui-v2-city-region-art.is-core {
+  left: 7%;
+  top: 33%;
+  background-position:
+    1.9900%
+    91.2409%;
+}
+
+.ui-v2-city-region-art.is-nightlife {
+  right: 2%;
+  top: 34%;
+  background-position:
+    63.6816%
+    91.2409%;
+}
+
+.ui-v2-city-region-art.is-lifestyle {
+  left: 7%;
+  top: 62%;
+  background-position:
+    32.8358%
+    91.2409%;
+}
+
+/* Approved speech-frame art. */
+.ui-v2-city-marker {
+  width:
+    clamp(
+      146px,
+      41vw,
+      176px
+    );
+  min-height: 0;
+  aspect-ratio:
+    2.2;
+  grid-template-columns:
+    34px
+    minmax(0,1fr);
+  gap:
+    6px;
+  padding:
+    8px
+    12px
+    14px
+    9px;
+  border: 0;
+  border-radius: 0;
+  background-color:
+    transparent;
+  background-image:
+    var(--ui-asset-city-map-atlas);
+  background-size:
+    310.3030%
+    512%;
+  background-repeat:
+    no-repeat;
+  box-shadow:
+    none;
+}
+
+.ui-v2-city-marker.theme-yellow {
+  background-position:
+    2.3055%
+    22.6537%;
+}
+
+.ui-v2-city-marker.theme-green {
+  background-position:
+    54.1787%
+    22.6537%;
+}
+
+.ui-v2-city-marker.theme-pink {
+  background-position:
+    2.3055%
+    50.1618%;
+}
+
+.ui-v2-city-marker.theme-blue {
+  background-position:
+    54.1787%
+    50.1618%;
+}
+
+.ui-v2-city-marker.is-locked {
+  opacity: .76;
+  filter:
+    grayscale(.82);
+}
+
+.ui-v2-city-marker.is-selected {
+  z-index: 5;
+  transform:
+    translate(
+      -50%,
+      -50%
+    )
+    scale(1.055);
+  filter:
+    brightness(1.06)
+    drop-shadow(
+      0
+      6px
+      9px
+      rgba(5,46,77,.25)
+    );
+}
+
+.ui-v2-city-marker__icon {
+  width: 32px;
+  height: 32px;
+  align-self: center;
+  box-shadow:
+    inset 0 0 0 2px
+    rgba(255,255,255,.72);
+}
+
+/* City detail metric sprites: 512×256 atlas, 72×72 cells */
+.ui-v2-city-metric__icon {
+  background-image:
+    var(--ui-asset-city-metric-atlas);
+  background-size:
+    711.1111%
+    355.5556%;
+  background-repeat:
+    no-repeat;
+}
+
+.ui-v2-city-metric__icon[data-image-key="traffic"] {
+  background-position:
+    3.6364%
+    8.6957%;
+}
+
+.ui-v2-city-metric__icon[data-image-key="spending"] {
+  background-position:
+    22.2727%
+    8.6957%;
+}
+
+.ui-v2-city-metric__icon[data-image-key="rent"] {
+  background-position:
+    40.9091%
+    8.6957%;
+}
+
+.ui-v2-city-metric__icon[data-image-key="competition"] {
+  background-position:
+    59.5455%
+    8.6957%;
+}
+
+.ui-v2-city-metric__icon[data-image-key="delivery"] {
+  background-position:
+    78.1818%
+    8.6957%;
+}
+
+.ui-v2-city-metric__icon[data-image-key="properties"] {
+  background-position:
+    96.8182%
+    8.6957%;
+}
+
+.ui-v2-city-property-button
+[data-image-slot="search-property"] {
+  width: 22px;
+  height: 22px;
+  background-image:
+    var(--ui-asset-city-metric-atlas);
+  background-size:
+    914.2857%
+    457.1429%;
+  background-position:
+    3.5088%
+    60%;
+  background-repeat:
+    no-repeat;
+}
+
+.ui-v2-city-opportunities__icon {
+  background-image:
+    var(--ui-asset-shared-atlas);
+  background-size:
+    711.111%
+    711.111%;
+  background-position:
+    75.9091%
+    4.5455%;
+}
