@@ -12,7 +12,10 @@
       8px,
       var(--ui-safe-right)
     )
-    3px
+    calc(
+      3px +
+      var(--ui-safe-bottom)
+    )
     max(
       8px,
       var(--ui-safe-left)
