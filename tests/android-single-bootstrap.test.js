@@ -74,3 +74,39 @@ test(
     );
   }
 );
+
+
+test(
+  "Android试玩版使用沉浸式全屏避免系统栏压住游戏HUD",
+  () => {
+    const activity =
+      source(
+        "android/app/src/main/java/com/cityrestaurant/game/MainActivity.java"
+      );
+
+    assert.match(
+      activity,
+      /applyImmersiveMode/
+    );
+
+    assert.match(
+      activity,
+      /WindowInsets\.Type\.statusBars/
+    );
+
+    assert.match(
+      activity,
+      /WindowInsets\.Type\.navigationBars/
+    );
+
+    assert.match(
+      activity,
+      /BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE/
+    );
+
+    assert.doesNotMatch(
+      activity,
+      /setOnApplyWindowInsetsListener/
+    );
+  }
+);

@@ -274,7 +274,7 @@ test(
 
 
 test(
-  "集团HUD显示集团范围而不是单店等级声望",
+  "集团HUD按确认稿显示集团范围、等级和评分",
   () => {
     const html =
       renderGameTopBar({
@@ -286,6 +286,9 @@ test(
 
         storeLevel:
           8,
+
+        rating:
+          4.8,
 
         reputation:
           92,
@@ -308,7 +311,19 @@ test(
             "11:30",
 
           dateText:
-            "第12天"
+            "第1年 4月10日 周三",
+
+          paused:
+            false,
+
+          speed:
+            1,
+
+          speedOptions: [
+            1,
+            2,
+            4
+          ]
         },
 
         actions: {
@@ -320,34 +335,25 @@ test(
         }
       });
 
-    assert.ok(
-      html.includes(
-        "美味餐饮集团"
-      )
-    );
+    for (const text of [
+      "美味餐饮集团",
+      "集团视角",
+      "管理旗下 2 家门店",
+      "¥288,000",
+      "Lv.8",
+      "★ 4.8",
+      "11:30"
+    ]) {
+      assert.equal(
+        html.includes(text),
+        true,
+        "集团HUD缺少：" + text
+      );
+    }
 
-    assert.ok(
+    assert.equal(
       html.includes(
         "门店数量"
-      )
-    );
-
-    assert.ok(
-      html.includes(
-        "2家"
-      )
-    );
-
-    assert.equal(
-      html.includes(
-        "Lv.8"
-      ),
-      false
-    );
-
-    assert.equal(
-      html.includes(
-        "声望 92"
       ),
       false
     );
