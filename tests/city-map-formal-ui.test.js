@@ -322,6 +322,18 @@ test(
       );
     }
 
+
+    assert.equal(
+      (
+        html.match(
+          /class="rg-bottom-nav"/g
+        ) ??
+        []
+      ).length,
+      1,
+      "城市一级页只能渲染一个正式底部导航"
+    );
+
     assert.ok(
       html.includes(
         'class="city-map-artwork city-image-slot--map"'

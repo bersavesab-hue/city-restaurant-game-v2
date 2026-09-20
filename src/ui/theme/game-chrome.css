@@ -214,6 +214,33 @@
   background: linear-gradient(180deg,#ffe85e,#ffc91e);
 }
 
+.rg-bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 500;
+  width: min(100%, var(--rg-shell-max));
+  min-height: calc(clamp(64px,15.3vw,132px) + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: repeat(5,minmax(0,1fr));
+  gap: 0;
+  padding:
+    clamp(3px,.55vw,5px)
+    clamp(4px,.8vw,7px)
+    env(safe-area-inset-bottom);
+  transform: translateX(-50%);
+  border-top: 1px solid #42c4fc;
+  background:
+    linear-gradient(
+      180deg,
+      #075fa8 0%,
+      #034987 40%,
+      #022f67 100%
+    );
+  box-shadow:
+    0 -4px 12px rgba(0,47,101,.24);
+}
+
 .rg-bottom-nav > .rg-bottom-nav__item {
   position: relative;
   min-width: 0;

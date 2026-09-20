@@ -29,10 +29,6 @@ import {
 } from "./GameRuntimeLoop.js";
 
 import {
-  cityMapViewportRuntime
-} from "./CityMapViewportRuntime.js";
-
-import {
   formalPageRuntime
 } from "./FormalPageRuntime.js";
 
@@ -567,9 +563,6 @@ function saveNow() {
 
 
 function destroyCurrent() {
-  cityMapViewportRuntime
-    .stop();
-
   if (
     currentView &&
     typeof currentView
@@ -758,11 +751,6 @@ function navigate(
         });
 
       currentView.mount();
-
-      cityMapViewportRuntime
-        .start(
-          root
-        );
 
       return;
     }
