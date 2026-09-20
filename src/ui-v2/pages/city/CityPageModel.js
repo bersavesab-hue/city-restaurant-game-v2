@@ -1,4 +1,4 @@
-const FILTER_IDS =
+import {\n  getCityDistrictVisual\n} from "./CityMapVisualLayout.js";\n\nconst FILTER_IDS =
   Object.freeze([
     "all",
     "opened",
@@ -268,6 +268,17 @@ function buildCityPageModel({
           !locked &&
           score >= 66;
 
+        const visual =
+          getCityDistrictVisual(
+            district.id,
+            {
+              x:
+                district.mapPosition?.x,
+              y:
+                district.mapPosition?.y
+            }
+          );
+
         return {
           id:
             district.id,
@@ -278,7 +289,7 @@ function buildCityPageModel({
           x:
             clamp(
               Number(
-                district.mapPosition?.x
+                visual.x
               ) ||
               50,
               7,
@@ -288,12 +299,18 @@ function buildCityPageModel({
           y:
             clamp(
               Number(
-                district.mapPosition?.y
+                visual.y
               ) ||
               50,
               8,
               90
             ),
+
+          visualTheme:
+            visual.theme,
+
+          iconKey:
+            visual.iconKey,
 
           opened,
           locked,
