@@ -1,15 +1,16 @@
 .ui-v2-city-page {
   width: 100%;
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
   display: grid;
   grid-template-rows:
-    auto
+    var(--ui-city-hero-min-height)
     var(--ui-city-filter-height)
     minmax(
       var(--ui-city-map-min-height),
       1fr
     )
-    auto;
+    var(--ui-city-detail-height);
   color:
     var(--ui-text);
   background:
@@ -23,19 +24,20 @@
 
 .ui-v2-city-hero {
   position: relative;
-  min-height:
+  height:
     var(--ui-city-hero-min-height);
+  min-height: 0;
   display: grid;
   grid-template-columns:
-    68px
-    minmax(0,1fr);
+    32px
+    minmax(0,1fr)
+    132px;
   gap:
-    var(--ui-space-sm);
+    var(--ui-space-xs);
   align-items: center;
   padding:
-    var(--ui-space-md)
-    var(--ui-page-gutter)
-    var(--ui-space-sm);
+    var(--ui-space-xs)
+    var(--ui-page-gutter);
   overflow: hidden;
   background:
     linear-gradient(
@@ -73,10 +75,10 @@
 .ui-v2-city-hero__map-icon {
   position: relative;
   z-index: 1;
-  width: 64px;
-  height: 64px;
+  width: 30px;
+  height: 30px;
   border-radius:
-    var(--ui-radius-xl);
+    var(--ui-radius-sm);
   background-image:
     var(
       --ui-city-title-icon-image,
@@ -128,34 +130,25 @@
 }
 
 .ui-v2-city-hero__summary {
-  grid-column:
-    1 /
-    -1;
-  display: grid;
-  grid-template-columns:
-    repeat(
-      2,
-      minmax(0,1fr)
-    );
-  gap:
-    var(--ui-space-xs);
+  min-width: 0;
+  display: block;
   position: relative;
   z-index: 1;
 }
 
 .ui-v2-city-summary-card {
   min-width: 0;
-  min-height: 58px;
+  height: 50px;
   display: grid;
   grid-template-columns:
-    40px
+    34px
     minmax(0,1fr);
   gap:
     var(--ui-space-xs);
   align-items: center;
   padding:
-    var(--ui-space-xs)
-    var(--ui-space-sm);
+    5px
+    var(--ui-space-xs);
   border:
     1px solid
     rgba(50,119,174,.14);
@@ -168,8 +161,8 @@
 }
 
 .ui-v2-city-summary-card > span {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius:
     var(--ui-radius-md);
   background-size: contain;
@@ -239,7 +232,7 @@
   align-items: center;
   justify-content: center;
   gap:
-    3px;
+    1px;
   padding:
     0
     var(--ui-space-xxs);
@@ -347,14 +340,14 @@
     var(--city-marker-x);
   top:
     var(--city-marker-y);
-  max-width: 176px;
-  min-height: 48px;
+  max-width: 136px;
+  min-height: 42px;
   display: grid;
   grid-template-columns:
     var(--ui-city-marker-icon-size)
     minmax(0,1fr);
   gap:
-    var(--ui-space-xs);
+    var(--ui-space-xxs);
   align-items: center;
   padding:
     var(--ui-space-xxs)
@@ -469,9 +462,9 @@
   position: absolute;
   z-index: 5;
   right:
-    var(--ui-space-sm);
+    var(--ui-space-xs);
   bottom:
-    74px;
+    54px;
   display: grid;
   gap:
     var(--ui-space-xs);
@@ -512,11 +505,15 @@
 .ui-v2-city-detail {
   position: relative;
   z-index: 7;
-  margin-top: -16px;
+  height:
+    var(--ui-city-detail-height);
+  min-height: 0;
+  margin-top: -8px;
   padding:
+    4px
     10px
-    var(--ui-space-sm)
-    var(--ui-space-sm);
+    8px;
+  overflow: hidden;
   border-radius:
     var(--ui-radius-sheet)
     var(--ui-radius-sheet)
@@ -529,34 +526,38 @@
 }
 
 .ui-v2-city-detail__handle {
-  width: 72px;
-  height: 5px;
+  width: 38px;
+  height: 3px;
   margin:
     0
     auto
-    10px;
+    4px;
   border-radius:
     var(--ui-radius-pill);
   background: #c7d1dc;
 }
 
 .ui-v2-city-detail__main {
+  min-height: 64px;
   display: grid;
   grid-template-columns:
     var(--ui-city-detail-thumb-size)
-    minmax(0,1fr);
+    minmax(0,1fr)
+    104px;
   grid-template-areas:
-    "image heading"
-    "image action";
+    "image heading action";
   gap:
-    var(--ui-space-xs)
-    var(--ui-space-sm);
+    var(--ui-space-xs);
+  align-items: center;
 }
 
 .ui-v2-city-detail__image {
   grid-area: image;
-  min-height:
+  width:
     var(--ui-city-detail-thumb-size);
+  height:
+    var(--ui-city-detail-thumb-size);
+  min-height: 0;
   border-radius:
     var(--ui-radius-lg);
   background-image:
@@ -650,8 +651,7 @@
 .ui-v2-city-property-button {
   grid-area: action;
   justify-self: stretch;
-  height:
-    var(--ui-hit-comfortable);
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -699,36 +699,39 @@
   display: grid;
   grid-template-columns:
     repeat(
-      3,
+      6,
       minmax(0,1fr)
     );
   gap:
-    var(--ui-space-xs);
+    var(--ui-space-xxs);
   margin-top:
-    var(--ui-space-sm);
+    6px;
 }
 
 .ui-v2-city-metric {
   min-width: 0;
-  min-height:
+  height:
     var(--ui-city-metric-min-height);
+  min-height: 0;
   display: grid;
-  grid-template-columns:
-    34px
+  grid-template-columns: 1fr;
+  grid-template-rows:
+    24px
     minmax(0,1fr);
-  gap:
-    var(--ui-space-xs);
+  gap: 2px;
+  justify-items: center;
   align-items: center;
   padding:
-    var(--ui-space-xs);
+    3px
+    2px;
   border-radius:
     var(--ui-radius-md);
   background: #f5f8fc;
 }
 
 .ui-v2-city-metric__icon {
-  width: 34px;
-  height: 34px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background-size: contain;
   background-position: center;
@@ -738,8 +741,9 @@
 .ui-v2-city-metric__copy {
   min-width: 0;
   display: grid;
-  gap:
-    2px;
+  justify-items: center;
+  gap: 1px;
+  text-align: center;
 }
 
 .ui-v2-city-metric__copy small {
@@ -777,16 +781,16 @@
 
 .ui-v2-city-opportunities {
   margin-top:
-    var(--ui-space-sm);
+    5px;
   padding-top:
-    var(--ui-space-xs);
+    4px;
   border-top:
     1px solid
     #e7edf3;
 }
 
 .ui-v2-city-opportunities__header {
-  min-height: 34px;
+  min-height: 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -830,8 +834,7 @@
 }
 
 .ui-v2-city-opportunities__header button {
-  min-height:
-    var(--ui-hit-min);
+  min-height: 28px;
   padding:
     0
     var(--ui-space-xxs);
@@ -852,25 +855,26 @@
       minmax(0,1fr)
     );
   gap:
-    var(--ui-space-xs);
-  margin-top:
     var(--ui-space-xxs);
+  margin-top:
+    2px;
 }
 
 .ui-v2-city-opportunity {
   min-width: 0;
-  min-height:
+  height:
     var(--ui-city-opportunity-min-height);
+  min-height: 0;
   display: grid;
   grid-template-columns:
-    54px
+    34px
     minmax(0,1fr)
-    12px;
+    8px;
   gap:
-    var(--ui-space-xs);
+    4px;
   align-items: center;
   padding:
-    var(--ui-space-xs);
+    4px;
   border:
     1px solid
     #e0e8ef;
@@ -885,8 +889,8 @@
 }
 
 .ui-v2-city-opportunity__image {
-  width: 54px;
-  height: 66px;
+  width: 34px;
+  height: 42px;
   border-radius:
     var(--ui-radius-sm);
   background-size: cover;
@@ -959,108 +963,89 @@
 @media (max-width: 399px) {
   .ui-v2-city-hero {
     grid-template-columns:
-      58px
-      minmax(0,1fr);
+      28px
+      minmax(0,1fr)
+      118px;
     gap:
-      var(--ui-space-xs);
+      6px;
     padding:
-      var(--ui-space-sm)
-      var(--ui-page-gutter)
-      var(--ui-space-xs);
+      6px
+      var(--ui-page-gutter);
   }
 
   .ui-v2-city-hero__map-icon {
-    width: 54px;
-    height: 54px;
+    width: 26px;
+    height: 26px;
   }
 
   .ui-v2-city-summary-card {
-    min-height: 54px;
+    height: 46px;
     grid-template-columns:
-      34px
+      30px
       minmax(0,1fr);
     padding:
-      var(--ui-space-xxs)
-      var(--ui-space-xs);
+      4px
+      6px;
   }
 
   .ui-v2-city-summary-card > span {
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
   }
 
   .ui-v2-city-marker {
-    max-width: 148px;
+    max-width: 118px;
   }
 
   .ui-v2-city-detail__main {
     grid-template-columns:
       var(--ui-city-detail-thumb-size)
-      minmax(0,1fr);
+      minmax(0,1fr)
+      94px;
   }
 
-  .ui-v2-city-metrics {
-    gap:
-      var(--ui-space-xxs);
-  }
-
-  .ui-v2-city-metric {
-    grid-template-columns:
-      28px
-      minmax(0,1fr);
-    gap:
-      var(--ui-space-xxs);
+  .ui-v2-city-property-button {
     padding:
-      var(--ui-space-xxs);
+      0
+      6px;
   }
 
   .ui-v2-city-metric__icon {
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
   }
 
   .ui-v2-city-opportunity {
     grid-template-columns:
-      44px
+      30px
       minmax(0,1fr)
-      8px;
-    gap:
-      var(--ui-space-xxs);
-    padding:
-      var(--ui-space-xxs);
+      7px;
   }
 
   .ui-v2-city-opportunity__image {
-    width: 44px;
-    height: 58px;
+    width: 30px;
+    height: 38px;
   }
 }
 
 @media (min-width: 600px) {
   .ui-v2-city-hero {
     grid-template-columns:
-      76px
+      34px
       minmax(0,1fr)
-      minmax(320px,.75fr);
+      170px;
   }
 
   .ui-v2-city-hero__map-icon {
-    width: 68px;
-    height: 68px;
-  }
-
-  .ui-v2-city-hero__summary {
-    grid-column: 3;
+    width: 32px;
+    height: 32px;
   }
 
   .ui-v2-city-detail__main {
     grid-template-columns:
       var(--ui-city-detail-thumb-size)
       minmax(0,1fr)
-      180px;
-    grid-template-areas:
-      "image heading action";
-    align-items: center;
+      132px;
   }
 }
 
@@ -1093,6 +1078,7 @@
   .ui-v2-city-detail {
     grid-column: 2;
     grid-row: 3;
+    height: auto;
     margin-top: 0;
     border-radius:
       0
