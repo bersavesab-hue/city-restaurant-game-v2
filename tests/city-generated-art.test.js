@@ -169,6 +169,22 @@ test(
     );
 
     assert.equal(
+      css.includes(
+        "district-thumbnails-sprite.webp"
+      ),
+      true,
+      "城市正式地图视觉必须使用生成商圈素材"
+    );
+
+    assert.equal(
+      css.includes(
+        "city-main-map.webp"
+      ),
+      false,
+      "旧航拍底图必须彻底停止引用"
+    );
+
+    assert.equal(
       view.includes(
         "city-map-regions"
       ),

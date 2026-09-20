@@ -167,7 +167,7 @@
 .opening-setup-page,
 .dish-center-page {
   width: 100% !important;
-  max-width: var(--rg-shell-max, 760px) !important;
+  max-width: var(--rg-shell-max, 864px) !important;
   margin-left: auto !important;
   margin-right: auto !important;
 }
@@ -175,7 +175,7 @@
 
 .city-bottom-nav,
 .rg-bottom-nav {
-  width: min(100%, var(--rg-shell-max, 760px)) !important;
+  width: min(100%, var(--rg-shell-max, 864px)) !important;
 }
 
 
@@ -184,13 +184,12 @@
 }
 
 
-.city-map-game,
 .cr-city-property-page,
 .property-detail-game,
 .construction-page,
 .opening-setup-page {
   padding-bottom:
-    9.7dvh !important;
+    9.9dvh !important;
 }
 
 

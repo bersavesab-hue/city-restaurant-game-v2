@@ -169,49 +169,86 @@ class CityMapView {
     return (
       '<section class="city-map-heading">' +
         '<div class="city-map-heading__copy">' +
-          '<h1><span class="city-map-heading__pin" aria-hidden="true"></span>城市地图</h1>' +
+          '<h1>城市地图</h1>' +
           '<p>发现优质商圈，拓展门店版图，让美食走进更多地方</p>' +
         '</div>' +
         '<div class="city-map-heading__summary">' +
-          '<span class="city-map-heading__building" aria-hidden="true"></span>' +
-          '<div><strong>' + count + ' 个商圈</strong>' +
-          '<small>' + areaCount + ' 大区域 · 等待你的探索</small></div>' +
+          '<strong>' +
+            count +
+            ' 个商圈' +
+          '</strong>' +
+          '<small>' +
+            areaCount +
+            ' 大区域 · 等待你的探索' +
+          '</small>' +
         '</div>' +
       '</section>'
     );
   }
 
+
   renderFilters(page) {
     const counts =
       page.filterCounts ?? {
-        all: page.map?.districts?.length ?? 0,
-        opened: 0,
-        available: 0,
-        potential: 0,
-        locked: 0
+        all:
+          page.map?.districts?.length ??
+          0,
+
+        opened:
+          0,
+
+        available:
+          0,
+
+        potential:
+          0,
+
+        locked:
+          0
       };
 
     return (
       '<nav class="city-map-filters" aria-label="城市商圈筛选">' +
-      FILTERS.map(([id, label]) =>
-        '<button type="button" class="' +
-          (this.filter === id ? "is-active" : "") +
-          '" data-action="set-filter" data-filter="' +
-          id +
-          '">' +
-          '<span class="city-map-filter__icon city-map-filter__icon--' +
-          id +
-          '" aria-hidden="true"></span>' +
-          '<strong>' +
-          escapeHtml(label) +
-          ' (' +
-          (counts[id] ?? 0) +
-          ')</strong>' +
-        '</button>'
-      ).join("") +
+        FILTERS.map(
+          (
+            [id, label],
+            index
+          ) =>
+            '<button type="button" class="' +
+              (
+                this.filter ===
+                id
+                  ? "is-active"
+                  : ""
+              ) +
+              '" data-action="set-filter" data-filter="' +
+              id +
+              '">' +
+              (
+                index ===
+                0
+                  ? ""
+                  : '<span class="city-map-filter__dot city-map-filter__dot--' +
+                    index +
+                    '" aria-hidden="true"></span>'
+              ) +
+              '<strong>' +
+                escapeHtml(
+                  label
+                ) +
+                ' (' +
+                (
+                  counts[id] ??
+                  0
+                ) +
+                ')' +
+              '</strong>' +
+            '</button>'
+        ).join("") +
       '</nav>'
     );
   }
+
 
   renderMap(page) {
     const visible =
@@ -221,10 +258,6 @@ class CityMapView {
 
     const selectedId =
       page.map.selectedDistrictId;
-
-    const areas =
-      page.map.areas ??
-      [];
 
     const priority =
       district =>
@@ -249,78 +282,72 @@ class CityMapView {
           0
         );
 
-    const displayed = [];
+    const displayed =
+      [
+        ...visible
+      ]
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            priority(b) -
+            priority(a)
+        )
+        .slice(
+          0,
+          5
+        );
 
-    const pushUnique =
-      district => {
-        if (
-          district &&
-          !displayed.some(
-            item =>
-              item.id ===
-              district.id
-          )
-        ) {
-          displayed.push(
-            district
-          );
-        }
-      };
-
-    pushUnique(
+    const selected =
       visible.find(
         district =>
           district.id ===
           selectedId
-      )
-    );
-
-    for (
-      const area
-      of areas
-    ) {
-      pushUnique(
-        visible
-          .filter(
-            district =>
-              district.areaId ===
-              area.id
-          )
-          .sort(
-            (
-              a,
-              b
-            ) =>
-              priority(b) -
-              priority(a)
-          )[0]
       );
+
+    if (
+      selected &&
+      !displayed.some(
+        district =>
+          district.id ===
+          selected.id
+      )
+    ) {
+      displayed.unshift(
+        selected
+      );
+
+      displayed.length =
+        Math.min(
+          displayed.length,
+          5
+        );
     }
 
-    for (
-      const district
-      of [
-        ...visible
-      ].sort(
+    const artDistricts =
+      [
+        "university",
+        "cbd",
+        "nightlife",
+        "old_town",
+        "waterfront_leisure"
+      ];
+
+    const artwork =
+      artDistricts.map(
         (
-          a,
-          b
+          districtId,
+          index
         ) =>
-          priority(b) -
-          priority(a)
-      )
-    ) {
-      if (
-        displayed.length >=
-        5
-      ) {
-        break;
-      }
-
-      pushUnique(
-        district
-      );
-    }
+          '<span class="city-map-art-piece city-map-art-piece--' +
+          index +
+          '" aria-hidden="true" style="' +
+          getDistrictThumbnailStyle(
+            districtId
+          ) +
+          '"></span>'
+      ).join("");
 
     const pins =
       displayed.map(
@@ -329,12 +356,12 @@ class CityMapView {
             district.locked ===
             true;
 
-          const selected =
+          const isSelected =
             selectedId ===
             district.id;
 
           const stateClass =
-            selected
+            isSelected
               ? "selected"
               : district.hasOpenStore
                 ? "open"
@@ -345,7 +372,7 @@ class CityMapView {
           return (
             '<button type="button" class="city-map-pin ' +
             (
-              selected
+              isSelected
                 ? "is-active "
                 : ""
             ) +
@@ -372,7 +399,9 @@ class CityMapView {
             getDistrictLabelStyle(
               district.id,
               {
-                selected,
+                selected:
+                  isSelected,
+
                 locked
               }
             ) +
@@ -410,10 +439,13 @@ class CityMapView {
     return (
       '<section class="city-map-viewport">' +
         '<div class="city-map-stage" style="--city-map-zoom:' +
-        this.zoom +
+          this.zoom +
         '">' +
-          '<div class="city-map-artwork" role="img" aria-label="城市发展地图"></div>' +
-          '<div class="city-map-slogan" aria-hidden="true">让美食<br>点亮这座城市 ♡</div>' +
+          '<div class="city-map-artwork" role="img" aria-label="城市发展地图">' +
+            artwork +
+            '<span class="city-map-river" aria-hidden="true"></span>' +
+            '<span class="city-map-slogan" aria-hidden="true">让美食<br>点亮这座城市 ♡</span>' +
+          '</div>' +
           '<div class="city-map-pins">' +
             pins +
           '</div>' +
@@ -426,6 +458,7 @@ class CityMapView {
       '</section>'
     );
   }
+
 
   renderMetric(  renderMetric(
     iconName,
