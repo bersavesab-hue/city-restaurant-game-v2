@@ -18,11 +18,11 @@ function renderGlobalNav() {
                   ? ' is-active'
                   : ''
               ) +
-              '" type="button" data-ui-destination="' +
+              '" type="button" data-ui-box="nav-cell" data-ui-destination="' +
               item.id +
             '">' +
               '<span class="ui-v2-box ui-v2-box--nav-icon" data-ui-box="nav-icon"></span>' +
-              '<strong>' +
+              '<strong data-ui-text="nav-label">' +
                 item.label +
               '</strong>' +
             '</button>'
