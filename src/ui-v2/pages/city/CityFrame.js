@@ -1,17 +1,32 @@
 const FILTERS =
   Object.freeze([
-    "全部(20)",
-    "已开店(3)",
-    "可选址(8)",
-    "高潜力(5)",
-    "待解锁(4)"
+    Object.freeze({
+      id: "all",
+      label: "全部"
+    }),
+    Object.freeze({
+      id: "opened",
+      label: "已开店"
+    }),
+    Object.freeze({
+      id: "available",
+      label: "可选址"
+    }),
+    Object.freeze({
+      id: "highPotential",
+      label: "高潜力"
+    }),
+    Object.freeze({
+      id: "locked",
+      label: "待解锁"
+    })
   ]);
 
 const MAP_MARKERS =
   Object.freeze([
     Object.freeze({
       id: "university",
-      title: "大学城区域",
+      title: "大学城",
       meta: "5个商圈",
       x: 52.9667,
       y: 11.0335
@@ -103,8 +118,8 @@ function renderCityFrame() {
         '<div class="ui-v2-city-frame__summary" data-ui-box="hero-summary">' +
           '<span class="ui-v2-box ui-v2-box--hero-icon"></span>' +
           '<div>' +
-            '<strong>20个商圈</strong>' +
-            '<small>4大区域 · 等待你的探索</small>' +
+            <strong data-live="city-total">20个商圈</strong>' +
+            <small data-live="city-summary-subtitle">4大区域 · 等待你的探索</small>' +
           '</div>' +
         '</div>' +
       '</section>' +
@@ -113,7 +128,7 @@ function renderCityFrame() {
         FILTERS
           .map(
             (
-              label,
+              filter,
               index
             ) => (
               '<button class="ui-v2-city-frame__filter' +
@@ -123,7 +138,9 @@ function renderCityFrame() {
                     ? ' is-active'
                     : ''
                 ) +
-                '" type="button" data-ui-box="filter">' +
+                '" type="button" data-ui-box="filter" data-city-filter="' +
+                filter.id +
+                '">' +
                 (
                   index ===
                   0
@@ -131,7 +148,10 @@ function renderCityFrame() {
                     : '<span class="ui-v2-box ui-v2-box--filter-icon"></span>'
                 ) +
                 '<strong data-ui-text="filter">' +
-                  label +
+                  filter.label +
+                  '(<span data-live="filter-' +
+                  filter.id +
+                  '">0</span>)' +
                 '</strong>' +
               '</button>'
             )
@@ -146,7 +166,9 @@ function renderCityFrame() {
         MAP_MARKERS
           .map(
             marker => (
-              '<div class="ui-v2-city-frame__marker" data-ui-box="map-marker" data-marker="' +
+              '<button class="ui-v2-city-frame__marker" type="button" data-ui-box="map-marker" data-marker="' +
+                marker.id +
+                '" data-district-id="' +
                 marker.id +
                 '" style="--marker-x:' +
                 marker.x +
@@ -155,14 +177,18 @@ function renderCityFrame() {
                 '%">' +
                 '<span class="ui-v2-box ui-v2-box--marker-icon" data-ui-box="map-marker-icon"></span>' +
                 '<div>' +
-                  '<strong data-ui-text="marker-title">' +
+                  '<strong data-ui-text="marker-title" data-live="marker-title-' +
+                    marker.id +
+                    '">' +
                     marker.title +
                   '</strong>' +
-                  '<small data-ui-text="marker-meta">' +
+                  '<small data-ui-text="marker-meta" data-live="marker-meta-' +
+                    marker.id +
+                    '">' +
                     marker.meta +
                   '</small>' +
                 '</div>' +
-              '</div>'
+              '</button>'
             )
           )
           .join(
@@ -183,10 +209,10 @@ function renderCityFrame() {
 
         '<div class="ui-v2-city-frame__detail-copy">' +
           '<div class="ui-v2-city-frame__detail-title-row">' +
-            '<h2 data-ui-text="detail-title">CBD商务区</h2>' +
-            '<span>高潜力</span>' +
+            '<h2 data-ui-text="detail-title" data-live="detail-title">CBD商务区</h2>' +
+            '<span data-live="detail-badge">高潜力</span>' +
           '</div>' +
-          '<p data-ui-text="detail-body">城市核心商务区，写字楼林立，上班族与商务客流稳定。</p>' +
+          '<p data-ui-text="detail-body" data-live="detail-body">城市核心商务区，写字楼林立，上班族与商务客流稳定。</p>' +
         '</div>' +
 
         '<button class="ui-v2-city-frame__primary-action" type="button" data-ui-box="primary-action">查看房源</button>' +
@@ -195,12 +221,18 @@ function renderCityFrame() {
           METRICS
             .map(
               item => (
-                '<div class="ui-v2-city-frame__metric" data-ui-box="metric">' +
+                '<div class="ui-v2-city-frame__metric" data-ui-box="metric" data-metric-index="' +
+                  METRICS.indexOf(item) +
+                  '">' +
                   '<span class="ui-v2-box ui-v2-box--metric-icon" data-ui-box="metric-icon"></span>' +
-                  '<small data-ui-text="metric-label">' +
+                  '<small data-ui-text="metric-label" data-live="metric-label-' +
+                    METRICS.indexOf(item) +
+                    '">' +
                     item[0] +
                   '</small>' +
-                  '<strong data-ui-text="metric-value">' +
+                  '<strong data-ui-text="metric-value" data-live="metric-value-' +
+                    METRICS.indexOf(item) +
+                    '">' +
                     item[1] +
                   '</strong>' +
                 '</div>'
@@ -212,7 +244,7 @@ function renderCityFrame() {
         '</div>' +
 
         '<div class="ui-v2-city-frame__opportunity-header" data-ui-box="opportunity-header">' +
-          '<h3 data-ui-text="section-title">今日机会 <span>(3)</span></h3>' +
+          '<h3 data-ui-text="section-title">今日机会 <span>(<span data-live="opportunity-count">3</span>)</span></h3>' +
           '<button type="button">查看全部</button>' +
         '</div>' +
 
@@ -220,13 +252,19 @@ function renderCityFrame() {
           OPPORTUNITIES
             .map(
               title => (
-                '<div class="ui-v2-city-frame__opportunity" data-ui-box="opportunity">' +
+                '<div class="ui-v2-city-frame__opportunity" data-ui-box="opportunity" data-opportunity-index="' +
+                  OPPORTUNITIES.indexOf(title) +
+                  '">' +
                   '<span class="ui-v2-city-frame__opportunity-thumb" data-ui-box="opportunity-thumbnail"></span>' +
                   '<div>' +
-                    '<strong data-ui-text="opportunity-title">' +
+                    '<strong data-ui-text="opportunity-title" data-live="opportunity-title-' +
+                      OPPORTUNITIES.indexOf(title) +
+                      '">' +
                       title +
                     '</strong>' +
-                    '<small data-ui-text="opportunity-body">两行内容区域</small>' +
+                    '<small data-ui-text="opportunity-body" data-live="opportunity-body-' +
+                      OPPORTUNITIES.indexOf(title) +
+                      '">两行内容区域</small>' +
                   '</div>' +
                   '<span>›</span>' +
                 '</div>'
