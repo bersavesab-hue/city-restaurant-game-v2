@@ -25,8 +25,8 @@
 
 ## 适配
 
-- >=400px：HUD三段单行
-- <400px：同一HUD只重排为两行
+- 所有手机宽度：HUD始终保持三段单行
+- <400px：只压缩图标、列宽与间距，不允许改成两行
 - Compact <600px
 - Medium 600–839px
 - Expanded >=840px
@@ -60,7 +60,7 @@
 - Global HUD 与 Global Nav 已进入 APK 正式启动链。
 - 暂停 / 继续与 1x / 2x / 4x 已直接调用 TimeSystem。
 - 一级导航只维护 city / store / operations / employees / more 五个状态，不建立旧 ID 兼容。
-- Page Content 当前保持空净，等待城市正式页面接入；禁止先塞临时卡片或旧页面。
+- 城市正式页已经挂载到唯一 Page Content；其他一级页后续按同一 AppShell 接入。
 - android/entry.js 旧 Canvas 试玩入口已删除。
 
 ## 城市页当前状态
@@ -69,3 +69,11 @@
 - 正式页面位于 pages/city，不恢复任何 0.8.x 城市页面代码。
 - 页面结构、动态数据位、五筛选、地图标签、详情Sheet、今日机会和地图本地控制已接入 Android 启动链。
 - 地图主图、商圈缩略图、地图控制图标、指标图标仍通过既定 image slot 接入；接图时不得改变页面DOM或把业务文字烘焙进图片。
+
+## 2026-09-21 实机校正
+
+- Safe Area 已并入 HUD / Nav 背景，不再单独占白色布局行。
+- 所有手机 HUD 固定单排，禁止恢复 Compact 双排。
+- HUD/Nav/地图控件/指标图标已改成独立 SVG 文件，旧 sprite atlas 已删除。
+- 城市商圈显示采用独立 CityMapVisualLayout，不再直接拿业务 mapPosition 当最终美术坐标。
+- 商圈详情与今日机会缩略图改为正式城市主图的受控裁切，不再显示蓝色空块。
