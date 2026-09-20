@@ -525,7 +525,7 @@ function renderCityPage(
         '<div class="ui-v2-city-hero__map-icon" data-image-slot="city-title-icon" aria-hidden="true"></div>' +
         '<div class="ui-v2-city-hero__copy">' +
           '<h1>城市地图</h1>' +
-          '<p>发现优质商圈，拓展门店版图，让美食走进更多地方</p>' +
+          '<p>发现优质商圈，拓展门店版图</p>' +
         '</div>' +
         '<div class="ui-v2-city-hero__summary">' +
           '<div class="ui-v2-city-summary-card">' +
@@ -536,18 +536,11 @@ function renderCityPage(
                   model.totalDistricts
                 ) +
                 '个商圈</strong>' +
-              '<small>全城潜力区域</small>' +
-            '</div>' +
-          '</div>' +
-          '<div class="ui-v2-city-summary-card">' +
-            '<span data-image-slot="opened-store-count" aria-hidden="true"></span>' +
-            '<div>' +
-              '<strong class="ui-v2-no-truncate-number">' +
+              '<small class="ui-v2-no-truncate-number">已开店 ' +
                 escapeHtml(
                   model.openedDistricts
                 ) +
-                '个已开店商圈</strong>' +
-              '<small>持续拓展中</small>' +
+                ' · 等待探索</small>' +
             '</div>' +
           '</div>' +
         '</div>' +
