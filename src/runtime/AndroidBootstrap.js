@@ -6,6 +6,11 @@ import {
   mountAppShell
 } from "../ui-v2/shell/AppShell.js";
 
+import {
+  buildCityPageModel,
+  mountCityPage
+} from "../ui-v2/pages/city/index.js";
+
 globalThis.__CITY_RESTAURANT_CORE__ =
   app;
 
@@ -229,6 +234,39 @@ function buildRuntimeHudModel() {
   };
 }
 
+function buildRuntimeCityModel() {
+  const districts =
+    app.systems
+      .districtSystem
+      .getAll();
+
+  const restaurants =
+    app.systems
+      .restaurantSystem
+      .list();
+
+  const properties =
+    app.systems
+      .propertySystem
+      .list();
+
+  return buildCityPageModel({
+    districts,
+    restaurants,
+    properties,
+
+    opportunityScore(
+      district
+    ) {
+      return app.systems
+        .districtSystem
+        .getOpportunityScore(
+          district
+        );
+    }
+  });
+}
+
 const root =
   document.getElementById(
     "app"
@@ -307,6 +345,42 @@ const shell =
     }
   );
 
+const cityPageRoot =
+  root.querySelector(
+    '[data-ui="page-content"]'
+  );
+
+if (!cityPageRoot) {
+  throw new Error(
+    "UI V2 page content region is missing"
+  );
+}
+
+const cityPage =
+  mountCityPage(
+    cityPageRoot,
+    buildRuntimeCityModel(),
+    {
+      onOpenProperties(
+        districtId
+      ) {
+        app.core.eventBus.emit(
+          "ui:city:openProperties",
+          {
+            districtId
+          }
+        );
+      },
+
+      onOpenOpportunities() {
+        app.core.eventBus.emit(
+          "ui:city:openOpportunities",
+          {}
+        );
+      }
+    }
+  );
+
 function refreshHud() {
   shell.updateHud(
     buildRuntimeHudModel()
@@ -339,6 +413,7 @@ globalThis.__CITY_RESTAURANT_UI__ =
       unsubscribeState();
       unsubscribeReplace();
       unsubscribeReset();
+      cityPage.destroy();
       shell.destroy();
     }
   });
