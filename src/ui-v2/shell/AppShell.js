@@ -3,67 +3,23 @@ import {
 } from "../components/GlobalHud.js";
 
 import {
-  PRIMARY_NAV_ITEMS,
   renderGlobalNav
 } from "../components/GlobalNav.js";
 
-const PRIMARY_PAGE_IDS =
-  Object.freeze(
-    PRIMARY_NAV_ITEMS.map(
-      item =>
-        item.id
-    )
-  );
-
-function normalizeActivePageId(
-  pageId
-) {
-  return PRIMARY_PAGE_IDS.includes(
-    pageId
-  )
-    ? pageId
-    : "city";
-}
-
-function renderAppShell({
-  activePageId = "city",
-  hudModel = {},
-  badges = {}
-} = {}) {
-  const activeId =
-    normalizeActivePageId(
-      activePageId
-    );
-
+function renderAppShell() {
   return (
-    '<div class="ui-v2-app" data-ui="app" data-active-page="' +
-      activeId +
-    '">' +
+    '<div class="ui-v2-app" data-ui="app">' +
       '<div class="ui-v2-app-shell" data-ui="app-shell">' +
-        renderGlobalHud(
-          hudModel
-        ) +
-        '<main class="ui-v2-page-content" data-ui="page-content" data-active-page="' +
-          activeId +
-        '"></main>' +
-        renderGlobalNav({
-          activeId,
-          badges
-        }) +
+        renderGlobalHud() +
+        '<main class="ui-v2-page-root" data-ui="page-root"></main>' +
+        renderGlobalNav() +
       '</div>' +
     '</div>'
   );
 }
 
 function mountAppShell(
-  root,
-  {
-    activePageId = "city",
-    hudModel = {},
-    badges = {},
-    onNavigate = null,
-    onAction = null
-  } = {}
+  root
 ) {
   if (
     !root ||
@@ -75,227 +31,30 @@ function mountAppShell(
     );
   }
 
-  let activeId =
-    normalizeActivePageId(
-      activePageId
+  root.innerHTML =
+    renderAppShell();
+
+  const pageRoot =
+    root.querySelector(
+      '[data-ui="page-root"]'
     );
 
-  let currentHudModel = {
-    ...hudModel
-  };
-
-  let currentBadges = {
-    ...badges
-  };
-
-  root.innerHTML =
-    renderAppShell({
-      activePageId:
-        activeId,
-      hudModel:
-        currentHudModel,
-      badges:
-        currentBadges
-    });
-
-  root.dataset.uiState =
-    "shell";
-
-  function updatePageIdentity() {
-    const appElement =
-      root.querySelector(
-        '[data-ui="app"]'
-      );
-
-    const pageContent =
-      root.querySelector(
-        '[data-ui="page-content"]'
-      );
-
-    if (appElement) {
-      appElement.dataset.activePage =
-        activeId;
-    }
-
-    if (pageContent) {
-      pageContent.dataset.activePage =
-        activeId;
-    }
+  if (!pageRoot) {
+    throw new Error(
+      "AppShell page root is missing"
+    );
   }
-
-  function renderNav() {
-    const current =
-      root.querySelector(
-        '[data-ui="global-nav"]'
-      );
-
-    if (!current) {
-      return;
-    }
-
-    current.outerHTML =
-      renderGlobalNav({
-        activeId,
-        badges:
-          currentBadges
-      });
-  }
-
-  function updateHud(
-    nextModel = {}
-  ) {
-    currentHudModel = {
-      ...nextModel
-    };
-
-    const current =
-      root.querySelector(
-        '[data-ui="global-hud"]'
-      );
-
-    if (!current) {
-      return;
-    }
-
-    current.outerHTML =
-      renderGlobalHud(
-        currentHudModel
-      );
-  }
-
-  function updateBadges(
-    nextBadges = {}
-  ) {
-    currentBadges = {
-      ...nextBadges
-    };
-
-    renderNav();
-  }
-
-  function setActivePage(
-    pageId,
-    {
-      emit = true
-    } = {}
-  ) {
-    const nextId =
-      normalizeActivePageId(
-        pageId
-      );
-
-    if (
-      nextId ===
-      activeId
-    ) {
-      return activeId;
-    }
-
-    activeId =
-      nextId;
-
-    updatePageIdentity();
-    renderNav();
-
-    if (
-      emit &&
-      typeof onNavigate ===
-        "function"
-    ) {
-      onNavigate(
-        activeId
-      );
-    }
-
-    return activeId;
-  }
-
-  function handleClick(
-    event
-  ) {
-    const target =
-      event.target;
-
-    if (
-      !target ||
-      typeof target.closest !==
-        "function"
-    ) {
-      return;
-    }
-
-    const destination =
-      target.closest(
-        "[data-ui-destination]"
-      );
-
-    if (
-      destination &&
-      root.contains(
-        destination
-      )
-    ) {
-      setActivePage(
-        destination.dataset
-          .uiDestination
-      );
-
-      return;
-    }
-
-    const action =
-      target.closest(
-        "[data-ui-action]"
-      );
-
-    if (
-      action &&
-      root.contains(
-        action
-      ) &&
-      typeof onAction ===
-        "function"
-    ) {
-      onAction({
-        action:
-          action.dataset.uiAction,
-        element:
-          action
-      });
-    }
-  }
-
-  root.addEventListener(
-    "click",
-    handleClick
-  );
 
   return Object.freeze({
-    getActivePageId() {
-      return activeId;
-    },
-
-    setActivePage,
-    updateHud,
-    updateBadges,
+    pageRoot,
 
     destroy() {
-      root.removeEventListener(
-        "click",
-        handleClick
-      );
-
       root.replaceChildren();
-
-      root.dataset.uiState =
-        "destroyed";
     }
   });
 }
 
 export {
-  PRIMARY_PAGE_IDS,
-  normalizeActivePageId,
   renderAppShell,
   mountAppShell
 };

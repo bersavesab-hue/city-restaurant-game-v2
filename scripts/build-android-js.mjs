@@ -18,10 +18,8 @@ const styleSources =
   Object.freeze([
     "src/ui-v2/tokens/tokens.css",
     "src/ui-v2/shell/app-shell.css",
-    "src/ui-v2/components/global-hud.css",
-    "src/ui-v2/components/global-nav.css",
-    "src/ui-v2/pages/city/city-page.css",
-    "src/ui-v2/assets/ui-assets.css"
+    "src/ui-v2/components/components.css",
+    "src/ui-v2/pages/city/city-frame.css"
   ]);
 
 fs.rmSync(
@@ -34,19 +32,6 @@ fs.rmSync(
 
 fs.mkdirSync(
   outputDirectory,
-  {
-    recursive: true
-  }
-);
-
-fs.cpSync(
-  path.resolve(
-    "assets/ui-v2"
-  ),
-  path.join(
-    outputDirectory,
-    "ui-v2"
-  ),
   {
     recursive: true
   }
@@ -108,21 +93,6 @@ const index = `<!doctype html>
     rel="stylesheet"
     href="game.css"
   >
-  <style>
-    html,
-    body,
-    #app {
-      width:100%;
-      height:100%;
-      margin:0;
-      padding:0;
-    }
-
-    body {
-      overflow:hidden;
-      background:#000;
-    }
-  </style>
 </head>
 <body>
   <div id="app"></div>
@@ -140,6 +110,6 @@ fs.writeFileSync(
 );
 
 console.log(
-  "Android UI V2 bootstrap ready:",
+  "Android 691x1536 UI framework ready:",
   outputDirectory
 );

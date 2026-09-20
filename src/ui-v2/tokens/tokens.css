@@ -1,233 +1,228 @@
 :root {
-  --ui-brand: #0877c9;
-  --ui-brand-deep: #034a84;
-  --ui-brand-dark: #023861;
-  --ui-accent: #ffd229;
-  --ui-accent-strong: #f6b800;
-
-  --ui-surface: #ffffff;
-  --ui-surface-soft: #f4f7fa;
-  --ui-surface-muted: #eaf1f6;
-
-  --ui-text: #102e4a;
-  --ui-text-secondary: #5f7488;
-  --ui-text-muted: #8a9aaa;
-
-  --ui-border: #d9e4ec;
-  --ui-success: #14a36b;
-  --ui-warning: #f59a16;
-  --ui-danger: #e64b4b;
-  --ui-info: #1d8fe1;
-  --ui-focus: #4db4ff;
+  --ui-ref-width: 691;
+  --ui-ref-height: 1536;
 
   --ui-font-family:
     "Noto Sans SC",
     "PingFang SC",
     "Microsoft YaHei",
     system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
     sans-serif;
 
-  --ui-font-weight-regular: 500;
-  --ui-font-weight-medium: 600;
-  --ui-font-weight-bold: 700;
-  --ui-font-weight-heavy: 800;
-  --ui-font-weight-black: 900;
+  --ui-weight-regular: 500;
+  --ui-weight-medium: 600;
+  --ui-weight-bold: 700;
+  --ui-weight-heavy: 800;
+  --ui-weight-black: 900;
 
-  --ui-line-tight: 1.08;
-  --ui-line-title: 1.16;
-  --ui-line-body: 1.4;
+  --ui-color-bg: #eaf4fb;
+  --ui-color-hud: #07548d;
+  --ui-color-hud-deep: #043f6f;
+  --ui-color-nav: #064d82;
+  --ui-color-nav-deep: #023b67;
+  --ui-color-accent: #ffd22d;
+  --ui-color-accent-deep: #f2b900;
+  --ui-color-surface: #ffffff;
+  --ui-color-surface-soft: #f4f7fa;
+  --ui-color-border: #d8e3ec;
+  --ui-color-text: #103252;
+  --ui-color-text-secondary: #60788d;
+  --ui-color-guide: rgba(18, 99, 154, .28);
 
-  --ui-font-caption: 10px;
-  --ui-font-small: 11px;
-  --ui-font-body-small: 12px;
-  --ui-font-body: 14px;
-  --ui-font-label: 14px;
-  --ui-font-card-title: 18px;
-  --ui-font-section-title: 14px;
-  --ui-font-title-small: 20px;
-  --ui-font-title: 24px;
-  --ui-font-display: 32px;
-
-  --ui-font-hud-title: 12px;
-  --ui-font-hud-subtitle: 9px;
-  --ui-font-hud-date: 9px;
-  --ui-font-hud-time: 16px;
-  --ui-font-hud-value: 12px;
-  --ui-font-hud-level: 11px;
-  --ui-font-hud-speed: 10px;
-
-  --ui-font-page-title:
-    clamp(
-      22px,
-      5.8vw,
-      26px
+  --ui-space-4:
+    min(
+      .5789vw,
+      .2604dvh
     );
-  --ui-font-page-subtitle:
-    clamp(
-      10px,
-      2.8vw,
-      12px
+  --ui-space-8:
+    min(
+      1.1577vw,
+      .5208dvh
     );
-  --ui-font-summary-value: 13px;
-  --ui-font-summary-caption: 9px;
-  --ui-font-filter:
-    clamp(
-      10px,
-      2.8vw,
-      12px
+  --ui-space-12:
+    min(
+      1.7366vw,
+      .7812dvh
     );
-  --ui-font-marker-title: 11px;
-  --ui-font-marker-meta: 9px;
-  --ui-font-detail-title:
-    clamp(
-      15px,
-      4vw,
-      18px
+  --ui-space-16:
+    min(
+      2.3155vw,
+      1.0417dvh
     );
-  --ui-font-detail-body: 10px;
-  --ui-font-detail-button: 13px;
-  --ui-font-metric-label: 9px;
-  --ui-font-metric-value:
-    clamp(
-      11px,
-      3vw,
-      13px
+  --ui-space-20:
+    min(
+      2.8944vw,
+      1.3021dvh
     );
-  --ui-font-metric-trend: 9px;
-  --ui-font-opportunity-title: 10px;
-  --ui-font-opportunity-body: 9px;
-  --ui-font-nav-label: 13px;
+  --ui-space-24:
+    min(
+      3.4732vw,
+      1.5625dvh
+    );
+  --ui-space-32:
+    min(
+      4.6309vw,
+      2.0833dvh
+    );
 
-  --ui-space-xxs: 4px;
-  --ui-space-xs: 8px;
-  --ui-space-sm: 12px;
-  --ui-space-md: 16px;
-  --ui-space-lg: 20px;
-  --ui-space-xl: 24px;
-  --ui-space-xxl: 32px;
-
-  --ui-radius-sm: 8px;
-  --ui-radius-md: 12px;
-  --ui-radius-lg: 16px;
-  --ui-radius-xl: 20px;
-  --ui-radius-sheet: 24px;
+  --ui-radius-sm:
+    min(
+      1.7366vw,
+      .7812dvh
+    );
+  --ui-radius-md:
+    min(
+      2.3155vw,
+      1.0417dvh
+    );
+  --ui-radius-lg:
+    min(
+      3.4732vw,
+      1.5625dvh
+    );
+  --ui-radius-xl:
+    min(
+      4.6309vw,
+      2.0833dvh
+    );
   --ui-radius-pill: 999px;
 
-  --ui-shadow-control:
-    0 5px 14px
-    rgba(9,48,79,.18);
-  --ui-shadow-card:
-    0 5px 16px
-    rgba(28,75,111,.10);
-  --ui-shadow-sheet:
-    0 -8px 24px
-    rgba(26,64,94,.14);
-
-  --ui-hit-min: 48px;
-  --ui-hit-comfortable: 52px;
-
-  --ui-page-gutter: 2.2vw;
-  --ui-hud-height: 6.12dvh;
-  --ui-nav-height: 9.70dvh;
-  --ui-nav-rail-width: 88px;
-  --ui-content-max-width: 960px;
-
-  --ui-city-hero-min-height: 8.79dvh;
-  --ui-city-filter-height: 4.30dvh;
-  --ui-city-map-height: 42.77dvh;
-  --ui-city-map-min-height: 0px;
-  --ui-city-map-control-size: clamp(30px,3.8dvh,40px);
-  --ui-city-marker-icon-size: clamp(24px,3.4dvh,30px);
-  --ui-city-detail-thumb-size: clamp(54px,7.55dvh,66px);
-  --ui-city-detail-height: 28.32dvh;
-  --ui-city-metric-min-height: clamp(46px,6.9dvh,58px);
-  --ui-city-opportunity-min-height: clamp(42px,6.5dvh,54px);
-
-  --ui-native-safe-top: 0px;
-  --ui-native-safe-right: 0px;
-  --ui-native-safe-bottom: 0px;
-  --ui-native-safe-left: 0px;
-
-  --ui-safe-top:
-    max(
-      env(
-        safe-area-inset-top,
-        0px
-      ),
-      var(--ui-native-safe-top)
+  --ui-font-hud-primary:
+    min(
+      3.1838vw,
+      1.4323dvh
+    );
+  --ui-font-hud-secondary:
+    min(
+      2.0260vw,
+      .9115dvh
+    );
+  --ui-font-hud-time:
+    min(
+      4.0521vw,
+      1.8229dvh
+    );
+  --ui-font-page-title:
+    min(
+      5.4993vw,
+      2.4740dvh
+    );
+  --ui-font-page-subtitle:
+    min(
+      2.3155vw,
+      1.0417dvh
+    );
+  --ui-font-filter:
+    min(
+      2.3155vw,
+      1.0417dvh
+    );
+  --ui-font-marker-title:
+    min(
+      2.6049vw,
+      1.1719dvh
+    );
+  --ui-font-marker-meta:
+    min(
+      2.0260vw,
+      .9115dvh
+    );
+  --ui-font-detail-title:
+    min(
+      3.4732vw,
+      1.5625dvh
+    );
+  --ui-font-detail-body:
+    min(
+      2.0260vw,
+      .9115dvh
+    );
+  --ui-font-detail-button:
+    min(
+      2.6049vw,
+      1.1719dvh
+    );
+  --ui-font-metric-label:
+    min(
+      2.0260vw,
+      .9115dvh
+    );
+  --ui-font-metric-value:
+    min(
+      2.6049vw,
+      1.1719dvh
+    );
+  --ui-font-section-title:
+    min(
+      2.8944vw,
+      1.3021dvh
+    );
+  --ui-font-opportunity-title:
+    min(
+      2.0260vw,
+      .9115dvh
+    );
+  --ui-font-opportunity-body:
+    min(
+      1.7366vw,
+      .7812dvh
+    );
+  --ui-font-nav:
+    min(
+      3.1838vw,
+      1.4323dvh
     );
 
-  --ui-safe-right:
-    max(
-      env(
-        safe-area-inset-right,
-        0px
-      ),
-      var(--ui-native-safe-right)
+  --ui-box-hud-avatar:
+    min(
+      9.8408vw,
+      4.4271dvh
     );
-
-  --ui-safe-bottom:
-    max(
-      env(
-        safe-area-inset-bottom,
-        0px
-      ),
-      var(--ui-native-safe-bottom)
+  --ui-box-hud-action:
+    min(
+      5.7887vw,
+      2.6042dvh
     );
-
-  --ui-safe-left:
-    max(
-      env(
-        safe-area-inset-left,
-        0px
-      ),
-      var(--ui-native-safe-left)
+  --ui-box-hud-icon:
+    min(
+      4.0521vw,
+      1.8229dvh
     );
-}
-
-@media (max-width: 399px) {
-  :root {
-    --ui-page-gutter: 2vw;
-  }
-}
-
-@media (min-width: 600px) {
-  :root {
-    --ui-page-gutter: 18px;
-    --ui-hud-height: 6.12dvh;
-    --ui-nav-height: 9.70dvh;
-    --ui-content-max-width: 1120px;
-
-    --ui-font-hud-title: 13px;
-    --ui-font-hud-subtitle: 10px;
-    --ui-font-hud-time: 17px;
-    --ui-font-hud-value: 13px;
-    --ui-font-nav-label: 14px;
-
-    --ui-city-hero-min-height: 8.79dvh;
-    --ui-city-filter-height: 4.30dvh;
-    --ui-city-map-height: 42.77dvh;
-    --ui-city-map-min-height: 0px;
-    --ui-city-detail-thumb-size: clamp(58px,7.55dvh,72px);
-    --ui-city-detail-height: 28.32dvh;
-  }
-}
-
-@media (min-width: 840px) {
-  :root {
-    --ui-page-gutter: 32px;
-    --ui-hud-height: 82px;
-    --ui-nav-height: 0px;
-    --ui-nav-rail-width: 96px;
-    --ui-content-max-width: 1280px;
-
-    --ui-city-hero-min-height: 136px;
-    --ui-city-filter-height: 62px;
-    --ui-city-map-min-height: 560px;
-  }
+  --ui-box-hero-icon:
+    min(
+      6.0781vw,
+      2.7344dvh
+    );
+  --ui-box-filter-icon:
+    min(
+      2.3155vw,
+      1.0417dvh
+    );
+  --ui-box-marker-icon:
+    min(
+      5.4993vw,
+      2.4740dvh
+    );
+  --ui-box-map-control:
+    min(
+      7.8148vw,
+      3.5156dvh
+    );
+  --ui-box-metric-icon:
+    min(
+      5.4993vw,
+      2.4740dvh
+    );
+  --ui-box-opportunity-thumb:
+    min(
+      8.6831vw,
+      3.9062dvh
+    );
+  --ui-box-nav-icon:
+    min(
+      6.3676vw,
+      2.8646dvh
+    );
 }
 
 *,
@@ -239,60 +234,39 @@
 
 html,
 body,
-button,
-input,
-select,
-textarea {
+button {
   font-family:
     var(--ui-font-family);
 }
 
-button,
-input,
-select,
-textarea {
-  font:
-    inherit;
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-button,
-[role="button"],
-a {
-  -webkit-tap-highlight-color:
-    transparent;
+button {
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
 }
 
-.ui-v2-type-page-title {
-  font-size:
-    var(--ui-font-page-title);
-  line-height:
-    var(--ui-line-tight);
-  font-weight:
-    var(--ui-font-weight-black);
+body {
+  overflow: hidden;
+  background:
+    var(--ui-color-bg);
 }
 
-.ui-v2-type-section-title {
-  font-size:
-    var(--ui-font-section-title);
-  line-height:
-    var(--ui-line-title);
-  font-weight:
-    var(--ui-font-weight-black);
+.ui-v2-no-wrap {
+  white-space: nowrap;
 }
 
-.ui-v2-type-body {
-  font-size:
-    var(--ui-font-body);
-  line-height:
-    var(--ui-line-body);
-  font-weight:
-    var(--ui-font-weight-medium);
-}
-
-:focus-visible {
-  outline:
-    3px solid
-    var(--ui-focus);
-  outline-offset:
-    2px;
+.ui-v2-tabular {
+  font-variant-numeric:
+    tabular-nums;
 }

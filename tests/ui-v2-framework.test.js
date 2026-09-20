@@ -1,0 +1,234 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+import {
+  UI_REFERENCE,
+  UI_REGIONS,
+  UI_BOXES,
+  UI_TYPOGRAPHY
+} from "../src/ui-v2/contracts/UiFrameContract.js";
+
+import {
+  renderAppShell
+} from "../src/ui-v2/shell/AppShell.js";
+
+import {
+  renderCityFrame
+} from "../src/ui-v2/pages/city/CityFrame.js";
+
+test(
+  "691x1536六段框架严格闭合",
+  () => {
+    assert.deepEqual(
+      UI_REFERENCE,
+      {
+        width: 691,
+        height: 1536
+      }
+    );
+
+    assert.equal(
+      Object.values(
+        UI_REGIONS
+      ).reduce(
+        (
+          total,
+          region
+        ) =>
+          total +
+          region.height,
+        0
+      ),
+      1536
+    );
+
+    assert.equal(
+      UI_REGIONS.hud.height,
+      103
+    );
+
+    assert.equal(
+      UI_REGIONS.map.height,
+      716
+    );
+
+    assert.equal(
+      UI_REGIONS.detail.height,
+      394
+    );
+
+    assert.equal(
+      UI_REGIONS.navigation.y,
+      1399
+    );
+  }
+);
+
+test(
+  "组件盒尺寸锁死",
+  () => {
+    assert.deepEqual(
+      UI_BOXES.hudAvatar,
+      {
+        width: 68,
+        height: 68
+      }
+    );
+
+    assert.deepEqual(
+      UI_BOXES.mapMarker,
+      {
+        width: 160,
+        height: 60
+      }
+    );
+
+    assert.deepEqual(
+      UI_BOXES.primaryAction,
+      {
+        width: 184,
+        height: 68
+      }
+    );
+
+    assert.deepEqual(
+      UI_BOXES.metric,
+      {
+        width: 105,
+        height: 112
+      }
+    );
+
+    assert.deepEqual(
+      UI_BOXES.navigationIcon,
+      {
+        width: 44,
+        height: 44
+      }
+    );
+  }
+);
+
+test(
+  "字体族字号字重契约锁死",
+  () => {
+    assert.deepEqual(
+      UI_TYPOGRAPHY.weights,
+      [
+        500,
+        600,
+        700,
+        800,
+        900
+      ]
+    );
+
+    assert.equal(
+      UI_TYPOGRAPHY.roles.pageTitle.size,
+      38
+    );
+
+    assert.equal(
+      UI_TYPOGRAPHY.roles.pageTitle.weight,
+      900
+    );
+
+    assert.equal(
+      UI_TYPOGRAPHY.roles.navigation.size,
+      22
+    );
+
+    assert.equal(
+      UI_TYPOGRAPHY.roles.metricValue.size,
+      18
+    );
+  }
+);
+
+test(
+  "运行结构只有新框架",
+  () => {
+    const shell =
+      renderAppShell();
+
+    const city =
+      renderCityFrame();
+
+    assert.equal(
+      (
+        shell.match(
+          /data-ui="global-hud"/g
+        ) ??
+        []
+      ).length,
+      1
+    );
+
+    assert.equal(
+      (
+        shell.match(
+          /data-ui="global-nav"/g
+        ) ??
+        []
+      ).length,
+      1
+    );
+
+    assert.equal(
+      (
+        city.match(
+          /data-ui-region="city-map"/g
+        ) ??
+        []
+      ).length,
+      1
+    );
+
+    assert.equal(
+      (
+        city.match(
+          /data-ui-box="map-marker"/g
+        ) ??
+        []
+      ).length,
+      5
+    );
+  }
+);
+
+test(
+  "旧UI实现与旧资源不允许回流",
+  () => {
+    for (
+      const path
+      of [
+        "src/ui-v2/pages/city/CityPage.js",
+        "src/ui-v2/pages/city/CityPageModel.js",
+        "src/ui-v2/pages/city/CityMapVisualLayout.js",
+        "src/ui-v2/assets/ui-assets.css",
+        "src/ui-v2/assets/CityVisualAssetContract.js",
+        "assets/ui-v2"
+      ]
+    ) {
+      assert.equal(
+        fs.existsSync(
+          path
+        ),
+        false,
+        path
+      );
+    }
+
+    const build =
+      fs.readFileSync(
+        "scripts/build-android-js.mjs",
+        "utf8"
+      );
+
+    assert.doesNotMatch(
+      build,
+      /assets\/ui-v2|ui-assets\.css|city-page\.css/
+    );
+  }
+);
