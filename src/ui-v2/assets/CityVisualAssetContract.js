@@ -18,7 +18,7 @@ const CITY_VISUAL_ASSET_CONTRACT =
         sourceReference:
           "approved-user-hud-nav-sheet",
         targetPath:
-          "assets/ui-v2/shared/hud-nav-atlas.webp",
+          "assets/ui-v2/shared/shared-ui-atlas.webp",
         fit: "contain",
         textInImage: false,
         status: "approved"
@@ -30,7 +30,7 @@ const CITY_VISUAL_ASSET_CONTRACT =
         sourceReference:
           "approved-user-map-component-sheet",
         targetPath:
-          "assets/ui-v2/city/city-map-components-atlas.webp",
+          "assets/ui-v2/city/city-map-atlas.webp",
         fit: "contain",
         textInImage: false,
         status: "approved"
@@ -42,7 +42,7 @@ const CITY_VISUAL_ASSET_CONTRACT =
         sourceReference:
           "approved-user-district-label-sheet",
         targetPath:
-          "assets/ui-v2/city/district-labels-atlas.webp",
+          "assets/ui-v2/city/city-map-atlas.webp",
         fit: "contain",
         textInImage: false,
         status: "approved"
@@ -54,7 +54,7 @@ const CITY_VISUAL_ASSET_CONTRACT =
         sourceReference:
           "approved-user-district-label-extended-sheet",
         targetPath:
-          "assets/ui-v2/city/district-labels-extended-atlas.webp",
+          "assets/ui-v2/city/city-map-atlas.webp",
         fit: "contain",
         textInImage: false,
         status: "approved"
@@ -66,7 +66,7 @@ const CITY_VISUAL_ASSET_CONTRACT =
         sourceReference:
           "approved-user-detail-sheet",
         targetPath:
-          "assets/ui-v2/city/city-detail-atlas.webp",
+          "assets/ui-v2/city/city-metric-atlas.webp",
         fit: "contain",
         textInImage: false,
         status: "approved"
