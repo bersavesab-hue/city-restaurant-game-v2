@@ -9,77 +9,91 @@ import {
 } from "../src/ui-v2/tokens/ReferenceLayout.js";
 
 test(
-  "城市母版严格锁定864x1536六区参考坐标",
+  "864x1536成品图只作为视觉像素母版并映射到432x768 CSS参考",
   () => {
     assert.deepEqual(
-      CITY_REFERENCE_LAYOUT.canvas,
+      CITY_REFERENCE_LAYOUT.artwork,
       {
         width: 864,
-        height: 1536
+        height: 1536,
+        pixelToCssScale: 0.5
       }
     );
 
-    const regions =
-      CITY_REFERENCE_LAYOUT.regions;
-
-    assert.equal(
-      regions.hud.height +
-      regions.hero.height +
-      regions.filters.height +
-      regions.map.height +
-      regions.detail.height +
-      regions.navigation.height,
-      1536
+    assert.deepEqual(
+      CITY_REFERENCE_LAYOUT.cssReference,
+      {
+        width: 432,
+        height: 768
+      }
     );
 
     assert.equal(
-      regions.hero.y,
-      94
+      CITY_RUNTIME_POLICY.pixelToCssScale,
+      0.5
     );
 
     assert.equal(
-      regions.map.y,
-      295
-    );
-
-    assert.equal(
-      regions.detail.y,
-      952
+      CITY_RUNTIME_POLICY.fullPageScaling,
+      false
     );
   }
 );
 
 test(
-  "城市适配只允许地图吸收额外纵向空间",
+  "城市运行时固定区接近母版而高度差只交给地图",
   () => {
+    const target =
+      CITY_REFERENCE_LAYOUT.runtimeTargets;
+
     assert.equal(
-      CITY_RUNTIME_POLICY.extraHeightTarget,
-      "city-map"
+      target.hud,
+      52
     );
 
     assert.equal(
-      CITY_RUNTIME_POLICY.minimumTouchTarget,
+      target.hero,
+      68
+    );
+
+    assert.equal(
+      target.filters,
       48
     );
 
     assert.equal(
-      CITY_RUNTIME_POLICY.textScaling,
-      "bounded"
+      target.detail,
+      218
+    );
+
+    assert.equal(
+      target.navigation,
+      74
+    );
+
+    assert.equal(
+      CITY_RUNTIME_POLICY.extraHeightTarget,
+      "city-map"
     );
   }
 );
 
 test(
-  "城市字体层级保持统一而不是页面自行漂移",
+  "字体按视觉像素折算为受控CSS字号",
   () => {
     assert.equal(
-      CITY_REFERENCE_TYPOGRAPHY.pageTitle,
+      CITY_REFERENCE_TYPOGRAPHY.artworkPixels.pageTitle,
       46
     );
 
     assert.equal(
-      CITY_REFERENCE_TYPOGRAPHY.metricValue,
-      21
+      CITY_REFERENCE_TYPOGRAPHY.runtimeCss.pageTitle,
+      24
+    );
+
+    assert.equal(
+      CITY_REFERENCE_TYPOGRAPHY.runtimeCss.metricValue,
+      12
     );
 
     const tokens =
@@ -97,7 +111,8 @@ test(
         "--ui-font-detail-title",
         "--ui-font-metric-label",
         "--ui-font-metric-value",
-        "--ui-font-nav-label"
+        "--ui-font-nav-label",
+        "--ui-city-detail-height"
       ]
     ) {
       assert.match(
@@ -107,5 +122,37 @@ test(
         )
       );
     }
+  }
+);
+
+test(
+  "城市详情维持六指标单排且页面不再用390px地图最小高",
+  () => {
+    const css =
+      fs.readFileSync(
+        "src/ui-v2/pages/city/city-page.css",
+        "utf8"
+      );
+
+    const tokens =
+      fs.readFileSync(
+        "src/ui-v2/tokens/tokens.css",
+        "utf8"
+      );
+
+    assert.match(
+      css,
+      /repeat\(\s*6,\s*minmax\(0,1fr\)\s*\)/
+    );
+
+    assert.match(
+      css,
+      /--ui-city-detail-height/
+    );
+
+    assert.doesNotMatch(
+      tokens,
+      /--ui-city-map-min-height:\s*390px/
+    );
   }
 );
