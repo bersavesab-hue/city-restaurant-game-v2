@@ -555,6 +555,9 @@ function mountCityPage(
       ?.id ??
     null;
 
+  let mapScale =
+    1;
+
   function render() {
     container.innerHTML =
       renderCityPage(
@@ -564,6 +567,13 @@ function mountCityPage(
           selectedDistrictId
         }
       );
+
+    container.style.setProperty(
+      "--ui-city-map-scale",
+      String(
+        mapScale
+      )
+    );
   }
 
   function handleClick(
@@ -624,6 +634,66 @@ function mountCityPage(
       }
 
       render();
+
+      return;
+    }
+
+    const mapAction =
+      target.closest(
+        "[data-city-map-action]"
+      );
+
+    if (
+      mapAction &&
+      container.contains(
+        mapAction
+      )
+    ) {
+      switch (
+        mapAction.dataset
+          .cityMapAction
+      ) {
+        case "zoom-in":
+          mapScale =
+            Math.min(
+              1.28,
+              Number(
+                (
+                  mapScale +
+                  .08
+                ).toFixed(
+                  2
+                )
+              )
+            );
+          break;
+
+        case "zoom-out":
+          mapScale =
+            Math.max(
+              .92,
+              Number(
+                (
+                  mapScale -
+                  .08
+                ).toFixed(
+                  2
+                )
+              )
+            );
+          break;
+
+        default:
+          mapScale =
+            1;
+      }
+
+      container.style.setProperty(
+        "--ui-city-map-scale",
+        String(
+          mapScale
+        )
+      );
 
       return;
     }
@@ -696,7 +766,8 @@ function mountCityPage(
     getState() {
       return {
         activeFilter,
-        selectedDistrictId
+        selectedDistrictId,
+        mapScale
       };
     },
 
