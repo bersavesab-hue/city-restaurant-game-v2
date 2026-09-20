@@ -53,3 +53,12 @@
 - docs/UI_PRIMARY_PAGES_V1.md
 
 页面信息结构已经整体定稿，后续实现只能按蓝图组合统一组件，禁止重新自由设计。
+
+## 当前运行时
+
+- AndroidBootstrap 已直接挂载唯一 AppShell。
+- Global HUD 与 Global Nav 已进入 APK 正式启动链。
+- 暂停 / 继续与 1x / 2x / 4x 已直接调用 TimeSystem。
+- 一级导航只维护 city / store / operations / employees / more 五个状态，不建立旧 ID 兼容。
+- Page Content 当前保持空净，等待城市正式页面接入；禁止先塞临时卡片或旧页面。
+- android/entry.js 旧 Canvas 试玩入口已删除。
