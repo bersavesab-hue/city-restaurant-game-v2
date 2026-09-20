@@ -732,7 +732,7 @@ class OpeningFlowSystem {
       status.hasOpened
     ) {
       return (
-        "operating-command-center"
+        "restaurant"
       );
     }
 

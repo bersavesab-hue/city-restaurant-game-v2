@@ -108,14 +108,14 @@ test(
 
 
 test(
-  "点击经营主导航默认进入经营首页",
+  "点击经营主导航直接进入唯一经营首页",
   () => {
     gameplayNavigationSystem
       .reset();
 
     assert.ok(
       pageRegistry.has(
-        "operations-home"
+        "operations"
       )
     );
 
@@ -124,7 +124,7 @@ test(
         .getLandingPage(
           "operations"
         ),
-      "operations-home"
+      "operations"
     );
 
     const result =
@@ -135,7 +135,7 @@ test(
 
     assert.equal(
       result.pageId,
-      "operations-home"
+      "operations"
     );
   }
 );

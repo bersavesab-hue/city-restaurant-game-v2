@@ -237,7 +237,7 @@ test(
 
     assert.ok(
       openingSystem.includes(
-        'nextPage:\n        "operating-command-center"'
+        'nextPage:\n        "restaurant"'
       )
     );
   }

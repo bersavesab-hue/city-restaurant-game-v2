@@ -816,7 +816,7 @@ test(
 
     assert.equal(
       opened.nextPage,
-      "operating-command-center"
+      "restaurant"
     );
 
 
@@ -850,7 +850,7 @@ test(
         .getRecommendedPage(
           restaurant.id
         ),
-      "operating-command-center"
+      "restaurant"
     );
 
 
@@ -867,7 +867,7 @@ test(
 
     assert.equal(
       commandCenter.pageId,
-      "operating-command-center"
+      "restaurant"
     );
 
 

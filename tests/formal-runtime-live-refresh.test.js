@@ -37,7 +37,7 @@ test(
       .getPage =
       restaurantId => ({
         pageId:
-          "operating-command-center",
+          "restaurant",
 
         restaurantId
       });
@@ -76,7 +76,7 @@ test(
       const mounted =
         runtime.mount({
           pageId:
-            "operating-command-center",
+            "restaurant",
 
           root,
 

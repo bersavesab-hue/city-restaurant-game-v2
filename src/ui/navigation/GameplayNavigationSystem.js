@@ -7,11 +7,13 @@ import {
   resolvePrimaryRouteAlias
 } from "../contracts/PrimaryUiContract.js";
 
-const MAIN_LANDINGS = Object.freeze(
-  Object.fromEntries(
-    PRIMARY_UI_IDS.map(id => [id, id])
-  )
-);
+const MAIN_LANDINGS = Object.freeze({
+  city: "city",
+  restaurant: "restaurant",
+  operations: "operations",
+  employees: "employees",
+  more: "more"
+});
 
 const ACTION_TARGETS = Object.freeze({
   finance: "finance",

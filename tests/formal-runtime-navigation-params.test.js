@@ -27,7 +27,7 @@ test("经营总控跳转日报时会把day周期传给analytics", () => {
   };
 
   const mounted = new FormalPageRuntime().mount({
-    pageId: "operating-command-center",
+    pageId: "restaurant",
     root,
     restaurantId: restaurant.id,
     onNavigate(pageId, nextRestaurantId, params) {

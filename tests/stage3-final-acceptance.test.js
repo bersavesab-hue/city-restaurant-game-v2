@@ -238,7 +238,7 @@ test(
         .getLandingPage(
           "restaurant"
         ),
-      "operating-command-center"
+      "restaurant"
     );
 
     assert.equal(
@@ -246,7 +246,7 @@ test(
         .getLandingPage(
           "operations"
         ),
-      "operations-home"
+      "operations"
     );
 
     assert.equal(
@@ -254,7 +254,7 @@ test(
         .getLandingPage(
           "employees"
         ),
-      "employee_roster"
+      "employees"
     );
 
     assert.equal(
@@ -262,7 +262,7 @@ test(
         .getLandingPage(
           "more"
         ),
-      "more-home"
+      "more"
     );
   }
 );
