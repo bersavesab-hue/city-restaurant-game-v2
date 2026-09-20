@@ -1,5 +1,5 @@
 import { cityMapDashboardSystem } from "./CityMapDashboardSystem.js";
-import { renderGameTopBar, renderNoticeTicker, renderBottomNavigation } from "../../components/GameChromeView.js";
+import { renderGameTopBar, renderBottomNavigation } from "../../components/GameChromeView.js";
 import { gameChromeSystem } from "../../components/GameChromeSystem.js";
 
 import {
@@ -169,11 +169,11 @@ class CityMapView {
     return (
       '<section class="city-map-heading">' +
         '<div class="city-map-heading__copy">' +
-          '<h1><span aria-hidden="true">●</span>城市地图</h1>' +
+          '<h1><span class="city-map-heading__pin" aria-hidden="true"></span>城市地图</h1>' +
           '<p>发现优质商圈，拓展门店版图，让美食走进更多地方</p>' +
         '</div>' +
         '<div class="city-map-heading__summary">' +
-          '<span class="city-map-heading__building" aria-hidden="true">▥</span>' +
+          '<span class="city-map-heading__building" aria-hidden="true"></span>' +
           '<div><strong>' + count + ' 个商圈</strong>' +
           '<small>' + areaCount + ' 大区域 · 等待你的探索</small></div>' +
         '</div>' +
@@ -193,17 +193,15 @@ class CityMapView {
 
     return (
       '<nav class="city-map-filters" aria-label="城市商圈筛选">' +
-      FILTERS.map(([id, label], index) =>
+      FILTERS.map(([id, label]) =>
         '<button type="button" class="' +
           (this.filter === id ? "is-active" : "") +
           '" data-action="set-filter" data-filter="' +
           id +
           '">' +
           '<span class="city-map-filter__icon city-map-filter__icon--' +
-          index +
-          '" aria-hidden="true">' +
-          (index === 0 ? "" : index === 4 ? "▣" : "●") +
-          '</span>' +
+          id +
+          '" aria-hidden="true"></span>' +
           '<strong>' +
           escapeHtml(label) +
           ' (' +
@@ -324,39 +322,6 @@ class CityMapView {
       );
     }
 
-    const selectedDistrict =
-      page.map.districts?.find(
-        district =>
-          district.id ===
-          selectedId
-      ) ??
-      null;
-
-    const regions =
-      areas.map(
-        area =>
-          '<div class="city-map-region city-map-region--' +
-          escapeHtml(area.id) +
-          (
-            selectedDistrict?.areaId ===
-            area.id
-              ? ' is-active'
-              : ''
-          ) +
-          '" aria-label="' +
-          escapeHtml(
-            area.name +
-            '，' +
-            area.districtCount +
-            '个商圈'
-          ) +
-          '">' +
-            '<span class="city-map-region__count">' +
-              area.districtCount +
-            '</span>' +
-          '</div>'
-      ).join("");
-
     const pins =
       displayed.map(
         district => {
@@ -447,10 +412,7 @@ class CityMapView {
         '<div class="city-map-stage" style="--city-map-zoom:' +
         this.zoom +
         '">' +
-          '<div class="city-map-artwork city-image-slot--map" role="img" aria-label="城市发展地图"></div>' +
-          '<div class="city-map-regions" aria-hidden="false">' +
-            regions +
-          '</div>' +
+          '<div class="city-map-artwork" role="img" aria-label="城市发展地图"></div>' +
           '<div class="city-map-slogan" aria-hidden="true">让美食<br>点亮这座城市 ♡</div>' +
           '<div class="city-map-pins">' +
             pins +
@@ -465,7 +427,7 @@ class CityMapView {
     );
   }
 
-  renderMetric(
+  renderMetric(  renderMetric(
     iconName,
     label,
     value,
@@ -544,7 +506,7 @@ class CityMapView {
           '</span>' +
           '<small>' + escapeHtml(description) + '</small>' +
         '</span>' +
-        '<span class="city-opportunity-card__arrow" aria-hidden="true">›</span>' +
+        '<span class="city-opportunity-card__arrow" aria-hidden="true"></span>' +
       '</button>'
     );
   }
@@ -618,7 +580,7 @@ class CityMapView {
           '</div>' +
           '<button type="button" class="city-district-sheet__properties" data-action="open-district-properties" data-district-id="' +
           escapeHtml(district.id) +
-          '"><span aria-hidden="true">⌕</span><strong>查看房源</strong></button>' +
+          '"><span class="city-district-sheet__properties-icon" aria-hidden="true"></span><strong>查看房源</strong></button>' +
         '</header>' +
         '<div class="city-district-metrics">' +
           this.renderMetric("traffic", "客流量", trafficPerDay.toLocaleString("zh-CN") + "人/天", district.trafficIndex >= 60 ? "▲ 活跃" : "平稳") +
@@ -629,11 +591,11 @@ class CityMapView {
           this.renderMetric("property", "可租房源", (district.propertyCount ?? 0) + "套") +
         '</div>' +
         '<section class="city-opportunities">' +
-          '<header><div><span aria-hidden="true">♛</span>' +
+          '<header><div><span class="city-opportunities__emblem" aria-hidden="true"></span>' +
           '<strong>今日机会 (' +
           opportunities.length +
           ')</strong></div>' +
-          '<button type="button" data-action="navigate" data-page-id="properties">查看全部 ›</button></header>' +
+          '<button type="button" data-action="navigate" data-page-id="properties">查看全部</button></header>' +
           '<div class="city-opportunities__grid">' +
           (
             opportunities.length

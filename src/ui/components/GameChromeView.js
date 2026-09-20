@@ -299,7 +299,10 @@ export function renderGameTopBar(
             class="rg-topbar__level-icon"
             aria-hidden="true"
           >
-            ♛
+            ${renderUiIcon(
+              "ranking",
+              "rg-topbar__level-svg"
+            )}
           </span>
 
           <strong>

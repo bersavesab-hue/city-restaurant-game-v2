@@ -4,7 +4,7 @@ import fs from "node:fs";
 
 
 test(
-  "城市确认稿使用1536高视口的固定纵向比例",
+  "城市正式稿使用1536高视口的固定纵向比例",
   () => {
     const city =
       fs.readFileSync(

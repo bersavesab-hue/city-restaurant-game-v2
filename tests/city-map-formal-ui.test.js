@@ -363,22 +363,8 @@ test(
         text
       );
     }
-
-
-
-    assert.equal(
-      (
-        html.match(
-          /class="city-map-region city-map-region--/g
-        ) ??
-        []
-      ).length,
-      4,
-      "城市地图必须保持四个宏观区域层"
-    );
-
-
-    for (
+    assert.equal(html.includes("city-map-regions"), false, "旧代码区域描边层必须彻底删除");
+for (
       const detailText
       of [
         "×",

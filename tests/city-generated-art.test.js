@@ -147,7 +147,8 @@ test(
       of [
         "city-metric-icons.webp",
         "city-map-controls.webp",
-        "city-state-badges.webp"
+        "city-state-badges.webp",
+        "city-main-map.webp"
       ]
     ) {
       assert.equal(
@@ -166,5 +167,31 @@ test(
       ),
       false
     );
+
+    assert.equal(
+      view.includes(
+        "city-map-regions"
+      ),
+      false,
+      "旧区域描边代码必须删除"
+    );
+
+    for (
+      const obsoleteGlyph
+      of [
+        "⌕",
+        "♛",
+        "查看全部 ›"
+      ]
+    ) {
+      assert.equal(
+        view.includes(
+          obsoleteGlyph
+        ),
+        false,
+        "仍残留旧字符UI：" +
+        obsoleteGlyph
+      );
+    }
   }
 );
