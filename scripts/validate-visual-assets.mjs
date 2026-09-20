@@ -62,6 +62,34 @@ const RULES =
 
     {
       directory:
+        "assets/images/ui/store-home/hero",
+
+      width:
+        1600,
+
+      height:
+        900,
+
+      label:
+        "门店主页场景"
+    },
+
+    {
+      directory:
+        "assets/images/ui/store-home/cards",
+
+      width:
+        960,
+
+      height:
+        720,
+
+      label:
+        "门店主页功能卡"
+    },
+
+    {
+      directory:
         "assets/images/ui/employees/avatars",
 
       width:
