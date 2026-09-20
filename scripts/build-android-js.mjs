@@ -17,11 +17,11 @@ const outputDirectory =
 const styleSources =
   Object.freeze([
     "src/ui-v2/tokens/tokens.css",
-    "src/ui-v2/assets/ui-assets.css",
     "src/ui-v2/shell/app-shell.css",
     "src/ui-v2/components/global-hud.css",
     "src/ui-v2/components/global-nav.css",
-    "src/ui-v2/pages/city/city-page.css"
+    "src/ui-v2/pages/city/city-page.css",
+    "src/ui-v2/assets/ui-assets.css"
   ]);
 
 fs.rmSync(
