@@ -286,7 +286,7 @@
     rgba(255,255,255,.94);
 }
 
-.ui-v2-city-frame__marker > div {
+.ui-v2-city-frame__marker-copy {
   min-width: 0;
   display: grid;
   align-content: center;
@@ -725,4 +725,27 @@
   line-height: 1.25;
   font-weight:
     var(--ui-weight-medium);
+}
+
+.ui-v2-city-frame__marker.is-filtered-out {
+  opacity: .18;
+  pointer-events: none;
+}
+
+.ui-v2-city-frame__marker.is-selected {
+  z-index: 4;
+  box-shadow:
+    0 0 0 3px
+    rgba(255,205,36,.42);
+}
+
+.ui-v2-city-frame__opportunity.is-empty {
+  opacity: .38;
+}
+
+.ui-v2-city-frame__detail-title-row
+[data-live="detail-badge"] {
+  max-width: 9.5vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
