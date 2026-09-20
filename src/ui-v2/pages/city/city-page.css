@@ -6,10 +6,7 @@
   grid-template-rows:
     var(--ui-city-hero-min-height)
     var(--ui-city-filter-height)
-    minmax(
-      var(--ui-city-map-min-height),
-      1fr
-    )
+    var(--ui-city-map-height)
     var(--ui-city-detail-height);
   color:
     var(--ui-text);
@@ -242,8 +239,8 @@
 
 .ui-v2-city-filter {
   min-width: 0;
-  min-height:
-    var(--ui-hit-min);
+  min-height: 0;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -289,8 +286,9 @@
 
 .ui-v2-city-map-stage {
   position: relative;
-  min-height:
-    var(--ui-city-map-min-height);
+  min-height: 0;
+  height:
+    var(--ui-city-map-height);
   overflow: hidden;
   isolation: isolate;
   background: #b9d8c9;
@@ -480,7 +478,7 @@
   right:
     var(--ui-space-xs);
   bottom:
-    54px;
+    3.2dvh;
   display: grid;
   gap:
     var(--ui-space-xs);
@@ -554,7 +552,8 @@
 }
 
 .ui-v2-city-detail__main {
-  min-height: 64px;
+  min-height:
+    var(--ui-city-detail-thumb-size);
   display: grid;
   grid-template-columns:
     var(--ui-city-detail-thumb-size)
@@ -667,7 +666,12 @@
 .ui-v2-city-property-button {
   grid-area: action;
   justify-self: stretch;
-  height: 48px;
+  height:
+    clamp(
+      40px,
+      6.4dvh,
+      48px
+    );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -722,7 +726,7 @@
   gap:
     var(--ui-space-xxs);
   margin-top:
-    6px;
+    4px;
 }
 
 .ui-v2-city-metric {
@@ -798,16 +802,21 @@
 
 .ui-v2-city-opportunities {
   margin-top:
-    5px;
+    3px;
   padding-top:
-    4px;
+    2px;
   border-top:
     1px solid
     #e7edf3;
 }
 
 .ui-v2-city-opportunities__header {
-  min-height: 24px;
+  min-height:
+    clamp(
+      20px,
+      3.2dvh,
+      24px
+    );
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -986,7 +995,7 @@
     gap:
       6px;
     padding:
-      6px
+      3px
       var(--ui-page-gutter);
   }
 
@@ -996,7 +1005,11 @@
   }
 
   .ui-v2-city-summary-card {
-    height: 46px;
+    height:
+      min(
+        6.3dvh,
+        46px
+      );
     grid-template-columns:
       30px
       minmax(0,1fr);
@@ -1008,10 +1021,6 @@
   .ui-v2-city-summary-card > span {
     width: 28px;
     height: 28px;
-  }
-
-  .ui-v2-city-marker {
-    max-width: 118px;
   }
 
   .ui-v2-city-detail__main {
