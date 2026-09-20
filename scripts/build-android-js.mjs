@@ -14,6 +14,14 @@ const outputDirectory =
     "android/app/src/main/assets"
   );
 
+const styleSources =
+  Object.freeze([
+    "src/ui-v2/tokens/tokens.css",
+    "src/ui-v2/shell/app-shell.css",
+    "src/ui-v2/components/global-hud.css",
+    "src/ui-v2/components/global-nav.css"
+  ]);
+
 fs.rmSync(
   outputDirectory,
   {
@@ -49,6 +57,29 @@ await build({
   logLevel: "info"
 });
 
+const css =
+  styleSources
+    .map(
+      source =>
+        fs.readFileSync(
+          path.resolve(
+            source
+          ),
+          "utf8"
+        )
+    )
+    .join(
+      "\n\n"
+    );
+
+fs.writeFileSync(
+  path.join(
+    outputDirectory,
+    "game.css"
+  ),
+  css
+);
+
 const index = `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -58,6 +89,10 @@ const index = `<!doctype html>
     content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
   >
   <title>${RELEASE_INFO.appName}</title>
+  <link
+    rel="stylesheet"
+    href="game.css"
+  >
   <style>
     html,
     body,
@@ -90,6 +125,6 @@ fs.writeFileSync(
 );
 
 console.log(
-  "Android core bootstrap ready:",
+  "Android UI V2 bootstrap ready:",
   outputDirectory
 );
