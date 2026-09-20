@@ -53,7 +53,7 @@ function districtDescription(
     0;
 
   if (
-    traffic >= 85 &&
+    traffic >= 80 &&
     spending >= 75
   ) {
     return "城市核心商圈，客流稳定，消费能力强，适合品牌扩张。";
