@@ -26,58 +26,6 @@ const GAMEPLAY_PAGES = [
 
   {
     id:
-      "operations-home",
-
-    title:
-      "经营",
-
-    parent:
-      "operations",
-
-    order:
-      301,
-
-    layout:
-      "management",
-
-    metadata: {
-      hiddenFromMenu:
-        true,
-
-      landingFor:
-        "operations"
-    }
-  },
-
-
-  {
-    id:
-      "operating-command-center",
-
-    title:
-      "经营总控",
-
-    parent:
-      "restaurant",
-
-    order:
-      201,
-
-    layout:
-      "dashboard",
-
-    metadata: {
-      landingFor:
-        "restaurant",
-
-      primary:
-        true
-    }
-  },
-
-
-  {
-    id:
       "menu-optimization",
 
     title:
@@ -335,32 +283,6 @@ const GAMEPLAY_PAGES = [
 
     layout:
       "dashboard"
-  },
-
-
-  {
-    id:
-      "more-home",
-
-    title:
-      "更多",
-
-    parent:
-      "more",
-
-    order:
-      501,
-
-    layout:
-      "management",
-
-    metadata: {
-      hiddenFromMenu:
-        true,
-
-      landingFor:
-        "more"
-    }
   },
 
 

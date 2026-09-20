@@ -1,359 +1,181 @@
-
-import {
-  pageRegistry
-} from "../registry/PageRegistry.js";
-
+import { pageRegistry } from "../registry/PageRegistry.js";
 import "../registry/defaultPages.js";
 import "../registry/gameplayPages.js";
 
-const MAIN_LANDINGS =
-  Object.freeze({
-    city:
-      "city",
+import {
+  PRIMARY_UI_IDS,
+  resolvePrimaryRouteAlias
+} from "../contracts/PrimaryUiContract.js";
 
-    restaurant:
-      "operating-command-center",
+const MAIN_LANDINGS = Object.freeze(
+  Object.fromEntries(
+    PRIMARY_UI_IDS.map(id => [id, id])
+  )
+);
 
-    operations:
-      "operations-home",
+const ACTION_TARGETS = Object.freeze({
+  finance: "finance",
+  analytics: "analytics",
+  supply: "supply",
+  inventory: "supply",
 
-    employees:
-      "employee_roster",
+  employees: "employees",
+  staffing: "employees",
+  workforce: "workforce-capacity",
+  schedule: "workforce-capacity",
 
-    more:
-      "more-home"
-  });
+  menu: "menu-optimization",
+  "menu-optimization": "menu-optimization",
+  capacity: "capacity",
+  reputation: "reputation",
+  channels: "channels",
 
-const ACTION_TARGETS =
-  Object.freeze({
-    finance:
-      "finance",
+  operations: "operations",
+  restaurant: "restaurant",
 
-    analytics:
-      "analytics",
+  customers: "customers",
+  "member-marketing": "member-marketing",
+  "menu-engineering": "menu-engineering",
+  "equipment-maintenance": "equipment-maintenance",
+  market: "market-strategy",
+  competition: "market-strategy",
+  "market-strategy": "market-strategy",
 
-    supply:
-      "supply",
+  "operating-command-center": "restaurant",
+  "operations-home": "operations",
+  employee_roster: "employees",
+  "more-home": "more"
+});
 
-    inventory:
-      "supply",
-
-    employees:
-      "employee_roster",
-
-    staffing:
-      "employee_roster",
-
-    workforce:
-      "workforce-capacity",
-
-    schedule:
-      "workforce-capacity",
-
-    menu:
-      "menu-optimization",
-
-    "menu-optimization":
-      "menu-optimization",
-
-    capacity:
-      "capacity",
-
-    reputation:
-      "reputation",
-
-    channels:
-      "channels",
-
-    operations:
-      "analytics",
-
-    restaurant:
-      "operating-command-center",
-
-    "operating-command-center":
-      "operating-command-center",
-
-    customers:
-      "customers",
-
-    "member-marketing":
-      "member-marketing",
-
-    "menu-engineering":
-      "menu-engineering",
-
-    "equipment-maintenance":
-      "equipment-maintenance",
-
-    market:
-      "market-strategy",
-
-    competition:
-      "market-strategy",
-
-    "market-strategy":
-      "market-strategy"
-  });
+const DEFAULT_PAGE_ID = "restaurant";
 
 class GameplayNavigationSystem {
   constructor() {
-    this.currentPageId =
-      "operating-command-center";
-
-    this.history = [
-      this.currentPageId
-    ];
+    this.currentPageId = DEFAULT_PAGE_ID;
+    this.history = [this.currentPageId];
   }
 
-  getLandingPage(
-    mainPageId
-  ) {
-    return (
-      MAIN_LANDINGS[
-        mainPageId
-      ] ??
-      mainPageId
+  getLandingPage(mainPageId) {
+    const canonical = resolvePrimaryRouteAlias(mainPageId);
+    return MAIN_LANDINGS[canonical] ?? canonical;
+  }
+
+  resolveActionTarget(target) {
+    const requested = resolvePrimaryRouteAlias(
+      String(target ?? "").trim()
     );
-  }
-
-  resolveActionTarget(
-    target
-  ) {
-    const requested =
-      String(
-        target ?? ""
-      ).trim();
 
     if (!requested) {
-      return (
-        this.currentPageId
-      );
+      return this.currentPageId;
     }
 
-    const mapped =
-      ACTION_TARGETS[
-        requested
-      ] ??
-      requested;
+    const mapped = resolvePrimaryRouteAlias(
+      ACTION_TARGETS[requested] ?? requested
+    );
 
-    if (
-      pageRegistry.has(
-        mapped
-      )
-    ) {
+    if (pageRegistry.has(mapped)) {
       return mapped;
     }
 
-    return (
-      "operating-command-center"
+    return DEFAULT_PAGE_ID;
+  }
+
+  resolveNavigationTarget(pageId) {
+    return this.resolveActionTarget(
+      this.getLandingPage(pageId)
     );
   }
 
-  resolveNavigationTarget(
-    pageId
-  ) {
-    const requested =
-      String(
-        pageId ?? ""
-      ).trim();
+  navigate(pageId, { unlockResolver = null } = {}) {
+    const target = this.resolveNavigationTarget(pageId);
 
-    const landing =
-      this.getLandingPage(
-        requested
-      );
-
-    return (
-      this.resolveActionTarget(
-        landing
-      )
-    );
-  }
-
-  navigate(
-    pageId,
-    {
-      unlockResolver = null
-    } = {}
-  ) {
-    const target =
-      this.resolveNavigationTarget(
-        pageId
-      );
-
-    if (
-      !pageRegistry.has(
-        target
-      )
-    ) {
-      throw new Error(
-        `Unknown page "${target}"`
-      );
+    if (!pageRegistry.has(target)) {
+      throw new Error(`Unknown page "${target}"`);
     }
 
-    if (
-      !pageRegistry.isUnlocked(
-        target,
-        unlockResolver
-      )
-    ) {
+    if (!pageRegistry.isUnlocked(target, unlockResolver)) {
       return {
         changed: false,
-
-        reason:
-          "locked",
-
-        pageId:
-          this.currentPageId
+        reason: "locked",
+        pageId: this.currentPageId
       };
     }
 
-    if (
-      target ===
-      this.currentPageId
-    ) {
+    if (target === this.currentPageId) {
       return {
         changed: false,
-
-        reason:
-          "same_page",
-
-        pageId:
-          target
+        reason: "same_page",
+        pageId: target
       };
     }
 
-    this.currentPageId =
-      target;
+    this.currentPageId = target;
+    this.history.push(target);
 
-    this.history.push(
-      target
-    );
-
-    if (
-      this.history.length >
-      30
-    ) {
+    if (this.history.length > 30) {
       this.history.shift();
     }
 
     return {
       changed: true,
-
-      reason:
-        "navigated",
-
-      pageId:
-        target,
-
-      page:
-        pageRegistry.get(
-          target
-        )
+      reason: "navigated",
+      pageId: target,
+      page: pageRegistry.get(target)
     };
   }
 
-  navigateAction(
-    actionTarget,
-    options = {}
-  ) {
+  navigateAction(actionTarget, options = {}) {
     return this.navigate(
-      this.resolveActionTarget(
-        actionTarget
-      ),
+      this.resolveActionTarget(actionTarget),
       options
     );
   }
 
   back() {
-    if (
-      this.history.length <=
-      1
-    ) {
+    if (this.history.length <= 1) {
       return {
         changed: false,
-
-        pageId:
-          this.currentPageId
+        pageId: this.currentPageId
       };
     }
 
     this.history.pop();
-
-    this.currentPageId =
-      this.history[
-        this.history.length -
-        1
-      ];
+    this.currentPageId = this.history[this.history.length - 1];
 
     return {
       changed: true,
-
-      pageId:
-        this.currentPageId,
-
-      page:
-        pageRegistry.get(
-          this.currentPageId
-        )
+      pageId: this.currentPageId,
+      page: pageRegistry.get(this.currentPageId)
     };
   }
 
   getCurrentPage() {
-    return pageRegistry.get(
-      this.currentPageId
-    );
+    return pageRegistry.get(this.currentPageId);
   }
 
   getMainNavigation() {
     return pageRegistry
       .mainNavigation()
-      .map(
-        page => ({
-          ...page,
-
-          landingPageId:
-            this.getLandingPage(
-              page.id
-            ),
-
-          active:
-            this.isMainPageActive(
-              page.id
-            )
-        })
-      );
+      .map(page => ({
+        ...page,
+        landingPageId: this.getLandingPage(page.id),
+        active: this.isMainPageActive(page.id)
+      }));
   }
 
-  isMainPageActive(
-    mainPageId
-  ) {
-    const current =
-      pageRegistry.get(
-        this.currentPageId
-      );
+  isMainPageActive(mainPageId) {
+    const current = pageRegistry.get(this.currentPageId);
 
-    if (
-      current.id ===
-      mainPageId
-    ) {
+    if (current.id === mainPageId) {
       return true;
     }
 
-    return (
-      current.parent ===
-      mainPageId
-    );
+    return current.parent === mainPageId;
   }
 
-
   reset() {
-    this.currentPageId =
-      "operating-command-center";
-
-    this.history = [
-      this.currentPageId
-    ];
+    this.currentPageId = DEFAULT_PAGE_ID;
+    this.history = [this.currentPageId];
   }
 }
 

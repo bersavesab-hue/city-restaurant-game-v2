@@ -1,50 +1,34 @@
+import {
+  PRIMARY_UI_IDS,
+  LEGACY_PRIMARY_ROUTE_ALIASES
+} from "../contracts/PrimaryUiContract.js";
+
 const MAIN_ROOT_PAGE_IDS =
   Object.freeze([
-    "city",
-    "restaurant",
-    "operations",
-    "employees",
-    "more"
+    ...PRIMARY_UI_IDS
   ]);
-
 
 const NATIVE_RUNTIME_PAGE_IDS =
   Object.freeze([
     "properties",
     "property_detail",
-
     "renovation",
     "renovation_construction",
-
     "opening-setup",
-
-    "employee_roster",
-
     "dishes",
-    "analytics",
-
+    "analytics"
   ]);
 
-
-/*
- * 这些页面目前确实没有独立正式 View。
- * 允许暂时占位，但必须显式登记。
- *
- * 后面真正做出页面时，必须从这里删除。
- */
 const INTENTIONAL_PLACEHOLDER_PAGE_IDS =
   Object.freeze([]);
 
-
 const LEGACY_PAGE_IDS =
   Object.freeze([
-    "restaurant_home",
-    "employee-home",
-    "employees-home",
-    "members",
-    "restaurant-home"
+    ...Object.keys(
+      LEGACY_PRIMARY_ROUTE_ALIASES
+    ),
+    "members"
   ]);
-
 
 export {
   MAIN_ROOT_PAGE_IDS,

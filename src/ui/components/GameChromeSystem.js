@@ -1,6 +1,11 @@
 import "../registry/defaultPages.js";
 
 import {
+  PRIMARY_UI_ICON_BY_ID,
+  resolvePrimaryRouteAlias
+} from "../contracts/PrimaryUiContract.js";
+
+import {
   pageRegistry
 } from "../registry/PageRegistry.js";
 
@@ -18,22 +23,7 @@ import {
 
 
 const MAIN_ICONS =
-  Object.freeze({
-    city:
-      "city",
-
-    restaurant:
-      "store",
-
-    operations:
-      "operations",
-
-    employees:
-      "employees",
-
-    more:
-      "more"
-  });
+  PRIMARY_UI_ICON_BY_ID;
 
 
 const BACK_OVERRIDES =
@@ -67,9 +57,6 @@ const BACK_OVERRIDES =
 
     finance:
       "operations",
-
-    employee_roster:
-      "employees",
 
     employee_training:
       "employee_roster",
@@ -121,7 +108,9 @@ function resolveMainRoot(
 
 
   let currentId =
-    pageId;
+    resolvePrimaryRouteAlias(
+      pageId
+    );
 
   const visited =
     new Set();
