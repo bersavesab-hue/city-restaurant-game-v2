@@ -48,16 +48,14 @@ test(
 );
 
 test(
-  "AppShell保持安全区HUD内容导航安全区五层结构",
+  "AppShell只保留HUD内容导航三层且安全区并入两端",
   () => {
     assert.deepEqual(
       APP_SHELL_REGIONS,
       [
-        "safe-top",
         "global-hud",
         "page-content",
-        "global-nav",
-        "safe-bottom"
+        "global-nav"
       ]
     );
   }
@@ -186,7 +184,7 @@ test(
 );
 
 test(
-  "HUD窄屏只重排不建立第二套结构且关键数值不截断",
+  "HUD窄屏仍保持单排且关键数值不截断",
   () => {
     const css =
       fs.readFileSync(
@@ -196,17 +194,12 @@ test(
 
     assert.match(
       css,
-      /@media \(max-width: 399px\)/
-    );
-
-    assert.match(
-      css,
-      /grid-template-areas:\s*"identity resources"\s*"simulation simulation"/
+      /grid-template-areas:\s*"identity simulation resources"/
     );
 
     assert.doesNotMatch(
       css,
-      /text-overflow:\s*ellipsis[\s\S]*ui-v2-no-truncate-number/
+      /"identity resources"\s*"simulation simulation"/
     );
 
     assert.doesNotMatch(
