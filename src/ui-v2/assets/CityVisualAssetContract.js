@@ -3,85 +3,100 @@ const CITY_VISUAL_ASSET_CONTRACT =
     cityMapMaster:
       Object.freeze({
         id: "city-map-master",
-        sourceReference:
-          "approved-user-city-map",
         targetPath:
           "assets/ui-v2/city/city-map-master.webp",
         fit: "cover",
-        textInImage: false,
         status: "approved"
       }),
 
-    hudAndNavigation:
+    sharedIcons:
       Object.freeze({
-        id: "hud-nav-components",
-        sourceReference:
-          "approved-user-hud-nav-sheet",
-        targetPath:
-          "assets/ui-v2/shared/shared-ui-atlas.webp",
-        fit: "contain",
-        textInImage: false,
-        status: "approved"
+        directory:
+          "assets/ui-v2/icons/shared",
+        files:
+          Object.freeze([
+            "hud-store.svg",
+            "money.svg",
+            "plus.svg",
+            "crown.svg",
+            "star.svg",
+            "weather-sunny.svg",
+            "pause.svg",
+            "play.svg",
+            "chevron-down.svg"
+          ])
       }),
 
-    cityMapControls:
+    navigationIcons:
       Object.freeze({
-        id: "city-map-components",
-        sourceReference:
-          "approved-user-map-component-sheet",
-        targetPath:
-          "assets/ui-v2/city/city-map-atlas.webp",
-        fit: "contain",
-        textInImage: false,
-        status: "approved"
+        directory:
+          "assets/ui-v2/icons/nav",
+        files:
+          Object.freeze([
+            "city.svg",
+            "store.svg",
+            "operations.svg",
+            "employees.svg",
+            "more.svg"
+          ])
       }),
 
-    districtLabels:
+    mapIcons:
       Object.freeze({
-        id: "district-labels",
-        sourceReference:
-          "approved-user-district-label-sheet",
-        targetPath:
-          "assets/ui-v2/city/city-map-atlas.webp",
-        fit: "contain",
-        textInImage: false,
-        status: "approved"
-      }),
-
-    districtLabelsExtended:
-      Object.freeze({
-        id: "district-labels-extended",
-        sourceReference:
-          "approved-user-district-label-extended-sheet",
-        targetPath:
-          "assets/ui-v2/city/city-map-atlas.webp",
-        fit: "contain",
-        textInImage: false,
-        status: "approved"
-      }),
-
-    detailSheet:
-      Object.freeze({
-        id: "city-detail-components",
-        sourceReference:
-          "approved-user-detail-sheet",
-        targetPath:
-          "assets/ui-v2/city/city-metric-atlas.webp",
-        fit: "contain",
-        textInImage: false,
-        status: "approved"
+        directory:
+          "assets/ui-v2/icons/map",
+        files:
+          Object.freeze([
+            "plus.svg",
+            "minus.svg",
+            "locate.svg",
+            "building.svg",
+            "university.svg",
+            "nightlife.svg",
+            "shop.svg",
+            "lock.svg",
+            "waterfront.svg"
+          ])
       }),
 
     metricIcons:
       Object.freeze({
-        id: "city-metric-icons",
-        sourceReference:
-          "approved-user-metric-icon-sheet",
-        targetPath:
-          "assets/ui-v2/city/city-metric-atlas.webp",
-        fit: "contain",
-        textInImage: false,
-        status: "approved"
+        directory:
+          "assets/ui-v2/icons/metric",
+        files:
+          Object.freeze([
+            "traffic.svg",
+            "spending.svg",
+            "rent.svg",
+            "competition.svg",
+            "delivery.svg",
+            "properties.svg"
+          ])
+      }),
+
+    actionIcons:
+      Object.freeze({
+        directory:
+          "assets/ui-v2/icons/action",
+        files:
+          Object.freeze([
+            "search.svg",
+            "opportunity.svg",
+            "chevron-right.svg"
+          ])
+      }),
+
+    regionOutlines:
+      Object.freeze({
+        directory:
+          "assets/ui-v2/icons/regions",
+        files:
+          Object.freeze([
+            "core.svg",
+            "campus.svg",
+            "nightlife.svg",
+            "lifestyle.svg"
+          ])
       })
   });
 
@@ -107,12 +122,12 @@ const CITY_VISUAL_SLOT_POLICY =
       Object.freeze([
         "background",
         "icon",
-        "frame",
-        "badge-frame",
-        "marker-frame",
         "region-outline",
         "thumbnail"
-      ])
+      ]),
+
+    spriteAtlas:
+      false
   });
 
 export {
