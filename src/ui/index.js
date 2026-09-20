@@ -2,8 +2,6 @@ export {
   PRIMARY_UI_TABS,
   PRIMARY_UI_IDS,
   PRIMARY_UI_ICON_BY_ID,
-  LEGACY_PRIMARY_ROUTE_ALIASES,
-  resolvePrimaryRouteAlias,
   isPrimaryUiPage
 } from "./contracts/PrimaryUiContract.js";
 

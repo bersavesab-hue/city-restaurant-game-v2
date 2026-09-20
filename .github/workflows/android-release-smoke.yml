@@ -7,36 +7,6 @@ concurrency:
 on:
   workflow_dispatch:
 
-  push:
-    branches:
-      - main
-
-    paths:
-      - "android/**"
-      - "src/release/**"
-      - "src/systems/FeedbackSystem.js"
-      - "src/systems/OnboardingSystem.js"
-      - "src/ui/runtime/AndroidPlaytestEntry.js"
-      - "src/ui/pages/**/*.js"
-      - "scripts/build-android-js.mjs"
-      - "scripts/generate-release-metadata.mjs"
-      - "scripts/pre-release-playtest-gate.mjs"
-      - "scripts/phase8-release-gate.mjs"
-      - "tests/new-player-full-journey-e2e.test.js"
-      - "tests/phase7-ux-integration.test.js"
-      - "tests/pre-release-playtest-acceptance.test.js"
-      - "tests/real-startup-affordability.test.js"
-      - "tests/workforce-capacity.test.js"
-      - "tests/phase8-release-integration.test.js"
-      - "package.json"
-      - "package-lock.json"
-      - "PRIVACY.md"
-      - "docs/PUBLISHING.md"
-      - "docs/STORE_LISTING_DRAFT.md"
-      - "docs/PLAYTEST_ACCEPTANCE.md"
-      - ".github/test-signing/**"
-      - ".github/workflows/android-release-smoke.yml"
-
 permissions:
   contents: read
 
@@ -48,10 +18,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Node 20
+      - name: Node 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install JavaScript dependencies

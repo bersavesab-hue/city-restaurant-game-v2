@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.91 - 2026-09-20
+
+- 正式删除一级导航运行时兼容层：PrimaryUiContract不再保存或导出旧一级ID别名，GameplayNavigationSystem与GameChromeSystem不再解析operating-command-center、operations-home、employee_roster、more-home等旧入口。
+- 员工二级页面返回目标统一改为employees；UI公共出口移除LEGACY_PRIMARY_ROUTE_ALIASES与resolvePrimaryRouteAlias，旧ID仅保留在RuntimeRouteContract的禁止回流名单和测试断言中，不再参与任何运行逻辑。
+- Restaurant Playtest APK自动工作流改为纯构建流程：删除npm test以及Phase2、存档兼容、连锁、生命周期、UX、发布、性能、90天平衡、365天长跑等前置测试。
+- 日常APK只执行依赖安装、Android Web Bundle构建、必要资源校验、签名与assembleDebug；测试文件/测试脚本变化不再触发APK重打包，Gradle不再执行无意义的clean，并启用Gradle缓存。
+- Android Release Smoke取消main自动触发，改为仅workflow_dispatch手动运行；需要完整发布门禁时再人工执行，避免日常开发同时重复构建两份APK。
+- GitHub Actions构建环境切换到Node 24，避免Node 20弃用警告。版本提升至0.8.91 (891)。
+
 ## 0.8.90 - 2026-09-20
 
 - 完成城市页整包替换后的最后一轮旧契约清理：APK门禁不再要求已删除的city-main-map.webp、旧city-image-slot--map类和城市一级页旧公告条。

@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import {
   PRIMARY_UI_TABS,
   PRIMARY_UI_IDS,
-  resolvePrimaryRouteAlias
+  isPrimaryUiPage
 } from "../src/ui/contracts/PrimaryUiContract.js";
 
 test("一级UI固定为五个唯一入口", () => {
@@ -19,9 +19,23 @@ test("一级UI固定为五个唯一入口", () => {
   );
 });
 
-test("旧一级落地ID只作为兼容别名，不再成为正式页面", () => {
-  assert.equal(resolvePrimaryRouteAlias("operating-command-center"), "restaurant");
-  assert.equal(resolvePrimaryRouteAlias("operations-home"), "operations");
-  assert.equal(resolvePrimaryRouteAlias("employee_roster"), "employees");
-  assert.equal(resolvePrimaryRouteAlias("more-home"), "more");
+test("旧一级ID不再作为运行时兼容入口", () => {
+  for (const legacyId of [
+    "operating-command-center",
+    "operations-home",
+    "employee_roster",
+    "more-home",
+    "restaurant_home",
+    "restaurant-home",
+    "employee-home",
+    "employees-home"
+  ]) {
+    assert.equal(
+      isPrimaryUiPage(
+        legacyId
+      ),
+      false,
+      legacyId
+    );
+  }
 });

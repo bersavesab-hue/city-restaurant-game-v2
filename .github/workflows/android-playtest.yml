@@ -16,24 +16,7 @@ on:
       - "assets/**"
       - "android/**"
       - "scripts/build-android-js.mjs"
-      - "scripts/phase2-gate.mjs"
-      - "scripts/phase3-balance-gate.mjs"
-      - "scripts/phase3-longrun-gate.mjs"
-      - "scripts/phase3-performance-gate.mjs"
-      - "scripts/save-compatibility-gate.mjs"
-      - "scripts/chain-expansion-gate.mjs"
-      - "scripts/phase6-lifecycle-gate.mjs"
-      - "scripts/phase7-ux-gate.mjs"
-      - "scripts/phase8-release-gate.mjs"
-      - "scripts/pre-release-playtest-gate.mjs"
       - "scripts/generate-release-metadata.mjs"
-      - "PRIVACY.md"
-      - "docs/PUBLISHING.md"
-      - "docs/STORE_LISTING_DRAFT.md"
-      - "docs/PLAYTEST_ACCEPTANCE.md"
-      - "scripts/stress-20year.mjs"
-      - "scripts/aging-performance.mjs"
-      - "tests/**"
       - "package.json"
       - "package-lock.json"
       - ".github/test-signing/**"
@@ -50,47 +33,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Node 20
+      - name: Node 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install JavaScript dependencies
         run: npm ci
-
-      - name: Run full test suite
-        run: npm test
-
-      - name: Run playable-flow gate
-        run: npm run test:phase2
-
-      - name: Run save compatibility gate
-        run: npm run test:save-compat
-
-      - name: Run chain expansion gate
-        run: npm run test:phase5:chain
-
-      - name: Run phase6 lifecycle gate
-        run: npm run test:phase6:lifecycle
-
-      - name: Run phase7 ux gate
-        run: npm run test:phase7:ux
-
-      - name: Run phase8 release gate
-        run: npm run test:phase8:release
-
-      - name: Run pre-release playtest acceptance gate
-        run: npm run test:release:acceptance
-
-      - name: Run phase3 performance gate
-        run: npm run test:phase3:performance
-
-      - name: Run phase3 90-day balance gate
-        run: npm run test:phase3:balance
-
-      - name: Run phase3 365-day longrun gate
-        run: npm run test:phase3:longrun
 
       - name: Build Android web bundle
         run: npm run build:android-js
@@ -100,6 +50,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+          cache: gradle
 
       - name: Locate Android SDK tools
         shell: bash
@@ -112,12 +63,14 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_ROOT" >> "$GITHUB_ENV"
           echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
 
-      - name: Install Android SDK 36
+      - name: Ensure Android SDK 36
         shell: bash
         run: |
           set -euo pipefail
-          yes | "$SDKMANAGER" --licenses >/dev/null || true
-          "$SDKMANAGER" "platforms;android-36" "build-tools;35.0.0"
+          if [ ! -d "$ANDROID_SDK_ROOT/platforms/android-36" ] || [ ! -d "$ANDROID_SDK_ROOT/build-tools/35.0.0" ]; then
+            yes | "$SDKMANAGER" --licenses >/dev/null || true
+            "$SDKMANAGER" "platforms;android-36" "build-tools;35.0.0"
+          fi
 
       - name: Prepare stable test signing
         shell: bash
@@ -135,7 +88,7 @@ jobs:
           set -euo pipefail
           chmod +x android/gradlew
           cd android
-          ./gradlew --no-daemon clean assembleDebug --stacktrace
+          ./gradlew --no-daemon assembleDebug --stacktrace
 
       - name: Prepare APK release package
         shell: bash

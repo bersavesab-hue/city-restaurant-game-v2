@@ -3,17 +3,19 @@ import "../registry/defaultPages.js";
 import "../registry/gameplayPages.js";
 
 import {
-  PRIMARY_UI_IDS,
-  resolvePrimaryRouteAlias
+  PRIMARY_UI_IDS
 } from "../contracts/PrimaryUiContract.js";
 
-const MAIN_LANDINGS = Object.freeze({
-  city: "city",
-  restaurant: "restaurant",
-  operations: "operations",
-  employees: "employees",
-  more: "more"
-});
+const MAIN_LANDINGS = Object.freeze(
+  Object.fromEntries(
+    PRIMARY_UI_IDS.map(
+      id => [
+        id,
+        id
+      ]
+    )
+  )
+);
 
 const ACTION_TARGETS = Object.freeze({
   finance: "finance",
@@ -41,12 +43,7 @@ const ACTION_TARGETS = Object.freeze({
   "equipment-maintenance": "equipment-maintenance",
   market: "market-strategy",
   competition: "market-strategy",
-  "market-strategy": "market-strategy",
-
-  "operating-command-center": "restaurant",
-  "operations-home": "operations",
-  employee_roster: "employees",
-  "more-home": "more"
+  "market-strategy": "market-strategy"
 });
 
 const DEFAULT_PAGE_ID = "restaurant";
@@ -58,22 +55,36 @@ class GameplayNavigationSystem {
   }
 
   getLandingPage(mainPageId) {
-    const canonical = resolvePrimaryRouteAlias(mainPageId);
-    return MAIN_LANDINGS[canonical] ?? canonical;
+    const requested =
+      String(
+        mainPageId ??
+        ""
+      ).trim();
+
+    return (
+      MAIN_LANDINGS[
+        requested
+      ] ??
+      requested
+    );
   }
 
   resolveActionTarget(target) {
-    const requested = resolvePrimaryRouteAlias(
-      String(target ?? "").trim()
-    );
+    const requested =
+      String(
+        target ??
+        ""
+      ).trim();
 
     if (!requested) {
       return this.currentPageId;
     }
 
-    const mapped = resolvePrimaryRouteAlias(
-      ACTION_TARGETS[requested] ?? requested
-    );
+    const mapped =
+      ACTION_TARGETS[
+        requested
+      ] ??
+      requested;
 
     if (pageRegistry.has(mapped)) {
       return mapped;

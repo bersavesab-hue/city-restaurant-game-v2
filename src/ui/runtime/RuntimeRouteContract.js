@@ -1,6 +1,5 @@
 import {
-  PRIMARY_UI_IDS,
-  LEGACY_PRIMARY_ROUTE_ALIASES
+  PRIMARY_UI_IDS
 } from "../contracts/PrimaryUiContract.js";
 
 const MAIN_ROOT_PAGE_IDS =
@@ -24,9 +23,14 @@ const INTENTIONAL_PLACEHOLDER_PAGE_IDS =
 
 const LEGACY_PAGE_IDS =
   Object.freeze([
-    ...Object.keys(
-      LEGACY_PRIMARY_ROUTE_ALIASES
-    ),
+    "operating-command-center",
+    "operations-home",
+    "employee_roster",
+    "more-home",
+    "restaurant_home",
+    "restaurant-home",
+    "employee-home",
+    "employees-home",
     "members"
   ]);
 

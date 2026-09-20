@@ -16,25 +16,15 @@ const PRIMARY_UI_ICON_BY_ID = Object.freeze(
   )
 );
 
-const LEGACY_PRIMARY_ROUTE_ALIASES = Object.freeze({
-  "operating-command-center": "restaurant",
-  "operations-home": "operations",
-  "employee_roster": "employees",
-  "more-home": "more",
-  "restaurant_home": "restaurant",
-  "restaurant-home": "restaurant",
-  "employee-home": "employees",
-  "employees-home": "employees"
-});
-
-function resolvePrimaryRouteAlias(value) {
-  const id = String(value ?? "").trim();
-  return LEGACY_PRIMARY_ROUTE_ALIASES[id] ?? id;
-}
-
 function isPrimaryUiPage(value) {
+  const id =
+    String(
+      value ??
+      ""
+    ).trim();
+
   return PRIMARY_UI_IDS.includes(
-    resolvePrimaryRouteAlias(value)
+    id
   );
 }
 
@@ -42,7 +32,5 @@ export {
   PRIMARY_UI_TABS,
   PRIMARY_UI_IDS,
   PRIMARY_UI_ICON_BY_ID,
-  LEGACY_PRIMARY_ROUTE_ALIASES,
-  resolvePrimaryRouteAlias,
   isPrimaryUiPage
 };

@@ -1,8 +1,7 @@
 import "../registry/defaultPages.js";
 
 import {
-  PRIMARY_UI_ICON_BY_ID,
-  resolvePrimaryRouteAlias
+  PRIMARY_UI_ICON_BY_ID
 } from "../contracts/PrimaryUiContract.js";
 
 import {
@@ -59,16 +58,16 @@ const BACK_OVERRIDES =
       "operations",
 
     employee_training:
-      "employee_roster",
+      "employees",
 
     employee_promotion:
-      "employee_roster",
+      "employees",
 
     employee_detail:
-      "employee_roster",
+      "employees",
 
     employee_recruitment:
-      "employee_roster",
+      "employees",
 
     chain:
       "more",
@@ -108,9 +107,9 @@ function resolveMainRoot(
 
 
   let currentId =
-    resolvePrimaryRouteAlias(
+    String(
       pageId
-    );
+    ).trim();
 
   const visited =
     new Set();
