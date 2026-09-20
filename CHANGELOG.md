@@ -2,6 +2,13 @@
 
 ## 0.9.4 - 2026-09-21
 
+- UI正式运行时第一批接入完成：删除不再参与构建的 android/entry.js 旧 Canvas/触摸桥/装修 Modal 入口，禁止历史试玩运行时继续残留。
+- 新增唯一 AppShell 运行实现，Safe Top / Global HUD / Page Content / Global Nav / Safe Bottom 五层正式进入 Android 启动链；一级页面当前只切换唯一 activePage 状态，不建立任何旧 ID 兼容。
+- Global HUD 正式读取当前游戏时间、暂停状态、倍速、门店数量/名称、资金、等级与评分；暂停/继续和 1x/2x/4x 直接调用现有 TimeSystem，不使用演示按钮。
+- Android Web Bundle 新增 game.css，将 tokens、AppShell、Global HUD、Global Nav 四层样式按固定顺序打入 APK；不恢复旧 game.css 或旧 assets 体系。
+- 新增 ui-v2-runtime-shell 契约测试，锁定唯一 HUD/Nav、旧入口物理删除、AndroidBootstrap 实际挂载与 CSS 构建链。
+
+
 - 五个一级页面整体视觉蓝图一次性定稿：城市、门店、经营、员工、更多全部以已确认的864×1536参考图为母版，不重新创造第二套视觉方向。
 - 新增统一组件目录ComponentCatalog，锁定PageHero、SectionHeader、KPI、筛选、状态Chip、ActionCard、ImageFeatureCard、TaskRow、EntityCarousel、DataList、MapViewport、DetailSheet、PromoBanner等可复用基础组件，禁止页面重复造轮子。
 - 新增PrimaryPageBlueprints：城市固定“地图筛选+大地图+商圈详情”；门店固定“Hero+集团KPI+门店组合+待办+4管理入口”；经营固定“Hero+4KPI+待办+6核心模块+2次级入口”；员工固定“Hero+4KPI+4员工入口+紧急提醒+员工列表”；更多固定“Hero+4品牌成长+3顾客安全+3游戏服务+Banner”。
