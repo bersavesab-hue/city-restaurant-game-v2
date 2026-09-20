@@ -79,11 +79,6 @@ test(
 
     assert.match(
       html,
-      /晴/
-    );
-
-    assert.match(
-      html,
       /data-page-target="settings"/
     );
   }

@@ -191,7 +191,7 @@
 .opening-setup-page {
   padding-bottom:
     calc(
-      78px +
+      min(15.3vw, 132px) +
       env(safe-area-inset-bottom)
     ) !important;
 }

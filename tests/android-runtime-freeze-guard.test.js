@@ -9,12 +9,6 @@ const androidSource =
     "utf8"
   );
 
-const mapSource =
-  fs.readFileSync(
-    "src/ui/runtime/CityMapViewportRuntime.js",
-    "utf8"
-  );
-
 
 test(
   "普通页面导航不再同步执行全量存档",
@@ -28,43 +22,18 @@ test(
 
 
 test(
-  "地图Runtime不再全局常驻",
+  "旧地图Runtime已从正式Android入口彻底删除",
   () => {
-    const runtimeStart =
-      androidSource.indexOf(
-        "function startRuntimeSystems"
-      );
-
-    const saveStart =
-      androidSource.indexOf(
-        "function saveNow"
-      );
-
-    const block =
-      androidSource.slice(
-        runtimeStart,
-        saveStart
-      );
-
-    assert.doesNotMatch(
-      block,
-      /cityMapViewportRuntime\.start/
-    );
-  }
-);
-
-
-test(
-  "地图Runtime不再监听document.body全部DOM变化",
-  () => {
-    assert.doesNotMatch(
-      mapSource,
-      /MutationObserver/
+    assert.equal(
+      fs.existsSync(
+        "src/ui/runtime/CityMapViewportRuntime.js"
+      ),
+      false
     );
 
     assert.doesNotMatch(
-      mapSource,
-      /observe\(document\.body/
+      androidSource,
+      /CityMapViewportRuntime|cityMapViewportRuntime/
     );
   }
 );
