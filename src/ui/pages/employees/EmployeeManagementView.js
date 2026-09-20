@@ -431,7 +431,10 @@ class EmployeeManagementView {
           }
         ) +
 
-        '<section class="staff-home-hero" aria-label="员工管理"></section>' +
+        '<section class="staff-home-hero" aria-label="员工管理">' +
+          '<div><h1>员工管理</h1><p>好团队 · 好服务 · 好味道</p></div>' +
+          '<span aria-hidden="true">用心的人<br>做有温度的美食 ♡</span>' +
+        '</section>' +
 
         '<div class="staff-home-content">' +
           this.renderMetrics() +
