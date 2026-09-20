@@ -68,6 +68,42 @@ const UI_HIT_TARGET = Object.freeze({
   comfortable: 52
 });
 
+const UI_FONT_WEIGHTS =
+  Object.freeze({
+    regular: 500,
+    medium: 600,
+    bold: 700,
+    heavy: 800,
+    black: 900
+  });
+
+const UI_LINE_HEIGHTS =
+  Object.freeze({
+    tight: 1.08,
+    title: 1.16,
+    body: 1.4
+  });
+
+const UI_SEMANTIC_TYPOGRAPHY =
+  Object.freeze({
+    pageTitle: 32,
+    pageSubtitle: 14,
+    summaryValue: 14,
+    summaryCaption: 11,
+    filter: 14,
+    markerTitle: 13,
+    markerMeta: 10,
+    detailTitle: 22,
+    detailBody: 12,
+    detailButton: 15,
+    metricLabel: 10,
+    metricValue: 17,
+    sectionTitle: 18,
+    opportunityTitle: 11,
+    opportunityBody: 9,
+    navLabel: 13
+  });
+
 export {
   DESIGN_REFERENCE,
   WINDOW_WIDTH_CLASS,
@@ -76,5 +112,8 @@ export {
   UI_SPACING,
   UI_RADII,
   UI_TYPOGRAPHY,
-  UI_HIT_TARGET
+  UI_HIT_TARGET,
+  UI_FONT_WEIGHTS,
+  UI_LINE_HEIGHTS,
+  UI_SEMANTIC_TYPOGRAPHY
 };
