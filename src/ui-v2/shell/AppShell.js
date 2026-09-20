@@ -40,7 +40,6 @@ function renderAppShell({
       activeId +
     '">' +
       '<div class="ui-v2-app-shell" data-ui="app-shell">' +
-        '<div class="ui-v2-safe-top" data-ui-region="safe-top" aria-hidden="true"></div>' +
         renderGlobalHud(
           hudModel
         ) +
@@ -51,7 +50,6 @@ function renderAppShell({
           activeId,
           badges
         }) +
-        '<div class="ui-v2-safe-bottom" data-ui-region="safe-bottom" aria-hidden="true"></div>' +
       '</div>' +
     '</div>'
   );
