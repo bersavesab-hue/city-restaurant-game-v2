@@ -40,6 +40,37 @@ function districtStateLabel(
   return "观察中";
 }
 
+function districtThemeClass(
+  district
+) {
+  if (
+    district.locked
+  ) {
+    return "theme-blue";
+  }
+
+  if (
+    district.id ===
+      "nightlife"
+  ) {
+    return "theme-pink";
+  }
+
+  if (
+    district.opened
+  ) {
+    return "theme-green";
+  }
+
+  if (
+    district.highPotential
+  ) {
+    return "theme-yellow";
+  }
+
+  return "theme-blue";
+}
+
 function districtStateClass(
   district
 ) {
@@ -123,6 +154,10 @@ function renderMapMarker(
   return (
     '<button class="ui-v2-city-marker ' +
       districtStateClass(
+        district
+      ) +
+      ' ' +
+      districtThemeClass(
         district
       ) +
       (
@@ -216,6 +251,12 @@ function renderMap(
     '<section class="ui-v2-city-map-stage" data-ui="city-map">' +
       '<div class="ui-v2-city-map-art" data-image-slot="city-map-master" aria-hidden="true"></div>' +
       '<div class="ui-v2-city-map-shade" aria-hidden="true"></div>' +
+      '<div class="ui-v2-city-region-overlays" aria-hidden="true">' +
+        '<span class="ui-v2-city-region-art is-campus"></span>' +
+        '<span class="ui-v2-city-region-art is-core"></span>' +
+        '<span class="ui-v2-city-region-art is-nightlife"></span>' +
+        '<span class="ui-v2-city-region-art is-lifestyle"></span>' +
+      '</div>' +
       '<div class="ui-v2-city-map-markers">' +
         visible
           .map(
