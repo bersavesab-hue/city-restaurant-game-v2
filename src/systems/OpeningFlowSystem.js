@@ -468,7 +468,7 @@ class OpeningFlowSystem {
           hasOpened,
 
         target:
-          "operating-command-center",
+          "restaurant",
 
         action:
           "open",

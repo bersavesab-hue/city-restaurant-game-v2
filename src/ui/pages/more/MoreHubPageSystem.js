@@ -195,7 +195,7 @@ class MoreHubPageSystem {
 
     return {
       pageId:
-        "more-home",
+        "more",
 
       topBar:
         chrome.topBar,

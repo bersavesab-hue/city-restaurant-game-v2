@@ -21,6 +21,15 @@ import {
 
 
 import {
+  employeeManagementPageSystem
+} from "../pages/employees/EmployeeManagementPageSystem.js";
+
+import {
+  employeeManagementView
+} from "../pages/employees/EmployeeManagementView.js";
+
+
+import {
   employeeRecruitmentPageSystem
 } from "../pages/employee-recruitment/EmployeeRecruitmentPageSystem.js";
 
@@ -304,6 +313,18 @@ const FORMAL_PAGE_DEFINITIONS =
     },
 
 
+    employees: {
+      pageSystem:
+        employeeManagementPageSystem,
+
+      view:
+        employeeManagementView,
+
+      mode:
+        "mount"
+    },
+
+
     employee_recruitment: {
       pageSystem:
         employeeRecruitmentPageSystem,
@@ -355,7 +376,7 @@ const FORMAL_PAGE_DEFINITIONS =
     },
 
 
-    "operating-command-center": {
+    restaurant: {
       pageSystem:
         operatingCommandCenterPageSystem,
 
@@ -494,7 +515,7 @@ const FORMAL_PAGE_DEFINITIONS =
     },
 
 
-    "operations-home": {
+    operations: {
       pageSystem:
         operationsHubPageSystem,
 
@@ -551,7 +572,7 @@ const FORMAL_PAGE_DEFINITIONS =
     },
 
 
-    "more-home": {
+    more: {
       pageSystem:
         moreHubPageSystem,
 

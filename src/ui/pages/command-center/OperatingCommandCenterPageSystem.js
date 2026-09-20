@@ -646,7 +646,7 @@ class OperatingCommandCenterPageSystem {
 
     return {
       pageId:
-        "operating-command-center",
+        "restaurant",
 
       title:
         "经营总控",
@@ -698,7 +698,7 @@ class OperatingCommandCenterPageSystem {
             restaurantId,
 
             activePageId:
-              "operating-command-center"
+              "restaurant"
           })
           .map(
             item => ({

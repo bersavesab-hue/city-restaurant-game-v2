@@ -232,7 +232,7 @@ function renderStaffPreview(
     '<section class="command-center__visual-panel command-center__staff">' +
       '<header class="command-center__section-title">' +
         '<div><span>实时员工状态</span><h2>员工状态</h2></div>' +
-        '<button type="button" data-page-target="employee_roster">查看全部 ›</button>' +
+        '<button type="button" data-page-target="employees">查看全部 ›</button>' +
       '</header>' +
       '<div class="command-center__staff-summary">' +
         '<article><span>可用员工</span><strong>' +
@@ -469,7 +469,7 @@ function renderStorePortfolio(portfolio) {
         <article><span>集团现金</span><strong>${money(portfolio.totals.balance)}</strong></article>
       </div>` : ""}
       <div class="command-center__store-strip" aria-label="门店列表">
-        ${portfolio.cards.map(store => `<button type="button" class="command-center__store-card ${store.active ? "is-active" : ""}" data-page-target="operating-command-center" data-restaurant-id="${escapeHtml(store.id)}">
+        ${portfolio.cards.map(store => `<button type="button" class="command-center__store-card ${store.active ? "is-active" : ""}" data-page-target="restaurant" data-restaurant-id="${escapeHtml(store.id)}">
           <span class="command-center__store-status" data-status="${escapeHtml(store.status)}">${escapeHtml(store.statusLabel)}</span>
           <strong>${escapeHtml(store.name)}</strong><small>Lv.${store.level} · 评分 ${Number(store.reviewScore).toFixed(1)}</small>
           <b>${money(store.revenue)}</b><i>${store.orders} 单 · ${store.issueCount} 项提醒</i>
@@ -484,7 +484,7 @@ function renderStoreManagementArtwork() {
     ["dining-layout", "assets/images/ui/store-home/cards/dining-layout.webp", "大厅布局", "桌位与动线", "renovation"],
     ["kitchen-equipment", "assets/images/ui/store-home/cards/kitchen-equipment.webp", "后厨设备", "产能与设备", "equipment-management"],
     ["store-renovation", "assets/images/ui/store-home/cards/store-renovation.webp", "门店装修", "风格与升级", "renovation"],
-    ["service-quality", "assets/images/ui/store-home/cards/service-quality.webp", "服务品质", "员工与服务", "employee_roster"],
+    ["service-quality", "assets/images/ui/store-home/cards/service-quality.webp", "服务品质", "员工与服务", "employees"],
     ["opening-hours", "assets/images/ui/store-home/cards/opening-hours.webp", "营业时段", "开店与排班", "opening-setup"],
     ["environment-hygiene", "assets/images/ui/store-home/cards/environment-hygiene.webp", "环境卫生", "检查与改善", "analytics"]
   ];
@@ -1247,7 +1247,7 @@ class OperatingCommandCenterView {
               <span>报表 · 分析</span>
             </button>
 
-            <button type="button" data-page-target="employee_roster">
+            <button type="button" data-page-target="employees">
               ${renderUiIcon("employees","command-center__quick-icon")}
               <strong>员工管理</strong>
               <span>排班 · 培养</span>

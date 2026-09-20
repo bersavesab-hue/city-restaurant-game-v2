@@ -80,10 +80,6 @@ import {
 } from "../pages/opening/OpeningSetupView.js";
 
 import {
-  EmployeeManagementView
-} from "../pages/employees/EmployeeManagementView.js";
-
-import {
   DishCenterView
 } from "../pages/dishes/DishCenterView.js";
 
@@ -904,26 +900,6 @@ function navigate(
 
       return;
     }
-
-
-    if (
-      pageId ===
-      "employee_roster"
-    ) {
-      currentView =
-        new EmployeeManagementView({
-          root,
-          restaurantId,
-
-          onNavigate:
-            navigate
-        });
-
-      currentView.mount();
-
-      return;
-    }
-
 
 
     if (

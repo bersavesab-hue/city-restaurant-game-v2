@@ -286,7 +286,7 @@ class OperationsHubPageSystem {
 
     return {
       pageId:
-        "operations-home",
+        "operations",
 
       title:
         "经营",
