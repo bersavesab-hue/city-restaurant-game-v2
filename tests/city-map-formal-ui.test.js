@@ -124,6 +124,32 @@ test(
         totalDistrictCount:
           2,
 
+        totalAreaCount:
+          4,
+
+        areas: [
+          {
+            id: "core",
+            name: "核心城区",
+            districtCount: 1
+          },
+          {
+            id: "innovation",
+            name: "新城科教区",
+            districtCount: 1
+          },
+          {
+            id: "culture",
+            name: "生活文旅区",
+            districtCount: 0
+          },
+          {
+            id: "waterfront",
+            name: "滨水休闲区",
+            districtCount: 0
+          }
+        ],
+
         districts: [
           {
             id:
@@ -165,7 +191,13 @@ test(
 
               y:
                 40
-            }
+            },
+
+            areaId:
+              "core",
+
+            areaDistrictCount:
+              1
           },
 
           {
@@ -207,8 +239,14 @@ test(
                 70,
 
               y:
-                65
-            }
+                35
+            },
+
+            areaId:
+              "innovation",
+
+            areaDistrictCount:
+              1
           }
         ]
       },
@@ -289,6 +327,7 @@ test(
       const text
       of [
         "城市地图",
+        "4 大区域",
         "全部 (2)",
         "已开店 (1)",
         "可选址 (2)",
@@ -322,6 +361,18 @@ test(
       );
     }
 
+
+
+    assert.equal(
+      (
+        html.match(
+          /class="city-map-region city-map-region--/g
+        ) ??
+        []
+      ).length,
+      4,
+      "城市地图必须保持四个宏观区域层"
+    );
 
     assert.equal(
       (

@@ -107,7 +107,8 @@ class CityMapView {
       0;
 
     const areaCount =
-      page.map?.districts?.length ??
+      page.map?.areas?.length ??
+      page.map?.totalAreaCount ??
       0;
 
     return (
@@ -161,71 +162,230 @@ class CityMapView {
 
   renderMap(page) {
     const visible =
-      this.getFilteredDistricts(page);
+      this.getFilteredDistricts(
+        page
+      );
 
-    const selectedDistrict =
-      visible.find(district => page.map.selectedDistrictId === district.id);
+    const selectedId =
+      page.map.selectedDistrictId;
 
-    const displayed =
-      visible.slice(0, 10);
+    const areas =
+      page.map.areas ??
+      [];
 
-    if (
-      selectedDistrict &&
-      !displayed.some(district => district.id === selectedDistrict.id)
+    const priority =
+      district =>
+        (
+          district.id ===
+          selectedId
+            ? 10000
+            : 0
+        ) +
+        (
+          district.hasOpenStore
+            ? 2000
+            : 0
+        ) +
+        (
+          district.highPotential
+            ? 1000
+            : 0
+        ) +
+        (
+          district.opportunityScore ??
+          0
+        );
+
+    const displayed = [];
+
+    const pushUnique =
+      district => {
+        if (
+          district &&
+          !displayed.some(
+            item =>
+              item.id ===
+              district.id
+          )
+        ) {
+          displayed.push(
+            district
+          );
+        }
+      };
+
+    pushUnique(
+      visible.find(
+        district =>
+          district.id ===
+          selectedId
+      )
+    );
+
+    for (
+      const area
+      of areas
     ) {
-      displayed[displayed.length - 1] = selectedDistrict;
+      pushUnique(
+        visible
+          .filter(
+            district =>
+              district.areaId ===
+              area.id
+          )
+          .sort(
+            (
+              a,
+              b
+            ) =>
+              priority(b) -
+              priority(a)
+          )[0]
+      );
     }
 
+    for (
+      const district
+      of [
+        ...visible
+      ].sort(
+        (
+          a,
+          b
+        ) =>
+          priority(b) -
+          priority(a)
+      )
+    ) {
+      if (
+        displayed.length >=
+        5
+      ) {
+        break;
+      }
+
+      pushUnique(
+        district
+      );
+    }
+
+    const selectedDistrict =
+      page.map.districts?.find(
+        district =>
+          district.id ===
+          selectedId
+      ) ??
+      null;
+
+    const regions =
+      areas.map(
+        area =>
+          '<div class="city-map-region city-map-region--' +
+          escapeHtml(area.id) +
+          (
+            selectedDistrict?.areaId ===
+            area.id
+              ? ' is-active'
+              : ''
+          ) +
+          '" aria-label="' +
+          escapeHtml(
+            area.name +
+            '，' +
+            area.districtCount +
+            '个商圈'
+          ) +
+          '">' +
+            '<span class="city-map-region__count">' +
+              area.districtCount +
+            '</span>' +
+          '</div>'
+      ).join("");
+
     const pins =
-      displayed.map((district, index) => {
-        const locked = district.locked === true;
-        const selected =
-          page.map.selectedDistrictId === district.id;
+      displayed.map(
+        (
+          district,
+          index
+        ) => {
+          const locked =
+            district.locked ===
+            true;
 
-        const icon =
-          locked
-            ? "▣"
-            : index === 0
-              ? "▦"
-              : index === 1
-                ? "◆"
-                : index === 2
-                  ? "◇"
-                  : index === 3
-                    ? "▤"
-                    : "◉";
+          const selected =
+            selectedId ===
+            district.id;
 
-        return (
-          '<button type="button" class="city-map-pin city-map-pin--' +
-          (index % 5) +
-          " " +
-          (selected ? "is-active " : "") +
-          (locked ? "is-locked" : "") +
-          '" data-action="' +
-          (locked ? "locked-district" : "select-district") +
-          '" data-district-id="' +
-          escapeHtml(district.id) +
-          '" style="left:' +
-          district.position.x +
-          "%;top:" +
-          district.position.y +
-          '%">' +
-            '<span class="city-map-pin__icon" aria-hidden="true">' +
-            icon +
-            '</span>' +
-            '<span class="city-map-pin__copy">' +
-              '<strong>' +
-              escapeHtml(district.name) +
-              '</strong>' +
-              '<small>' +
-              (locked
-                ? "待解锁"
-                : (district.propertyCount ?? 0) + " 个商圈") +
-              '</small>' +
-            '</span>' +
-          '</button>'
-        );
-      }).join("");
+          const icon =
+            locked
+              ? "▣"
+              : index === 0
+                ? "▦"
+                : index === 1
+                  ? "◆"
+                  : index === 2
+                    ? "◇"
+                    : index === 3
+                      ? "▤"
+                      : "◉";
+
+          return (
+            '<button type="button" class="city-map-pin city-map-pin--' +
+            (
+              index %
+              5
+            ) +
+            " " +
+            (
+              selected
+                ? "is-active "
+                : ""
+            ) +
+            (
+              locked
+                ? "is-locked"
+                : ""
+            ) +
+            '" data-action="' +
+            (
+              locked
+                ? "locked-district"
+                : "select-district"
+            ) +
+            '" data-district-id="' +
+            escapeHtml(
+              district.id
+            ) +
+            '" style="left:' +
+            district.position.x +
+            "%;top:" +
+            district.position.y +
+            '%">' +
+              '<span class="city-map-pin__icon" aria-hidden="true">' +
+                icon +
+              '</span>' +
+              '<span class="city-map-pin__copy">' +
+                '<strong>' +
+                  escapeHtml(
+                    district.name
+                  ) +
+                '</strong>' +
+                '<small>' +
+                  (
+                    locked
+                      ? "待解锁"
+                      : (
+                          district.areaDistrictCount ??
+                          0
+                        ) +
+                        " 个商圈"
+                  ) +
+                '</small>' +
+              '</span>' +
+            '</button>'
+          );
+        }
+      ).join("");
 
     return (
       '<section class="city-map-viewport">' +
@@ -233,8 +393,13 @@ class CityMapView {
         this.zoom +
         '">' +
           '<div class="city-map-artwork city-image-slot--map" role="img" aria-label="城市发展地图"></div>' +
+          '<div class="city-map-regions" aria-hidden="false">' +
+            regions +
+          '</div>' +
           '<div class="city-map-slogan" aria-hidden="true">让美食<br>点亮这座城市 ♡</div>' +
-          '<div class="city-map-pins">' + pins + '</div>' +
+          '<div class="city-map-pins">' +
+            pins +
+          '</div>' +
         '</div>' +
         '<div class="city-map-controls" aria-label="地图控制">' +
           '<button type="button" data-action="zoom-in" aria-label="放大地图">＋</button>' +

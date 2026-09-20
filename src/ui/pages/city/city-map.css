@@ -170,6 +170,154 @@
   filter: saturate(1.08) contrast(1.03);
 }
 
+.city-map-regions {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+}
+
+.city-map-region {
+  position: absolute;
+  border:
+    clamp(2px,.45vw,4px)
+    solid
+    rgba(255,255,255,.80);
+  background:
+    rgba(15,126,210,.06);
+  box-shadow:
+    0 0
+    clamp(7px,1.2vw,10px)
+    rgba(16,143,224,.66),
+    inset 0 0
+    clamp(10px,1.7vw,15px)
+    rgba(42,165,236,.11);
+  opacity: .74;
+}
+
+.city-map-region--core {
+  left: 7%;
+  top: 12%;
+  width: 48%;
+  height: 48%;
+  clip-path:
+    polygon(
+      10% 9%,
+      79% 0,
+      100% 25%,
+      91% 82%,
+      52% 100%,
+      4% 79%,
+      0 35%
+    );
+  border-color:
+    rgba(255,198,34,.94);
+  box-shadow:
+    0 0 12px
+    rgba(255,179,17,.86),
+    inset 0 0 18px
+    rgba(255,195,29,.12);
+}
+
+.city-map-region--innovation {
+  right: 5%;
+  top: 7%;
+  width: 44%;
+  height: 45%;
+  clip-path:
+    polygon(
+      14% 0,
+      90% 8%,
+      100% 52%,
+      79% 100%,
+      11% 86%,
+      0 37%
+    );
+  border-color:
+    rgba(32,169,255,.96);
+  box-shadow:
+    0 0 12px
+    rgba(26,158,255,.84),
+    inset 0 0 18px
+    rgba(35,168,255,.12);
+}
+
+.city-map-region--culture {
+  left: 4%;
+  bottom: 6%;
+  width: 50%;
+  height: 46%;
+  clip-path:
+    polygon(
+      4% 20%,
+      46% 0,
+      95% 13%,
+      100% 67%,
+      64% 100%,
+      10% 91%,
+      0 50%
+    );
+  border-color:
+    rgba(118,225,55,.96);
+  box-shadow:
+    0 0 12px
+    rgba(91,207,38,.86),
+    inset 0 0 18px
+    rgba(118,225,55,.12);
+}
+
+.city-map-region--waterfront {
+  right: 3%;
+  bottom: 4%;
+  width: 47%;
+  height: 51%;
+  clip-path:
+    polygon(
+      17% 4%,
+      78% 0,
+      100% 27%,
+      90% 87%,
+      51% 100%,
+      4% 79%,
+      0 28%
+    );
+  border-color:
+    rgba(20,222,208,.96);
+  box-shadow:
+    0 0 12px
+    rgba(11,201,194,.86),
+    inset 0 0 18px
+    rgba(20,222,208,.12);
+}
+
+.city-map-region.is-active {
+  opacity: 1;
+  background:
+    rgba(255,222,70,.08);
+  filter:
+    saturate(1.24)
+    brightness(1.05);
+}
+
+.city-map-region__count {
+  position: absolute;
+  right: 7%;
+  top: 7%;
+  min-width:
+    clamp(18px,3vw,26px);
+  height:
+    clamp(18px,3vw,26px);
+  display: none;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  background:
+    rgba(2,60,111,.74);
+  font-size:
+    clamp(7px,1.2vw,10px);
+  font-weight: 900;
+}
+
 .city-map-slogan {
   position: absolute;
   z-index: 2;
@@ -187,14 +335,14 @@
 
 .city-map-pins {
   position: absolute;
-  z-index: 4;
+  z-index: 5;
   inset: 0;
   pointer-events: none;
 }
 
 .city-map-pin {
   position: absolute;
-  min-width: clamp(95px,20vw,173px);
+  min-width: clamp(108px,18vw,156px);
   min-height: clamp(38px,7.2vw,62px);
   display: flex;
   align-items: center;

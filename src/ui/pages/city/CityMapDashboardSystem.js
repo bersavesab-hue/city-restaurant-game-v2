@@ -73,6 +73,43 @@ const HOME_MAP_DISTRICT_LAYOUT =
   ]);
 
 
+const CITY_MAP_AREAS =
+  Object.freeze([
+    {
+      id: "core",
+      name: "核心城区",
+      test:
+        position =>
+          position.x < 55 &&
+          position.y < 55
+    },
+    {
+      id: "innovation",
+      name: "新城科教区",
+      test:
+        position =>
+          position.x >= 55 &&
+          position.y < 55
+    },
+    {
+      id: "culture",
+      name: "生活文旅区",
+      test:
+        position =>
+          position.x < 55 &&
+          position.y >= 55
+    },
+    {
+      id: "waterfront",
+      name: "滨水休闲区",
+      test:
+        position =>
+          position.x >= 55 &&
+          position.y >= 55
+    }
+  ]);
+
+
 function safeBalance(
   restaurantId
 ) {
@@ -182,6 +219,80 @@ function normalizeMix(
 
 
 class CityMapDashboardSystem {
+  getAreaId(
+    position
+  ) {
+    return (
+      CITY_MAP_AREAS.find(
+        area =>
+          area.test(
+            position
+          )
+      )?.id ??
+      CITY_MAP_AREAS[0].id
+    );
+  }
+
+
+  getAreas(
+    districts
+  ) {
+    return CITY_MAP_AREAS.map(
+      area => {
+        const items =
+          districts.filter(
+            district =>
+              district.areaId ===
+              area.id
+          );
+
+        return {
+          id:
+            area.id,
+
+          name:
+            area.name,
+
+          districtCount:
+            items.length,
+
+          unlockedCount:
+            items.filter(
+              item =>
+                !item.locked
+            ).length,
+
+          lockedCount:
+            items.filter(
+              item =>
+                item.locked
+            ).length,
+
+          openStoreCount:
+            items.reduce(
+              (
+                sum,
+                item
+              ) =>
+                sum +
+                (
+                  item.openStoreCount ??
+                  0
+                ),
+              0
+            ),
+
+          highPotentialCount:
+            items.filter(
+              item =>
+                item.highPotential
+            ).length
+        };
+      }
+    );
+  }
+
+
   getDistrictPosition(
     district,
     index
@@ -403,13 +514,20 @@ class CityMapDashboardSystem {
             source.isLocked ===
               true;
 
+          const position =
+            this.getDistrictPosition(
+              source,
+              index
+            );
+
           return {
             ...district,
 
-            position:
-              this.getDistrictPosition(
-                source,
-                index
+            position,
+
+            areaId:
+              this.getAreaId(
+                position
               ),
 
             averageRent,
@@ -757,6 +875,32 @@ class CityMapDashboardSystem {
         marketplace
       );
 
+    const areas =
+      this.getAreas(
+        districts
+      );
+
+    const districtAreaCounts =
+      new Map(
+        areas.map(
+          area => [
+            area.id,
+            area.districtCount
+          ]
+        )
+      );
+
+    for (
+      const district
+      of districts
+    ) {
+      district.areaDistrictCount =
+        districtAreaCounts.get(
+          district.areaId
+        ) ??
+        0;
+    }
+
     const selectedDistrict =
       districts.find(
         item =>
@@ -1011,8 +1155,13 @@ class CityMapDashboardSystem {
 
         districts,
 
+        areas,
+
         totalDistrictCount:
-          districts.length
+          districts.length,
+
+        totalAreaCount:
+          areas.length
       },
 
       citySummary:
