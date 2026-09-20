@@ -93,7 +93,17 @@
 }
 
 /* City header uses the same icon family, never cropped from a large sheet. */
-.ui-v2-city-hero__map-icon,
+.ui-v2-city-hero__map-icon {
+  background-image:
+    url("ui-v2/icons/state/location.svg");
+  background-size:
+    contain;
+  background-position:
+    center;
+  background-repeat:
+    no-repeat;
+}
+
 .ui-v2-city-summary-card
 [data-image-slot="district-count"] {
   background-image:
@@ -201,9 +211,9 @@
 .ui-v2-city-marker {
   width:
     clamp(
-      108px,
-      31vw,
-      138px
+      96px,
+      27vw,
+      124px
     );
   min-height:
     44px;
@@ -483,4 +493,51 @@
     center;
   background-repeat:
     no-repeat;
+}
+
+.ui-v2-city-filter::before {
+  content: "";
+  width:
+    clamp(
+      12px,
+      3.4vw,
+      16px
+    );
+  height:
+    clamp(
+      12px,
+      3.4vw,
+      16px
+    );
+  flex: 0 0 auto;
+  background-size:
+    contain;
+  background-position:
+    center;
+  background-repeat:
+    no-repeat;
+}
+
+.ui-v2-city-filter[data-city-filter="all"]::before {
+  display: none;
+}
+
+.ui-v2-city-filter[data-city-filter="opened"]::before {
+  background-image:
+    url("ui-v2/icons/state/opened.svg");
+}
+
+.ui-v2-city-filter[data-city-filter="available"]::before {
+  background-image:
+    url("ui-v2/icons/state/available.svg");
+}
+
+.ui-v2-city-filter[data-city-filter="high-potential"]::before {
+  background-image:
+    url("ui-v2/icons/state/potential.svg");
+}
+
+.ui-v2-city-filter[data-city-filter="locked"]::before {
+  background-image:
+    url("ui-v2/icons/state/locked.svg");
 }
