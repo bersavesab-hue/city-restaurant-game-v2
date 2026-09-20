@@ -43,32 +43,13 @@ function districtStateLabel(
 function districtThemeClass(
   district
 ) {
-  if (
-    district.locked
-  ) {
-    return "theme-blue";
-  }
-
-  if (
-    district.id ===
-      "nightlife"
-  ) {
-    return "theme-pink";
-  }
-
-  if (
-    district.opened
-  ) {
-    return "theme-green";
-  }
-
-  if (
-    district.highPotential
-  ) {
-    return "theme-yellow";
-  }
-
-  return "theme-blue";
+  return (
+    "theme-" +
+    (
+      district.visualTheme ??
+      "blue"
+    )
+  );
 }
 
 function districtStateClass(
@@ -182,7 +163,8 @@ function renderMapMarker(
     '">' +
       '<span class="ui-v2-city-marker__icon" data-image-slot="district-marker" data-image-key="' +
         escapeHtml(
-          district.id
+          district.iconKey ??
+          "building"
         ) +
         '" aria-hidden="true"></span>' +
       '<span class="ui-v2-city-marker__copy">' +
