@@ -117,7 +117,7 @@ function renderGlobalNav({
       );
 
   return (
-    '<nav class="ui-v2-global-nav ui-v2-nav" aria-label="主导航">' +
+    '<nav class="ui-v2-global-nav ui-v2-nav" data-ui="global-nav" aria-label="主导航">' +
       items +
     '</nav>'
   );
