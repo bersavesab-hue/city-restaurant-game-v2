@@ -460,7 +460,7 @@ class CityMapView {
   }
 
 
-  renderMetric(  renderMetric(
+  renderMetric(
     iconName,
     label,
     value,

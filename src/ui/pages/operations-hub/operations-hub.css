@@ -345,7 +345,15 @@
 .operations-module--analytics .operations-module__visual {
   background-image:
     linear-gradient(90deg,rgba(0,33,68,.72),rgba(0,33,68,.10) 72%),
-    url("../../../../assets/images/ui/city/city-main-map.webp");
+    url("../../../../assets/images/ui/city/district-thumbnails-sprite.webp");
+  background-size:
+    cover,
+    400% 500%;
+  background-position:
+    center,
+    66.6667% 25%;
+  background-repeat:
+    no-repeat;
 }
 
 .operations-module__title strong,
