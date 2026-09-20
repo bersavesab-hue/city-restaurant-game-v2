@@ -1,9 +1,9 @@
 .ui-v2-hud {
   display: grid;
   grid-template-columns:
-    minmax(88px,.95fr)
-    minmax(168px,2.15fr)
-    minmax(76px,.82fr);
+    30%
+    45%
+    25%;
   grid-template-areas:
     "identity simulation resources";
   align-items: stretch;
@@ -40,7 +40,7 @@
   grid-area: identity;
   display: grid;
   grid-template-columns:
-    32px
+    30px
     minmax(0,1fr);
   align-items: center;
   gap: 4px;
@@ -52,8 +52,8 @@
 }
 
 .ui-v2-hud__avatar-slot {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius:
     var(--ui-radius-md);
   overflow: hidden;
@@ -79,16 +79,16 @@
   display: grid;
   grid-template-columns:
     minmax(0,1fr)
-    16px;
+    12px;
   grid-template-areas:
     "title chevron"
     "subtitle subtitle";
   align-items: center;
-  column-gap: 4px;
+  column-gap: 2px;
   row-gap: 2px;
   padding:
-    4px
-    4px;
+    2px
+    2px;
   background: transparent;
   text-align: left;
 }
@@ -104,7 +104,11 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size:
-    var(--ui-font-hud-title);
+    clamp(
+      10px,
+      2.75vw,
+      var(--ui-font-hud-title)
+    );
   line-height:
     var(--ui-line-tight);
   font-weight:
@@ -120,15 +124,19 @@
   color:
     rgba(255,255,255,.76);
   font-size:
-    var(--ui-font-hud-subtitle);
+    clamp(
+      7px,
+      2vw,
+      var(--ui-font-hud-subtitle)
+    );
   line-height:
     var(--ui-line-tight);
 }
 
 .ui-v2-hud__scope-chevron {
   grid-area: chevron;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   background-image:
     var(
       --ui-hud-chevron-image,
@@ -146,8 +154,8 @@
   grid-area: simulation;
   display: grid;
   grid-template-columns:
-    20px
-    42px
+    18px
+    40px
     minmax(0,1fr);
   align-items: center;
   gap: 4px;
@@ -159,8 +167,8 @@
 }
 
 .ui-v2-hud__weather {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   background-image:
     var(
       --ui-hud-weather-image,
@@ -195,7 +203,11 @@
 
 .ui-v2-hud__clock strong {
   font-size:
-    var(--ui-font-hud-time);
+    clamp(
+      13px,
+      4vw,
+      var(--ui-font-hud-time)
+    );
   line-height:
     var(--ui-line-tight);
   font-weight:
@@ -209,17 +221,21 @@
   grid-template-columns:
     repeat(
       4,
-      minmax(24px,1fr)
+      minmax(0,1fr)
     );
-  gap: 4px;
+  gap: 2px;
 }
 
 .ui-v2-hud__pause,
 .ui-v2-hud__speed {
   position: relative;
   min-width: 0;
-  min-height: 30px;
-  height: 30px;
+  min-height: 0;
+  height:
+    min(
+      3.15dvh,
+      28px
+    );
   padding:
     0
     2px;
@@ -325,7 +341,11 @@
 
 .ui-v2-hud__money strong {
   font-size:
-    var(--ui-font-hud-value);
+    clamp(
+      10px,
+      2.7vw,
+      var(--ui-font-hud-value)
+    );
   font-weight:
     var(--ui-font-weight-black);
 }
@@ -391,7 +411,11 @@
 .ui-v2-hud__level-rating strong,
 .ui-v2-hud__level-rating small {
   font-size:
-    var(--ui-font-hud-level);
+    clamp(
+      9px,
+      2.55vw,
+      var(--ui-font-hud-level)
+    );
   font-weight:
     var(--ui-font-weight-black);
 }
@@ -447,67 +471,79 @@
 @media (max-width: 399px) {
   .ui-v2-hud {
     grid-template-columns:
-      minmax(82px,.9fr)
-      minmax(158px,2.1fr)
-      minmax(72px,.8fr);
+      30%
+      45%
+      25%;
   }
 
   .ui-v2-hud__identity {
     grid-template-columns:
-      28px
+      27px
       minmax(0,1fr);
-    padding-inline:
-      5px
-      2px;
+    gap: 2px;
+    padding:
+      2px
+      2px
+      2px
+      4px;
   }
 
   .ui-v2-hud__avatar-slot {
-    width: 28px;
-    height: 28px;
+    width: 27px;
+    height: 27px;
   }
 
   .ui-v2-hud__simulation {
     grid-template-columns:
-      18px
-      38px
+      16px
+      36px
       minmax(0,1fr);
     gap: 2px;
     padding:
-      3px
       2px;
   }
 
   .ui-v2-hud__weather {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
   }
 
   .ui-v2-hud__time-controls {
     gap: 2px;
   }
 
-  .ui-v2-hud__pause,
-  .ui-v2-hud__speed {
-    min-height: 28px;
-    height: 28px;
-    border-radius: 8px;
+  .ui-v2-hud__resources {
+    padding:
+      2px
+      3px
+      2px
+      2px;
   }
 
-  .ui-v2-hud__resources {
-    padding-inline:
-      2px
-      4px;
+  .ui-v2-hud__money-icon {
+    width: 16px;
+    height: 16px;
   }
 
   .ui-v2-hud__money-action {
-    width: 28px;
-    min-width: 28px;
-    height: 28px;
-    min-height: 28px;
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    min-height: 24px;
   }
 
   .ui-v2-hud__money-action-visual {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .ui-v2-hud__crown-icon {
+    width: 16px;
+    height: 15px;
+  }
+
+  .ui-v2-hud__star-icon {
+    width: 14px;
+    height: 14px;
   }
 }
