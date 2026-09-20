@@ -1,156 +1,158 @@
 const CITY_REFERENCE_LAYOUT =
   Object.freeze({
-    canvas:
+    artwork:
       Object.freeze({
         width: 864,
-        height: 1536
+        height: 1536,
+        pixelToCssScale: 0.5
       }),
 
-    regions:
+    cssReference:
+      Object.freeze({
+        width: 432,
+        height: 768
+      }),
+
+    artworkRegions:
       Object.freeze({
         hud:
           Object.freeze({
-            x: 0,
             y: 0,
-            width: 864,
             height: 94
           }),
 
         hero:
           Object.freeze({
-            x: 0,
             y: 94,
-            width: 864,
             height: 135
           }),
 
         filters:
           Object.freeze({
-            x: 10,
             y: 229,
-            width: 844,
             height: 66
           }),
 
         map:
           Object.freeze({
-            x: 0,
             y: 295,
-            width: 864,
             height: 657
           }),
 
         detail:
           Object.freeze({
-            x: 0,
             y: 952,
-            width: 864,
             height: 435
           }),
 
         navigation:
           Object.freeze({
-            x: 0,
             y: 1387,
-            width: 864,
             height: 149
           })
       }),
 
-    pageContent:
+    cssVisualReference:
       Object.freeze({
-        y: 94,
-        height: 1293,
-
-        rows:
-          Object.freeze({
-            hero: 135,
-            filters: 66,
-            map: 657,
-            detail: 435
-          })
+        hud: 47,
+        hero: 67.5,
+        filters: 33,
+        map: 328.5,
+        detail: 217.5,
+        navigation: 74.5
       }),
 
-    anchors:
+    runtimeTargets:
       Object.freeze({
-        mapControls:
-          Object.freeze({
-            right: 16,
-            bottom: 92,
-            size: 54,
-            gap: 12
-          }),
-
-        detailHandle:
-          Object.freeze({
-            top: 8,
-            width: 76,
-            height: 6
-          }),
-
-        detailPadding:
-          Object.freeze({
-            x: 20,
-            top: 28,
-            bottom: 18
-          }),
-
-        filterPadding:
-          Object.freeze({
-            x: 10,
-            y: 6
-          })
+        hud: 52,
+        hero: 68,
+        filters: 48,
+        detail: 218,
+        navigation: 74,
+        mapMinimum: 160
       })
   });
 
 const CITY_REFERENCE_TYPOGRAPHY =
   Object.freeze({
-    hudScopeTitle: 23,
-    hudScopeSubtitle: 15,
-    hudDate: 16,
-    hudTime: 29,
-    hudValue: 23,
-    hudLevel: 20,
-    hudSpeed: 17,
+    artworkPixels:
+      Object.freeze({
+        hudScopeTitle: 23,
+        hudScopeSubtitle: 15,
+        hudDate: 16,
+        hudTime: 29,
+        hudValue: 23,
+        hudLevel: 20,
+        hudSpeed: 17,
 
-    pageTitle: 46,
-    pageSubtitle: 23,
-    summaryValue: 25,
-    summaryCaption: 15,
+        pageTitle: 46,
+        pageSubtitle: 23,
+        summaryValue: 25,
+        summaryCaption: 15,
 
-    filterLabel: 22,
+        filterLabel: 22,
 
-    markerTitle: 20,
-    markerMeta: 17,
+        markerTitle: 20,
+        markerMeta: 17,
 
-    detailTitle: 27,
-    detailBody: 16,
-    detailButton: 20,
+        detailTitle: 27,
+        detailBody: 16,
+        detailButton: 20,
 
-    metricLabel: 14,
-    metricValue: 21,
-    metricTrend: 13,
+        metricLabel: 14,
+        metricValue: 21,
+        metricTrend: 13,
 
-    sectionTitle: 22,
-    opportunityTitle: 15,
-    opportunityBody: 13,
+        sectionTitle: 22,
+        opportunityTitle: 15,
+        opportunityBody: 13,
 
-    navLabel: 25
+        navLabel: 25
+      }),
+
+    runtimeCss:
+      Object.freeze({
+        hudScopeTitle: 12,
+        hudScopeSubtitle: 9,
+        hudDate: 9,
+        hudTime: 16,
+        hudValue: 12,
+        hudLevel: 11,
+        hudSpeed: 10,
+
+        pageTitle: 24,
+        pageSubtitle: 12,
+        summaryValue: 13,
+        summaryCaption: 9,
+
+        filterLabel: 11,
+
+        markerTitle: 11,
+        markerMeta: 9,
+
+        detailTitle: 16,
+        detailBody: 10,
+        detailButton: 13,
+
+        metricLabel: 9,
+        metricValue: 12,
+        metricTrend: 9,
+
+        sectionTitle: 14,
+        opportunityTitle: 10,
+        opportunityBody: 9,
+
+        navLabel: 13
+      })
   });
 
 const CITY_RUNTIME_POLICY =
   Object.freeze({
     referenceMode:
-      "fixed-structure-fluid-map",
+      "artwork-pixels-to-css-reference",
 
-    fixedRegions:
-      Object.freeze([
-        "global-hud",
-        "city-hero",
-        "city-filters",
-        "city-detail",
-        "global-nav"
-      ]),
+    pixelToCssScale:
+      0.5,
 
     flexibleRegion:
       "city-map",
@@ -165,7 +167,10 @@ const CITY_RUNTIME_POLICY =
       "bounded",
 
     imageScaling:
-      "cover-no-stretch"
+      "cover-no-stretch",
+
+    fullPageScaling:
+      false
   });
 
 export {
