@@ -494,6 +494,52 @@ class CityMapDashboardSystem {
                 )
               : 0;
 
+          const rentPerSquareMetre =
+            properties
+              .map(
+                item => {
+                  const area =
+                    Number(
+                      item.usableArea ??
+                      item.area ??
+                      0
+                    );
+
+                  const rent =
+                    Number(
+                      item.monthlyRent ??
+                      0
+                    );
+
+                  return (
+                    area > 0
+                      ? rent / area
+                      : 0
+                  );
+                }
+              )
+              .filter(
+                value =>
+                  value > 0
+              );
+
+          const averageRentPerSquareMetre =
+            rentPerSquareMetre.length >
+            0
+              ? Math.round(
+                  rentPerSquareMetre.reduce(
+                    (
+                      sum,
+                      value
+                    ) =>
+                      sum +
+                      value,
+                    0
+                  ) /
+                  rentPerSquareMetre.length
+                )
+              : 0;
+
           const opportunityScore =
             districtSystem
               .getOpportunityScore(
@@ -531,6 +577,8 @@ class CityMapDashboardSystem {
               ),
 
             averageRent,
+
+            averageRentPerSquareMetre,
 
             customerMix:
               normalizeMix(

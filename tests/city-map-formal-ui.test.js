@@ -276,6 +276,9 @@ test(
         averageRent:
           18000,
 
+        averageRentPerSquareMetre:
+          220,
+
         hasOpenStore:
           true,
 
@@ -373,6 +376,25 @@ test(
       4,
       "城市地图必须保持四个宏观区域层"
     );
+
+
+    for (
+      const detailText
+      of [
+        "×",
+        "¥220/㎡/月",
+        "城市核心商圈，客流稳定，消费能力强，适合品牌扩张。"
+      ]
+    ) {
+      assert.equal(
+        html.includes(
+          detailText
+        ),
+        true,
+        "商圈详情确认版缺少：" +
+        detailText
+      );
+    }
 
     assert.equal(
       (

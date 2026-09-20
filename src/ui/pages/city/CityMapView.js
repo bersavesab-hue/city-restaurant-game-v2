@@ -30,6 +30,56 @@ const FILTERS = Object.freeze([
   ["locked", "待解锁"]
 ]);
 
+
+function districtDescription(
+  district
+) {
+  const traffic =
+    Number(
+      district?.trafficIndex
+    ) ||
+    0;
+
+  const spending =
+    Number(
+      district?.spendingPower
+    ) ||
+    0;
+
+  const competition =
+    Number(
+      district?.competition
+    ) ||
+    0;
+
+  if (
+    traffic >= 85 &&
+    spending >= 75
+  ) {
+    return "城市核心商圈，客流稳定，消费能力强，适合品牌扩张。";
+  }
+
+  if (
+    spending >= 75
+  ) {
+    return "消费能力较强，适合品质型门店与特色餐饮布局。";
+  }
+
+  if (
+    traffic >= 80
+  ) {
+    return "客流活跃，用餐高峰明显，适合高周转经营模式。";
+  }
+
+  if (
+    competition <= 40
+  ) {
+    return "竞争压力相对较低，适合稳步培育社区与长期客群。";
+  }
+
+  return "客群与消费结构相对均衡，适合根据定位灵活选址。";
+}
+
 class CityMapView {
   constructor({
     root,
@@ -467,41 +517,106 @@ class CityMapView {
   }
 
   renderDetail(page) {
-    const district = page.selectedDistrict;
-    if (!district) return "";
+    const district =
+      page.selectedDistrict;
+
+    if (!district) {
+      return "";
+    }
 
     const opportunities =
-      page.opportunities ?? [];
+      page.opportunities ??
+      [];
 
     const trafficPerDay =
       Math.max(
         0,
-        Math.round((district.trafficIndex ?? 0) * 160)
+        Math.round(
+          (
+            district.trafficIndex ??
+            0
+          ) *
+          160
+        )
+      );
+
+    const thumbX =
+      Math.max(
+        0,
+        Math.min(
+          100,
+          Number(
+            district.position?.x ??
+            50
+          )
+        )
+      );
+
+    const thumbY =
+      Math.max(
+        0,
+        Math.min(
+          100,
+          Number(
+            district.position?.y ??
+            50
+          )
+        )
+      );
+
+    const rentPerSquareMetre =
+      Number(
+        district.averageRentPerSquareMetre
+      ) ||
+      (
+        Number(
+          district.averageRent
+        ) ||
+        0
       );
 
     return (
       '<section class="city-district-sheet">' +
         '<div class="city-district-sheet__handle" aria-hidden="true"></div>' +
+        '<span class="city-district-sheet__close" aria-hidden="true">×</span>' +
         '<header class="city-district-sheet__header">' +
-          '<div class="city-district-sheet__thumb" aria-hidden="true"></div>' +
+          '<div class="city-district-sheet__thumb" aria-hidden="true" style="--district-thumb-x:' +
+            thumbX +
+            '%;--district-thumb-y:' +
+            thumbY +
+            '%"></div>' +
           '<div class="city-district-sheet__identity">' +
             '<div><h2>' +
-            escapeHtml(district.name) +
+              escapeHtml(
+                district.name
+              ) +
             '</h2>' +
-            (district.highPotential ? '<b>高潜力</b>' : "") +
+            (
+              district.highPotential
+                ? '<b>高潜力</b>'
+                : district.hasOpenStore
+                  ? '<b class="is-open">已开店</b>'
+                  : ""
+            ) +
             '</div>' +
-            '<p>城市重点商圈，客流与消费能力随经营环境动态变化。</p>' +
+            '<p>' +
+              escapeHtml(
+                districtDescription(
+                  district
+                )
+              ) +
+            '</p>' +
           '</div>' +
           '<button type="button" class="city-district-sheet__properties" data-action="open-district-properties" data-district-id="' +
           escapeHtml(district.id) +
-          '"><span aria-hidden="true">⌕</span>查看房源</button>' +
+          '"><span aria-hidden="true">⌕</span><strong>查看房源</strong></button>' +
         '</header>' +
         '<div class="city-district-metrics">' +
           this.renderMetric("♟", "客流量", trafficPerDay.toLocaleString("zh-CN") + "人/天", district.trafficIndex >= 60 ? "▲ 活跃" : "平稳") +
-          this.renderMetric("●", "消费力", String(district.spendingPower ?? 0), district.spendingPower >= 60 ? "▲ 较强" : "中等") +
-          this.renderMetric("⌂", "平均租金", money(district.averageRent ?? 0) + "/月") +
+          this.renderMetric("●", "消费力", "¥" + String(district.spendingPower ?? 0), district.spendingPower >= 60 ? "▲ 较强" : "中等") +
+          this.renderMetric("⌂", "平均租金", "¥" + Math.round(rentPerSquareMetre).toLocaleString("zh-CN") + "/㎡/月") +
           this.renderMetric("▥", "竞争度", levelLabel(district.competition)) +
-          this.renderMetric("◉", "外卖需求", levelLabel(district.deliveryDemand)) +
+          this.renderMetric("◉", "外卖需求", levelLabel(district.deliveryDemand), district.deliveryDemand >= 60 ? "▲ 活跃" : "") +
           this.renderMetric("▦", "可租房源", (district.propertyCount ?? 0) + "套") +
         '</div>' +
         '<section class="city-opportunities">' +
