@@ -1,4 +1,8 @@
-import {\n  getCityDistrictVisual\n} from "./CityMapVisualLayout.js";\n\nconst FILTER_IDS =
+import {
+  getCityDistrictVisual
+} from "./CityMapVisualLayout.js";
+
+const FILTER_IDS =
   Object.freeze([
     "all",
     "opened",
