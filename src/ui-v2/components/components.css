@@ -392,3 +392,23 @@
   text-align: center;
   white-space: nowrap;
 }
+
+.ui-v2-hud__money {
+  min-width: 0;
+  font-size:
+    var(--ui-font-hud-money) !important;
+  letter-spacing:
+    -.02em;
+  text-overflow: clip !important;
+}
+
+.ui-v2-hud__level,
+.ui-v2-hud__rating {
+  font-size:
+    var(--ui-font-hud-level) !important;
+}
+
+.ui-v2-hud__clock small {
+  letter-spacing:
+    -.01em;
+}
