@@ -13,51 +13,92 @@ const MAP_MARKERS =
       id: "university",
       title: "大学城区域",
       meta: "5个商圈",
-      x: 53,
-      y: 11
+      x: 52.9667,
+      y: 11.0335
     }),
 
     Object.freeze({
       id: "cbd",
       title: "CBD商务区",
       meta: "6个商圈",
-      x: 40,
-      y: 27
+      x: 39.9421,
+      y: 26.9553
     }),
 
     Object.freeze({
       id: "nightlife",
       title: "夜生活区",
       meta: "4个商圈",
-      x: 80,
-      y: 34
+      x: 80.0289,
+      y: 33.9385
     }),
 
     Object.freeze({
       id: "old-town",
       title: "老城商业区",
       meta: "4个商圈",
-      x: 22,
-      y: 64
+      x: 21.9971,
+      y: 63.9665
     }),
 
     Object.freeze({
       id: "waterfront",
       title: "水岸休闲区",
       meta: "5个商圈",
-      x: 74,
-      y: 70
+      x: 73.9508,
+      y: 69.9721
     })
+  ]);
+
+const METRICS =
+  Object.freeze([
+    Object.freeze([
+      "客流量",
+      "12,800/天"
+    ]),
+
+    Object.freeze([
+      "消费力",
+      "¥68/人"
+    ]),
+
+    Object.freeze([
+      "平均租金",
+      "¥220/㎡/月"
+    ]),
+
+    Object.freeze([
+      "竞争度",
+      "中等"
+    ]),
+
+    Object.freeze([
+      "外卖需求",
+      "高"
+    ]),
+
+    Object.freeze([
+      "可租房源",
+      "8套"
+    ])
+  ]);
+
+const OPPORTUNITIES =
+  Object.freeze([
+    "金融大厦周边",
+    "中央广场",
+    "科技园西区"
   ]);
 
 function renderCityFrame() {
   return (
     '<div class="ui-v2-city-frame" data-ui="city-frame">' +
+
       '<section class="ui-v2-city-frame__hero" data-ui-region="city-hero">' +
-        '<div class="ui-v2-box ui-v2-box--hero-icon"></div>' +
+        '<div class="ui-v2-box ui-v2-box--hero-icon ui-v2-city-frame__hero-icon" data-ui-box="hero-icon"></div>' +
         '<div class="ui-v2-city-frame__hero-copy">' +
-          '<h1>城市地图</h1>' +
-          '<p>发现优质商圈，拓展门店版图，让美食走进更多地方</p>' +
+          '<h1 data-ui-text="page-title">城市地图</h1>' +
+          '<p data-ui-text="page-subtitle">发现优质商圈，拓展门店版图，让美食走进更多地方</p>' +
         '</div>' +
         '<div class="ui-v2-city-frame__summary" data-ui-box="hero-summary">' +
           '<span class="ui-v2-box ui-v2-box--hero-icon"></span>' +
@@ -82,14 +123,14 @@ function renderCityFrame() {
                     ? ' is-active'
                     : ''
                 ) +
-                '" type="button">' +
+                '" type="button" data-ui-box="filter">' +
                 (
                   index ===
                   0
                     ? ''
                     : '<span class="ui-v2-box ui-v2-box--filter-icon"></span>'
                 ) +
-                '<strong>' +
+                '<strong data-ui-text="filter">' +
                   label +
                 '</strong>' +
               '</button>'
@@ -105,17 +146,19 @@ function renderCityFrame() {
         MAP_MARKERS
           .map(
             marker => (
-              '<div class="ui-v2-city-frame__marker" data-ui-box="map-marker" style="--marker-x:' +
+              '<div class="ui-v2-city-frame__marker" data-ui-box="map-marker" data-marker="' +
+                marker.id +
+                '" style="--marker-x:' +
                 marker.x +
                 '%;--marker-y:' +
                 marker.y +
                 '%">' +
-                '<span class="ui-v2-box ui-v2-box--marker-icon"></span>' +
+                '<span class="ui-v2-box ui-v2-box--marker-icon" data-ui-box="map-marker-icon"></span>' +
                 '<div>' +
-                  '<strong>' +
+                  '<strong data-ui-text="marker-title">' +
                     marker.title +
                   '</strong>' +
-                  '<small>' +
+                  '<small data-ui-text="marker-meta">' +
                     marker.meta +
                   '</small>' +
                 '</div>' +
@@ -125,43 +168,39 @@ function renderCityFrame() {
           .join(
             ""
           ) +
-        '<div class="ui-v2-city-frame__map-controls">' +
-          '<button type="button">＋</button>' +
-          '<button type="button">－</button>' +
-          '<button type="button">◎</button>' +
+        '<div class="ui-v2-city-frame__map-controls" data-ui-box="map-controls">' +
+          '<button type="button" data-ui-box="map-control">＋</button>' +
+          '<button type="button" data-ui-box="map-control">－</button>' +
+          '<button type="button" data-ui-box="map-control">◎</button>' +
         '</div>' +
       '</section>' +
 
       '<section class="ui-v2-city-frame__detail" data-ui-region="city-detail">' +
-        '<div class="ui-v2-city-frame__detail-main">' +
-          '<div class="ui-v2-city-frame__thumbnail" data-ui-box="detail-thumbnail"></div>' +
-          '<div class="ui-v2-city-frame__detail-copy">' +
-            '<div class="ui-v2-city-frame__detail-title-row">' +
-              '<h2>CBD商务区</h2>' +
-              '<span>高潜力</span>' +
-            '</div>' +
-            '<p>城市核心商务区，写字楼林立，上班族与商务客流稳定。</p>' +
+        '<div class="ui-v2-city-frame__detail-handle" data-ui-box="detail-handle"></div>' +
+        '<button class="ui-v2-city-frame__detail-close" type="button" data-ui-box="detail-close" aria-label="关闭">×</button>' +
+
+        '<div class="ui-v2-city-frame__thumbnail" data-ui-box="detail-thumbnail"></div>' +
+
+        '<div class="ui-v2-city-frame__detail-copy">' +
+          '<div class="ui-v2-city-frame__detail-title-row">' +
+            '<h2 data-ui-text="detail-title">CBD商务区</h2>' +
+            '<span>高潜力</span>' +
           '</div>' +
-          '<button class="ui-v2-city-frame__primary-action" type="button">查看房源</button>' +
+          '<p data-ui-text="detail-body">城市核心商务区，写字楼林立，上班族与商务客流稳定。</p>' +
         '</div>' +
 
-        '<div class="ui-v2-city-frame__metrics">' +
-          [
-            ["客流量","12,800/天"],
-            ["消费力","¥68/人"],
-            ["平均租金","¥220/㎡/月"],
-            ["竞争度","中等"],
-            ["外卖需求","高"],
-            ["可租房源","8套"]
-          ]
+        '<button class="ui-v2-city-frame__primary-action" type="button" data-ui-box="primary-action">查看房源</button>' +
+
+        '<div class="ui-v2-city-frame__metrics" data-ui-box="metrics-row">' +
+          METRICS
             .map(
               item => (
                 '<div class="ui-v2-city-frame__metric" data-ui-box="metric">' +
-                  '<span class="ui-v2-box ui-v2-box--marker-icon"></span>' +
-                  '<small>' +
+                  '<span class="ui-v2-box ui-v2-box--metric-icon" data-ui-box="metric-icon"></span>' +
+                  '<small data-ui-text="metric-label">' +
                     item[0] +
                   '</small>' +
-                  '<strong>' +
+                  '<strong data-ui-text="metric-value">' +
                     item[1] +
                   '</strong>' +
                 '</div>'
@@ -172,26 +211,22 @@ function renderCityFrame() {
             ) +
         '</div>' +
 
-        '<div class="ui-v2-city-frame__opportunity-header">' +
-          '<h3>今日机会 <span>(3)</span></h3>' +
+        '<div class="ui-v2-city-frame__opportunity-header" data-ui-box="opportunity-header">' +
+          '<h3 data-ui-text="section-title">今日机会 <span>(3)</span></h3>' +
           '<button type="button">查看全部</button>' +
         '</div>' +
 
-        '<div class="ui-v2-city-frame__opportunities">' +
-          [
-            "金融大厦周边",
-            "中央广场",
-            "科技园西区"
-          ]
+        '<div class="ui-v2-city-frame__opportunities" data-ui-box="opportunity-row">' +
+          OPPORTUNITIES
             .map(
               title => (
                 '<div class="ui-v2-city-frame__opportunity" data-ui-box="opportunity">' +
-                  '<span class="ui-v2-city-frame__opportunity-thumb"></span>' +
+                  '<span class="ui-v2-city-frame__opportunity-thumb" data-ui-box="opportunity-thumbnail"></span>' +
                   '<div>' +
-                    '<strong>' +
+                    '<strong data-ui-text="opportunity-title">' +
                       title +
                     '</strong>' +
-                    '<small>两行内容区域</small>' +
+                    '<small data-ui-text="opportunity-body">两行内容区域</small>' +
                   '</div>' +
                   '<span>›</span>' +
                 '</div>'
