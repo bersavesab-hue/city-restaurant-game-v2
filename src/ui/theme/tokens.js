@@ -44,8 +44,8 @@ export const UI_TOKENS = Object.freeze({
     floating: "0 12px 30px rgba(20, 37, 49, 0.16)"
   }),
   layout: Object.freeze({
-    mobileMaxWidth: 760,
-    topbarMinHeight: 64,
+    mobileMaxWidth: 864,
+    topbarMinHeight: 49,
     noticeMinHeight: 34,
     bottomNavMinHeight: 66
   })
