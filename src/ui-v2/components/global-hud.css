@@ -104,13 +104,11 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size:
-    clamp(
-      12px,
-      3.4vw,
-      16px
-    );
-  line-height: 1.05;
-  font-weight: 900;
+    var(--ui-font-hud-title);
+  line-height:
+    var(--ui-line-tight);
+  font-weight:
+    var(--ui-font-weight-black);
 }
 
 .ui-v2-hud__scope-copy small {
@@ -122,12 +120,9 @@
   color:
     rgba(255,255,255,.76);
   font-size:
-    clamp(
-      9px,
-      2.4vw,
-      12px
-    );
-  line-height: 1.05;
+    var(--ui-font-hud-subtitle);
+  line-height:
+    var(--ui-line-tight);
 }
 
 .ui-v2-hud__scope-chevron {
@@ -196,22 +191,16 @@
   color:
     rgba(255,255,255,.78);
   font-size:
-    clamp(
-      9px,
-      2.2vw,
-      11px
-    );
+    var(--ui-font-hud-date);
 }
 
 .ui-v2-hud__clock strong {
   font-size:
-    clamp(
-      17px,
-      4.8vw,
-      22px
-    );
-  line-height: 1;
-  font-weight: 950;
+    var(--ui-font-hud-time);
+  line-height:
+    var(--ui-line-tight);
+  font-weight:
+    var(--ui-font-weight-black);
   letter-spacing: .01em;
 }
 
@@ -241,8 +230,10 @@
   box-shadow:
     inset 0 0 0 1px
     rgba(255,255,255,.12);
-  font-size: 12px;
-  font-weight: 900;
+  font-size:
+    var(--ui-font-hud-speed);
+  font-weight:
+    var(--ui-font-weight-black);
 }
 
 /*
@@ -334,12 +325,9 @@
 
 .ui-v2-hud__money strong {
   font-size:
-    clamp(
-      12px,
-      3.3vw,
-      16px
-    );
-  font-weight: 950;
+    var(--ui-font-hud-value);
+  font-weight:
+    var(--ui-font-weight-black);
 }
 
 .ui-v2-hud__money-action {
@@ -403,12 +391,9 @@
 .ui-v2-hud__level-rating strong,
 .ui-v2-hud__level-rating small {
   font-size:
-    clamp(
-      11px,
-      2.9vw,
-      14px
-    );
-  font-weight: 900;
+    var(--ui-font-hud-level);
+  font-weight:
+    var(--ui-font-weight-black);
 }
 
 .ui-v2-hud__level-rating small {
