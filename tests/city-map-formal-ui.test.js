@@ -406,8 +406,19 @@ for (
 
     assert.ok(
       html.includes(
-        'class="city-map-artwork city-image-slot--map"'
+        'class="city-map-artwork"'
       )
+    );
+
+    assert.equal(
+      (
+        html.match(
+          /class="city-map-art-piece city-map-art-piece--/g
+        ) ??
+        []
+      ).length,
+      5,
+      "城市主地图必须使用五块正式生成商圈美术"
     );
 
     assert.equal(

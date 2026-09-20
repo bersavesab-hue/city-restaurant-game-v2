@@ -90,13 +90,21 @@ test(
         "../src/ui/pages/city/PropertyDetailView.js"
       );
 
-    for (const source of [city, properties, detail]) {
+    for (const source of [properties, detail]) {
       assert.ok(
         source.includes(
           "renderNoticeTicker"
         )
       );
     }
+
+    assert.equal(
+      city.includes(
+        "renderNoticeTicker"
+      ),
+      false,
+      "城市确认版一级页不再插入旧公告条"
+    );
 
     assert.ok(city.includes("city-map-heading"));
     assert.ok(city.includes("城市地图"));

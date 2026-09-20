@@ -147,8 +147,7 @@ test(
       of [
         "city-metric-icons.webp",
         "city-map-controls.webp",
-        "city-state-badges.webp",
-        "city-main-map.webp"
+        "city-state-badges.webp"
       ]
     ) {
       assert.equal(
@@ -174,6 +173,14 @@ test(
       ),
       true,
       "城市正式地图视觉必须使用生成商圈素材"
+    );
+
+    assert.equal(
+      view.includes(
+        "city-map-art-piece"
+      ),
+      true,
+      "城市主地图必须由生成商圈美术图块组成"
     );
 
     assert.equal(
