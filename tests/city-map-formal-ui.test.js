@@ -7,7 +7,7 @@ import {
 
 
 test(
-  "城市正式主页使用唯一成稿结构与本地直连地图",
+  "城市一级页使用确认版地图结构且业务数量全部动态",
   () => {
     const root = {
       addEventListener() {},
@@ -31,6 +31,9 @@ test(
         restaurantName:
           "东门小馆",
 
+        brandName:
+          "集团视角",
+
         balance:
           100000,
 
@@ -40,31 +43,49 @@ test(
         reputation:
           60,
 
+        rating:
+          4.5,
+
+        scope: {
+          type:
+            "group",
+
+          canSwitch:
+            false,
+
+          stores:
+            []
+        },
+
+        actions: {
+          speeds: [
+            1,
+            2,
+            4
+          ]
+        },
+
         clock: {
           dateText:
-            "4月10日",
+            "第1年 4月10日 周三",
 
           clockText:
-            "10:30"
-        }
-      },
+            "10:30",
 
-      noticeTicker: {
-        current: {
-          type:
-            "info",
+          speed:
+            1,
 
-          title:
-            "城市市场",
-
-          message:
-            "当前共有8套可租房源"
+          speedOptions: [
+            1,
+            2,
+            4
+          ]
         }
       },
 
       citySummary: {
         districtCount:
-          3,
+          2,
 
         propertyCount:
           8,
@@ -79,9 +100,29 @@ test(
           57
       },
 
+      filterCounts: {
+        all:
+          2,
+
+        opened:
+          1,
+
+        available:
+          2,
+
+        potential:
+          1,
+
+        locked:
+          0
+      },
+
       map: {
         selectedDistrictId:
           "d1",
+
+        totalDistrictCount:
+          2,
 
         districts: [
           {
@@ -100,35 +141,23 @@ test(
             competition:
               61,
 
+            deliveryDemand:
+              78,
+
             propertyCount:
               4,
 
             averageRent:
               18000,
 
-            customerMix: [
-              {
-                id:
-                  "office",
+            hasOpenStore:
+              true,
 
-                percent:
-                  55
-              },
+            highPotential:
+              true,
 
-              {
-                id:
-                  "family",
-
-                percent:
-                  45
-              }
-            ],
-
-            recommendedPropertyId:
-              "p1",
-
-            recommendedPropertyName:
-              "东门临街旺铺",
+            locked:
+              false,
 
             position: {
               x:
@@ -155,13 +184,23 @@ test(
             competition:
               49,
 
+            deliveryDemand:
+              60,
+
             propertyCount:
               4,
 
             averageRent:
               13000,
 
-            customerMix: [],
+            hasOpenStore:
+              false,
+
+            highPotential:
+              false,
+
+            locked:
+              false,
 
             position: {
               x:
@@ -190,36 +229,35 @@ test(
         competition:
           61,
 
+        deliveryDemand:
+          78,
+
         propertyCount:
           4,
 
         averageRent:
           18000,
 
-        customerMix: [
-          {
-            id:
-              "office",
+        hasOpenStore:
+          true,
 
-            percent:
-              55
-          }
-        ],
+        highPotential:
+          true,
 
-        recommendedPropertyId:
-          "p1",
-
-        recommendedPropertyName:
-          "东门临街旺铺"
+        locked:
+          false
       },
 
-      recommendedProperties: [
+      opportunities: [
         {
           id:
             "p1",
 
           name:
             "东门临街旺铺",
+
+          districtId:
+            "d1",
 
           districtName:
             "东门商圈",
@@ -233,77 +271,11 @@ test(
           qualityScore:
             88,
 
-          trafficIndex:
-            82,
-
           affordable:
             true,
 
-          foodServiceAllowed:
-            true,
-
-          exhaustAllowed:
-            true,
-
-          imageSlot:
-            "property-p1"
-        }
-      ],
-
-      navigation: [
-        {
-          id:
-            "city",
-
-          title:
-            "城市",
-
-          active:
-            true
-        },
-
-        {
-          id:
-            "restaurant",
-
-          title:
-            "门店",
-
-          active:
-            false
-        },
-
-        {
-          id:
-            "operations",
-
-          title:
-            "经营",
-
-          active:
-            false
-        },
-
-        {
-          id:
-            "employees",
-
-          title:
-            "员工",
-
-          active:
-            false
-        },
-
-        {
-          id:
-            "more",
-
-          title:
-            "更多",
-
-          active:
-            false
+          tag:
+            "高潜力"
         }
       ]
     };
@@ -313,39 +285,40 @@ test(
         page
       );
 
-    const expected = [
-      "城市发展",
-      "开放商圈",
-      "可租房源",
-      "城市发展地图",
-      "东门商圈",
-      "大学城商圈",
-      "客流",
-      "消费力",
-      "城市发展推荐",
-      "前往考察",
-      "商圈地图",
-      "房源推荐",
-      "客流分析",
-      "周边竞店",
-      "城区扩展",
-      "营销活动",
-      "城市小贴士",
-      "城市",
-      "门店",
-      "经营",
-      "员工",
-      "更多"
-    ];
-
     for (
       const text
-      of expected
+      of [
+        "城市地图",
+        "全部 (2)",
+        "已开店 (1)",
+        "可选址 (2)",
+        "高潜力 (1)",
+        "待解锁 (0)",
+        "城市发展地图",
+        "东门商圈",
+        "大学城商圈",
+        "客流量",
+        "消费力",
+        "平均租金",
+        "竞争度",
+        "外卖需求",
+        "可租房源",
+        "今日机会 (1)",
+        "查看房源",
+        "城市",
+        "门店",
+        "经营",
+        "员工",
+        "更多"
+      ]
     ) {
       assert.equal(
-        html.includes(text),
+        html.includes(
+          text
+        ),
         true,
-        `城市正式主页缺少：${text}`
+        "城市确认版主页缺少：" +
+        text
       );
     }
 
@@ -355,7 +328,19 @@ test(
       )
     );
 
-    assert.equal(html.includes("data-image-slot="), false);
+    assert.equal(
+      html.includes(
+        "城市小贴士"
+      ),
+      false
+    );
+
+    assert.equal(
+      html.includes(
+        "商圈地图"
+      ),
+      false
+    );
 
     assert.ok(
       html.includes(
