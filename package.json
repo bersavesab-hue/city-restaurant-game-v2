@@ -1,6 +1,6 @@
 {
   "name": "city-restaurant-game-v2",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "private": true,
   "type": "module",
   "scripts": {
@@ -37,7 +37,8 @@
     "test:phase3:performance": "node scripts/phase3-performance-gate.mjs",
     "test:save-compat": "node scripts/save-compatibility-gate.mjs",
     "test:phase5:chain": "node scripts/chain-expansion-gate.mjs",
-    "test:ui-v2:foundation": "node --test tests/ui-v2-design-system.test.js tests/ui-reset-baseline.test.js"
+    "test:ui-v2:foundation": "node --test tests/ui-v2-design-system.test.js tests/ui-reset-baseline.test.js",
+    "test:ui-v2:blueprints": "node --test tests/ui-v2-design-system.test.js tests/ui-v2-primary-pages-blueprint.test.js tests/ui-reset-baseline.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"

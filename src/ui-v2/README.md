@@ -10,6 +10,8 @@
 - Expanded Navigation Rail
 - AppShell
 - Native Safe Insets
+- 五个一级页面视觉蓝图 1.0
+- 一级页面正式资源计划 1.0
 
 ## Global HUD
 
@@ -40,3 +42,14 @@
 - 禁止 fixed 底栏
 - 禁止关键数字截断
 - 禁止用emoji/Unicode冒充正式图标
+
+
+## 五个一级页面
+
+正式蓝图位于：
+
+- blueprints/PrimaryPageBlueprints.js
+- blueprints/PrimaryVisualResourcePlan.js
+- docs/UI_PRIMARY_PAGES_V1.md
+
+页面信息结构已经整体定稿，后续实现只能按蓝图组合统一组件，禁止重新自由设计。

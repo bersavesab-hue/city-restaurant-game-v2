@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.4 - 2026-09-21
+
+- 五个一级页面整体视觉蓝图一次性定稿：城市、门店、经营、员工、更多全部以已确认的864×1536参考图为母版，不重新创造第二套视觉方向。
+- 新增统一组件目录ComponentCatalog，锁定PageHero、SectionHeader、KPI、筛选、状态Chip、ActionCard、ImageFeatureCard、TaskRow、EntityCarousel、DataList、MapViewport、DetailSheet、PromoBanner等可复用基础组件，禁止页面重复造轮子。
+- 新增PrimaryPageBlueprints：城市固定“地图筛选+大地图+商圈详情”；门店固定“Hero+集团KPI+门店组合+待办+4管理入口”；经营固定“Hero+4KPI+待办+6核心模块+2次级入口”；员工固定“Hero+4KPI+4员工入口+紧急提醒+员工列表”；更多固定“Hero+4品牌成长+3顾客安全+3游戏服务+Banner”。
+- 一级页面继续只允许填充Page Content，Global HUD和Global Nav不进入任何页面蓝图，确保五页不会重新各做一套顶部和底部。
+- 同步锁定Compact/Medium/Expanded布局策略：手机不等比缩放整页；门店Carousel、经营2/3列、员工Dense/Split、城市Bottom Sheet/Side Panel均按窗口宽度切换。
+- 新增PrimaryVisualResourcePlan：共享HUD/Nav槽位、城市完整地图与20商圈缩略图、门店Hero与12张起步门店外观池、经营6张模块封面、员工40张起步头像池、更多10项功能图标与品牌Banner全部纳入统一资源计划。
+- 所有正式视觉资源明确textInImage=false：金额、人数、门店名、商圈数、等级、状态等动态数据禁止烘焙进图片，避免未来数据变化导致整套UI报废。
+- 新增UI_PRIMARY_PAGES_V1.md与ui-v2-primary-pages-blueprint自动契约测试；版本提升至0.9.4 (904)。
+
 ## 0.9.3 - 2026-09-21
 
 - 正式锁定城市参考稿为五个一级页面唯一Global HUD母版，员工/经营/门店/更多参考图中的其他顶部变体不再作为候选方案。
