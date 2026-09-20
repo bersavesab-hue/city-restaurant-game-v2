@@ -4,14 +4,32 @@ import fs from "node:fs";
 
 const REQUIRED_ASSETS =
   Object.freeze([
-    "assets/ui-v2/shared/shared-ui-atlas.webp",
-    "assets/ui-v2/city/city-map-atlas.webp",
-    "assets/ui-v2/city/city-metric-atlas.webp",
-    "assets/ui-v2/city/city-map-master.webp"
+    "assets/ui-v2/city/city-map-master.webp",
+    "assets/ui-v2/icons/shared/hud-store.svg",
+    "assets/ui-v2/icons/shared/money.svg",
+    "assets/ui-v2/icons/shared/crown.svg",
+    "assets/ui-v2/icons/nav/city.svg",
+    "assets/ui-v2/icons/nav/store.svg",
+    "assets/ui-v2/icons/map/plus.svg",
+    "assets/ui-v2/icons/map/locate.svg",
+    "assets/ui-v2/icons/map/building.svg",
+    "assets/ui-v2/icons/map/university.svg",
+    "assets/ui-v2/icons/map/nightlife.svg",
+    "assets/ui-v2/icons/metric/traffic.svg",
+    "assets/ui-v2/icons/metric/spending.svg",
+    "assets/ui-v2/icons/metric/rent.svg",
+    "assets/ui-v2/icons/metric/competition.svg",
+    "assets/ui-v2/icons/metric/delivery.svg",
+    "assets/ui-v2/icons/metric/properties.svg",
+    "assets/ui-v2/icons/action/search.svg",
+    "assets/ui-v2/icons/regions/core.svg",
+    "assets/ui-v2/icons/regions/campus.svg",
+    "assets/ui-v2/icons/regions/nightlife.svg",
+    "assets/ui-v2/icons/regions/lifestyle.svg"
   ]);
 
 test(
-  "城市正式视觉资源全部进入仓库且不是空壳",
+  "城市正式视觉资源均为独立文件并进入仓库",
   () => {
     for (
       const asset
@@ -29,7 +47,7 @@ test(
         fs.statSync(
           asset
         ).size >
-          1000,
+          80,
         asset
       );
     }
@@ -37,7 +55,7 @@ test(
 );
 
 test(
-  "Android构建复制UI资源且视觉绑定样式最后加载",
+  "Android构建递归复制独立UI资源且视觉绑定样式最后加载",
   () => {
     const build =
       fs.readFileSync(
@@ -78,7 +96,7 @@ test(
 );
 
 test(
-  "视觉绑定只引用规范化atlas和正式地图",
+  "视觉绑定不再包含sprite atlas切图",
   () => {
     const css =
       fs.readFileSync(
@@ -86,45 +104,35 @@ test(
         "utf8"
       );
 
-    for (
-      const name
-      of [
-        "shared-ui-atlas.webp",
-        "city-map-atlas.webp",
-        "city-metric-atlas.webp",
-        "city-map-master.webp"
-      ]
-    ) {
-      assert.match(
-        css,
-        new RegExp(
-          name.replace(
-            ".",
-            "\\."
-          )
-        )
-      );
-    }
-
-    assert.match(
+    assert.doesNotMatch(
       css,
-      /ui-v2-city-region-art/
+      /atlas/i
     );
 
     assert.match(
       css,
-      /theme-yellow/
+      /city-map-master\.webp/
     );
 
     assert.match(
       css,
-      /data-image-key="traffic"/
+      /icons\/shared\/money\.svg/
+    );
+
+    assert.match(
+      css,
+      /icons\/map\/locate\.svg/
+    );
+
+    assert.match(
+      css,
+      /icons\/metric\/traffic\.svg/
     );
   }
 );
 
 test(
-  "城市页面已真正挂载区域美术层而不是重新造第二张地图",
+  "城市页面保持一张正式地图加动态覆盖层",
   () => {
     const page =
       fs.readFileSync(
