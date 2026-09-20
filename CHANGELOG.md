@@ -2,6 +2,17 @@
 
 ## 0.8.91 - 2026-09-20
 
+- 纠正0.8.88-0.8.90城市视觉方向错误：删除用5张商圈缩略图拼接主地图的实现，城市主地图恢复为一张完整、连贯的游戏化城市底图。
+- 删除city-map-art-piece与city-map-river旧拼图/假河流结构；商圈缩略图只用于详情卡、今日机会和房源卡，不再参与主地图绘制。
+- 商圈标签素材替换为重新归一化的2×6高清精灵图，消除此前极限压缩与非等分裁切导致的白块、模糊图标、标签错位。
+- 商圈缩略图素材替换为重新切割的4×5图鉴精灵，修复详情卡左侧缩略图空白或取错区域。
+- 修复手机端顶部HUD被固定min-height撑高的问题：顶部栏严格使用6.25dvh，头像、管理范围、日期时间、倍速重新按列内百分比分配，不再压住“城市地图”标题。
+- 修复底部导航被118px固定最小高度撑大的问题：底栏严格使用9.9dvh，不再向上覆盖今日机会区域。
+- 保留动态商圈名称、数量、状态、指标、机会和房源数据；完整底图只负责静态城市视觉，不把截图示例状态写死进图片。
+- 新增HUD高度回归测试，禁止固定最小高度与商圈缩略图拼主地图重新回流。
+
+## 0.8.91 - 2026-09-20
+
 - 正式删除一级导航运行时兼容层：PrimaryUiContract不再保存或导出旧一级ID别名，GameplayNavigationSystem与GameChromeSystem不再解析operating-command-center、operations-home、employee_roster、more-home等旧入口。
 - 员工二级页面返回目标统一改为employees；UI公共出口移除LEGACY_PRIMARY_ROUTE_ALIASES与resolvePrimaryRouteAlias，旧ID仅保留在RuntimeRouteContract的禁止回流名单和测试断言中，不再参与任何运行逻辑。
 - Restaurant Playtest APK自动工作流改为纯构建流程：删除npm test以及Phase2、存档兼容、连锁、生命周期、UX、发布、性能、90天平衡、365天长跑等前置测试。

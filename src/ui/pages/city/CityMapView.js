@@ -325,30 +325,6 @@ class CityMapView {
         );
     }
 
-    const artDistricts =
-      [
-        "university",
-        "cbd",
-        "nightlife",
-        "old_town",
-        "waterfront_leisure"
-      ];
-
-    const artwork =
-      artDistricts.map(
-        (
-          districtId,
-          index
-        ) =>
-          '<span class="city-map-art-piece city-map-art-piece--' +
-          index +
-          '" aria-hidden="true" style="' +
-          getDistrictThumbnailStyle(
-            districtId
-          ) +
-          '"></span>'
-      ).join("");
-
     const pins =
       displayed.map(
         district => {
@@ -442,8 +418,6 @@ class CityMapView {
           this.zoom +
         '">' +
           '<div class="city-map-artwork" role="img" aria-label="城市发展地图">' +
-            artwork +
-            '<span class="city-map-river" aria-hidden="true"></span>' +
             '<span class="city-map-slogan" aria-hidden="true">让美食<br>点亮这座城市 ♡</span>' +
           '</div>' +
           '<div class="city-map-pins">' +

@@ -60,9 +60,9 @@
   height:
     6.25dvh;
   min-height:
-    82px;
+    0;
   max-height:
-    96px;
+    none;
   display:
     grid;
   grid-template-columns:
@@ -105,25 +105,29 @@
   display:
     grid;
   grid-template-columns:
-    min(9.2dvh,72px)
+    29%
     minmax(0,1fr);
   gap:
-    7px;
+    3%;
   align-items:
     center;
   padding:
-    5px 7px;
+    .35dvh 5px;
 }
 
 .rg-topbar__avatar {
   width:
-    min(9.2dvh,72px);
+    100%;
   height:
-    min(9.2dvh,72px);
+    auto;
+  aspect-ratio:
+    1;
   min-width:
-    54px;
+    0;
   min-height:
-    54px;
+    0;
+  max-height:
+    5.55dvh;
   padding:
     0;
   overflow:
@@ -207,7 +211,7 @@
   min-width:
     0;
   height:
-    clamp(28px,2.45dvh,37px);
+    2.35dvh;
   padding:
     0 24px 0 8px;
   border:
@@ -268,15 +272,15 @@
   display:
     grid;
   grid-template-columns:
-    36px
-    minmax(78px,1fr)
-    minmax(132px,1.38fr);
+    15%
+    31%
+    minmax(0,54%);
   gap:
-    5px;
+    2px;
   align-items:
     center;
   padding:
-    5px 7px;
+    .3dvh 4px;
 }
 
 .rg-topbar__weather-symbol {
@@ -357,7 +361,7 @@
   min-width:
     0;
   height:
-    clamp(27px,2.35dvh,35px);
+    2.2dvh;
   padding:
     0;
   border:
@@ -537,9 +541,9 @@
   height:
     9.9dvh;
   min-height:
-    118px;
+    0;
   max-height:
-    152px;
+    none;
   display:
     grid;
   grid-template-columns:

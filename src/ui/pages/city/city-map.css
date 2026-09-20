@@ -343,142 +343,17 @@
     0;
   overflow:
     hidden;
-  background:
-    linear-gradient(
-      180deg,
-      #72bce7 0%,
-      #5ab7df 38%,
-      #3fa1ce 100%
-    );
-}
-
-.city-map-art-piece {
-  position:
-    absolute;
-  overflow:
-    hidden;
   background-image:
-    var(
-      --district-thumbnail-image
-    );
+    url("../../../../assets/images/ui/city/city-main-map.webp");
   background-size:
-    var(
-      --district-thumbnail-size,
-      400% 500%
-    );
+    100% 100%;
   background-position:
-    var(
-      --district-thumbnail-position,
-      0 0
-    );
+    center;
   background-repeat:
     no-repeat;
   filter:
-    saturate(1.12)
-    contrast(1.04);
-  box-shadow:
-    0 0 14px
-    rgba(0,48,86,.16);
-}
-
-.city-map-art-piece--0 {
-  left:
-    27%;
-  top:
-    -4%;
-  width:
-    46%;
-  height:
-    37%;
-  border-radius:
-    0 0 36% 36%;
-}
-
-.city-map-art-piece--1 {
-  left:
-    10%;
-  top:
-    23%;
-  width:
-    52%;
-  height:
-    48%;
-  border-radius:
-    18% 24% 24% 20%;
-}
-
-.city-map-art-piece--2 {
-  right:
-    -4%;
-  top:
-    24%;
-  width:
-    46%;
-  height:
-    42%;
-  border-radius:
-    28% 0 0 30%;
-}
-
-.city-map-art-piece--3 {
-  left:
-    -5%;
-  bottom:
-    -3%;
-  width:
-    51%;
-  height:
-    40%;
-  border-radius:
-    0 26% 0 0;
-}
-
-.city-map-art-piece--4 {
-  right:
-    -5%;
-  bottom:
-    -4%;
-  width:
-    51%;
-  height:
-    41%;
-  border-radius:
-    30% 0 0 0;
-}
-
-.city-map-river {
-  position:
-    absolute;
-  z-index:
-    1;
-  left:
-    43%;
-  top:
-    -10%;
-  width:
-    18%;
-  height:
-    122%;
-  transform:
-    rotate(14deg);
-  border-left:
-    3px solid
-    rgba(210,247,255,.72);
-  border-right:
-    3px solid
-    rgba(0,92,151,.32);
-  background:
-    linear-gradient(
-      90deg,
-      rgba(39,173,226,.66),
-      rgba(120,224,248,.82),
-      rgba(23,154,214,.70)
-    );
-  box-shadow:
-    0 0 18px
-    rgba(59,200,240,.48);
-  pointer-events:
-    none;
+    saturate(1.04)
+    contrast(1.01);
 }
 
 .city-map-slogan {
@@ -527,9 +402,9 @@
   position:
     absolute;
   width:
-    clamp(132px,21%,180px);
+    clamp(128px,20.5%,176px);
   height:
-    clamp(44px,3.45dvh,53px);
+    clamp(43px,3.35dvh,52px);
   display:
     block;
   transform:
@@ -538,8 +413,8 @@
       -50%
     );
   padding:
-    5px 9px 5px
-    clamp(45px,7%,60px);
+    5px 8px 5px
+    30%;
   overflow:
     visible;
   border:
@@ -610,7 +485,7 @@
   color:
     #073b76;
   font-size:
-    clamp(11px,.98dvh,15px);
+    clamp(11px,.94dvh,14px);
   font-weight:
     950;
   line-height:
@@ -623,7 +498,7 @@
   color:
     #174e7c;
   font-size:
-    clamp(9px,.72dvh,11px);
+    clamp(9px,.70dvh,11px);
   font-weight:
     850;
   line-height:

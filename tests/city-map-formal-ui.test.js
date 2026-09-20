@@ -411,14 +411,11 @@ for (
     );
 
     assert.equal(
-      (
-        html.match(
-          /class="city-map-art-piece city-map-art-piece--/g
-        ) ??
-        []
-      ).length,
-      5,
-      "城市主地图必须使用五块正式生成商圈美术"
+      html.includes(
+        "city-map-art-piece"
+      ),
+      false,
+      "城市主地图不得再由缩略图拼块组成"
     );
 
     assert.equal(

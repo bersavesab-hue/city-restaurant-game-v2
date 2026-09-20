@@ -169,26 +169,26 @@ test(
 
     assert.equal(
       css.includes(
-        "district-thumbnails-sprite.webp"
+        "city-main-map.webp"
       ),
       true,
-      "城市正式地图视觉必须使用生成商圈素材"
+      "城市主地图必须使用单张正式游戏化底图"
     );
 
     assert.equal(
       view.includes(
         "city-map-art-piece"
       ),
-      true,
-      "城市主地图必须由生成商圈美术图块组成"
+      false,
+      "禁止再用商圈缩略图拼接主地图"
     );
 
     assert.equal(
       css.includes(
-        "city-main-map.webp"
+        ".city-map-river"
       ),
       false,
-      "旧航拍底图必须彻底停止引用"
+      "禁止用CSS假河流覆盖正式地图"
     );
 
     assert.equal(
