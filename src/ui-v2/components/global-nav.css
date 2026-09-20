@@ -76,9 +76,12 @@
 }
 
 .ui-v2-nav__label {
-  font-size: 11px;
-  line-height: 1.1;
-  font-weight: 750;
+  font-size:
+    var(--ui-font-nav-label);
+  line-height:
+    var(--ui-line-tight);
+  font-weight:
+    var(--ui-font-weight-heavy);
   white-space: nowrap;
 }
 
@@ -103,7 +106,8 @@
     var(--ui-danger);
   font-size: 10px;
   line-height: 1;
-  font-weight: 900;
+  font-weight:
+    var(--ui-font-weight-black);
 }
 
 .ui-v2-nav__item.is-active {
@@ -156,6 +160,7 @@
   }
 
   .ui-v2-nav__label {
-    font-size: 12px;
+    font-size:
+      var(--ui-font-nav-label);
   }
 }
