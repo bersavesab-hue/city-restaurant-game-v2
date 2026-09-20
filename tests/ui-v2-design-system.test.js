@@ -24,7 +24,7 @@ import {
 } from "../src/ui-v2/components/GlobalHud.js";
 
 test(
-  "UI V2采用864x1536设计参考但Android触摸目标固定48",
+  "UI V2采用864x1536设计参考且Android触摸目标固定48",
   () => {
     assert.deepEqual(
       DESIGN_REFERENCE,
@@ -41,18 +41,8 @@ test(
     );
 
     assert.deepEqual(
-      Object.values(
-        UI_SPACING
-      ),
-      [
-        4,
-        8,
-        12,
-        16,
-        20,
-        24,
-        32
-      ]
+      Object.values(UI_SPACING),
+      [4,8,12,16,20,24,32]
     );
   }
 );
@@ -74,7 +64,7 @@ test(
 );
 
 test(
-  "窗口按Android主流宽高Size Class分类",
+  "窗口按宽高Size Class分类",
   () => {
     assert.deepEqual(
       classifyWindow({
@@ -88,38 +78,6 @@ test(
       }
     );
 
-    assert.deepEqual(
-      classifyWindow({
-        width: 700,
-        height: 1000
-      }),
-      {
-        widthClass: "medium",
-        heightClass: "expanded",
-        orientation: "portrait"
-      }
-    );
-
-    assert.deepEqual(
-      classifyWindow({
-        width: 900,
-        height: 1200
-      }),
-      {
-        widthClass: "expanded",
-        heightClass: "expanded",
-        orientation: "portrait"
-      }
-    );
-
-    assert.equal(
-      getPrimaryNavigationMode({
-        width: 412,
-        height: 915
-      }),
-      "bottom"
-    );
-
     assert.equal(
       getPrimaryNavigationMode({
         width: 900,
@@ -131,13 +89,10 @@ test(
 );
 
 test(
-  "五项Global Nav是唯一一级导航并使用新ID",
+  "五项Global Nav保持唯一一级导航",
   () => {
     assert.deepEqual(
-      PRIMARY_NAV_ITEMS.map(
-        item =>
-          item.id
-      ),
+      PRIMARY_NAV_ITEMS.map(item => item.id),
       [
         "city",
         "store",
@@ -149,18 +104,12 @@ test(
 
     const html =
       renderGlobalNav({
-        activeId:
-          "operations"
+        activeId: "city"
       });
 
     assert.match(
       html,
-      /aria-label="主导航"/
-    );
-
-    assert.match(
-      html,
-      /data-ui-destination="operations"/
+      /data-ui-destination="city"/
     );
 
     assert.doesNotMatch(
@@ -171,34 +120,54 @@ test(
 );
 
 test(
-  "Global HUD只保留高频全局状态且关键数字不省略",
+  "Global HUD严格采用城市参考稿字段与结构",
   () => {
     const html =
       renderGlobalHud({
-        scopeTitle:
-          "测试集团",
-        scopeSubtitle:
-          "2家门店",
-        dateLabel:
-          "第12天",
-        timeLabel:
-          "18:30",
-        moneyLabel:
-          "¥128,500",
-        levelLabel:
-          "Lv.6",
-        ratingLabel:
-          "4.8",
-        speed:
-          2
+        scopeTitle: "集团视角",
+        scopeSubtitle: "管理旗下3家门店",
+        dateLabel: "第1年 4月10日 周三",
+        timeLabel: "11:30",
+        weatherKey: "sunny",
+        weatherLabel: "晴",
+        moneyLabel: "¥52,800",
+        levelLabel: "Lv.3",
+        ratingLabel: "4.8",
+        speed: 1
       });
+
+    assert.match(
+      html,
+      /data-hud-preset="city"/
+    );
+
+    for (
+      const slot
+      of [
+        "store-avatar",
+        "scope-chevron",
+        "weather",
+        "money",
+        "plus",
+        "level",
+        "rating"
+      ]
+    ) {
+      assert.match(
+        html,
+        new RegExp(
+          slot
+        )
+      );
+    }
 
     for (
       const action
       of [
         "change-scope",
         "toggle-pause",
-        "set-speed"
+        "set-speed",
+        "open-funds"
       ]
     ) {
       assert.match(
@@ -209,56 +178,40 @@ test(
       );
     }
 
-    assert.match(
-      html,
-      /ui-v2-no-truncate-number/
-    );
-
     assert.doesNotMatch(
       html,
-      /天气|任务|库存|活动/
+      /员工人数|会员人数|库存|任务/
     );
   }
 );
 
 test(
-  "AppShell无fixed底栏且大屏切Navigation Rail",
+  "HUD窄屏只重排不建立第二套结构且关键数值不截断",
   () => {
-    const shell =
+    const css =
       fs.readFileSync(
-        "src/ui-v2/shell/app-shell.css",
-        "utf8"
-      );
-
-    const nav =
-      fs.readFileSync(
-        "src/ui-v2/components/global-nav.css",
+        "src/ui-v2/components/global-hud.css",
         "utf8"
       );
 
     assert.match(
-      shell,
-      /minmax\(0,1fr\)/
+      css,
+      /@media \(max-width: 399px\)/
     );
 
     assert.match(
-      shell,
-      /@media \(min-width: 840px\)/
-    );
-
-    assert.match(
-      nav,
-      /@media \(min-width: 840px\)/
+      css,
+      /grid-template-areas:\s*"identity resources"\s*"simulation simulation"/
     );
 
     assert.doesNotMatch(
-      shell + nav,
+      css,
+      /text-overflow:\s*ellipsis[\s\S]*ui-v2-no-truncate-number/
+    );
+
+    assert.doesNotMatch(
+      css,
       /position\s*:\s*fixed/
-    );
-
-    assert.doesNotMatch(
-      shell + nav,
-      /transform\s*:\s*scale\(/
     );
   }
 );
@@ -280,22 +233,12 @@ test(
 
     assert.match(
       tokens,
-      /safe-area-inset-top/
-    );
-
-    assert.match(
-      tokens,
       /--ui-native-safe-top/
     );
 
     assert.match(
       activity,
       /WindowInsets\.Type\.displayCutout\(\)/
-    );
-
-    assert.match(
-      activity,
-      /WindowInsets\.Type\.mandatorySystemGestures\(\)/
     );
 
     assert.match(

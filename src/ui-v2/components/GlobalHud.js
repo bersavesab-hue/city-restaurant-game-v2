@@ -44,6 +44,16 @@ function normalizeGlobalHudModel(
         model.timeLabel ??
         ""
       ),
+    weatherKey:
+      String(
+        model.weatherKey ??
+        "sunny"
+      ),
+    weatherLabel:
+      String(
+        model.weatherLabel ??
+        ""
+      ),
     moneyLabel:
       String(
         model.moneyLabel ??
@@ -103,7 +113,7 @@ function renderGlobalHud(
               ) +
             '">' +
               value +
-              '×' +
+              'x' +
             '</button>'
           )
       )
@@ -112,10 +122,10 @@ function renderGlobalHud(
       );
 
   return (
-    '<header class="ui-v2-global-hud ui-v2-hud" data-ui="global-hud">' +
+    '<header class="ui-v2-global-hud ui-v2-hud" data-ui="global-hud" data-hud-preset="city">' +
       '<div class="ui-v2-hud__identity">' +
+        '<span class="ui-v2-hud__avatar-slot" data-image-slot="store-avatar" aria-hidden="true"></span>' +
         '<button class="ui-v2-hud__scope ui-v2-hit-target" type="button" data-ui-action="change-scope">' +
-          '<span class="ui-v2-hud__avatar-slot" data-icon-slot="scope" aria-hidden="true"></span>' +
           '<span class="ui-v2-hud__scope-copy">' +
             '<strong>' +
               escapeHtml(
@@ -128,11 +138,21 @@ function renderGlobalHud(
               ) +
             '</small>' +
           '</span>' +
-          '<span class="ui-v2-hud__scope-indicator" aria-hidden="true"></span>' +
+          '<span class="ui-v2-hud__scope-chevron" data-icon-slot="scope-chevron" aria-hidden="true"></span>' +
         '</button>' +
       '</div>' +
 
       '<div class="ui-v2-hud__simulation">' +
+        '<span class="ui-v2-hud__weather" data-icon-slot="weather" data-weather="' +
+          escapeHtml(
+            data.weatherKey
+          ) +
+          '" role="img" aria-label="' +
+          escapeHtml(
+            data.weatherLabel
+          ) +
+        '"></span>' +
+
         '<div class="ui-v2-hud__clock">' +
           '<small>' +
             escapeHtml(
@@ -159,33 +179,46 @@ function renderGlobalHud(
                 ? 'true'
                 : 'false'
             ) +
-          '">' +
+            '" aria-label="' +
             (
               data.paused
                 ? '继续'
                 : '暂停'
             ) +
+          '">' +
+            '<span class="ui-v2-hud__pause-icon" data-icon-slot="' +
+              (
+                data.paused
+                  ? 'play'
+                  : 'pause'
+              ) +
+            '" aria-hidden="true"></span>' +
           '</button>' +
           speedButtons +
         '</div>' +
       '</div>' +
 
       '<div class="ui-v2-hud__resources">' +
-        '<div class="ui-v2-hud__resource ui-v2-hud__resource--money">' +
-          '<span class="ui-v2-hud__resource-icon" data-icon-slot="money" aria-hidden="true"></span>' +
+        '<div class="ui-v2-hud__money">' +
+          '<span class="ui-v2-hud__money-icon" data-icon-slot="money" aria-hidden="true"></span>' +
           '<strong class="ui-v2-no-truncate-number">' +
             escapeHtml(
               data.moneyLabel
             ) +
           '</strong>' +
+          '<button class="ui-v2-hud__money-action ui-v2-hit-target" type="button" data-ui-action="open-funds" aria-label="资金">' +
+            '<span class="ui-v2-hud__money-action-visual" data-icon-slot="plus" aria-hidden="true"></span>' +
+          '</button>' +
         '</div>' +
 
-        '<div class="ui-v2-hud__progress">' +
+        '<div class="ui-v2-hud__level-rating">' +
+          '<span class="ui-v2-hud__crown-icon" data-icon-slot="level" aria-hidden="true"></span>' +
           '<strong class="ui-v2-no-truncate-number">' +
             escapeHtml(
               data.levelLabel
             ) +
           '</strong>' +
+          '<span class="ui-v2-hud__star-icon" data-icon-slot="rating" aria-hidden="true"></span>' +
           '<small class="ui-v2-no-truncate-number">' +
             escapeHtml(
               data.ratingLabel

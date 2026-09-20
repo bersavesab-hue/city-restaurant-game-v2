@@ -55,7 +55,7 @@
   --ui-hit-comfortable: 52px;
 
   --ui-page-gutter: 16px;
-  --ui-hud-height: 104px;
+  --ui-hud-height: 78px;
   --ui-nav-height: 72px;
   --ui-nav-rail-width: 88px;
   --ui-content-max-width: 960px;
@@ -100,6 +100,12 @@
       ),
       var(--ui-native-safe-left)
     );
+}
+
+@media (max-width: 399px) {
+  :root {
+    --ui-hud-height: 104px;
+  }
 }
 
 @media (min-width: 600px) {

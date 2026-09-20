@@ -2,35 +2,41 @@
 
 这是 0.9.x 之后唯一允许使用的新 UI 根目录。
 
-当前已经建立：
+当前已锁定：
 
-- Design System 1.1
-- Global HUD
-- Global Navigation Bar
-- Expanded Window Navigation Rail
+- Design System 1.2
+- 城市参考稿 Global HUD
+- 五项 Global Nav
+- Expanded Navigation Rail
 - AppShell
-- Native Safe Insets 契约
+- Native Safe Insets
 
-暂时没有任何正式一级页面。
+## Global HUD
 
-## 设计与适配
+五个一级页统一采用城市参考稿：
 
-- 设计稿基准：864×1536 竖屏。
-- 运行时按实际窗口宽度/高度分类，不按具体手机型号。
-- Compact <600px；Medium 600–839px；Expanded >=840px。
-- Expanded 使用左侧 Navigation Rail；Compact/Medium 使用底部 Navigation Bar。
-- Android最小触摸目标48×48。
-- HUD只放管理范围、时间、速度、资金、等级评分。
-- 天气、任务、活动、库存等页面信息不得塞进全局HUD。
-- 五个一级页只允许填充 Page Content。
+左：门店/集团主图 + 管理视角 + 管理门店数  
+中：天气 + 日期时间 + 暂停/1x/2x/4x  
+右：资金 + 资金入口 + 等级 + 星级评分
+
+页面不得自行修改 HUD 结构。
+
+## 适配
+
+- >=400px：HUD三段单行
+- <400px：同一HUD只重排为两行
+- Compact <600px
+- Medium 600–839px
+- Expanded >=840px
+- Expanded使用左侧Navigation Rail
+- Android触摸目标至少48×48
 
 ## 禁止事项
 
-- 禁止恢复 src/ui。
-- 禁止旧入口兼容层。
-- 禁止页面自建HUD/Nav。
-- 禁止整页 transform: scale()。
-- 禁止 fixed 底栏。
-- 禁止图片非等比拉伸。
-- 禁止关键金额、时间、数量省略号截断。
-- 禁止用 emoji / Unicode 字符冒充正式游戏图标。
+- 禁止恢复 src/ui
+- 禁止旧入口兼容层
+- 禁止页面自建HUD/Nav
+- 禁止整页 transform: scale()
+- 禁止 fixed 底栏
+- 禁止关键数字截断
+- 禁止用emoji/Unicode冒充正式图标
