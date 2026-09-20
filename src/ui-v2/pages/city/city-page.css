@@ -39,12 +39,20 @@
     var(--ui-space-xs)
     var(--ui-page-gutter);
   overflow: hidden;
-  background:
+  background-image:
     linear-gradient(
-      180deg,
-      rgba(255,255,255,.96),
-      rgba(238,248,255,.92)
-    );
+      90deg,
+      rgba(5,50,83,.82),
+      rgba(4,72,108,.64) 58%,
+      rgba(4,71,111,.82)
+    ),
+    var(--ui-city-map-image);
+  background-size:
+    cover,
+    cover;
+  background-position:
+    center,
+    center 18%;
 }
 
 .ui-v2-city-hero::before {
@@ -103,7 +111,7 @@
 
 .ui-v2-city-hero__copy h1 {
   margin: 0;
-  color: #0d2d55;
+  color: #ffffff;
   font-size:
     var(--ui-font-page-title);
   line-height:
@@ -112,6 +120,9 @@
     var(--ui-font-weight-black);
   letter-spacing:
     .01em;
+  text-shadow:
+    0 2px 5px
+    rgba(0,29,55,.46);
 }
 
 .ui-v2-city-hero__copy p {
@@ -120,7 +131,7 @@
     0
     0;
   color:
-    var(--ui-text-secondary);
+    rgba(255,255,255,.88);
   font-size:
     var(--ui-font-page-subtitle);
   line-height:
@@ -154,8 +165,13 @@
     rgba(50,119,174,.14);
   border-radius:
     var(--ui-radius-lg);
+  color: #ffffff;
   background:
-    rgba(255,255,255,.88);
+    linear-gradient(
+      180deg,
+      rgba(3,83,143,.94),
+      rgba(2,57,102,.96)
+    );
   box-shadow:
     var(--ui-shadow-card);
 }
@@ -178,7 +194,7 @@
 }
 
 .ui-v2-city-summary-card strong {
-  color: #17395f;
+  color: #ffffff;
   font-size:
     var(--ui-font-summary-value);
   line-height:
@@ -190,7 +206,7 @@
 .ui-v2-city-summary-card small {
   overflow: hidden;
   color:
-    var(--ui-text-secondary);
+    rgba(255,255,255,.76);
   font-size:
     var(--ui-font-summary-caption);
   line-height:
@@ -687,6 +703,7 @@
 }
 
 .ui-v2-city-property-button strong {
+  white-space: nowrap;
   font-size:
     var(--ui-font-detail-button);
   line-height:
