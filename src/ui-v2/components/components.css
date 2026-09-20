@@ -97,6 +97,15 @@
     50%;
 }
 
+.ui-v2-box--metric-icon {
+  width:
+    var(--ui-box-metric-icon);
+  height:
+    var(--ui-box-metric-icon);
+  border-radius:
+    50%;
+}
+
 .ui-v2-box--nav-icon {
   width:
     var(--ui-box-nav-icon);
@@ -127,8 +136,6 @@
 .ui-v2-hud__simulation,
 .ui-v2-hud__resources {
   position: absolute;
-  top:
-    var(--ui-hud-group-y);
   height:
     var(--ui-hud-group-height);
   min-width: 0;
@@ -194,13 +201,13 @@
   display: grid;
   grid-template-columns:
     var(--ui-box-hud-weather)
-    12.1563vw
-    minmax(0,1fr);
+    11.2879vw
+    24.0232vw;
   gap:
-    .8683vw;
+    .5789vw;
   align-items: center;
   padding-inline:
-    .5789vw;
+    .7236vw;
   border-inline:
     1px solid
     rgba(255,255,255,.12);
