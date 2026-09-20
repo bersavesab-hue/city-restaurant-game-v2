@@ -37,9 +37,9 @@
     "test:phase3:performance": "node scripts/phase3-performance-gate.mjs",
     "test:save-compat": "node scripts/save-compatibility-gate.mjs",
     "test:phase5:chain": "node scripts/chain-expansion-gate.mjs",
-    "test:ui-v2:foundation": "node --test tests/ui-v2-design-system.test.js tests/ui-reset-baseline.test.js tests/ui-v2-runtime-shell.test.js",
-    "test:ui-v2:blueprints": "node --test tests/ui-v2-design-system.test.js tests/ui-v2-primary-pages-blueprint.test.js tests/ui-reset-baseline.test.js tests/ui-v2-runtime-shell.test.js tests/ui-v2-city-page.test.js",
-    "test:ui-v2:city": "node --test tests/ui-v2-city-page.test.js tests/ui-v2-runtime-shell.test.js tests/ui-v2-design-system.test.js"
+    "test:ui-v2:foundation": "node --test tests/ui-v2-design-system.test.js tests/ui-reset-baseline.test.js tests/ui-v2-runtime-shell.test.js tests/ui-v2-city-reference-layout.test.js",
+    "test:ui-v2:blueprints": "node --test tests/ui-v2-design-system.test.js tests/ui-v2-primary-pages-blueprint.test.js tests/ui-reset-baseline.test.js tests/ui-v2-runtime-shell.test.js tests/ui-v2-city-page.test.js tests/ui-v2-city-reference-layout.test.js",
+    "test:ui-v2:city": "node --test tests/ui-v2-city-page.test.js tests/ui-v2-runtime-shell.test.js tests/ui-v2-design-system.test.js tests/ui-v2-city-reference-layout.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
