@@ -90,16 +90,7 @@ import { equipmentMaintenanceSystem } from "./systems/EquipmentMaintenanceSystem
 import { layoutFlowSystem } from "./systems/LayoutFlowSystem.js";
 import { renovationPlanningSystem } from "./systems/RenovationPlanningSystem.js";
 import { renovationEditorSystem } from "./systems/RenovationEditorSystem.js";
-import { renovationMobilePageSystem } from "./ui/renovation/RenovationMobilePageSystem.js";
-import { openingSetupPageSystem } from "./ui/pages/opening/OpeningSetupPageSystem.js";
-import { cityPropertyPageSystem } from "./ui/pages/city/CityPropertyPageSystem.js";
-import { dishCenterPageSystem } from "./ui/pages/dishes/DishCenterPageSystem.js";
-import { businessAnalyticsPageSystem } from "./ui/pages/analytics/BusinessAnalyticsPageSystem.js";
-import { supplyManagementPageSystem } from "./ui/pages/supply/SupplyManagementPageSystem.js";
 import { dishManagementSystem } from "./systems/DishManagementSystem.js";
-import { employeeManagementPageSystem } from "./ui/pages/employees/EmployeeManagementPageSystem.js";
-import { pageRegistry } from "./ui/registry/PageRegistry.js";
-import "./ui/registry/defaultPages.js";
 import { dailySettlementSystem } from "./systems/DailySettlementSystem.js";
 import { operatingAnalyticsSystem } from "./systems/OperatingAnalyticsSystem.js";
 import { operatingReportSystem } from "./systems/OperatingReportSystem.js";
@@ -111,7 +102,6 @@ import { propertyFloorplanSystem } from "./systems/PropertyFloorplanSystem.js";
 import { propertyMarketSystem } from "./systems/PropertyMarketSystem.js";
 import { propertyLeaseMarketSystem } from "./systems/PropertyLeaseMarketSystem.js";
 import { leaseSystem } from "./systems/LeaseSystem.js";
-
 function bootstrap() {
   gameFoundationSystem.initialize({
     seedProperties: false,
@@ -213,7 +203,6 @@ function bootstrap() {
       layoutFlowSystem,
       renovationPlanningSystem,
       renovationEditorSystem,
-      renovationMobilePageSystem,
       dailySettlementSystem,
       operatingAnalyticsSystem,
       operatingReportSystem,
@@ -226,16 +215,8 @@ function bootstrap() {
       propertyMarketSystem,
       propertyLeaseMarketSystem,
       leaseSystem
-    },
-
-    ui: {
-      pageRegistry,
-      openingSetupPageSystem,
-      cityPropertyPageSystem,
-      employeeManagementPageSystem,
-      supplyManagementPageSystem,
-      businessAnalyticsPageSystem
     }
+
   };
 }
 

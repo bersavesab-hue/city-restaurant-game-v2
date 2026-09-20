@@ -5,93 +5,49 @@ import {
   build
 } from "esbuild";
 
-
 import {
   RELEASE_INFO
 } from "../src/release/ReleaseInfo.js";
-
 
 const outputDirectory =
   path.resolve(
     "android/app/src/main/assets"
   );
 
-
 fs.rmSync(
   outputDirectory,
   {
-    recursive:
-      true,
-
-    force:
-      true
+    recursive: true,
+    force: true
   }
 );
-
 
 fs.mkdirSync(
   outputDirectory,
   {
-    recursive:
-      true
+    recursive: true
   }
 );
 
-
 await build({
   entryPoints: [
-    "src/ui/runtime/AndroidPlaytestEntry.js"
+    "src/runtime/AndroidBootstrap.js"
   ],
-
   outfile:
     path.join(
       outputDirectory,
       "game.js"
     ),
-
-  bundle:
-    true,
-
-  platform:
-    "browser",
-
-  format:
-    "iife",
-
+  bundle: true,
+  platform: "browser",
+  format: "iife",
   target: [
     "chrome100"
   ],
-
-  sourcemap:
-    false,
-
-  minify:
-    false,
-
-  logLevel:
-    "info",
-
-  assetNames:
-    "bundle-assets/[name]-[hash]",
-
-  loader: {
-    ".png":
-      "file",
-
-    ".jpg":
-      "file",
-
-    ".jpeg":
-      "file",
-
-    ".webp":
-      "file",
-
-    ".svg":
-      "file"
-  }
+  sourcemap: false,
+  minify: false,
+  logLevel: "info"
 });
-
 
 const index = `<!doctype html>
 <html lang="zh-CN">
@@ -101,60 +57,29 @@ const index = `<!doctype html>
     name="viewport"
     content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
   >
-  <meta
-    name="theme-color"
-    content="#064b8e"
-  >
-
-  <title>
-    ${RELEASE_INFO.appName}
-  </title>
-
-  <link
-    rel="stylesheet"
-    href="game.css"
-  >
-
+  <title>${RELEASE_INFO.appName}</title>
   <style>
     html,
     body,
     #app {
       width:100%;
-      min-height:100%;
+      height:100%;
       margin:0;
       padding:0;
     }
 
     body {
-      background:#dceffa;
-      overscroll-behavior:none;
-    }
-
-    * {
-      box-sizing:border-box;
+      overflow:hidden;
+      background:#000;
     }
   </style>
 </head>
-
 <body>
-  <div id="app">
-    <div
-      style="
-        padding:32px;
-        text-align:center;
-        font-family:sans-serif;
-        color:#175481;
-      "
-    >
-      正在启动${RELEASE_INFO.appName}……
-    </div>
-  </div>
-
+  <div id="app"></div>
   <script src="game.js"></script>
 </body>
 </html>
 `;
-
 
 fs.writeFileSync(
   path.join(
@@ -164,33 +89,7 @@ fs.writeFileSync(
   index
 );
 
-
-const projectAssets =
-  path.resolve(
-    "assets"
-  );
-
-
-if (
-  fs.existsSync(
-    projectAssets
-  )
-) {
-  fs.cpSync(
-    projectAssets,
-    path.join(
-      outputDirectory,
-      "assets"
-    ),
-    {
-      recursive:
-        true
-    }
-  );
-}
-
-
 console.log(
-  "Android web bundle ready:",
+  "Android core bootstrap ready:",
   outputDirectory
 );

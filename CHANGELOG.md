@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.0 - 2026-09-21
+
+- UI正式归零：物理删除整个src/ui目录，旧页面、旧View、旧PageSystem、旧导航、旧页面注册表、旧CSS主题、旧AndroidPlaytestEntry与FormalPageRuntime全部不再保留。
+- 视觉资源正式归零：删除整个assets目录及现有城市地图、门店图、菜品图、食材图、场景图、员工头像、图标、精灵图和manifest；同时删除ingredientAtlas、ingredientAtlasParts与ingredientVisuals等嵌入式视觉数据。
+- 删除旧视觉生成/校验脚本和旧UI阶段门禁；删除New Player Journey Gate与Android Release Smoke旧工作流，避免已废弃页面契约继续干扰开发。
+- src/main.js彻底解除对UI层的导入和app.ui出口，只保留core与systems；业务数据、经营系统、存档、时间推进、经济、员工、供应链、菜品、商圈、房源、排行榜等奖励系统继续保留。
+- Android构建入口改为全新的src/runtime/AndroidBootstrap.js；当前APK仅启动核心系统并呈现空白根节点，不包含任何旧界面、旧图片或旧路由。
+- package scripts清除UI、视觉资源、Phase2/UX/发布旧门禁引用；保留核心数据、长期模拟、存档兼容与经营系统测试入口。
+- 版本切换到0.9.0 (900)，作为“UI从零重建”新基线；后续任何界面只能从新方案重新建立，禁止恢复旧UI兼容层。
+
 ## 0.8.92 - 2026-09-20
 
 - 城市界面第二步正式锁定864×1536六段骨架：顶部HUD、城市标题、五项筛选、完整地图、商圈详情、底部五导航固定为6.25/8.4/4.55/42.65/28.25/9.9dvh，总和严格100%，不再允许互相挤占。

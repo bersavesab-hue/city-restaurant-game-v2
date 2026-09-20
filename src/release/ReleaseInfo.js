@@ -7,10 +7,10 @@ export const RELEASE_INFO =
       "com.cityrestaurant.v2playtest",
 
     versionName:
-      "0.8.92",
+      "0.9.0",
 
     versionCode:
-      892,
+      900,
 
     channel:
       "playtest",

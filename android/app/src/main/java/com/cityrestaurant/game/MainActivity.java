@@ -21,7 +21,7 @@ public class MainActivity extends Activity {
 
         gameView = new WebView(this);
         gameView.setBackgroundColor(
-                Color.rgb(4, 75, 145)
+                Color.BLACK
         );
 
         gameView.setPadding(0, 0, 0, 0);
@@ -132,19 +132,7 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (gameView == null) {
-            super.onBackPressed();
-            return;
-        }
-
-        gameView.evaluateJavascript(
-                "(window.restaurantGameBack && window.restaurantGameBack()) ? 'true' : 'false';",
-                value -> {
-                    if (!"\"true\"".equals(value)) {
-                        MainActivity.super.onBackPressed();
-                    }
-                }
-        );
+        super.onBackPressed();
     }
 
     @Override

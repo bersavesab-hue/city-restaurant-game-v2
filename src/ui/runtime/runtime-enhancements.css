@@ -1,6 +1,0 @@
-.city-customer-mix article span[data-segment-name] {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
