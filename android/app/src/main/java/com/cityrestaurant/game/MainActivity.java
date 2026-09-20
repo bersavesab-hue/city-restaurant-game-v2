@@ -77,6 +77,7 @@ public class MainActivity extends Activity {
         gameView.setHorizontalScrollBarEnabled(false);
 
         setContentView(gameView);
+        gameView.requestApplyInsets();
 
         gameView.loadUrl(
                 "file:///android_asset/index.html"

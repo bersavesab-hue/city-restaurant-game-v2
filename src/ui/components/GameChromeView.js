@@ -564,7 +564,7 @@ export function renderBottomNavigation(
   items = []
 ) {
   return `
-    <nav class="rg-bottom-nav">
+    <nav class="rg-bottom-nav" style="--rg-nav-count:${Math.max(1, items.length)}">
 
       ${
         items.map(
@@ -591,7 +591,7 @@ export function renderBottomNavigation(
             return `
               <button
                 type="button"
-                class="${
+                class="rg-bottom-nav__item ${
                   item.active
                     ? "is-active"
                     : ""

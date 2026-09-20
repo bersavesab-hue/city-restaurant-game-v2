@@ -163,8 +163,21 @@ class CityMapView {
     const visible =
       this.getFilteredDistricts(page);
 
+    const selectedDistrict =
+      visible.find(district => page.map.selectedDistrictId === district.id);
+
+    const displayed =
+      visible.slice(0, 10);
+
+    if (
+      selectedDistrict &&
+      !displayed.some(district => district.id === selectedDistrict.id)
+    ) {
+      displayed[displayed.length - 1] = selectedDistrict;
+    }
+
     const pins =
-      visible.map((district, index) => {
+      displayed.map((district, index) => {
         const locked = district.locked === true;
         const selected =
           page.map.selectedDistrictId === district.id;
