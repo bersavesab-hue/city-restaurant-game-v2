@@ -41,6 +41,9 @@ jobs:
       - name: Install JavaScript dependencies
         run: npm ci
 
+      - name: UI 691x1536 framework gate
+        run: npm run test:ui-v2:framework
+
       - name: Build Android web bundle
         run: npm run build:android-js
 
