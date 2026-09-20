@@ -125,22 +125,12 @@ export function getSlotAssetCandidates(
     );
   }
 
-  if (
-    slot ===
-    "command-center-hero"
-  ) {
+  if (slot === "store-home-hero") {
     candidates.push(
-      ...withExtensions(
-        "assets/images/scenes/restaurants/command-center-hero"
-      ),
-      ...withExtensions(
-        "assets/images/scenes/restaurants/default"
-      )
+      "assets/images/ui/store-home/hero/store-hero.webp"
     );
 
-    return unique(
-      candidates
-    );
+    return unique(candidates);
   }
 
   if (
@@ -150,9 +140,6 @@ export function getSlotAssetCandidates(
     candidates.push(
       ...withExtensions(
         "assets/images/scenes/restaurants/restaurant-home-hero"
-      ),
-      ...withExtensions(
-        "assets/images/scenes/restaurants/command-center-hero"
       ),
       ...withExtensions(
         "assets/images/scenes/restaurants/default"
@@ -171,9 +158,6 @@ export function getSlotAssetCandidates(
     candidates.push(
       ...withExtensions(
         "assets/images/scenes/restaurants/restaurant-live"
-      ),
-      ...withExtensions(
-        "assets/images/scenes/restaurants/command-center-hero"
       ),
       ...withExtensions(
         "assets/images/scenes/restaurants/default"

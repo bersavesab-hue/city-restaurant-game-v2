@@ -479,6 +479,39 @@ function renderStorePortfolio(portfolio) {
 }
 
 
+function renderStoreManagementArtwork() {
+  const cards = [
+    ["dining-layout", "assets/images/ui/store-home/cards/dining-layout.webp", "大厅布局", "桌位与动线", "renovation"],
+    ["kitchen-equipment", "assets/images/ui/store-home/cards/kitchen-equipment.webp", "后厨设备", "产能与设备", "equipment-management"],
+    ["store-renovation", "assets/images/ui/store-home/cards/store-renovation.webp", "门店装修", "风格与升级", "renovation"],
+    ["service-quality", "assets/images/ui/store-home/cards/service-quality.webp", "服务品质", "员工与服务", "employee_roster"],
+    ["opening-hours", "assets/images/ui/store-home/cards/opening-hours.webp", "营业时段", "开店与排班", "opening-setup"],
+    ["environment-hygiene", "assets/images/ui/store-home/cards/environment-hygiene.webp", "环境卫生", "检查与改善", "analytics"]
+  ];
+
+  return `
+    <section class="command-center__store-artwork">
+      <header class="command-center__section-title">
+        <div><span>门店现场</span><h2>经营区域管理</h2></div>
+      </header>
+      <div class="command-center__store-artwork-grid">
+        ${cards.map(([asset, source, title, subtitle, target]) => `
+          <button
+            type="button"
+            data-page-target="${target}"
+            data-image-slot="store-home-${asset}"
+            data-image-src="${source}"
+            data-image-fit="cover"
+          >
+            <span><strong>${title}</strong><small>${subtitle}</small></span>
+          </button>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+
 class OperatingCommandCenterView {
   renderMarkup(page) {
     const awardFeedback =
@@ -569,8 +602,8 @@ class OperatingCommandCenterView {
           <div
             class="command-center__hero-image"
             role="img"
-            data-image-slot="command-center-hero"
-            data-image-src="assets/images/scenes/restaurants/command-center-hero.webp"
+            data-image-slot="store-home-hero"
+            data-image-src="assets/images/ui/store-home/hero/store-hero.webp"
             data-image-fit="cover"
             aria-label="门店经营场景"
           ></div>
@@ -995,6 +1028,8 @@ class OperatingCommandCenterView {
           </div>
 
         </section>
+
+        ${renderStoreManagementArtwork()}
 
         <section class="command-center__priority">
 

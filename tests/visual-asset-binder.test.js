@@ -11,14 +11,10 @@ test(
   () => {
     assert.deepEqual(
       getSlotAssetCandidates(
-        "command-center-hero"
-      ).slice(
-        0,
-        2
+        "store-home-hero"
       ),
       [
-        "assets/images/scenes/restaurants/command-center-hero.webp",
-        "assets/images/scenes/restaurants/command-center-hero.png"
+        "assets/images/ui/store-home/hero/store-hero.webp"
       ]
     );
 

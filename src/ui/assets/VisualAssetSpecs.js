@@ -90,7 +90,7 @@ export const VISUAL_SLOT_SPEC_MAP =
     "restaurant-live":
       "restaurantLive",
 
-    "command-center-hero":
+    "store-home-hero":
       "commandCenterHero",
 
     "city-main-map":
