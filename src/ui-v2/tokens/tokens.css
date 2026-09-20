@@ -129,21 +129,22 @@
   --ui-hit-min: 48px;
   --ui-hit-comfortable: 52px;
 
-  --ui-page-gutter: 16px;
-  --ui-hud-height: 52px;
-  --ui-nav-height: 74px;
+  --ui-page-gutter: 2.2vw;
+  --ui-hud-height: 6.12dvh;
+  --ui-nav-height: 9.70dvh;
   --ui-nav-rail-width: 88px;
   --ui-content-max-width: 960px;
 
-  --ui-city-hero-min-height: 68px;
-  --ui-city-filter-height: 48px;
-  --ui-city-map-min-height: 160px;
-  --ui-city-map-control-size: 48px;
-  --ui-city-marker-icon-size: 28px;
-  --ui-city-detail-thumb-size: 64px;
-  --ui-city-detail-height: 218px;
-  --ui-city-metric-min-height: 52px;
-  --ui-city-opportunity-min-height: 52px;
+  --ui-city-hero-min-height: 8.79dvh;
+  --ui-city-filter-height: 4.30dvh;
+  --ui-city-map-height: 42.77dvh;
+  --ui-city-map-min-height: 0px;
+  --ui-city-map-control-size: clamp(30px,3.8dvh,40px);
+  --ui-city-marker-icon-size: clamp(24px,3.4dvh,30px);
+  --ui-city-detail-thumb-size: clamp(54px,7.55dvh,66px);
+  --ui-city-detail-height: 28.32dvh;
+  --ui-city-metric-min-height: clamp(46px,6.9dvh,58px);
+  --ui-city-opportunity-min-height: clamp(42px,6.5dvh,54px);
 
   --ui-native-safe-top: 0px;
   --ui-native-safe-right: 0px;
@@ -189,22 +190,15 @@
 
 @media (max-width: 399px) {
   :root {
-    --ui-hud-height: 54px;
-    --ui-nav-height: 72px;
-    --ui-page-gutter: 10px;
-    --ui-city-hero-min-height: 64px;
-    --ui-city-filter-height: 46px;
-    --ui-city-map-min-height: 150px;
-    --ui-city-detail-thumb-size: 60px;
-    --ui-city-detail-height: 214px;
+    --ui-page-gutter: 2vw;
   }
 }
 
 @media (min-width: 600px) {
   :root {
-    --ui-page-gutter: 20px;
-    --ui-hud-height: 58px;
-    --ui-nav-height: 78px;
+    --ui-page-gutter: 18px;
+    --ui-hud-height: 6.12dvh;
+    --ui-nav-height: 9.70dvh;
     --ui-content-max-width: 1120px;
 
     --ui-font-hud-title: 13px;
@@ -213,11 +207,12 @@
     --ui-font-hud-value: 13px;
     --ui-font-nav-label: 14px;
 
-    --ui-city-hero-min-height: 72px;
-    --ui-city-filter-height: 50px;
-    --ui-city-map-min-height: 220px;
-    --ui-city-detail-thumb-size: 70px;
-    --ui-city-detail-height: 232px;
+    --ui-city-hero-min-height: 8.79dvh;
+    --ui-city-filter-height: 4.30dvh;
+    --ui-city-map-height: 42.77dvh;
+    --ui-city-map-min-height: 0px;
+    --ui-city-detail-thumb-size: clamp(58px,7.55dvh,72px);
+    --ui-city-detail-height: 28.32dvh;
   }
 }
 
