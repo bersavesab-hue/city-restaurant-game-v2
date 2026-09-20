@@ -343,94 +343,142 @@
 
 .city-map-pin {
   position: absolute;
-  min-width: min(18vw,156px);
-  min-height: min(7.2vw,62px);
-  display: flex;
-  align-items: center;
-  gap: min(.75vw,7px);
-  transform: translate(-50%,-50%);
-  padding: min(.9vw,8px) min(1.3vw,11px);
-  border: min(.25vw,2px) solid #fff;
-  border-radius: min(1.3vw,11px);
+  width: min(20.8vw,180px);
+  height: min(6.1vw,53px);
+  display: block;
+  transform:
+    translate(
+      -50%,
+      -50%
+    );
+  padding:
+    min(.75vw,6px)
+    min(1.25vw,11px)
+    min(.7vw,6px)
+    min(7vw,60px);
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
   color: #093e7c;
-  background: rgba(249,253,255,.95);
-  box-shadow: 0 3px 8px rgba(0,34,78,.28);
+  background-image:
+    var(
+      --district-label-image
+    );
+  background-size:
+    var(
+      --district-label-size,
+      200% 600%
+    );
+  background-position:
+    var(
+      --district-label-position,
+      0 0
+    );
+  background-repeat:
+    no-repeat;
+  box-shadow: none;
   pointer-events: auto;
-}
-
-.city-map-pin__icon {
-  width: min(5.8vw,50px);
-  height: min(5.8vw,50px);
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  border-radius: 999px;
-  color: #fff;
-  background: #128de0;
-  font-size: min(2.8vw,24px);
-  font-weight: 900;
+  text-align: left;
 }
 
 .city-map-pin__copy {
+  position: relative;
+  z-index: 2;
   min-width: 0;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .city-map-pin__copy strong,
 .city-map-pin__copy small {
   display: block;
+  max-width: 100%;
   overflow: hidden;
   text-align: left;
   white-space: nowrap;
   text-overflow: ellipsis;
+  text-shadow:
+    0 1px 0
+    rgba(255,255,255,.72);
 }
 
 .city-map-pin__copy strong {
-  font-size: min(1.8vw,16px);
+  color: #083e77;
+  font-size: min(1.7vw,15px);
+  font-weight: 1000;
+  line-height: 1.04;
 }
 
 .city-map-pin__copy small {
-  margin-top: 1px;
-  font-size: min(1.35vw,12px);
-  font-weight: 800;
+  margin-top: min(.3vw,3px);
+  color: #154d79;
+  font-size: min(1.25vw,11px);
+  font-weight: 900;
+  line-height: 1;
 }
-
-.city-map-pin--0 .city-map-pin__icon { background: #168de3; }
-.city-map-pin--1 .city-map-pin__icon { background: #ff8a13; }
-.city-map-pin--2 .city-map-pin__icon { background: #dd2d7d; }
-.city-map-pin--3 .city-map-pin__icon { background: #48a51e; }
-.city-map-pin--4 .city-map-pin__icon { background: #10aa87; }
 
 .city-map-pin.is-active {
-  border-color: #ffe25a;
-  box-shadow:
-    0 0 0 3px rgba(255,221,54,.34),
-    0 4px 12px rgba(0,34,78,.32);
-}
-
-.city-map-pin.is-active::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: clamp(-22px,-2.7vw,-12px);
-  width: min(3.6vw,31px);
-  height: min(3.6vw,31px);
-  transform: translateX(-50%) rotate(45deg);
-  border: min(.35vw,3px) solid #fff;
-  border-radius: 50% 50% 50% 0;
-  background: #f3423d;
-  box-shadow: 0 2px 5px rgba(0,0,0,.28);
+  z-index: 4;
+  filter:
+    drop-shadow(
+      0 3px 6px
+      rgba(0,31,72,.30)
+    );
 }
 
 .city-map-pin.is-locked {
-  min-width: min(10vw,86px);
-  justify-content: center;
-  color: rgba(255,255,255,.8);
-  border-color: rgba(255,255,255,.36);
-  background: rgba(44,58,78,.66);
+  width: min(14.6vw,126px);
+  padding-left:
+    min(5.6vw,48px);
+  opacity: .94;
 }
 
-.city-map-pin.is-locked .city-map-pin__icon {
-  display: none;
+.city-map-pin__state {
+  position: absolute;
+  z-index: 3;
+  width: min(3.8vw,33px);
+  height: min(3.8vw,33px);
+  left: 50%;
+  bottom: min(-2.8vw,-14px);
+  transform: translateX(-50%);
+  background-image:
+    url("../../../../assets/images/ui/city/city-state-badges.webp");
+  background-size:
+    500% 100%;
+  background-repeat:
+    no-repeat;
+  pointer-events: none;
+}
+
+.city-map-pin__state--selected {
+  width: min(4.6vw,40px);
+  height: min(4.6vw,40px);
+  bottom: min(-3.5vw,-19px);
+  background-position: 0 0;
+}
+
+.city-map-pin__state--potential {
+  width: min(3vw,26px);
+  height: min(3vw,26px);
+  left: auto;
+  right: min(-.4vw,-2px);
+  top: min(-1vw,-5px);
+  bottom: auto;
+  transform: none;
+  background-position: 50% 0;
+}
+
+.city-map-pin__state--open {
+  width: min(3vw,26px);
+  height: min(3vw,26px);
+  left: auto;
+  right: min(-.4vw,-2px);
+  top: min(-1vw,-5px);
+  bottom: auto;
+  transform: none;
+  background-position: 75% 0;
 }
 
 .city-map-controls {
@@ -446,13 +494,33 @@
   width: min(7.2vw,62px);
   height: min(7.2vw,62px);
   padding: 0;
-  border: 1px solid #d6e0e7;
+  border: 0;
   border-radius: min(1vw,9px);
-  color: #042e77;
-  background: rgba(255,255,255,.95);
-  box-shadow: 0 2px 7px rgba(0,37,81,.18);
-  font-size: min(4vw,34px);
-  font-weight: 900;
+  background-color: transparent;
+  background-image:
+    url("../../../../assets/images/ui/city/city-map-controls.webp");
+  background-size:
+    100% 300%;
+  background-repeat:
+    no-repeat;
+  box-shadow:
+    0 2px 7px
+    rgba(0,37,81,.12);
+}
+
+.city-map-control--zoom-in {
+  background-position:
+    center 0;
+}
+
+.city-map-control--zoom-out {
+  background-position:
+    center 50%;
+}
+
+.city-map-control--locate {
+  background-position:
+    center 100%;
 }
 
 .city-district-sheet {
@@ -655,21 +723,40 @@
 .city-district-metric__icon {
   width: min(5.1vw,44px);
   height: min(5.1vw,44px);
-  display: grid;
-  place-items: center;
+  flex: 0 0 auto;
   margin-bottom: min(.45vw,4px);
   border-radius: 999px;
-  color: #fff;
-  background: #1598e5;
-  font-size: min(2.5vw,22px);
-  font-weight: 900;
+  background-image:
+    url("../../../../assets/images/ui/city/city-metric-icons.webp");
+  background-size:
+    800% 100%;
+  background-repeat:
+    no-repeat;
 }
 
-.city-district-metric:nth-child(2) .city-district-metric__icon { background: #ff8c22; }
-.city-district-metric:nth-child(3) .city-district-metric__icon { background: #a446df; }
-.city-district-metric:nth-child(4) .city-district-metric__icon { background: #ef4a54; }
-.city-district-metric:nth-child(5) .city-district-metric__icon { background: #12b978; }
-.city-district-metric:nth-child(6) .city-district-metric__icon { background: #2698d9; }
+.city-district-metric__icon--traffic {
+  background-position: 0 0;
+}
+
+.city-district-metric__icon--spending {
+  background-position: 14.2857% 0;
+}
+
+.city-district-metric__icon--rent {
+  background-position: 28.5714% 0;
+}
+
+.city-district-metric__icon--competition {
+  background-position: 42.8571% 0;
+}
+
+.city-district-metric__icon--delivery {
+  background-position: 57.1429% 0;
+}
+
+.city-district-metric__icon--property {
+  background-position: 71.4286% 0;
+}
 
 .city-district-metric small,
 .city-district-metric strong,

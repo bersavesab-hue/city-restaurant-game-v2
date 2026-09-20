@@ -3,7 +3,8 @@ import { renderGameTopBar, renderNoticeTicker, renderBottomNavigation } from "..
 import { gameChromeSystem } from "../../components/GameChromeSystem.js";
 
 import {
-  getDistrictThumbnailStyle
+  getDistrictThumbnailStyle,
+  getDistrictLabelStyle
 } from "./DistrictVisualRegistry.js";
 
 function escapeHtml(value) {
@@ -358,10 +359,7 @@ class CityMapView {
 
     const pins =
       displayed.map(
-        (
-          district,
-          index
-        ) => {
+        district => {
           const locked =
             district.locked ===
             true;
@@ -370,26 +368,17 @@ class CityMapView {
             selectedId ===
             district.id;
 
-          const icon =
-            locked
-              ? "▣"
-              : index === 0
-                ? "▦"
-                : index === 1
-                  ? "◆"
-                  : index === 2
-                    ? "◇"
-                    : index === 3
-                      ? "▤"
-                      : "◉";
+          const stateClass =
+            selected
+              ? "selected"
+              : district.hasOpenStore
+                ? "open"
+                : district.highPotential
+                  ? "potential"
+                  : "";
 
           return (
-            '<button type="button" class="city-map-pin city-map-pin--' +
-            (
-              index %
-              5
-            ) +
-            " " +
+            '<button type="button" class="city-map-pin ' +
             (
               selected
                 ? "is-active "
@@ -414,10 +403,15 @@ class CityMapView {
             district.position.x +
             "%;top:" +
             district.position.y +
-            '%">' +
-              '<span class="city-map-pin__icon" aria-hidden="true">' +
-                icon +
-              '</span>' +
+            "%;" +
+            getDistrictLabelStyle(
+              district.id,
+              {
+                selected,
+                locked
+              }
+            ) +
+            '">' +
               '<span class="city-map-pin__copy">' +
                 '<strong>' +
                   escapeHtml(
@@ -436,6 +430,13 @@ class CityMapView {
                   ) +
                 '</small>' +
               '</span>' +
+              (
+                stateClass
+                  ? '<span class="city-map-pin__state city-map-pin__state--' +
+                    stateClass +
+                    '" aria-hidden="true"></span>'
+                  : ""
+              ) +
             '</button>'
           );
         }
@@ -456,23 +457,46 @@ class CityMapView {
           '</div>' +
         '</div>' +
         '<div class="city-map-controls" aria-label="地图控制">' +
-          '<button type="button" data-action="zoom-in" aria-label="放大地图">＋</button>' +
-          '<button type="button" data-action="zoom-out" aria-label="缩小地图">－</button>' +
-          '<button type="button" data-action="locate" aria-label="重置地图">⌾</button>' +
+          '<button type="button" class="city-map-control city-map-control--zoom-in" data-action="zoom-in" aria-label="放大地图"></button>' +
+          '<button type="button" class="city-map-control city-map-control--zoom-out" data-action="zoom-out" aria-label="缩小地图"></button>' +
+          '<button type="button" class="city-map-control city-map-control--locate" data-action="locate" aria-label="重置地图"></button>' +
         '</div>' +
       '</section>'
     );
   }
 
-  renderMetric(icon, label, value, sub = "") {
+  renderMetric(
+    iconName,
+    label,
+    value,
+    sub = ""
+  ) {
     return (
       '<article class="city-district-metric">' +
-        '<span class="city-district-metric__icon" aria-hidden="true">' +
-        icon +
-        '</span>' +
-        '<small>' + escapeHtml(label) + '</small>' +
-        '<strong>' + escapeHtml(value) + '</strong>' +
-        (sub ? '<b>' + escapeHtml(sub) + '</b>' : "") +
+        '<span class="city-district-metric__icon city-district-metric__icon--' +
+        escapeHtml(
+          iconName
+        ) +
+        '" aria-hidden="true"></span>' +
+        '<small>' +
+        escapeHtml(
+          label
+        ) +
+        '</small>' +
+        '<strong>' +
+        escapeHtml(
+          value
+        ) +
+        '</strong>' +
+        (
+          sub
+            ? '<b>' +
+              escapeHtml(
+                sub
+              ) +
+              '</b>'
+            : ""
+        ) +
       '</article>'
     );
   }
@@ -597,12 +621,12 @@ class CityMapView {
           '"><span aria-hidden="true">⌕</span><strong>查看房源</strong></button>' +
         '</header>' +
         '<div class="city-district-metrics">' +
-          this.renderMetric("♟", "客流量", trafficPerDay.toLocaleString("zh-CN") + "人/天", district.trafficIndex >= 60 ? "▲ 活跃" : "平稳") +
-          this.renderMetric("●", "消费力", "¥" + String(district.spendingPower ?? 0), district.spendingPower >= 60 ? "▲ 较强" : "中等") +
-          this.renderMetric("⌂", "平均租金", "¥" + Math.round(rentPerSquareMetre).toLocaleString("zh-CN") + "/㎡/月") +
-          this.renderMetric("▥", "竞争度", levelLabel(district.competition)) +
-          this.renderMetric("◉", "外卖需求", levelLabel(district.deliveryDemand), district.deliveryDemand >= 60 ? "▲ 活跃" : "") +
-          this.renderMetric("▦", "可租房源", (district.propertyCount ?? 0) + "套") +
+          this.renderMetric("traffic", "客流量", trafficPerDay.toLocaleString("zh-CN") + "人/天", district.trafficIndex >= 60 ? "▲ 活跃" : "平稳") +
+          this.renderMetric("spending", "消费力", "¥" + String(district.spendingPower ?? 0), district.spendingPower >= 60 ? "▲ 较强" : "中等") +
+          this.renderMetric("rent", "平均租金", "¥" + Math.round(rentPerSquareMetre).toLocaleString("zh-CN") + "/㎡/月") +
+          this.renderMetric("competition", "竞争度", levelLabel(district.competition)) +
+          this.renderMetric("delivery", "外卖需求", levelLabel(district.deliveryDemand), district.deliveryDemand >= 60 ? "▲ 活跃" : "") +
+          this.renderMetric("property", "可租房源", (district.propertyCount ?? 0) + "套") +
         '</div>' +
         '<section class="city-opportunities">' +
           '<header><div><span aria-hidden="true">♛</span>' +

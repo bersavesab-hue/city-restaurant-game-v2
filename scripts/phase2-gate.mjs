@@ -9,6 +9,7 @@ import {
 
 const tests = [
   "tests/district-visual-registry.test.js",
+  "tests/city-generated-art.test.js",
   "tests/foundation-v2-smoke.test.js",
   "tests/word-of-mouth.test.js",
   "tests/customer-loyalty-integration.test.js",
