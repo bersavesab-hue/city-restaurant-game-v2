@@ -236,9 +236,9 @@ function renderCityFrame() {
           '<span>点亮这座城市 ♡</span>' +
         '</div>' +
         '<div class="ui-v2-city-frame__map-controls" data-ui-box="map-controls" aria-label="地图控制">' +
-          '<button type="button" data-ui-box="map-control" data-city-map-action="zoom-in" aria-label="放大">＋</button>' +
-          '<button type="button" data-ui-box="map-control" data-city-map-action="zoom-out" aria-label="缩小">－</button>' +
-          '<button type="button" data-ui-box="map-control" data-city-map-action="locate" aria-label="复位地图">◎</button>' +
+          '<button type="button" data-ui-box="map-control" data-city-map-action="zoom-in" aria-label="放大"></button>' +
+          '<button type="button" data-ui-box="map-control" data-city-map-action="zoom-out" aria-label="缩小"></button>' +
+          '<button type="button" data-ui-box="map-control" data-city-map-action="locate" aria-label="复位地图"></button>' +
         '</div>' +
       '</section>' +
 

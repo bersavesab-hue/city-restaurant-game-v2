@@ -1430,3 +1430,28 @@ small {
   font-size: 14px;
   line-height: 1.5;
 }
+
+
+/* Final interaction polish: preserve visual geometry while improving mobile taps. */
+.ui-v2-city-frame__filter,
+.ui-v2-city-frame__marker,
+.ui-v2-city-frame__map-controls button,
+.ui-v2-city-frame__detail-close,
+.ui-v2-city-frame__primary-action,
+.ui-v2-city-frame__opportunity,
+.ui-v2-city-frame__opportunity-header button {
+  touch-action: manipulation;
+}
+
+.ui-v2-city-frame__detail-close::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+.ui-v2-city-frame__map-controls button:active,
+.ui-v2-city-frame__primary-action:active,
+.ui-v2-city-frame__opportunity:active,
+.ui-v2-city-frame__filter:active {
+  transform: translateY(1px);
+}

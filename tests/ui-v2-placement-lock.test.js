@@ -13,28 +13,28 @@ import { renderCityFrame } from "../src/ui-v2/pages/city/CityFrame.js";
 
 test("HUD和地图坐标与864母版一致", () => {
   assert.deepEqual(UI_PLACEMENTS.hud.identity, {
-    x: 0, y: 0, width: 289, height: 94
+    x: 0, y: 0, width: 272, height: 94
   });
   assert.deepEqual(UI_PLACEMENTS.hud.simulation, {
-    x: 289, y: 0, width: 380, height: 94
+    x: 272, y: 0, width: 393, height: 94
   });
   assert.deepEqual(UI_PLACEMENTS.hud.resources, {
-    x: 669, y: 0, width: 195, height: 94
+    x: 665, y: 0, width: 199, height: 94
   });
   assert.deepEqual(UI_PLACEMENTS.hero.summary, {
-    x: 576, y: 16, width: 276, height: 103
+    x: 587, y: 17, width: 265, height: 97
   });
   assert.deepEqual(UI_PLACEMENTS.filters, {
-    x: 11, y: 0, width: 842, height: 66, gap: 5
+    x: 10, y: 0, width: 844, height: 63, gap: 5
   });
   assert.deepEqual(UI_PLACEMENTS.map.controls, {
-    x: 794, y: 360, width: 56, height: 192, gap: 12
+    x: 793, y: 442, width: 56, height: 192, gap: 12
   });
   assert.deepEqual(UI_PLACEMENTS.map.markers.cbd, {
-    x: 320, y: 191
+    x: 320, y: 198
   });
   assert.deepEqual(UI_PLACEMENTS.map.markers.waterfront, {
-    x: 674, y: 455
+    x: 674, y: 471
   });
 });
 
@@ -52,13 +52,13 @@ test("详情与文字盒固定，动态数据落在盒内", () => {
     x: 17, y: 322, width: 830, height: 102, gap: 8
   });
   assert.deepEqual(UI_BOXES.detailHandle, {
-    width: 60, height: 6
+    width: 69, height: 5
   });
   assert.deepEqual(UI_TEXT_SLOTS.heroTitle, {
-    x: 60, y: 21, width: 518, height: 65
+    x: 60, y: 17, width: 518, height: 60
   });
   assert.equal(UI_TYPOGRAPHY.roles.hudPrimary.size, 23);
-  assert.equal(UI_TYPOGRAPHY.roles.markerTitle.size, 20);
+  assert.equal(UI_TYPOGRAPHY.roles.markerTitle.size, 19);
   assert.equal(UI_TYPOGRAPHY.roles.opportunityBody.size, 15);
   const html = renderCityFrame();
   assert.match(html, /data-ui-box="detail-handle"/);
@@ -77,7 +77,7 @@ test("地图是独立静态素材，状态文字和操作由DOM实时绘制", ()
   const shellCss = fs.readFileSync(
     "src/ui-v2/shell/app-shell.css", "utf8"
   );
-  assert.match(cityCss, /city-map-master\.webp/);
+  assert.match(cityCss, /city-map-master-v3\.webp/);
   assert.match(cityCss, /marker-cbd\.webp/);
   assert.match(cityCss, /pin-selected\.svg/);
   assert.match(cityCss, /ui-v2-city-frame__region-overlays/);
@@ -88,10 +88,11 @@ test("地图是独立静态素材，状态文字和操作由DOM实时绘制", ()
   assert.match(shellCss, /var\(--ui-safe-top\)/);
   assert.match(shellCss, /var\(--ui-safe-bottom\)/);
   assert.doesNotMatch(cityCss + hudCss, /data:image|base64|map-grid/);
+  assert.doesNotMatch(renderCityFrame(), />[＋－◎]</);
   assert.equal(UI_REGIONS.detail.y + UI_REGIONS.detail.height,
     UI_REGIONS.navigation.y);
   for (const file of [
-    "illustrations/city-map-master.webp",
+    "illustrations/city-map-master-v3.webp",
     "illustrations/store-avatar.webp",
     "illustrations/district-cbd-v3.webp",
     "illustrations/district-university-v3.webp",
