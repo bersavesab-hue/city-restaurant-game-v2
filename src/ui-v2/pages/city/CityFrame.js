@@ -48,12 +48,12 @@ const MAP_MARKERS =
 
 const METRICS =
   Object.freeze([
-    Object.freeze(["客流量","—"]),
-    Object.freeze(["消费力","—"]),
-    Object.freeze(["平均租金","—"]),
-    Object.freeze(["竞争度","—"]),
-    Object.freeze(["外卖需求","—"]),
-    Object.freeze(["可租房源","—"])
+    Object.freeze(["客流","—"]),
+    Object.freeze(["消费","—"]),
+    Object.freeze(["租金","—"]),
+    Object.freeze(["竞争","—"]),
+    Object.freeze(["外卖","—"]),
+    Object.freeze(["房源","—"])
   ]);
 
 const OPPORTUNITIES =
@@ -216,16 +216,10 @@ function renderCityFrame() {
             renderMarkers() +
           '</div>' +
         '</div>' +
-        '<div class="ui-v2-city-frame__map-controls" data-ui-box="map-controls" aria-label="地图控制">' +
-          '<button type="button" data-ui-box="map-control" data-city-map-action="zoom-in" aria-label="放大"></button>' +
-          '<button type="button" data-ui-box="map-control" data-city-map-action="zoom-out" aria-label="缩小"></button>' +
-          '<button type="button" data-ui-box="map-control" data-city-map-action="locate" aria-label="复位地图"></button>' +
-        '</div>' +
       '</section>' +
 
       '<section class="ui-v2-city-frame__detail" data-ui-region="city-detail">' +
         '<div class="ui-v2-city-frame__detail-handle" data-ui-box="detail-handle"></div>' +
-        '<button class="ui-v2-city-frame__detail-close" type="button" data-ui-box="detail-close" data-city-action="close-detail" aria-label="收起商圈详情">×</button>' +
         '<div class="ui-v2-city-frame__detail-main">' +
           '<div class="ui-v2-city-frame__thumbnail" data-ui-box="detail-thumbnail"></div>' +
           '<div class="ui-v2-city-frame__detail-copy">' +
