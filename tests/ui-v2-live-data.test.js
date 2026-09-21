@@ -12,6 +12,10 @@ import {
   resolveDistrictSelectionForFilter
 } from "../src/ui-v2/runtime/LiveUiBinding.js";
 
+import {
+  createSimulationClock
+} from "../src/runtime/SimulationClock.js";
+
 test(
   "资金自动缩写避免HUD被大数字撑爆",
   () => {
@@ -376,6 +380,126 @@ test(
         "all"
       ),
       "available"
+    );
+  }
+);
+
+
+test(
+  "实时模拟时钟按1x/2x/4x连续推进游戏分钟",
+  () => {
+    let nowMs = 0;
+    let callback = null;
+    let runtime = {
+      paused: false,
+      speed: 4
+    };
+    let advanced = 0;
+
+    const app = {
+      core: {
+        gameState: {
+          getSection(
+            section
+          ) {
+            return section ===
+              "runtime"
+              ? {
+                  ...runtime
+                }
+              : null;
+          }
+        },
+        simulationSystem: {
+          advance(minutes) {
+            advanced +=
+              minutes;
+          }
+        }
+      }
+    };
+
+    const clock =
+      createSimulationClock(
+        app,
+        {
+          now: () =>
+            nowMs,
+
+          setIntervalFn(
+            handler
+          ) {
+            callback =
+              handler;
+
+            return 1;
+          },
+
+          clearIntervalFn() {
+            callback =
+              null;
+          }
+        }
+      );
+
+    assert.equal(
+      clock.start(),
+      true
+    );
+
+    nowMs = 250;
+    callback();
+
+    assert.equal(
+      advanced,
+      1
+    );
+
+    nowMs = 500;
+    callback();
+
+    assert.equal(
+      advanced,
+      2
+    );
+
+    runtime = {
+      paused: true,
+      speed: 4
+    };
+
+    nowMs = 750;
+    callback();
+
+    assert.equal(
+      advanced,
+      2
+    );
+
+    runtime = {
+      paused: false,
+      speed: 1
+    };
+
+    nowMs = 1000;
+    callback();
+
+    assert.equal(
+      advanced,
+      2
+    );
+
+    nowMs = 1750;
+    callback();
+
+    assert.equal(
+      advanced,
+      3
+    );
+
+    assert.equal(
+      clock.stop(),
+      true
     );
   }
 );

@@ -16,6 +16,10 @@ import {
   bindCityFrameLive
 } from "../ui-v2/runtime/LiveUiBinding.js";
 
+import {
+  createSimulationClock
+} from "./SimulationClock.js";
+
 globalThis.__CITY_RESTAURANT_CORE__ =
   app;
 
@@ -59,6 +63,22 @@ const navLive =
     cityLive.openQuickPanel
   );
 
+const simulationClock =
+  createSimulationClock(
+    app
+  );
+
+simulationClock.start();
+
+const onVisibilityChange = () => {
+  simulationClock.reset();
+};
+
+document.addEventListener(
+  "visibilitychange",
+  onVisibilityChange
+);
+
 globalThis.__CITY_RESTAURANT_UI__ =
   Object.freeze({
     shell,
@@ -66,6 +86,7 @@ globalThis.__CITY_RESTAURANT_UI__ =
     hudLive,
     navLive,
     cityLive,
+    simulationClock,
 
     refresh() {
       hudLive.refresh();
@@ -73,6 +94,13 @@ globalThis.__CITY_RESTAURANT_UI__ =
     },
 
     destroy() {
+      simulationClock.stop();
+
+      document.removeEventListener(
+        "visibilitychange",
+        onVisibilityChange
+      );
+
       navLive.destroy();
       cityLive.destroy();
       hudLive.destroy();
