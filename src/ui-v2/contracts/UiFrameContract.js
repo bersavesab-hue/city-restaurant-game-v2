@@ -53,26 +53,26 @@ const UI_BOXES =
 
     hudWeather:
       Object.freeze({
-        width: 36,
-        height: 36
+        width: 28,
+        height: 28
       }),
 
     hudSpeedAction:
       Object.freeze({
-        width: 40,
-        height: 40
+        width: 34,
+        height: 34
       }),
 
     hudResourceAction:
       Object.freeze({
-        width: 32,
-        height: 32
+        width: 28,
+        height: 28
       }),
 
     hudIcon:
       Object.freeze({
-        width: 28,
-        height: 28
+        width: 24,
+        height: 24
       }),
 
     heroIcon:
@@ -185,25 +185,25 @@ const UI_PLACEMENTS =
         identity:
           Object.freeze({
             x: 12,
-            y: 17,
-            width: 211,
-            height: 69
+            y: 14,
+            width: 205,
+            height: 75
           }),
 
         simulation:
           Object.freeze({
-            x: 231,
-            y: 17,
-            width: 298,
-            height: 69
+            x: 225,
+            y: 14,
+            width: 300,
+            height: 75
           }),
 
         resources:
           Object.freeze({
-            x: 537,
-            y: 17,
-            width: 142,
-            height: 69
+            x: 533,
+            y: 14,
+            width: 146,
+            height: 75
           })
       }),
 
@@ -370,17 +370,17 @@ const UI_TEXT_SLOTS =
   Object.freeze({
     hudIdentityTitle:
       Object.freeze({
-        x: 88,
+        x: 86,
         y: 27,
-        width: 130,
+        width: 126,
         height: 25
       }),
 
     hudIdentitySubtitle:
       Object.freeze({
-        x: 88,
-        y: 57,
-        width: 130,
+        x: 86,
+        y: 56,
+        width: 126,
         height: 18
       }),
 

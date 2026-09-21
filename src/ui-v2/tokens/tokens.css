@@ -197,18 +197,18 @@
     );
   --ui-box-hud-speed:
     min(
-      5.7887vw,
-      2.6042dvh
+      4.9204vw,
+      2.2135dvh
     );
   --ui-box-hud-resource:
     min(
-      4.6310vw,
-      2.0833dvh
+      4.0521vw,
+      1.8229dvh
     );
   --ui-box-hud-icon:
     min(
-      4.0521vw,
-      1.8229dvh
+      3.4732vw,
+      1.5625dvh
     );
   --ui-box-hero-icon:
     min(
@@ -267,17 +267,17 @@
 
   /* Locked HUD group placement. */
   --ui-hud-identity-x: 1.7366vw;
-  --ui-hud-identity-y: 1.1068dvh;
-  --ui-hud-identity-width: 30.5355vw;
-  --ui-hud-group-height: 4.4922dvh;
+  --ui-hud-identity-y: .9115dvh;
+  --ui-hud-identity-width: 29.6671vw;
+  --ui-hud-group-height: 4.8828dvh;
 
-  --ui-hud-simulation-x: 33.4298vw;
-  --ui-hud-simulation-y: 1.1068dvh;
-  --ui-hud-simulation-width: 43.1259vw;
+  --ui-hud-simulation-x: 32.5615vw;
+  --ui-hud-simulation-y: .9115dvh;
+  --ui-hud-simulation-width: 43.4153vw;
 
-  --ui-hud-resources-x: 77.7135vw;
-  --ui-hud-resources-y: 1.1068dvh;
-  --ui-hud-resources-width: 20.5500vw;
+  --ui-hud-resources-x: 77.1346vw;
+  --ui-hud-resources-y: .9115dvh;
+  --ui-hud-resources-width: 21.1288vw;
 
   /* Locked hero placement. */
   --ui-hero-icon-x: 2.8944vw;

@@ -20,29 +20,29 @@ test(
       UI_PLACEMENTS.hud.identity,
       {
         x: 12,
-        y: 17,
-        width: 211,
-        height: 69
+        y: 14,
+        width: 205,
+        height: 75
       }
     );
 
     assert.deepEqual(
       UI_PLACEMENTS.hud.simulation,
       {
-        x: 231,
-        y: 17,
-        width: 298,
-        height: 69
+        x: 225,
+        y: 14,
+        width: 300,
+        height: 75
       }
     );
 
     assert.deepEqual(
       UI_PLACEMENTS.hud.resources,
       {
-        x: 537,
-        y: 17,
-        width: 142,
-        height: 69
+        x: 533,
+        y: 14,
+        width: 146,
+        height: 75
       }
     );
   }
