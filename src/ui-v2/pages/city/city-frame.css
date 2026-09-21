@@ -37,8 +37,8 @@
       rgba(16,45,41,.60),
       rgba(18,61,49,.27)
     ),
-    url("ui-v2/illustrations/city-map-master.webp")
-    center top /
+    url("ui-v2/illustrations/city-hero-v3.webp")
+    center /
     cover
     no-repeat;
 }
@@ -306,7 +306,7 @@
       rgba(0,52,81,.10),
       rgba(0,52,81,.10)
     ),
-    url("ui-v2/illustrations/city-map-master.webp")
+    url("ui-v2/illustrations/city-map-master-v3.webp")
     center / cover no-repeat;
   filter:
     saturate(1.02)
@@ -370,7 +370,7 @@
   position: absolute;
   inset: 0;
   background:
-    url("ui-v2/illustrations/city-map-master.webp")
+    url("ui-v2/illustrations/city-map-master-v3.webp")
     center /
     100% 100%
     no-repeat;
@@ -828,10 +828,10 @@ button[data-city-map-action="locate"] {
   min-height: 0;
   display: grid;
   grid-template-columns:
-    15%
+    16%
     minmax(0,1fr)
-    28%;
-  gap: 1.5%;
+    29%;
+  gap: 1.3%;
   align-items: center;
   padding:
     0
@@ -877,7 +877,7 @@ button[data-city-map-action="locate"] {
 }
 
 .ui-v2-city-frame__thumbnail[data-district-art="city"] {
-  background-image: url("ui-v2/illustrations/city-map-master.webp");
+  background-image: url("ui-v2/illustrations/city-map-master-v3.webp");
 }
 
 .ui-v2-city-frame__detail-copy {
@@ -961,8 +961,8 @@ button[data-city-map-action="locate"] {
 }
 
 .ui-v2-city-frame__primary-action {
-  width: 96%;
-  height: 75%;
+  width: 97%;
+  height: 78%;
   min-width: 0;
   min-height: 0;
   display: flex;
@@ -1013,8 +1013,8 @@ button[data-city-map-action="locate"] {
       6,
       minmax(0,1fr)
     );
-  gap: .8%;
-  margin-top: 1%;
+  gap: .65%;
+  margin-top: .7%;
 }
 
 .ui-v2-city-frame__metric {
@@ -1022,7 +1022,7 @@ button[data-city-map-action="locate"] {
   min-width: 0;
   min-height: 0;
   padding:
-    8%
+    7%
     3%
     3%;
   border:
@@ -1220,12 +1220,12 @@ h3 span {
   min-height: 0;
   display: grid;
   grid-template-columns:
-    28%
+    30%
     minmax(0,1fr)
     4%;
-  gap: 3%;
+  gap: 2.5%;
   align-items: center;
-  padding: 3%;
+  padding: 2.5%;
   overflow: hidden;
   border:
     1px solid
