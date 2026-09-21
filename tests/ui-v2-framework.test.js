@@ -50,12 +50,12 @@ test(
 
     assert.equal(
       UI_REGIONS.map.height,
-      682
+      744
     );
 
     assert.equal(
       UI_REGIONS.detail.height,
-      430
+      404
     );
 
     assert.equal(
@@ -209,6 +209,19 @@ test(
       city,
       /ui-v2-city-frame__map-grid/
     );
+
+    assert.doesNotMatch(
+      city,
+      /hero-summary|city-total|city-summary-subtitle/
+    );
+
+    assert.doesNotMatch(
+      city,
+      /region-overlays|map-motto|让美食|点亮这座城市/
+    );
+
+    assert.match(city, /data-live="filter-all"/);
+    assert.match(city, /data-live="detail-title"/);
   }
 );
 

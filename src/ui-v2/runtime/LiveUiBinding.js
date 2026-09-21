@@ -651,28 +651,6 @@ function bindCityFrameLive(
         model.selected.id;
     }
 
-    setText(
-      root,
-      "city-total",
-      model.totalDistricts +
-      "个商圈"
-    );
-
-    setText(
-      root,
-      "city-summary-subtitle",
-      model.regionCount +
-      "大区域 · " +
-      (
-        model.counts.opened >
-          0
-          ? "已开" +
-            model.counts.opened +
-            "家门店"
-          : "等待你的探索"
-      )
-    );
-
     for (
       const [
         id,
@@ -815,21 +793,68 @@ function bindCityFrameLive(
         selected.name
       );
 
+      const badgeState =
+        selected.opened
+          ? "opened"
+          : !selected.unlocked
+            ? "locked"
+            : selected.highPotential
+              ? "highPotential"
+              : selected.availablePropertyCount > 0
+                ? "available"
+                : "observe";
+
       setText(
         root,
         "detail-badge",
-        selected.opened
+        badgeState === "opened"
           ? "已开店"
-          : !selected.unlocked
+          : badgeState === "locked"
             ? "待解锁"
-            : selected.highPotential
+            : badgeState === "highPotential"
               ? "高潜力"
-              : selected
-                  .availablePropertyCount >
-                  0
+              : badgeState === "available"
                 ? "可选址"
                 : "观察"
       );
+
+      const badgeElement =
+        root.querySelector(
+          '[data-live="detail-badge"]'
+        );
+
+      if (badgeElement) {
+        badgeElement.dataset.state =
+          badgeState;
+      }
+
+      const propertyAction =
+        root.querySelector(
+          ".ui-v2-city-frame__primary-action"
+        );
+
+      if (propertyAction) {
+        const hasProperties =
+          selected.availablePropertyCount > 0;
+        const enabled =
+          selected.unlocked &&
+          hasProperties;
+
+        propertyAction.disabled =
+          !enabled;
+        propertyAction.setAttribute(
+          "aria-disabled",
+          String(!enabled)
+        );
+        propertyAction.dataset.districtId =
+          selected.id;
+        propertyAction.textContent =
+          !selected.unlocked
+            ? "待解锁"
+            : hasProperties
+              ? "查看房源"
+              : "暂无房源";
+      }
 
       setText(
         root,

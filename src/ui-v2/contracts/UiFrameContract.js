@@ -14,22 +14,22 @@ const UI_REGIONS =
     hero:
       Object.freeze({
         y: 94,
-        height: 131
+        height: 96
       }),
     filters:
       Object.freeze({
-        y: 225,
-        height: 63
+        y: 190,
+        height: 62
       }),
     map:
       Object.freeze({
-        y: 288,
-        height: 682
+        y: 252,
+        height: 744
       }),
     detail:
       Object.freeze({
-        y: 970,
-        height: 430
+        y: 996,
+        height: 404
       }),
     navigation:
       Object.freeze({
@@ -69,11 +69,6 @@ const UI_BOXES =
       Object.freeze({
         width: 42,
         height: 52
-      }),
-    heroSummary:
-      Object.freeze({
-        width: 265,
-        height: 97
       }),
     filter:
       Object.freeze({
@@ -183,21 +178,14 @@ const UI_PLACEMENTS =
         icon:
           Object.freeze({
             x: 12,
-            y: 28
+            y: 22
           }),
         copy:
           Object.freeze({
             x: 60,
-            y: 21,
-            width: 518,
-            height: 95
-          }),
-        summary:
-          Object.freeze({
-            x: 587,
-            y: 17,
-            width: 265,
-            height: 97
+            y: 10,
+            width: 792,
+            height: 76
           })
       }),
     filters:
@@ -241,7 +229,7 @@ const UI_PLACEMENTS =
         controls:
           Object.freeze({
             x: 793,
-            y: 442,
+            y: 500,
             width: 56,
             height: 192,
             gap: 12
@@ -338,16 +326,16 @@ const UI_TEXT_SLOTS =
     heroTitle:
       Object.freeze({
         x: 60,
-        y: 17,
-        width: 518,
-        height: 60
+        y: 10,
+        width: 792,
+        height: 54
       }),
     heroSubtitle:
       Object.freeze({
-        x: 28,
-        y: 96,
-        width: 562,
-        height: 25
+        x: 60,
+        y: 64,
+        width: 792,
+        height: 24
       }),
     detailTitle:
       Object.freeze({
@@ -428,7 +416,7 @@ const UI_TYPOGRAPHY =
           }),
         pageSubtitle:
           Object.freeze({
-            size: 21,
+            size: 20,
             weight: 700,
             lineHeight: 1.2
           }),

@@ -21,14 +21,11 @@ test("HUD和地图坐标与864母版一致", () => {
   assert.deepEqual(UI_PLACEMENTS.hud.resources, {
     x: 665, y: 0, width: 199, height: 94
   });
-  assert.deepEqual(UI_PLACEMENTS.hero.summary, {
-    x: 587, y: 17, width: 265, height: 97
-  });
   assert.deepEqual(UI_PLACEMENTS.filters, {
     x: 10, y: 0, width: 844, height: 63, gap: 5
   });
   assert.deepEqual(UI_PLACEMENTS.map.controls, {
-    x: 793, y: 442, width: 56, height: 192, gap: 12
+    x: 793, y: 500, width: 56, height: 192, gap: 12
   });
   assert.deepEqual(UI_PLACEMENTS.map.markers.cbd, {
     x: 320, y: 198
@@ -55,7 +52,7 @@ test("详情与文字盒固定，动态数据落在盒内", () => {
     width: 69, height: 5
   });
   assert.deepEqual(UI_TEXT_SLOTS.heroTitle, {
-    x: 60, y: 17, width: 518, height: 60
+    x: 60, y: 10, width: 792, height: 54
   });
   assert.equal(UI_TYPOGRAPHY.roles.hudPrimary.size, 23);
   assert.equal(UI_TYPOGRAPHY.roles.markerTitle.size, 19);
@@ -80,8 +77,9 @@ test("地图是独立静态素材，状态文字和操作由DOM实时绘制", ()
   assert.match(cityCss, /city-map-master-v3\.webp/);
   assert.match(cityCss, /marker-cbd\.webp/);
   assert.match(cityCss, /pin-selected\.svg/);
-  assert.match(cityCss, /ui-v2-city-frame__region-overlays/);
-  assert.match(cityCss, /min\(\s*100cqw/);
+  assert.doesNotMatch(cityCss, /ui-v2-city-frame__region-overlays/);
+  assert.doesNotMatch(cityCss, /ui-v2-city-frame__map-motto/);
+  assert.match(cityCss, /max\(\s*100cqw/);
   assert.match(cityCss, /district-cbd-v3\.webp/);
   assert.match(cityCss, /opportunity-sheet-v3\.webp/);
   assert.match(hudCss, /hud-weather\.webp/);

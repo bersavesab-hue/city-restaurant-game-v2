@@ -201,14 +201,7 @@ function renderCityFrame() {
         '<div class="ui-v2-city-frame__hero-icon" data-ui-box="hero-icon" aria-hidden="true"></div>' +
         '<div class="ui-v2-city-frame__hero-copy">' +
           '<h1 data-ui-text="page-title">城市地图</h1>' +
-          '<p data-ui-text="page-subtitle">发现优质商圈，拓展门店版图，让美食走进更多地方</p>' +
-        '</div>' +
-        '<div class="ui-v2-city-frame__summary" data-ui-box="hero-summary">' +
-          '<span class="ui-v2-city-frame__summary-icon" aria-hidden="true"></span>' +
-          '<div>' +
-            '<strong data-live="city-total">20个商圈</strong>' +
-            '<small data-live="city-summary-subtitle">4大区域 · 等待你的探索</small>' +
-          '</div>' +
+          '<p data-ui-text="page-subtitle">发现优质商圈，拓展门店版图</p>' +
         '</div>' +
       '</section>' +
 
@@ -219,21 +212,9 @@ function renderCityFrame() {
       '<section class="ui-v2-city-frame__map" data-ui-region="city-map">' +
         '<div class="ui-v2-city-frame__map-world" data-layer="map-world">' +
           '<div class="ui-v2-city-frame__map-art" data-ui-box="city-map-art" aria-hidden="true"></div>' +
-          '<div class="ui-v2-city-frame__map-shade" aria-hidden="true"></div>' +
-          '<svg class="ui-v2-city-frame__region-overlays" viewBox="0 0 864 660" preserveAspectRatio="none" aria-hidden="true">' +
-            '<path class="is-campus" d="M248 95 L346 45 448 35 570 53 658 101 642 148 551 180 456 212 371 180 273 161 Z"/>' +
-            '<path class="is-core" d="M45 262 L124 218 194 165 264 160 323 194 432 251 491 332 508 382 453 424 361 437 237 393 119 361 43 315 Z"/>' +
-            '<path class="is-nightlife" d="M540 199 L623 155 678 115 748 132 824 188 860 231 859 320 774 341 700 330 611 297 Z"/>' +
-            '<path class="is-lifestyle" d="M9 423 L95 398 174 422 250 446 315 489 374 565 300 606 195 650 88 630 5 571 Z"/>' +
-            '<path class="is-waterfront" d="M578 444 L643 402 716 404 794 449 863 458 863 568 791 615 713 603 620 574 568 522 510 486 Z"/>' +
-          '</svg>' +
           '<div class="ui-v2-city-frame__markers">' +
             renderMarkers() +
           '</div>' +
-        '</div>' +
-        '<div class="ui-v2-city-frame__map-motto" aria-hidden="true">' +
-          '<span>让美食</span>' +
-          '<span>点亮这座城市 ♡</span>' +
         '</div>' +
         '<div class="ui-v2-city-frame__map-controls" data-ui-box="map-controls" aria-label="地图控制">' +
           '<button type="button" data-ui-box="map-control" data-city-map-action="zoom-in" aria-label="放大"></button>' +
