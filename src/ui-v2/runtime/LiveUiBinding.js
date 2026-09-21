@@ -586,30 +586,10 @@ function bindCityFrameLive(
   let latestModel =
     null;
 
-  const frame =
-    root.querySelector(
-      '[data-ui="city-frame"]'
-    );
-
-  const mapStage =
-    root.querySelector(
-      ".ui-v2-city-frame__map"
-    );
-
-  const mapWorld =
-    root.querySelector(
-      ".ui-v2-city-frame__map-world"
-    );
-
   const dialog =
     root.querySelector(
       '[data-ui="city-dialog"]'
     );
-
-  let mapScale = 1;
-  let mapPanX = 0;
-  let mapPanY = 0;
-  let dragState = null;
 
   const refresh = () => {
     let model =
@@ -1046,12 +1026,6 @@ function bindCityFrameLive(
           .districtId ??
         selectedDistrictId;
 
-      frame
-        ?.classList
-        .remove(
-          "is-detail-closed"
-        );
-
       refresh();
     };
 
@@ -1417,12 +1391,6 @@ function bindCityFrameLive(
       selectedDistrictId =
         districtId;
 
-      frame
-        ?.classList
-        .remove(
-          "is-detail-closed"
-        );
-
       refresh();
     };
 
@@ -1436,25 +1404,6 @@ function bindCityFrameLive(
       handler
     );
   }
-
-  const closeDetailButton =
-    root.querySelector(
-      '[data-city-action="close-detail"]'
-    );
-
-  const onCloseDetail = () => {
-    frame
-      ?.classList
-      .add(
-        "is-detail-closed"
-      );
-  };
-
-  closeDetailButton
-    ?.addEventListener(
-      "click",
-      onCloseDetail
-    );
 
   const opportunityAllButton =
     root.querySelector(
@@ -1533,330 +1482,6 @@ function bindCityFrameLive(
       onDialogBackdrop
     );
 
-  const applyMapTransform = () => {
-    if (
-      !mapStage ||
-      !mapWorld
-    ) {
-      return;
-    }
-
-    const maximumX =
-      Math.max(
-        0,
-        (
-          mapWorld.offsetWidth *
-          mapScale -
-          mapStage.clientWidth
-        ) /
-        2
-      );
-
-    const maximumY =
-      Math.max(
-        0,
-        (
-          mapWorld.offsetHeight *
-          mapScale -
-          mapStage.clientHeight
-        ) /
-        2
-      );
-
-    mapPanX =
-      Math.max(
-        -maximumX,
-        Math.min(
-          maximumX,
-          mapPanX
-        )
-      );
-
-    mapPanY =
-      Math.max(
-        -maximumY,
-        Math.min(
-          maximumY,
-          mapPanY
-        )
-      );
-
-    mapWorld.style
-      .setProperty(
-        "--ui-city-map-scale",
-        String(
-          mapScale
-        )
-      );
-
-    mapWorld.style
-      .setProperty(
-        "--ui-city-pan-x",
-        mapPanX +
-        "px"
-      );
-
-    mapWorld.style
-      .setProperty(
-        "--ui-city-pan-y",
-        mapPanY +
-        "px"
-      );
-
-    const isZoomed =
-      mapScale >
-      1.001;
-
-    mapStage.classList
-      .toggle(
-        "is-zoomed",
-        isZoomed
-      );
-
-    for (
-      const control
-      of root.querySelectorAll(
-        "[data-city-map-action]"
-      )
-    ) {
-      const action =
-        control.dataset
-          .cityMapAction;
-
-      const disabled =
-        (
-          action ===
-            "zoom-in" &&
-          mapScale >=
-            2
-        ) ||
-        (
-          action ===
-            "zoom-out" &&
-          mapScale <=
-            1
-        ) ||
-        (
-          action ===
-            "locate" &&
-          mapScale <=
-            1 &&
-          Math.abs(mapPanX) <
-            .5 &&
-          Math.abs(mapPanY) <
-            .5
-        );
-
-      control.disabled =
-        disabled;
-
-      control.setAttribute(
-        "aria-disabled",
-        String(
-          disabled
-        )
-      );
-    }
-  };
-
-  const mapControlHandlers =
-    [];
-
-  for (
-    const button
-    of root.querySelectorAll(
-      "[data-city-map-action]"
-    )
-  ) {
-    const handler = () => {
-      const action =
-        button.dataset
-          .cityMapAction;
-
-      if (
-        action ===
-        "locate"
-      ) {
-        mapScale = 1;
-        mapPanX = 0;
-        mapPanY = 0;
-      } else {
-        const delta =
-          action ===
-            "zoom-in"
-            ? .12
-            : -.12;
-
-        mapScale =
-          Math.max(
-            1,
-            Math.min(
-              2,
-              Number(
-                (
-                  mapScale +
-                  delta
-                ).toFixed(
-                  2
-                )
-              )
-            )
-          );
-      }
-
-      applyMapTransform();
-    };
-
-    mapControlHandlers.push([
-      button,
-      handler
-    ]);
-
-    button.addEventListener(
-      "click",
-      handler
-    );
-  }
-
-  const onPointerDown = event => {
-    if (
-      event.button !==
-        0 ||
-      mapScale <=
-        1.001 ||
-      event.target
-        ?.closest(
-          "button"
-        )
-    ) {
-      return;
-    }
-
-    dragState = {
-      pointerId:
-        event.pointerId,
-      clientX:
-        event.clientX,
-      clientY:
-        event.clientY,
-      panX:
-        mapPanX,
-      panY:
-        mapPanY
-    };
-
-    mapStage
-      ?.classList
-      .add(
-        "is-dragging"
-      );
-
-    mapStage
-      ?.setPointerCapture
-      ?.(
-        event.pointerId
-      );
-  };
-
-  const onPointerMove = event => {
-    if (
-      !dragState ||
-      dragState.pointerId !==
-        event.pointerId
-    ) {
-      return;
-    }
-
-    mapPanX =
-      dragState.panX +
-      event.clientX -
-      dragState.clientX;
-
-    mapPanY =
-      dragState.panY +
-      event.clientY -
-      dragState.clientY;
-
-    applyMapTransform();
-  };
-
-  const onPointerUp = event => {
-    if (
-      !dragState ||
-      dragState.pointerId !==
-        event.pointerId
-    ) {
-      return;
-    }
-
-    dragState = null;
-
-    mapStage
-      ?.classList
-      .remove(
-        "is-dragging"
-      );
-
-    if (
-      mapStage
-        ?.hasPointerCapture
-        ?.(
-          event.pointerId
-        )
-    ) {
-      mapStage.releasePointerCapture(
-        event.pointerId
-      );
-    }
-  };
-
-  mapStage
-    ?.addEventListener(
-      "pointerdown",
-      onPointerDown
-    );
-
-  mapStage
-    ?.addEventListener(
-      "pointermove",
-      onPointerMove
-    );
-
-  mapStage
-    ?.addEventListener(
-      "pointerup",
-      onPointerUp
-    );
-
-  mapStage
-    ?.addEventListener(
-      "pointercancel",
-      onPointerUp
-    );
-
-  let resizeObserver = null;
-
-  if (
-    typeof globalThis
-      .ResizeObserver ===
-      "function" &&
-    mapStage
-  ) {
-    resizeObserver =
-      new globalThis.ResizeObserver(
-        applyMapTransform
-      );
-
-    resizeObserver.observe(
-      mapStage
-    );
-  } else {
-    globalThis.addEventListener?.(
-      "resize",
-      applyMapTransform
-    );
-  }
-
   const unsubscribers = [
     app.core
       .eventBus
@@ -1881,7 +1506,6 @@ function bindCityFrameLive(
   ];
 
   refresh();
-  applyMapTransform();
 
   return Object.freeze({
     refresh,
@@ -1891,15 +1515,7 @@ function bindCityFrameLive(
       return {
         activeFilter,
         selectedDistrictId,
-        mapScale,
-        mapPanX,
-        mapPanY,
-        detailOpen:
-          !frame
-            ?.classList
-            .contains(
-              "is-detail-closed"
-            ),
+        mapMode: "static",
         model:
           latestModel
       };
@@ -1951,25 +1567,6 @@ function bindCityFrameLive(
         );
       }
 
-      for (
-        const [
-          button,
-          handler
-        ]
-        of mapControlHandlers
-      ) {
-        button.removeEventListener(
-          "click",
-          handler
-        );
-      }
-
-      closeDetailButton
-        ?.removeEventListener(
-          "click",
-          onCloseDetail
-        );
-
       opportunityAllButton
         ?.removeEventListener(
           "click",
@@ -1987,40 +1584,6 @@ function bindCityFrameLive(
           "click",
           onDialogBackdrop
         );
-
-      mapStage
-        ?.removeEventListener(
-          "pointerdown",
-          onPointerDown
-        );
-
-      mapStage
-        ?.removeEventListener(
-          "pointermove",
-          onPointerMove
-        );
-
-      mapStage
-        ?.removeEventListener(
-          "pointerup",
-          onPointerUp
-        );
-
-      mapStage
-        ?.removeEventListener(
-          "pointercancel",
-          onPointerUp
-        );
-
-      resizeObserver
-        ?.disconnect();
-
-      if (!resizeObserver) {
-        globalThis.removeEventListener?.(
-          "resize",
-          applyMapTransform
-        );
-      }
 
       for (
         const unsubscribe
