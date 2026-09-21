@@ -221,17 +221,9 @@
   overflow: hidden;
   isolation: isolate;
   container-type: size;
-  touch-action: none;
+  touch-action: manipulation;
   background: #73b8af;
   cursor: default;
-}
-
-.ui-v2-city-frame__map.is-zoomed {
-  cursor: grab;
-}
-
-.ui-v2-city-frame__map.is-dragging {
-  cursor: grabbing;
 }
 
 .ui-v2-city-frame__map-world {
@@ -243,16 +235,8 @@
     );
   position: absolute;
   z-index: 1;
-  left:
-    calc(
-      50% +
-      var(--ui-city-pan-x,0px)
-    );
-  top:
-    calc(
-      50% +
-      var(--ui-city-pan-y,0px)
-    );
+  left: 50%;
+  top: 50%;
   width:
     max(
       100cqw,
@@ -268,15 +252,8 @@
     660;
   container-type: inline-size;
   transform:
-    translate(-50%,-50%)
-    scale(
-      var(--ui-city-map-scale,1)
-    );
+    translate(-50%,-50%);
   transform-origin: center;
-  will-change:
-    transform,
-    left,
-    top;
 }
 
 .ui-v2-city-frame__map-art {
@@ -530,67 +507,6 @@
   pointer-events: none;
 }
 
-.ui-v2-city-frame__map-controls {
-  position: absolute;
-  z-index: 5;
-  right: 1.4%;
-  bottom: 5.2%;
-  display: grid;
-  gap:
-    calc(10 * var(--city-stage-u));
-}
-
-.ui-v2-city-frame__map-controls button {
-  width:
-    calc(60 * var(--city-stage-u));
-  height:
-    calc(60 * var(--city-stage-u));
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-  color: transparent;
-  border:
-    calc(1.5 * var(--city-stage-u))
-    solid
-    rgba(185,218,239,.92);
-  border-radius:
-    calc(14 * var(--city-stage-u));
-  background-color: #ffffff;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  box-shadow:
-    0 4px 10px
-    rgba(0,43,78,.28),
-    inset 0 1px 0
-    rgba(255,255,255,.9);
-}
-
-.ui-v2-city-frame__map-controls button:disabled {
-  opacity: .46;
-  filter: saturate(.55);
-  cursor: default;
-  pointer-events: none;
-}
-
-.ui-v2-city-frame__map-controls
-button[data-city-map-action="zoom-in"] {
-  background-image:
-    url("ui-v2/icons/map-plus.svg");
-}
-
-.ui-v2-city-frame__map-controls
-button[data-city-map-action="zoom-out"] {
-  background-image:
-    url("ui-v2/icons/map-minus.svg");
-}
-
-.ui-v2-city-frame__map-controls
-button[data-city-map-action="locate"] {
-  background-image:
-    url("ui-v2/icons/map-locate.svg");
-}
-
 .ui-v2-city-frame__detail {
   position: relative;
   z-index: 6;
@@ -647,23 +563,6 @@ button[data-city-map-action="locate"] {
   border-radius:
     var(--ui-radius-pill);
   background: #c5d0d7;
-}
-
-.ui-v2-city-frame__detail-close {
-  position: absolute;
-  z-index: 2;
-  right: 1.8%;
-  top: 1.7%;
-  width:
-    calc(32 * var(--city-u));
-  height:
-    calc(32 * var(--city-u));
-  color: #22456b;
-  font-size:
-    calc(38 * var(--city-u));
-  line-height: .8;
-  font-weight:
-    var(--ui-weight-bold);
 }
 
 .ui-v2-city-frame__detail-main {
@@ -1181,19 +1080,6 @@ small {
   pointer-events: none;
 }
 
-.ui-v2-city-frame.is-detail-closed {
-  grid-template-rows:
-    10.2167%
-    5.1084%
-    minmax(0,1fr)
-    0;
-}
-
-.ui-v2-city-frame.is-detail-closed
-.ui-v2-city-frame__detail {
-  display: none;
-}
-
 .ui-v2-city-dialog {
   width:
     min(
@@ -1275,24 +1161,15 @@ small {
 }
 
 
-/* Final interaction polish: preserve visual geometry while improving mobile taps. */
+/* Final interaction polish: fixed map, interactive district labels and content actions only. */
 .ui-v2-city-frame__filter,
 .ui-v2-city-frame__marker,
-.ui-v2-city-frame__map-controls button,
-.ui-v2-city-frame__detail-close,
 .ui-v2-city-frame__primary-action,
 .ui-v2-city-frame__opportunity,
 .ui-v2-city-frame__opportunity-header button {
   touch-action: manipulation;
 }
 
-.ui-v2-city-frame__detail-close::before {
-  content: "";
-  position: absolute;
-  inset: -8px;
-}
-
-.ui-v2-city-frame__map-controls button:active,
 .ui-v2-city-frame__primary-action:active,
 .ui-v2-city-frame__opportunity:active,
 .ui-v2-city-frame__filter:active {
