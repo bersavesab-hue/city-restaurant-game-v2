@@ -166,10 +166,23 @@ public class MainActivity extends Activity {
         int bottom = 0;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Insets systemBars =
-                    windowInsets.getInsets(
-                            WindowInsets.Type.systemBars()
+            Insets systemBars = Insets.NONE;
+
+            boolean statusVisible =
+                    windowInsets.isVisible(
+                            WindowInsets.Type.statusBars()
                     );
+            boolean navigationVisible =
+                    windowInsets.isVisible(
+                            WindowInsets.Type.navigationBars()
+                    );
+
+            if (statusVisible || navigationVisible) {
+                systemBars =
+                        windowInsets.getInsets(
+                                WindowInsets.Type.systemBars()
+                        );
+            }
 
             Insets cutoutInsets =
                     windowInsets.getInsetsIgnoringVisibility(
@@ -268,6 +281,10 @@ public class MainActivity extends Activity {
                                     .APPEARANCE_LIGHT_NAVIGATION_BARS
                 );
             }
+        }
+
+        if (gameView != null) {
+            gameView.requestApplyInsets();
         }
     }
 

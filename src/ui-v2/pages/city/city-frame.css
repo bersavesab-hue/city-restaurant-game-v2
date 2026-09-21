@@ -309,9 +309,9 @@
     url("ui-v2/illustrations/city-map-master-v3.webp")
     center / cover no-repeat;
   filter:
-    saturate(1.02)
-    brightness(.90);
-  opacity: .96;
+    saturate(1.00)
+    brightness(.98);
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -360,6 +360,22 @@
       var(--ui-city-map-scale,1)
     );
   transform-origin: center;
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 2.2%,
+      #000 97.8%,
+      transparent 100%
+    );
+  mask-image:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 2.2%,
+      #000 97.8%,
+      transparent 100%
+    );
   will-change:
     transform,
     left,
@@ -382,9 +398,10 @@
   pointer-events: none;
   background:
     linear-gradient(
-      rgba(4,44,68,.06),
-      transparent 30%,
-      rgba(5,45,54,.06)
+      rgba(4,44,68,.035),
+      transparent 26%,
+      transparent 74%,
+      rgba(5,45,54,.035)
     );
 }
 
