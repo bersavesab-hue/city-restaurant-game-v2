@@ -7,10 +7,10 @@
   min-height: 0;
   display: grid;
   grid-template-rows:
-    135fr
-    66fr
-    657fr
-    435fr;
+    130fr
+    62fr
+    675fr
+    426fr;
   overflow: hidden;
   color: var(--ui-color-text);
   background: #e4eddc;
@@ -50,7 +50,7 @@
     calc(52 * var(--city-u));
   align-self: start;
   margin-top:
-    calc(25 * var(--city-u));
+    calc(22 * var(--city-u));
   background:
     url("ui-v2/icons/hero-location.svg")
     center /
@@ -62,7 +62,7 @@
   min-width: 0;
   align-self: start;
   padding-top:
-    calc(19 * var(--city-u));
+    calc(17 * var(--city-u));
 }
 
 .ui-v2-city-frame__hero h1 {
@@ -83,7 +83,7 @@
 .ui-v2-city-frame__hero p {
   position: absolute;
   left: 3.2%;
-  bottom: 12%;
+  bottom: 10%;
   max-width: 65%;
   margin: 0;
   overflow: hidden;
@@ -102,7 +102,7 @@
 
 .ui-v2-city-frame__summary {
   min-width: 0;
-  height: 72%;
+  height: 74%;
   display: grid;
   grid-template-columns:
     25%
@@ -786,14 +786,14 @@ button[data-city-map-action="locate"] {
   display: grid;
   grid-template-rows:
     3%
-    26%
-    30%
+    25%
+    29%
     minmax(0,1fr);
-  gap: 1.4%;
+  gap: 1.2%;
   padding:
-    .8%
+    .7%
     2%
-    1.6%;
+    1.4%;
   overflow: hidden;
   border:
     1px solid
@@ -1038,7 +1038,7 @@ button[data-city-map-action="locate"] {
       minmax(0,1fr)
     );
   gap: .55%;
-  margin-top: .5%;
+  margin-top: .35%;
 }
 
 .ui-v2-city-frame__metric {
