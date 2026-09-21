@@ -17,7 +17,9 @@ function renderGlobalNav() {
                   ? ' is-active'
                   : ''
               ) +
-              '" type="button" data-ui-box="nav-cell" data-ui-destination="' +
+              '" type="button" data-ui-box="nav-cell" data-ui-key="' +
+              item.id +
+              '" data-ui-destination="' +
               item.id +
               (item.id === "city"
                 ? '" aria-current="page">'
