@@ -412,3 +412,96 @@
   letter-spacing:
     -.01em;
 }
+
+/* Formal static visual assets. Box geometry stays controlled by the 691x1536 contract. */
+[data-ui-box="hud-avatar"],
+[data-ui-box="hud-weather"],
+[data-ui-box="hud-money-icon"],
+[data-ui-box="hud-add"],
+[data-ui-box="hud-level-icon"],
+[data-ui-box="hud-rating-icon"],
+.ui-v2-box--nav-icon {
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-color: transparent;
+}
+
+[data-ui-box="hud-avatar"] {
+  background-image:
+    url("ui-v2/icons/hud-store.svg");
+}
+
+[data-ui-box="hud-weather"] {
+  background-image:
+    url("ui-v2/icons/hud-weather.svg");
+}
+
+[data-ui-box="hud-money-icon"] {
+  background-image:
+    url("ui-v2/icons/hud-money.svg");
+}
+
+[data-ui-box="hud-add"] {
+  background-image:
+    url("ui-v2/icons/hud-add.svg");
+}
+
+[data-ui-box="hud-level-icon"] {
+  background-image:
+    url("ui-v2/icons/hud-crown.svg");
+}
+
+[data-ui-box="hud-rating-icon"] {
+  background-image:
+    url("ui-v2/icons/hud-star.svg");
+}
+
+.ui-v2-hud__speed-row
+[data-hud-action="toggle-pause"] {
+  color: transparent;
+  background-color: transparent;
+  background-image:
+    url("ui-v2/icons/hud-pause.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-color: transparent;
+}
+
+.ui-v2-hud__speed-row
+[data-hud-action="toggle-pause"].is-active {
+  background-image:
+    url("ui-v2/icons/hud-play.svg");
+}
+
+.ui-v2-nav__item:nth-child(1)
+.ui-v2-box--nav-icon {
+  background-image:
+    url("ui-v2/icons/nav-city.svg");
+}
+
+.ui-v2-nav__item:nth-child(2)
+.ui-v2-box--nav-icon {
+  background-image:
+    url("ui-v2/icons/nav-store.svg");
+}
+
+.ui-v2-nav__item:nth-child(3)
+.ui-v2-box--nav-icon {
+  background-image:
+    url("ui-v2/icons/nav-business.svg");
+}
+
+.ui-v2-nav__item:nth-child(4)
+.ui-v2-box--nav-icon {
+  background-image:
+    url("ui-v2/icons/nav-staff.svg");
+}
+
+.ui-v2-nav__item:nth-child(5)
+.ui-v2-box--nav-icon {
+  background-image:
+    url("ui-v2/icons/nav-more.svg");
+}
