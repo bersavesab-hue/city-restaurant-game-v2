@@ -18,12 +18,24 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  background:
+  background-color:
+    #0c5d91;
+  background-image:
     linear-gradient(
-      180deg,
-      #e7f4fb,
-      #d6eef7
-    );
+      90deg,
+      rgba(0,46,83,.74) 0%,
+      rgba(0,63,105,.52) 58%,
+      rgba(0,67,108,.24) 100%
+    ),
+    url("ui-v2/illustrations/city-map-master.webp");
+  background-position:
+    center,
+    center 18%;
+  background-repeat:
+    no-repeat;
+  background-size:
+    cover,
+    112% auto;
 }
 
 .ui-v2-city-frame__hero-icon {
@@ -52,11 +64,14 @@
     2.7344dvh;
   margin: 0;
   overflow: hidden;
+  color: #ffffff;
   font-size:
     var(--ui-font-page-title);
   line-height: 1.05;
   font-weight:
     var(--ui-weight-black);
+  text-shadow:
+    0 2px 8px rgba(0,30,54,.55);
   white-space: nowrap;
 }
 
@@ -69,7 +84,7 @@
     0;
   overflow: hidden;
   color:
-    var(--ui-color-text-secondary);
+    rgba(255,255,255,.92);
   font-size:
     var(--ui-font-page-subtitle);
   line-height: 1.3;
@@ -100,10 +115,14 @@
     0
     var(--ui-space-12);
   color: #ffffff;
+  border:
+    1px solid rgba(255,255,255,.20);
   border-radius:
     var(--ui-radius-lg);
   background:
-    rgba(6,79,130,.88);
+    rgba(3,72,119,.90);
+  box-shadow:
+    0 8px 18px rgba(0,36,68,.22);
 }
 
 .ui-v2-city-frame__summary div {
@@ -246,6 +265,48 @@
     cover;
 }
 
+.ui-v2-city-frame__region-glow {
+  position: absolute;
+  width: 27vw;
+  height: 12.5dvh;
+  transform: translate(-50%,-50%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(8px);
+  opacity: .34;
+  mix-blend-mode: screen;
+}
+
+.ui-v2-city-frame__region-glow--university {
+  left: 53%;
+  top: 14%;
+  background: radial-gradient(circle,rgba(21,158,231,.92),rgba(21,158,231,0) 70%);
+}
+
+.ui-v2-city-frame__region-glow--cbd {
+  left: 40%;
+  top: 35%;
+  background: radial-gradient(circle,rgba(255,183,0,.98),rgba(255,183,0,0) 70%);
+}
+
+.ui-v2-city-frame__region-glow--nightlife {
+  left: 80%;
+  top: 39%;
+  background: radial-gradient(circle,rgba(255,46,134,.92),rgba(255,46,134,0) 70%);
+}
+
+.ui-v2-city-frame__region-glow--oldtown {
+  left: 22%;
+  top: 66%;
+  background: radial-gradient(circle,rgba(34,191,84,.90),rgba(34,191,84,0) 70%);
+}
+
+.ui-v2-city-frame__region-glow--waterfront {
+  left: 74%;
+  top: 72%;
+  background: radial-gradient(circle,rgba(0,202,212,.90),rgba(0,202,212,0) 70%);
+}
+
 .ui-v2-city-frame__marker {
   position: absolute;
   left:
@@ -265,19 +326,20 @@
   align-items: center;
   padding:
     0
-    var(--ui-space-8);
+    var(--ui-space-12);
   transform:
     translate(
       -50%,
       -50%
     );
-  border:
-    2px solid
-    #38a7df;
-  border-radius:
-    var(--ui-radius-lg);
-  background:
-    rgba(255,255,255,.94);
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  filter:
+    drop-shadow(0 4px 7px rgba(0,49,80,.24));
 }
 
 .ui-v2-city-frame__marker-copy {
@@ -727,10 +789,9 @@
 }
 
 .ui-v2-city-frame__marker.is-selected {
-  z-index: 4;
-  box-shadow:
-    0 0 0 3px
-    rgba(255,205,36,.42);
+  z-index: 5;
+  filter:
+    drop-shadow(0 5px 9px rgba(0,42,72,.30));
 }
 
 .ui-v2-city-frame__opportunity.is-empty {
@@ -763,13 +824,13 @@
 
 .ui-v2-city-frame__hero-icon {
   background-image:
-    url("ui-v2/icons/nav-city.svg");
+    url("ui-v2/icons/hero-location.svg");
 }
 
 .ui-v2-city-frame__summary
 .ui-v2-box--hero-icon {
   background-image:
-    url("ui-v2/icons/marker-cbd.svg");
+    url("ui-v2/icons/hero-summary.svg");
 }
 
 .ui-v2-city-frame__filter[data-city-filter="opened"]
@@ -826,6 +887,46 @@
     url("ui-v2/icons/marker-waterfront.svg");
 }
 
+.ui-v2-city-frame__marker[data-district-id="university"] {
+  background-image:
+    url("ui-v2/markers/frame-university.svg");
+}
+
+.ui-v2-city-frame__marker[data-district-id="cbd"] {
+  background-image:
+    url("ui-v2/markers/frame-cbd.svg");
+}
+
+.ui-v2-city-frame__marker[data-district-id="nightlife"] {
+  background-image:
+    url("ui-v2/markers/frame-nightlife.svg");
+}
+
+.ui-v2-city-frame__marker[data-district-id="old_town"] {
+  background-image:
+    url("ui-v2/markers/frame-oldtown.svg");
+}
+
+.ui-v2-city-frame__marker[data-district-id="waterfront_leisure"] {
+  background-image:
+    url("ui-v2/markers/frame-waterfront.svg");
+}
+
+.ui-v2-city-frame__marker.is-selected::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(100% - .3255dvh);
+  width: 4.3401vw;
+  height: 3.2552dvh;
+  transform: translateX(-50%);
+  background:
+    url("ui-v2/markers/pin-selected.svg")
+    center / contain
+    no-repeat;
+  pointer-events: none;
+}
+
 .ui-v2-city-frame__metric[data-metric-index="0"]
 .ui-v2-box--metric-icon {
   background-image:
@@ -866,20 +967,28 @@
   background-color:
     var(--ui-color-surface-soft);
   background-image:
-    url("ui-v2/illustrations/district-thumb.svg");
-  background-position: center;
+    url("ui-v2/illustrations/city-map-master.webp");
+  background-position:
+    var(--district-thumb-x,50%)
+    var(--district-thumb-y,50%);
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: 320% auto;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.55);
 }
 
 .ui-v2-city-frame__opportunity-thumb {
   background-color:
     #d7e7f0;
   background-image:
-    url("ui-v2/illustrations/property-thumb.svg");
-  background-position: center;
+    url("ui-v2/illustrations/city-map-master.webp");
+  background-position:
+    var(--district-thumb-x,50%)
+    var(--district-thumb-y,50%);
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: 360% auto;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.55);
 }
 
 .ui-v2-city-frame__map-controls

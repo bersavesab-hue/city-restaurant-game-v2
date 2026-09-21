@@ -27,6 +27,97 @@ function setText(
   return true;
 }
 
+const DISTRICT_THUMB_PRESETS =
+  Object.freeze({
+    university: [58,18],
+    cbd: [43,42],
+    nightlife: [82,45],
+    old_town: [19,72],
+    waterfront_leisure: [77,75]
+  });
+
+function getDistrictThumbPosition(
+  districtId
+) {
+  const preset =
+    DISTRICT_THUMB_PRESETS[
+      districtId
+    ];
+
+  if (preset) {
+    return preset;
+  }
+
+  const text =
+    String(
+      districtId ??
+      "district"
+    );
+
+  let hash = 0;
+
+  for (
+    let index = 0;
+    index < text.length;
+    index += 1
+  ) {
+    hash =
+      (
+        hash * 31 +
+        text.charCodeAt(
+          index
+        )
+      ) >>>
+      0;
+  }
+
+  return [
+    18 + hash % 65,
+    20 + (
+      Math.floor(
+        hash / 97
+      ) %
+      61
+    )
+  ];
+}
+
+function applyDistrictThumb(
+  element,
+  districtId
+) {
+  if (!element) {
+    return;
+  }
+
+  const [
+    x,
+    y
+  ] =
+    getDistrictThumbPosition(
+      districtId
+    );
+
+  element.dataset
+    .districtId =
+    String(
+      districtId ??
+      ""
+    );
+
+  element.style
+    .setProperty(
+      "--district-thumb-x",
+      x + "%"
+    );
+
+  element.style
+    .setProperty(
+      "--district-thumb-y",
+      y + "%"
+    );
+}
+
 function scheduleRefresh(
   callback
 ) {
@@ -546,6 +637,13 @@ function bindCityFrameLive(
         selected.description
       );
 
+      applyDistrictThumb(
+        root.querySelector(
+          ".ui-v2-city-frame__thumbnail"
+        ),
+        selected.id
+      );
+
       selected.metrics
         .forEach(
           (
@@ -602,6 +700,15 @@ function bindCityFrameLive(
           "is-empty",
           !opportunity
         );
+
+      applyDistrictThumb(
+        card?.querySelector(
+          ".ui-v2-city-frame__opportunity-thumb"
+        ),
+        opportunity
+          ?.districtId ??
+        ""
+      );
 
       setText(
         root,

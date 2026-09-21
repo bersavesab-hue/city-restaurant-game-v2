@@ -139,8 +139,14 @@
   height:
     var(--ui-hud-group-height);
   min-width: 0;
+  border:
+    1px solid rgba(255,255,255,.10);
   border-radius:
     var(--ui-radius-md);
+  background:
+    rgba(0,54,96,.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05);
 }
 
 .ui-v2-hud__identity {
@@ -208,9 +214,7 @@
   align-items: center;
   padding-inline:
     .7236vw;
-  border-inline:
-    1px solid
-    rgba(255,255,255,.12);
+  border-inline: 0;
 }
 
 .ui-v2-hud__clock {
@@ -361,6 +365,18 @@
 
 .ui-v2-nav__item.is-active::before {
   opacity: 1;
+}
+
+.ui-v2-nav__item.is-active
+.ui-v2-box--nav-icon {
+  filter:
+    brightness(.34)
+    saturate(1.25);
+}
+
+.ui-v2-nav__item + .ui-v2-nav__item {
+  border-left:
+    1px solid rgba(255,255,255,.055);
 }
 
 .ui-v2-nav__icon-slot,

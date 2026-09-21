@@ -1022,6 +1022,43 @@ function buildCityModel(
       "waterfront_leisure"
     ];
 
+  const getRegionId =
+    districtId =>
+      safeCall(
+        "unknown",
+        () =>
+          app.systems
+            .chainSystem
+            .getRegionIdForDistrict(
+              districtId
+            )
+      );
+
+  const regionSizeById =
+    new Map();
+
+  for (
+    const district
+    of decorated
+  ) {
+    const regionId =
+      getRegionId(
+        district.id
+      );
+
+    regionSizeById.set(
+      regionId,
+      (
+        regionSizeById
+          .get(
+            regionId
+          ) ??
+        0
+      ) +
+      1
+    );
+  }
+
   const markers =
     fixedMarkerIds
       .map(
@@ -1042,7 +1079,18 @@ function buildCityModel(
               district.id,
 
             title:
-              district.name,
+              (
+                district.name.endsWith(
+                  "区"
+                )
+                  ? district.name.slice(
+                      0,
+                      -1
+                    ) +
+                    "区域"
+                  : district.name +
+                    "区域"
+              ),
 
             opened:
               district.opened,
@@ -1061,23 +1109,16 @@ function buildCityModel(
               66,
 
             meta:
-              district.opened
-                ? "已开店"
-                : !district.unlocked
-                  ? "待解锁"
-                  : district
-                      .availablePropertyCount >
-                      0
-                    ? (
-                        district
-                          .availablePropertyCount +
-                        "套房源"
-                      )
-                    : district
-                        .opportunityScore >=
-                        66
-                      ? "高潜力"
-                      : "观察中"
+              (
+                regionSizeById
+                  .get(
+                    getRegionId(
+                      district.id
+                    )
+                  ) ??
+                0
+              ) +
+              "个商圈"
           };
         }
       )

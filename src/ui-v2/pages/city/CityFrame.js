@@ -155,7 +155,7 @@ function renderCityFrame() {
       '</section>' +
 
       '<section class="ui-v2-city-frame__map" data-ui-region="city-map">' +
-        '<div class="ui-v2-city-frame__map-art" data-ui-box="city-map-art" aria-hidden="true"></div>' +
+        '<div class="ui-v2-city-frame__map-art" data-ui-box="city-map-art" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--university" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--cbd" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--nightlife" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--oldtown" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--waterfront" aria-hidden="true"></div>' +
         MAP_MARKERS
           .map(
             marker => (
