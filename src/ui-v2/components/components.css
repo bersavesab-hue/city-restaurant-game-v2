@@ -36,17 +36,21 @@
   grid-template-columns:
     30%
     minmax(0,1fr);
-  gap: 3%;
+  gap: 3.5%;
   align-items: center;
   padding:
-    calc(5 * var(--hud-u))
-    calc(8 * var(--hud-u));
+    calc(6 * var(--hud-u))
+    calc(7 * var(--hud-u));
 }
 
 .ui-v2-hud__avatar {
   width: 100%;
-  max-height: 100%;
+  max-width:
+    calc(76 * var(--hud-u));
+  max-height:
+    calc(76 * var(--hud-u));
   aspect-ratio: 1;
+  justify-self: center;
   border:
     1px solid
     #fff4a2;
@@ -69,6 +73,8 @@
   min-width: 0;
   display: grid;
   align-items: center;
+  padding-block:
+    calc(2 * var(--hud-u));
   text-align: left;
 }
 
@@ -76,16 +82,16 @@
   min-width: 0;
   display: grid;
   gap:
-    calc(6 * var(--hud-u));
+    calc(4 * var(--hud-u));
 }
 
 .ui-v2-hud__identity-copy strong {
   overflow: hidden;
   padding:
-    calc(7 * var(--hud-u))
-    calc(21 * var(--hud-u))
-    calc(7 * var(--hud-u))
-    calc(37 * var(--hud-u));
+    calc(6 * var(--hud-u))
+    calc(20 * var(--hud-u))
+    calc(6 * var(--hud-u))
+    calc(35 * var(--hud-u));
   border:
     1px solid
     rgba(61,173,235,.62);
@@ -119,12 +125,12 @@
   position: absolute;
   z-index: 1;
   left:
-    calc(8 * var(--hud-u));
-  top: 18%;
+    calc(7 * var(--hud-u));
+  top: 17%;
   width:
-    calc(27 * var(--hud-u));
+    calc(25 * var(--hud-u));
   height:
-    calc(27 * var(--hud-u));
+    calc(25 * var(--hud-u));
   background:
     url("ui-v2/icons/hud-scope-group.svg")
     center /
@@ -141,11 +147,11 @@
 .ui-v2-hud__scope-chevron {
   position: absolute;
   right: 5%;
-  top: 22%;
+  top: 21%;
   width:
-    calc(16 * var(--hud-u));
+    calc(14 * var(--hud-u));
   height:
-    calc(16 * var(--hud-u));
+    calc(14 * var(--hud-u));
   background:
     url("ui-v2/icons/hud-chevron.svg")
     center /
@@ -157,7 +163,7 @@
 .ui-v2-hud__simulation {
   position: relative;
   padding:
-    calc(10 * var(--hud-u))
+    calc(8 * var(--hud-u))
     calc(6 * var(--hud-u));
   border-left:
     1px solid
@@ -166,12 +172,12 @@
 
 .ui-v2-hud__weather {
   position: absolute;
-  left: 2%;
-  top: 17%;
+  left: 2.5%;
+  top: 22%;
   width:
-    calc(40 * var(--hud-u));
+    calc(38 * var(--hud-u));
   height:
-    calc(40 * var(--hud-u));
+    calc(38 * var(--hud-u));
   background:
     url("ui-v2/icons/hud-weather.webp")
     center /
@@ -181,17 +187,19 @@
 
 .ui-v2-hud__clock {
   min-width: 0;
+  width: 42%;
   margin-left: 13%;
   display: grid;
+  align-content: center;
   gap:
-    calc(3 * var(--hud-u));
+    calc(2 * var(--hud-u));
 }
 
 .ui-v2-hud__clock small {
   overflow: hidden;
   color: #dbe7ed;
   font-size:
-    calc(16 * var(--hud-u));
+    calc(15 * var(--hud-u));
   line-height: 1.08;
   font-weight:
     var(--ui-weight-medium);
@@ -201,7 +209,7 @@
 
 .ui-v2-hud__clock strong {
   font-size:
-    calc(31 * var(--hud-u));
+    calc(30 * var(--hud-u));
   line-height: 1.05;
   font-weight:
     var(--ui-weight-black);
@@ -211,9 +219,9 @@
 .ui-v2-hud__speed-row {
   position: absolute;
   right: 2%;
-  bottom: 8%;
-  width: 55%;
-  height: 38%;
+  bottom: 9%;
+  width: 54%;
+  height: 39%;
   display: grid;
   grid-template-columns:
     repeat(
@@ -224,10 +232,11 @@
   padding: 1%;
   border:
     1px solid
-    #2998d7;
+    rgba(74,183,239,.78);
   border-radius:
-    calc(10 * var(--hud-u));
-  background: #003a6d;
+    calc(9 * var(--hud-u));
+  background:
+    rgba(0,53,101,.72);
 }
 
 .ui-v2-hud__pause,
@@ -238,10 +247,11 @@
   display: grid;
   place-items: center;
   border-radius:
-    calc(7 * var(--hud-u));
-  background: #005183;
+    calc(6 * var(--hud-u));
+  background:
+    rgba(0,83,133,.74);
   font-size:
-    calc(18 * var(--hud-u));
+    calc(17 * var(--hud-u));
   line-height: 1;
   font-weight:
     var(--ui-weight-heavy);
@@ -274,14 +284,27 @@
 .ui-v2-hud__resources {
   display: grid;
   grid-template-rows:
-    54%
-    46%;
-  gap: 1.5%;
+    52%
+    48%;
+  margin:
+    6%
+    5%
+    6%
+    0;
   padding:
-    4%
-    4%
-    4%
-    1%;
+    0
+    4%;
+  overflow: hidden;
+  border:
+    1px solid
+    rgba(69,174,233,.78);
+  border-radius:
+    calc(10 * var(--hud-u));
+  background:
+    rgba(0,52,99,.72);
+  box-shadow:
+    inset 0 1px 0
+    rgba(255,255,255,.08);
 }
 
 .ui-v2-hud__resource-row {
@@ -289,20 +312,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2%;
+  gap: 2.5%;
   padding:
     0
-    3%;
-  border:
+    1%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ui-v2-hud__resource-row--money {
+  border-bottom:
     1px solid
-    rgba(83,191,255,.38);
-  border-radius:
-    calc(9 * var(--hud-u));
-  background:
-    rgba(0,55,103,.58);
-  box-shadow:
-    inset 0 1px 0
-    rgba(255,255,255,.05);
+    rgba(106,196,241,.30);
 }
 
 .ui-v2-hud__resource-icon {
@@ -315,27 +338,27 @@
 
 .ui-v2-hud__resource-icon.is-money {
   width:
-    calc(32 * var(--hud-u));
+    calc(30 * var(--hud-u));
   height:
-    calc(27 * var(--hud-u));
+    calc(26 * var(--hud-u));
   background-image:
     url("ui-v2/icons/hud-money.webp");
 }
 
 .ui-v2-hud__resource-icon.is-crown {
   width:
-    calc(30 * var(--hud-u));
+    calc(28 * var(--hud-u));
   height:
-    calc(27 * var(--hud-u));
+    calc(25 * var(--hud-u));
   background-image:
     url("ui-v2/icons/hud-crown.webp");
 }
 
 .ui-v2-hud__resource-icon.is-star {
   width:
-    calc(23 * var(--hud-u));
+    calc(21 * var(--hud-u));
   height:
-    calc(23 * var(--hud-u));
+    calc(21 * var(--hud-u));
   background-image:
     url("ui-v2/icons/hud-star.webp");
 }
@@ -343,9 +366,9 @@
 .ui-v2-hud__resource-action {
   flex: 0 0 auto;
   width:
-    calc(28 * var(--hud-u));
+    calc(26 * var(--hud-u));
   height:
-    calc(28 * var(--hud-u));
+    calc(26 * var(--hud-u));
   background:
     url("ui-v2/icons/hud-add.svg")
     center /
@@ -364,13 +387,13 @@
 
 .ui-v2-hud__money {
   font-size:
-    calc(22 * var(--hud-u));
-  letter-spacing: -.03em;
+    calc(21 * var(--hud-u));
+  letter-spacing: -.025em;
 }
 
 .ui-v2-hud__level {
   font-size:
-    calc(22 * var(--hud-u));
+    calc(18 * var(--hud-u));
 }
 
 .ui-v2-hud__rating {
