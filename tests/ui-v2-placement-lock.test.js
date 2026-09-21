@@ -28,25 +28,25 @@ test("HUD和地图坐标与864母版一致", () => {
     x: 790, y: 430, width: 60, height: 200, gap: 10
   });
   assert.deepEqual(UI_PLACEMENTS.map.markers.cbd, {
-    x: 320, y: 198
+    x: 311, y: 206
   });
   assert.deepEqual(UI_PLACEMENTS.map.markers.waterfront, {
-    x: 674, y: 471
+    x: 648, y: 480
   });
 });
 
 test("详情与文字盒固定，动态数据落在盒内", () => {
   assert.deepEqual(UI_PLACEMENTS.detail.thumbnail, {
-    x: 20, y: 27, width: 132, height: 108
+    x: 18, y: 23, width: 134, height: 112
   });
   assert.deepEqual(UI_PLACEMENTS.detail.primaryAction, {
-    x: 604, y: 36, width: 230, height: 84
+    x: 604, y: 31, width: 230, height: 88
   });
   assert.deepEqual(UI_PLACEMENTS.detail.metrics, {
-    x: 16, y: 144, width: 832, height: 118, gap: 8
+    x: 15, y: 140, width: 834, height: 120, gap: 8
   });
   assert.deepEqual(UI_PLACEMENTS.detail.opportunities, {
-    x: 16, y: 322, width: 832, height: 104, gap: 10
+    x: 15, y: 314, width: 834, height: 112, gap: 10
   });
   assert.deepEqual(UI_BOXES.detailHandle, {
     width: 69, height: 5

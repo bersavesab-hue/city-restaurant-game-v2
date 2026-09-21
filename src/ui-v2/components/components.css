@@ -43,8 +43,8 @@
   gap: 3.5%;
   align-items: center;
   padding:
-    calc(9 * var(--hud-u))
-    calc(9 * var(--hud-u));
+    calc(7 * var(--hud-u))
+    calc(8 * var(--hud-u));
   background:
     rgba(0,50,93,.26);
   box-shadow:
@@ -55,9 +55,9 @@
 .ui-v2-hud__avatar {
   width: 100%;
   max-width:
-    calc(90 * var(--hud-u));
+    calc(92 * var(--hud-u));
   max-height:
-    calc(90 * var(--hud-u));
+    calc(92 * var(--hud-u));
   aspect-ratio: 1;
   justify-self: center;
   border:
@@ -210,7 +210,7 @@
   overflow: hidden;
   color: #dbe7ed;
   font-size:
-    calc(18 * var(--hud-u));
+    calc(19 * var(--hud-u));
   line-height: 1.08;
   font-weight:
     var(--ui-weight-medium);
@@ -230,9 +230,9 @@
 .ui-v2-hud__speed-row {
   position: absolute;
   right: 2.5%;
-  bottom: 7%;
-  width: 55%;
-  height: 37%;
+  bottom: 5.5%;
+  width: 56%;
+  height: 39%;
   display: grid;
   grid-template-columns:
     repeat(
@@ -298,21 +298,21 @@
     52%
     48%;
   margin:
-    5%
-    5%
-    5%
+    3%
+    3%
+    3%
     0;
   padding:
     0
-    4%;
+    5%;
   overflow: hidden;
   border:
     1px solid
     rgba(69,174,233,.78);
   border-radius:
-    calc(10 * var(--hud-u));
+    calc(12 * var(--hud-u));
   background:
-    rgba(0,49,91,.62);
+    rgba(0,49,91,.68);
   backdrop-filter:
     blur(
       calc(1.5 * var(--hud-u))
@@ -414,7 +414,7 @@
 .ui-v2-hud__rating {
   color: #ffe867;
   font-size:
-    calc(20 * var(--hud-u));
+    calc(21 * var(--hud-u));
 }
 
 /* Bottom navigation rebuilt in CSS; no full-bar bitmap dependency. */

@@ -42,8 +42,8 @@ const UI_BOXES =
   Object.freeze({
     hudAvatar:
       Object.freeze({
-        width: 90,
-        height: 90
+        width: 92,
+        height: 92
       }),
     hudWeather:
       Object.freeze({
@@ -202,28 +202,28 @@ const UI_PLACEMENTS =
           Object.freeze({
             university:
               Object.freeze({
-                x: 467,
-                y: 61
+                x: 441,
+                y: 82
               }),
             cbd:
               Object.freeze({
-                x: 320,
-                y: 198
+                x: 311,
+                y: 206
               }),
             nightlife:
               Object.freeze({
-                x: 708,
-                y: 273
+                x: 700,
+                y: 281
               }),
             oldTown:
               Object.freeze({
-                x: 233,
-                y: 505
+                x: 216,
+                y: 515
               }),
             waterfront:
               Object.freeze({
-                x: 674,
-                y: 471
+                x: 648,
+                y: 480
               })
           }),
         controls:
@@ -253,46 +253,46 @@ const UI_PLACEMENTS =
           }),
         thumbnail:
           Object.freeze({
-            x: 20,
-            y: 27,
-            width: 132,
-            height: 108
+            x: 18,
+            y: 23,
+            width: 134,
+            height: 112
           }),
         copy:
           Object.freeze({
             x: 164,
-            y: 29,
+            y: 25,
             width: 422,
-            height: 104
+            height: 108
           }),
         primaryAction:
           Object.freeze({
             x: 604,
-            y: 36,
+            y: 31,
             width: 230,
-            height: 84
+            height: 88
           }),
         metrics:
           Object.freeze({
-            x: 16,
-            y: 144,
-            width: 832,
-            height: 118,
+            x: 15,
+            y: 140,
+            width: 834,
+            height: 120,
             gap: 8
           }),
         opportunityHeader:
           Object.freeze({
-            x: 16,
-            y: 276,
-            width: 832,
-            height: 44
+            x: 15,
+            y: 270,
+            width: 834,
+            height: 42
           }),
         opportunities:
           Object.freeze({
-            x: 16,
-            y: 322,
-            width: 832,
-            height: 104,
+            x: 15,
+            y: 314,
+            width: 834,
+            height: 112,
             gap: 10
           })
       }),

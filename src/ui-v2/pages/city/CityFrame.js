@@ -13,36 +13,36 @@ const MAP_MARKERS =
       id: "university",
       title: "大学城区域",
       meta: "5个商圈",
-      x: 54,
-      y: 9
+      x: 51,
+      y: 12
     }),
     Object.freeze({
       id: "cbd",
       title: "CBD商务区域",
       meta: "6个商圈",
-      x: 37,
-      y: 29
+      x: 36,
+      y: 30
     }),
     Object.freeze({
       id: "nightlife",
       title: "夜生活区域",
       meta: "4个商圈",
-      x: 82,
-      y: 40
+      x: 81,
+      y: 41
     }),
     Object.freeze({
       id: "old_town",
       title: "老城商业区域",
       meta: "4个商圈",
-      x: 27,
-      y: 74
+      x: 25,
+      y: 75
     }),
     Object.freeze({
       id: "waterfront_leisure",
       title: "水岸休闲区域",
       meta: "5个商圈",
-      x: 78,
-      y: 69
+      x: 75,
+      y: 70
     })
   ]);
 
