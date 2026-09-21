@@ -180,8 +180,8 @@
     );
   --ui-font-nav:
     min(
-      3.1838vw,
-      1.4323dvh
+      2.8944vw,
+      1.3021dvh
     );
 
   /* Locked visual boxes. */
@@ -261,8 +261,8 @@
     );
   --ui-box-nav-icon:
     min(
-      6.3676vw,
-      2.8646dvh
+      6.0781vw,
+      2.7344dvh
     );
 
   /* Locked HUD group placement. */
@@ -340,12 +340,12 @@
   --ui-detail-opportunities-gap: 1.1577vw;
 
   /* Locked navigation placement. */
-  --ui-nav-icon-y: 1.4323dvh;
-  --ui-nav-label-y: 5.7292dvh;
-  --ui-nav-active-inset-x: 2.0260vw;
-  --ui-nav-active-inset-y: .5208dvh;
-  --ui-nav-active-width: 15.9189vw;
-  --ui-nav-active-height: 7.8776dvh;
+  --ui-nav-icon-y: 1.1719dvh;
+  --ui-nav-label-y: 5.0781dvh;
+  --ui-nav-active-inset-x: 2.4602vw;
+  --ui-nav-active-inset-y: .6510dvh;
+  --ui-nav-active-width: 15.0507vw;
+  --ui-nav-active-height: 7.1615dvh;
 }
 
 *,

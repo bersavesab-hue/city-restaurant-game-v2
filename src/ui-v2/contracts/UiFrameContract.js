@@ -173,8 +173,8 @@ const UI_BOXES =
 
     navigationIcon:
       Object.freeze({
-        width: 44,
-        height: 44
+        width: 42,
+        height: 42
       })
   });
 
@@ -357,12 +357,12 @@ const UI_PLACEMENTS =
 
     navigation:
       Object.freeze({
-        iconY: 22,
-        labelY: 88,
-        activeInsetX: 14,
-        activeInsetY: 8,
-        activeWidth: 110,
-        activeHeight: 121
+        iconY: 18,
+        labelY: 78,
+        activeInsetX: 17,
+        activeInsetY: 10,
+        activeWidth: 104,
+        activeHeight: 110
       })
   });
 
@@ -418,8 +418,8 @@ const UI_TEXT_SLOTS =
 
     navLabel:
       Object.freeze({
-        y: 88,
-        height: 28
+        y: 78,
+        height: 26
       })
   });
 
@@ -573,7 +573,7 @@ const UI_TYPOGRAPHY =
 
         navigation:
           Object.freeze({
-            size: 22,
+            size: 20,
             weight: 800,
             lineHeight: 1
           })

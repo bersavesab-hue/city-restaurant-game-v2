@@ -103,8 +103,8 @@ test(
     assert.deepEqual(
       UI_BOXES.navigationIcon,
       {
-        width: 44,
-        height: 44
+        width: 42,
+        height: 42
       }
     );
   }
@@ -136,7 +136,7 @@ test(
 
     assert.equal(
       UI_TYPOGRAPHY.roles.navigation.size,
-      22
+      20
     );
 
     assert.equal(

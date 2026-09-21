@@ -243,6 +243,47 @@ test(
 );
 
 test(
+  "底栏使用统一轻量壳且选中态不再铺满单元格",
+  () => {
+    assert.deepEqual(
+      UI_PLACEMENTS.navigation,
+      {
+        iconY: 18,
+        labelY: 78,
+        activeInsetX: 17,
+        activeInsetY: 10,
+        activeWidth: 104,
+        activeHeight: 110
+      }
+    );
+
+    assert.deepEqual(
+      UI_TEXT_SLOTS.navLabel,
+      {
+        y: 78,
+        height: 26
+      }
+    );
+
+    const css =
+      fs.readFileSync(
+        "src/ui-v2/components/components.css",
+        "utf8"
+      );
+
+    assert.match(
+      css,
+      /Navigation stays one integrated shell/
+    );
+
+    assert.doesNotMatch(
+      css,
+      /ui-v2-nav__item \+ \.ui-v2-nav__item/
+    );
+  }
+);
+
+test(
   "框架CSS不得再用媒体查询改变盒子位置",
   () => {
     for (
