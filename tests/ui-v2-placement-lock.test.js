@@ -13,19 +13,19 @@ import { renderCityFrame } from "../src/ui-v2/pages/city/CityFrame.js";
 
 test("HUD和地图坐标与864母版一致", () => {
   assert.deepEqual(UI_PLACEMENTS.hud.identity, {
-    x: 0, y: 0, width: 272, height: 94
+    x: 0, y: 0, width: 276, height: 112
   });
   assert.deepEqual(UI_PLACEMENTS.hud.simulation, {
-    x: 272, y: 0, width: 393, height: 94
+    x: 276, y: 0, width: 389, height: 112
   });
   assert.deepEqual(UI_PLACEMENTS.hud.resources, {
-    x: 665, y: 0, width: 199, height: 94
+    x: 665, y: 0, width: 199, height: 112
   });
   assert.deepEqual(UI_PLACEMENTS.filters, {
     x: 10, y: 0, width: 844, height: 63, gap: 5
   });
   assert.deepEqual(UI_PLACEMENTS.map.controls, {
-    x: 793, y: 500, width: 56, height: 192, gap: 12
+    x: 793, y: 480, width: 56, height: 192, gap: 12
   });
   assert.deepEqual(UI_PLACEMENTS.map.markers.cbd, {
     x: 320, y: 198
@@ -52,9 +52,9 @@ test("详情与文字盒固定，动态数据落在盒内", () => {
     width: 69, height: 5
   });
   assert.deepEqual(UI_TEXT_SLOTS.heroTitle, {
-    x: 60, y: 10, width: 792, height: 54
+    x: 60, y: 14, width: 792, height: 58
   });
-  assert.equal(UI_TYPOGRAPHY.roles.hudPrimary.size, 23);
+  assert.equal(UI_TYPOGRAPHY.roles.hudPrimary.size, 25);
   assert.equal(UI_TYPOGRAPHY.roles.markerTitle.size, 19);
   assert.equal(UI_TYPOGRAPHY.roles.opportunityBody.size, 15);
   const html = renderCityFrame();
@@ -86,8 +86,12 @@ test("地图是独立静态素材，状态文字和操作由DOM实时绘制", ()
   assert.match(shellCss, /var\(--ui-safe-top\)/);
   assert.match(shellCss, /var\(--ui-safe-bottom\)/);
   assert.doesNotMatch(cityCss + hudCss, /data:image|base64|map-grid/);
-  assert.match(hudCss, /nav-bottom-city-approved\.webp/);
-  assert.doesNotMatch(hudCss, /ui-v2-nav__item:not\(\.is-active\)::before/);
+  assert.doesNotMatch(hudCss, /nav-bottom-city-approved\.webp/);
+  assert.match(hudCss, /icons\/nav-city\.svg/);
+  assert.match(hudCss, /icons\/nav-store\.svg/);
+  assert.match(hudCss, /icons\/nav-business\.svg/);
+  assert.match(hudCss, /icons\/nav-staff\.svg/);
+  assert.match(hudCss, /icons\/nav-more\.svg/);
   assert.doesNotMatch(renderCityFrame(), />[＋－◎]</);
   assert.equal(UI_REGIONS.detail.y + UI_REGIONS.detail.height,
     UI_REGIONS.navigation.y);
@@ -109,8 +113,11 @@ test("地图是独立静态素材，状态文字和操作由DOM实时绘制", ()
     "icons/hud-money.webp",
     "icons/hud-crown.webp",
     "icons/hud-star.webp",
-    "illustrations/nav-bottom-city-approved.webp",
     "icons/nav-city.svg",
+    "icons/nav-store.svg",
+    "icons/nav-business.svg",
+    "icons/nav-staff.svg",
+    "icons/nav-more.svg",
     "icons/map-locate.svg",
     "markers/pin-selected.svg"
   ]) {

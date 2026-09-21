@@ -9,32 +9,32 @@ const UI_REGIONS =
     hud:
       Object.freeze({
         y: 0,
-        height: 94
+        height: 112
       }),
     hero:
       Object.freeze({
-        y: 94,
-        height: 96
+        y: 112,
+        height: 108
       }),
     filters:
       Object.freeze({
-        y: 190,
+        y: 220,
         height: 62
       }),
     map:
       Object.freeze({
-        y: 252,
-        height: 744
+        y: 282,
+        height: 724
       }),
     detail:
       Object.freeze({
-        y: 996,
+        y: 1006,
         height: 404
       }),
     navigation:
       Object.freeze({
-        y: 1400,
-        height: 136
+        y: 1410,
+        height: 126
       })
   });
 
@@ -42,13 +42,13 @@ const UI_BOXES =
   Object.freeze({
     hudAvatar:
       Object.freeze({
-        width: 76,
-        height: 76
+        width: 86,
+        height: 86
       }),
     hudWeather:
       Object.freeze({
-        width: 38,
-        height: 38
+        width: 44,
+        height: 44
       }),
     hudSpeedAction:
       Object.freeze({
@@ -138,12 +138,12 @@ const UI_BOXES =
     navigationCell:
       Object.freeze({
         width: 173,
-        height: 136
+        height: 126
       }),
     navigationIcon:
       Object.freeze({
-        width: 46,
-        height: 46
+        width: 56,
+        height: 56
       })
   });
 
@@ -155,22 +155,22 @@ const UI_PLACEMENTS =
           Object.freeze({
             x: 0,
             y: 0,
-            width: 272,
-            height: 94
+            width: 276,
+            height: 112
           }),
         simulation:
           Object.freeze({
-            x: 272,
+            x: 276,
             y: 0,
-            width: 393,
-            height: 94
+            width: 389,
+            height: 112
           }),
         resources:
           Object.freeze({
             x: 665,
             y: 0,
             width: 199,
-            height: 94
+            height: 112
           })
       }),
     hero:
@@ -178,14 +178,14 @@ const UI_PLACEMENTS =
         icon:
           Object.freeze({
             x: 12,
-            y: 22
+            y: 28
           }),
         copy:
           Object.freeze({
             x: 60,
-            y: 10,
+            y: 14,
             width: 792,
-            height: 76
+            height: 82
           })
       }),
     filters:
@@ -229,7 +229,7 @@ const UI_PLACEMENTS =
         controls:
           Object.freeze({
             x: 793,
-            y: 500,
+            y: 480,
             width: 56,
             height: 192,
             gap: 12
@@ -298,9 +298,9 @@ const UI_PLACEMENTS =
       }),
     navigation:
       Object.freeze({
-        assetWidth: 864,
-        assetHeight: 136,
-        hitCellWidth: 173
+        hitCellWidth: 173,
+        hitCellHeight: 126,
+        iconSize: 56
       })
   });
 
@@ -308,31 +308,31 @@ const UI_TEXT_SLOTS =
   Object.freeze({
     hudIdentityTitle:
       Object.freeze({
-        x: 114,
-        y: 17,
+        x: 118,
+        y: 20,
         width: 153,
-        height: 31
+        height: 34
       }),
     hudIdentitySubtitle:
       Object.freeze({
-        x: 114,
-        y: 60,
+        x: 118,
+        y: 72,
         width: 153,
-        height: 20
+        height: 22
       }),
     heroTitle:
       Object.freeze({
         x: 60,
-        y: 10,
+        y: 14,
         width: 792,
-        height: 54
+        height: 58
       }),
     heroSubtitle:
       Object.freeze({
         x: 60,
-        y: 64,
+        y: 75,
         width: 792,
-        height: 24
+        height: 25
       }),
     detailTitle:
       Object.freeze({
@@ -377,7 +377,7 @@ const UI_TYPOGRAPHY =
       Object.freeze({
         hudPrimary:
           Object.freeze({
-            size: 23,
+            size: 25,
             weight: 800,
             lineHeight: 1.15
           }),
@@ -395,25 +395,25 @@ const UI_TYPOGRAPHY =
           }),
         hudSecondary:
           Object.freeze({
-            size: 17,
+            size: 18,
             weight: 600,
             lineHeight: 1.12
           }),
         hudTime:
           Object.freeze({
-            size: 30,
+            size: 34,
             weight: 900,
             lineHeight: 1.05
           }),
         pageTitle:
           Object.freeze({
-            size: 50,
+            size: 52,
             weight: 900,
             lineHeight: 1.2
           }),
         pageSubtitle:
           Object.freeze({
-            size: 20,
+            size: 21,
             weight: 700,
             lineHeight: 1.2
           }),
@@ -485,7 +485,7 @@ const UI_TYPOGRAPHY =
           }),
         navigation:
           Object.freeze({
-            size: 23,
+            size: 22,
             weight: 700,
             lineHeight: 1
           })

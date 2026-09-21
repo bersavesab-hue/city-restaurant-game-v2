@@ -45,12 +45,12 @@ test(
 
     assert.equal(
       UI_REGIONS.hud.height,
-      94
+      112
     );
 
     assert.equal(
       UI_REGIONS.map.height,
-      744
+      724
     );
 
     assert.equal(
@@ -60,12 +60,12 @@ test(
 
     assert.equal(
       UI_REGIONS.navigation.y,
-      1400
+      1410
     );
 
     assert.equal(
       UI_REGIONS.navigation.height,
-      136
+      126
     );
   }
 );
@@ -76,8 +76,8 @@ test(
     assert.deepEqual(
       UI_BOXES.hudAvatar,
       {
-        width: 76,
-        height: 76
+        width: 86,
+        height: 86
       }
     );
 
@@ -108,8 +108,8 @@ test(
     assert.deepEqual(
       UI_BOXES.navigationIcon,
       {
-        width: 46,
-        height: 46
+        width: 56,
+        height: 56
       }
     );
   }
@@ -131,7 +131,7 @@ test(
 
     assert.equal(
       UI_TYPOGRAPHY.roles.pageTitle.size,
-      50
+      52
     );
 
     assert.equal(
@@ -141,7 +141,7 @@ test(
 
     assert.equal(
       UI_TYPOGRAPHY.roles.navigation.size,
-      23
+      22
     );
 
     assert.equal(

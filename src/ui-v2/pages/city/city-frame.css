@@ -7,9 +7,9 @@
   min-height: 0;
   display: grid;
   grid-template-rows:
-    96fr
+    108fr
     62fr
-    744fr
+    724fr
     404fr;
   overflow: hidden;
   color: var(--ui-color-text);
@@ -69,7 +69,7 @@
   margin: 0;
   color: #ffffff;
   font-size:
-    calc(50 * var(--city-u));
+    calc(52 * var(--city-u));
   line-height: 1.2;
   font-weight:
     var(--ui-weight-black);
@@ -87,7 +87,7 @@
   overflow: hidden;
   color: #ffffff;
   font-size:
-    calc(20 * var(--city-u));
+    calc(21 * var(--city-u));
   line-height: 1.2;
   font-weight:
     var(--ui-weight-bold);

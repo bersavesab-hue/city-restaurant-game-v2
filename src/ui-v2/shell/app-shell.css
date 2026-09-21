@@ -15,9 +15,9 @@
   display: grid;
   grid-template-columns: minmax(0,1fr);
   grid-template-rows:
-    calc(6.1198dvh + var(--ui-safe-top))
+    calc(7.2917dvh + var(--ui-safe-top))
     minmax(0,1fr)
-    calc(8.8542dvh + var(--ui-safe-bottom));
+    calc(8.203125dvh + var(--ui-safe-bottom));
   padding-inline:
     var(--ui-safe-left)
     var(--ui-safe-right);
