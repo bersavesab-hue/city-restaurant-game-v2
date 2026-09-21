@@ -452,7 +452,7 @@ test(
 
     assert.equal(
       advanced,
-      1
+      2
     );
 
     nowMs = 500;
@@ -460,7 +460,7 @@ test(
 
     assert.equal(
       advanced,
-      2
+      4
     );
 
     runtime = {
@@ -473,7 +473,7 @@ test(
 
     assert.equal(
       advanced,
-      2
+      4
     );
 
     runtime = {
@@ -486,7 +486,7 @@ test(
 
     assert.equal(
       advanced,
-      2
+      4
     );
 
     nowMs = 1750;
@@ -494,7 +494,7 @@ test(
 
     assert.equal(
       advanced,
-      3
+      6
     );
 
     assert.equal(

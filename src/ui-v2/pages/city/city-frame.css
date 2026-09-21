@@ -36,8 +36,8 @@
       rgba(16,45,41,.60),
       rgba(18,61,49,.27)
     ),
-    url("ui-v2/illustrations/city-hero-v3.webp")
-    center /
+    url("ui-v2/illustrations/city-map-master-v3.webp")
+    center 23% /
     cover
     no-repeat;
 }
@@ -296,6 +296,7 @@
 
 .ui-v2-city-frame__marker {
   --marker-accent: #16b2f0;
+  --marker-fill: #f5fbff;
   position: absolute;
   left:
     clamp(
@@ -342,11 +343,7 @@
     calc(17 * var(--city-map-u));
   color: #0c2450;
   background:
-    linear-gradient(
-      110deg,
-      #ffffff,
-      rgba(240,250,255,.96)
-    );
+    var(--marker-fill);
   box-shadow:
     0 2px
     calc(4 * var(--city-map-u))
@@ -356,36 +353,22 @@
 
 .ui-v2-city-frame__marker[data-district-id="cbd"] {
   --marker-accent: #ffca32;
-  background:
-    linear-gradient(
-      110deg,
-      #fffdf4,
-      rgba(255,243,204,.94)
-    );
+  --marker-fill: #fff7da;
 }
 
 .ui-v2-city-frame__marker[data-district-id="nightlife"] {
   --marker-accent: #ff60b0;
-  background:
-    linear-gradient(
-      110deg,
-      #ffffff,
-      rgba(255,228,242,.94)
-    );
+  --marker-fill: #fff0f8;
 }
 
 .ui-v2-city-frame__marker[data-district-id="old_town"] {
   --marker-accent: #82d94d;
-  background:
-    linear-gradient(
-      110deg,
-      #ffffff,
-      rgba(241,255,220,.94)
-    );
+  --marker-fill: #f2ffe8;
 }
 
 .ui-v2-city-frame__marker[data-district-id="waterfront_leisure"] {
   --marker-accent: #28d8d7;
+  --marker-fill: #edffff;
   left:
     clamp(
       calc(
@@ -412,6 +395,32 @@
         var(--city-map-u)
       )
     );
+}
+
+.ui-v2-city-frame__marker::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom:
+    calc(-8 * var(--city-map-u));
+  width:
+    calc(16 * var(--city-map-u));
+  height:
+    calc(16 * var(--city-map-u));
+  transform:
+    translateX(-50%)
+    rotate(45deg);
+  border-right:
+    calc(2 * var(--city-map-u))
+    solid
+    var(--marker-accent);
+  border-bottom:
+    calc(2 * var(--city-map-u))
+    solid
+    var(--marker-accent);
+  background:
+    var(--marker-fill);
 }
 
 .ui-v2-city-frame__marker-icon {
@@ -496,7 +505,7 @@
   top:
     calc(
       100% +
-      12 *
+      16 *
       var(--city-map-u)
     );
   width:
@@ -652,10 +661,10 @@ button[data-city-map-action="locate"] {
   min-height: 0;
   display: grid;
   grid-template-columns:
-    14.5%
+    16%
     minmax(0,1fr)
-    27%;
-  gap: 1.6%;
+    28%;
+  gap: 1.4%;
   align-items: center;
   padding:
     0

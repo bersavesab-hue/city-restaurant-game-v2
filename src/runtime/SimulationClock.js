@@ -1,5 +1,5 @@
 const DEFAULT_PULSE_MS = 250;
-const GAME_MINUTES_PER_REAL_SECOND = 1;
+const GAME_MINUTES_PER_REAL_SECOND = 2;
 const MAX_CATCH_UP_MS = 1000;
 
 function defaultNow() {
