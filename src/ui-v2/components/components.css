@@ -436,7 +436,7 @@
     max(0%,var(--ui-safe-left));
   overflow: hidden;
   background:
-    url("ui-v2/illustrations/nav-bottom-city-v1.svg")
+    url("ui-v2/illustrations/nav-bottom-city-approved.webp")
     center /
     100% 100%
     no-repeat;

@@ -55,17 +55,17 @@ test(
 
     assert.equal(
       UI_REGIONS.detail.height,
-      384
+      404
     );
 
     assert.equal(
       UI_REGIONS.navigation.y,
-      1380
+      1400
     );
 
     assert.equal(
       UI_REGIONS.navigation.height,
-      156
+      136
     );
   }
 );
