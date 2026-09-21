@@ -33,7 +33,6 @@ const CITY_MAP_STATIC_REGIONS = Object.freeze([
   'top-hud',
   'title-banner',
   'filter-container',
-  'map-controls',
   'district-card-layout',
   'bottom-navigation'
 ]);
