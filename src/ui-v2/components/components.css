@@ -314,8 +314,8 @@
     var(--ui-hud-resources-width);
   display: grid;
   grid-template-rows:
-    1fr
-    1fr;
+    56%
+    44%;
   align-items: center;
   gap: 0;
   padding:
@@ -337,7 +337,8 @@
     minmax(0,1fr)
     var(--ui-box-hud-resource);
   gap:
-    .2894vw;
+    .4342vw;
+  align-items: center;
 }
 
 .ui-v2-hud__resource-row--level {
@@ -514,15 +515,20 @@
 
 .ui-v2-hud__money {
   min-width: 0;
+  color:
+    #fff9dc;
   font-size:
     min(
-      2.3155vw,
-      1.0417dvh
+      2.6049vw,
+      1.1719dvh
     ) !important;
+  line-height: 1;
   letter-spacing:
-    -.025em;
+    -.03em;
   font-variant-numeric:
     tabular-nums;
+  text-shadow:
+    0 1px 3px rgba(0,35,63,.36);
   text-overflow: clip !important;
 }
 

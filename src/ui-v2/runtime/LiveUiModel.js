@@ -43,7 +43,7 @@ function formatCompactMoney(
 
   if (
     amount <
-    100000
+    10000
   ) {
     return (
       "¥" +

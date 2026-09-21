@@ -26,7 +26,7 @@ function renderGlobalHud() {
       '<section class="ui-v2-hud__resources" data-ui-box="hud-resources">' +
         '<div class="ui-v2-hud__resource-row ui-v2-hud__resource-row--money">' +
           '<span class="ui-v2-box ui-v2-box--hud-icon" data-ui-box="hud-money-icon"></span>' +
-          '<strong class="ui-v2-tabular ui-v2-hud__money" data-live="hud-money" title="¥52,800">¥52,800</strong>' +
+          '<strong class="ui-v2-tabular ui-v2-hud__money" data-live="hud-money" title="¥52,800">¥5.3万</strong>' +
           '<span class="ui-v2-box ui-v2-box--hud-resource-action" data-ui-box="hud-add"></span>' +
         '</div>' +
         '<div class="ui-v2-hud__resource-row ui-v2-hud__resource-row--level">' +

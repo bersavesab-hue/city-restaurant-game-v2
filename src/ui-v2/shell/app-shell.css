@@ -2,6 +2,26 @@
   width: 100vw;
   height: 100dvh;
   overflow: hidden;
+  padding-top:
+    max(
+      var(--ui-native-safe-top, 0px),
+      env(safe-area-inset-top, 0px)
+    );
+  padding-right:
+    max(
+      var(--ui-native-safe-right, 0px),
+      env(safe-area-inset-right, 0px)
+    );
+  padding-bottom:
+    max(
+      var(--ui-native-safe-bottom, 0px),
+      env(safe-area-inset-bottom, 0px)
+    );
+  padding-left:
+    max(
+      var(--ui-native-safe-left, 0px),
+      env(safe-area-inset-left, 0px)
+    );
   background:
     var(--ui-color-bg);
 }

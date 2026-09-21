@@ -284,6 +284,81 @@ test(
 );
 
 test(
+  "Android沉浸式与系统安全区形成双保险",
+  () => {
+    const activity =
+      fs.readFileSync(
+        "android/app/src/main/java/com/cityrestaurant/game/MainActivity.java",
+        "utf8"
+      );
+
+    const manifest =
+      fs.readFileSync(
+        "android/app/src/main/AndroidManifest.xml",
+        "utf8"
+      );
+
+    const shell =
+      fs.readFileSync(
+        "src/ui-v2/shell/app-shell.css",
+        "utf8"
+      );
+
+    assert.match(
+      activity,
+      /setDecorFitsSystemWindows\(\s*false\s*\)/
+    );
+
+    assert.match(
+      activity,
+      /BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE/
+    );
+
+    assert.match(
+      activity,
+      /IMMERSIVE_RETRY_DELAYS_MS/
+    );
+
+    assert.match(
+      activity,
+      /FLAG_FULLSCREEN/
+    );
+
+    assert.match(
+      manifest,
+      /@style\/Theme\.CityRestaurant/
+    );
+
+    assert.equal(
+      fs.existsSync(
+        "android/app/src/main/res/values/styles.xml"
+      ),
+      true
+    );
+
+    assert.match(
+      shell,
+      /--ui-native-safe-top/
+    );
+
+    assert.match(
+      shell,
+      /--ui-native-safe-bottom/
+    );
+
+    assert.match(
+      shell,
+      /safe-area-inset-top/
+    );
+
+    assert.match(
+      shell,
+      /safe-area-inset-bottom/
+    );
+  }
+);
+
+test(
   "框架CSS不得再用媒体查询改变盒子位置",
   () => {
     for (
