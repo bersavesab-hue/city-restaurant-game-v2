@@ -13,19 +13,19 @@ import { renderCityFrame } from "../src/ui-v2/pages/city/CityFrame.js";
 
 test("HUD和地图坐标与864母版一致", () => {
   assert.deepEqual(UI_PLACEMENTS.hud.identity, {
-    x: 0, y: 0, width: 276, height: 112
+    x: 0, y: 0, width: 294, height: 118
   });
   assert.deepEqual(UI_PLACEMENTS.hud.simulation, {
-    x: 276, y: 0, width: 389, height: 112
+    x: 294, y: 0, width: 346, height: 118
   });
   assert.deepEqual(UI_PLACEMENTS.hud.resources, {
-    x: 665, y: 0, width: 199, height: 112
+    x: 640, y: 0, width: 224, height: 118
   });
   assert.deepEqual(UI_PLACEMENTS.filters, {
-    x: 10, y: 0, width: 844, height: 63, gap: 5
+    x: 8, y: 0, width: 848, height: 66, gap: 6
   });
   assert.deepEqual(UI_PLACEMENTS.map.controls, {
-    x: 793, y: 480, width: 56, height: 192, gap: 12
+    x: 793, y: 442, width: 56, height: 192, gap: 12
   });
   assert.deepEqual(UI_PLACEMENTS.map.markers.cbd, {
     x: 320, y: 198
@@ -52,11 +52,14 @@ test("详情与文字盒固定，动态数据落在盒内", () => {
     width: 69, height: 5
   });
   assert.deepEqual(UI_TEXT_SLOTS.heroTitle, {
-    x: 60, y: 14, width: 792, height: 58
+    x: 70, y: 17, width: 780, height: 64
   });
-  assert.equal(UI_TYPOGRAPHY.roles.hudPrimary.size, 25);
+  assert.equal(UI_TYPOGRAPHY.roles.hudPrimary.size, 26);
   assert.equal(UI_TYPOGRAPHY.roles.markerTitle.size, 19);
   assert.equal(UI_TYPOGRAPHY.roles.opportunityBody.size, 15);
+  assert.equal(UI_REGIONS.hero.height, 132);
+  assert.equal(UI_REGIONS.filters.height, 66);
+  assert.equal(UI_BOXES.filterIcon.width, 20);
   const html = renderCityFrame();
   assert.match(html, /data-ui-box="detail-handle"/);
   assert.match(html, /data-ui-box="detail-close"/);

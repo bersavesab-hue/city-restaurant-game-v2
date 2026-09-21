@@ -2,9 +2,9 @@
   --hud-u: var(--ui-u);
   display: grid;
   grid-template-columns:
-    32%
-    45%
-    23%;
+    34%
+    40%
+    26%;
   min-width: 0;
   padding-top: var(--ui-safe-top);
   overflow: hidden;
@@ -38,13 +38,13 @@
 .ui-v2-hud__identity {
   display: grid;
   grid-template-columns:
-    31%
+    32%
     minmax(0,1fr);
   gap: 3.5%;
   align-items: center;
   padding:
-    calc(8 * var(--hud-u))
-    calc(8 * var(--hud-u));
+    calc(9 * var(--hud-u))
+    calc(9 * var(--hud-u));
   background:
     rgba(0,50,93,.26);
   box-shadow:
@@ -55,16 +55,16 @@
 .ui-v2-hud__avatar {
   width: 100%;
   max-width:
-    calc(86 * var(--hud-u));
+    calc(90 * var(--hud-u));
   max-height:
-    calc(86 * var(--hud-u));
+    calc(90 * var(--hud-u));
   aspect-ratio: 1;
   justify-self: center;
   border:
     1px solid
     #fff4a2;
   border-radius:
-    calc(12 * var(--hud-u));
+    calc(14 * var(--hud-u));
   background:
     url("ui-v2/illustrations/store-avatar.webp")
     center /
@@ -105,11 +105,11 @@
     1px solid
     rgba(61,173,235,.62);
   border-radius:
-    calc(10 * var(--hud-u));
+    calc(12 * var(--hud-u));
   background:
     rgba(0,47,94,.18);
   font-size:
-    calc(25 * var(--hud-u));
+    calc(26 * var(--hud-u));
   line-height: 1.15;
   font-weight:
     var(--ui-weight-heavy);
@@ -122,7 +122,7 @@
   color:
     rgba(227,241,250,.88);
   font-size:
-    calc(18 * var(--hud-u));
+    calc(19 * var(--hud-u));
   line-height: 1.12;
   font-weight:
     var(--ui-weight-medium);
@@ -137,9 +137,9 @@
     calc(7 * var(--hud-u));
   top: 17%;
   width:
-    calc(27 * var(--hud-u));
+    calc(29 * var(--hud-u));
   height:
-    calc(27 * var(--hud-u));
+    calc(29 * var(--hud-u));
   background:
     url("ui-v2/icons/hud-scope-group.svg")
     center /
@@ -172,8 +172,8 @@
 .ui-v2-hud__simulation {
   position: relative;
   padding:
-    calc(8 * var(--hud-u))
-    calc(6 * var(--hud-u));
+    calc(9 * var(--hud-u))
+    calc(7 * var(--hud-u));
   border-left:
     1px solid
     rgba(255,255,255,.12);
@@ -186,9 +186,9 @@
   left: 2.5%;
   top: 18%;
   width:
-    calc(44 * var(--hud-u));
+    calc(48 * var(--hud-u));
   height:
-    calc(44 * var(--hud-u));
+    calc(48 * var(--hud-u));
   background:
     url("ui-v2/icons/hud-weather.webp")
     center /
@@ -198,8 +198,8 @@
 
 .ui-v2-hud__clock {
   min-width: 0;
-  width: 43%;
-  margin-left: 14%;
+  width: 46%;
+  margin-left: 16%;
   display: grid;
   align-content: center;
   gap:
@@ -220,7 +220,7 @@
 
 .ui-v2-hud__clock strong {
   font-size:
-    calc(34 * var(--hud-u));
+    calc(36 * var(--hud-u));
   line-height: 1.05;
   font-weight:
     var(--ui-weight-black);
@@ -229,10 +229,10 @@
 
 .ui-v2-hud__speed-row {
   position: absolute;
-  right: 2%;
-  bottom: 8%;
-  width: 54%;
-  height: 36%;
+  right: 2.5%;
+  bottom: 7%;
+  width: 55%;
+  height: 37%;
   display: grid;
   grid-template-columns:
     repeat(
@@ -245,7 +245,7 @@
     1px solid
     rgba(74,183,239,.78);
   border-radius:
-    calc(9 * var(--hud-u));
+    calc(11 * var(--hud-u));
   background:
     rgba(0,53,101,.72);
 }
@@ -262,7 +262,7 @@
   background:
     rgba(0,83,133,.74);
   font-size:
-    calc(17 * var(--hud-u));
+    calc(18 * var(--hud-u));
   line-height: 1;
   font-weight:
     var(--ui-weight-heavy);
@@ -298,9 +298,9 @@
     52%
     48%;
   margin:
-    6%
     5%
-    6%
+    5%
+    5%
     0;
   padding:
     0
@@ -353,27 +353,27 @@
 
 .ui-v2-hud__resource-icon.is-money {
   width:
-    calc(32 * var(--hud-u));
+    calc(34 * var(--hud-u));
   height:
-    calc(28 * var(--hud-u));
+    calc(30 * var(--hud-u));
   background-image:
     url("ui-v2/icons/hud-money.webp");
 }
 
 .ui-v2-hud__resource-icon.is-crown {
   width:
-    calc(30 * var(--hud-u));
+    calc(32 * var(--hud-u));
   height:
-    calc(28 * var(--hud-u));
+    calc(30 * var(--hud-u));
   background-image:
     url("ui-v2/icons/hud-crown.webp");
 }
 
 .ui-v2-hud__resource-icon.is-star {
   width:
-    calc(23 * var(--hud-u));
+    calc(25 * var(--hud-u));
   height:
-    calc(23 * var(--hud-u));
+    calc(25 * var(--hud-u));
   background-image:
     url("ui-v2/icons/hud-star.webp");
 }
@@ -381,9 +381,9 @@
 .ui-v2-hud__resource-action {
   flex: 0 0 auto;
   width:
-    calc(28 * var(--hud-u));
+    calc(30 * var(--hud-u));
   height:
-    calc(28 * var(--hud-u));
+    calc(30 * var(--hud-u));
   background:
     url("ui-v2/icons/hud-add.svg")
     center /
@@ -402,13 +402,13 @@
 
 .ui-v2-hud__money {
   font-size:
-    calc(22 * var(--hud-u));
+    calc(23 * var(--hud-u));
   letter-spacing: -.025em;
 }
 
 .ui-v2-hud__level {
   font-size:
-    calc(20 * var(--hud-u));
+    calc(21 * var(--hud-u));
 }
 
 .ui-v2-hud__rating {
@@ -427,20 +427,20 @@
       5,
       minmax(0,1fr)
     );
-  gap: 1.2%;
+  gap: .65%;
   align-items: stretch;
   padding:
-    calc(7 * var(--nav-u))
+    calc(6 * var(--nav-u))
     max(
-      calc(10 * var(--nav-u)),
+      calc(7 * var(--nav-u)),
       var(--ui-safe-right)
     )
     max(
-      calc(7 * var(--nav-u)),
+      calc(6 * var(--nav-u)),
       var(--ui-safe-bottom)
     )
     max(
-      calc(10 * var(--nav-u)),
+      calc(7 * var(--nav-u)),
       var(--ui-safe-left)
     );
   overflow: hidden;
@@ -492,9 +492,9 @@
   position: relative;
   z-index: 1;
   width:
-    calc(56 * var(--nav-u));
+    calc(60 * var(--nav-u));
   height:
-    calc(56 * var(--nav-u));
+    calc(60 * var(--nav-u));
   display: block;
   border:
     calc(2 * var(--nav-u))
@@ -521,7 +521,7 @@
   position: relative;
   z-index: 1;
   font-size:
-    calc(22 * var(--nav-u));
+    calc(23 * var(--nav-u));
   line-height: 1;
   font-weight:
     var(--ui-weight-heavy);
@@ -531,13 +531,13 @@
 .ui-v2-nav__item.is-active {
   margin:
     0
-    6%;
+    2%;
   border:
     calc(2 * var(--nav-u))
     solid
     #fff0a4;
   border-radius:
-    calc(18 * var(--nav-u));
+    calc(20 * var(--nav-u));
   color: #513000;
   background:
     linear-gradient(
@@ -561,9 +561,9 @@
 .ui-v2-nav__item.is-active
 .ui-v2-nav__icon-slot {
   width:
-    calc(52 * var(--nav-u));
+    calc(56 * var(--nav-u));
   height:
-    calc(52 * var(--nav-u));
+    calc(56 * var(--nav-u));
   border: 0;
   background-color: transparent;
   box-shadow: none;
