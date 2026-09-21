@@ -136,6 +136,6 @@ fs.writeFileSync(
 );
 
 console.log(
-  "Android 691x1536 UI framework ready:",
+  "Android 691x1536 UI framework + formal assets ready:",
   outputDirectory
 );
