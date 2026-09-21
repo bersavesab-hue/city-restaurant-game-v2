@@ -86,6 +86,8 @@ test("地图是独立静态素材，状态文字和操作由DOM实时绘制", ()
   assert.match(shellCss, /var\(--ui-safe-top\)/);
   assert.match(shellCss, /var\(--ui-safe-bottom\)/);
   assert.doesNotMatch(cityCss + hudCss, /data:image|base64|map-grid/);
+  assert.match(hudCss, /nav-bottom-city-v1\.svg/);
+  assert.doesNotMatch(hudCss, /ui-v2-nav__item:not\(\.is-active\)::before/);
   assert.doesNotMatch(renderCityFrame(), />[＋－◎]</);
   assert.equal(UI_REGIONS.detail.y + UI_REGIONS.detail.height,
     UI_REGIONS.navigation.y);
@@ -107,6 +109,7 @@ test("地图是独立静态素材，状态文字和操作由DOM实时绘制", ()
     "icons/hud-money.webp",
     "icons/hud-crown.webp",
     "icons/hud-star.webp",
+    "illustrations/nav-bottom-city-v1.svg",
     "icons/nav-city.svg",
     "icons/map-locate.svg",
     "markers/pin-selected.svg"
