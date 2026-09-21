@@ -23,19 +23,19 @@
   background-image:
     linear-gradient(
       90deg,
-      rgba(0,46,83,.74) 0%,
-      rgba(0,63,105,.52) 58%,
-      rgba(0,67,108,.24) 100%
+      rgba(0,46,83,.70) 0%,
+      rgba(0,63,105,.48) 58%,
+      rgba(0,67,108,.20) 100%
     ),
-    url("ui-v2/illustrations/city-map-master.webp");
+    url("ui-v2/illustrations/city-hero-v3.webp");
   background-position:
     center,
-    center 18%;
+    center;
   background-repeat:
     no-repeat;
   background-size:
     cover,
-    112% auto;
+    cover;
 }
 
 .ui-v2-city-frame__hero-icon {
@@ -253,16 +253,47 @@
 .ui-v2-city-frame__map-art {
   position: absolute;
   inset: 0;
-  background-color:
+  overflow: hidden;
+  isolation: isolate;
+  background:
     #dcebf2;
+}
+
+.ui-v2-city-frame__map-art::before {
+  content: "";
+  position: absolute;
+  inset: -4%;
+  z-index: 0;
   background-image:
-    url("ui-v2/illustrations/city-map-master.webp");
+    url("ui-v2/illustrations/city-map-master-v3.webp");
   background-position:
     center;
   background-repeat:
     no-repeat;
   background-size:
     cover;
+  filter:
+    blur(18px)
+    saturate(.84)
+    brightness(.84);
+  opacity: .48;
+  transform:
+    scale(1.08);
+}
+
+.ui-v2-city-frame__map-image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit:
+    contain;
+  object-position:
+    center;
+  pointer-events: none;
+  user-select: none;
 }
 
 .ui-v2-city-frame__region-glow {
@@ -279,31 +310,31 @@
 
 .ui-v2-city-frame__region-glow--university {
   left: 53%;
-  top: 14%;
+  top: 24%;
   background: radial-gradient(circle,rgba(21,158,231,.92),rgba(21,158,231,0) 70%);
 }
 
 .ui-v2-city-frame__region-glow--cbd {
-  left: 40%;
-  top: 35%;
+  left: 39%;
+  top: 43%;
   background: radial-gradient(circle,rgba(255,183,0,.98),rgba(255,183,0,0) 70%);
 }
 
 .ui-v2-city-frame__region-glow--nightlife {
-  left: 80%;
-  top: 39%;
+  left: 84%;
+  top: 46%;
   background: radial-gradient(circle,rgba(255,46,134,.92),rgba(255,46,134,0) 70%);
 }
 
 .ui-v2-city-frame__region-glow--oldtown {
-  left: 22%;
+  left: 18%;
   top: 66%;
   background: radial-gradient(circle,rgba(34,191,84,.90),rgba(34,191,84,0) 70%);
 }
 
 .ui-v2-city-frame__region-glow--waterfront {
-  left: 74%;
-  top: 72%;
+  left: 75%;
+  top: 70%;
   background: radial-gradient(circle,rgba(0,202,212,.90),rgba(0,202,212,0) 70%);
 }
 
@@ -416,6 +447,36 @@
   line-height: 1;
   font-weight:
     var(--ui-weight-black);
+}
+
+.ui-v2-city-frame__map-control-icon {
+  width: 62%;
+  height: 62%;
+  display: block;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.ui-v2-city-frame__map-controls
+[data-map-control="zoom-in"]
+.ui-v2-city-frame__map-control-icon {
+  background-image:
+    url("ui-v2/icons/map-plus.svg");
+}
+
+.ui-v2-city-frame__map-controls
+[data-map-control="zoom-out"]
+.ui-v2-city-frame__map-control-icon {
+  background-image:
+    url("ui-v2/icons/map-minus.svg");
+}
+
+.ui-v2-city-frame__map-controls
+[data-map-control="locate"]
+.ui-v2-city-frame__map-control-icon {
+  background-image:
+    url("ui-v2/icons/map-locate.svg");
 }
 
 /* DETAIL: no content is allowed to move the four locked rows. */
@@ -586,6 +647,21 @@
   font-weight:
     var(--ui-weight-black);
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap:
+    var(--ui-space-8);
+}
+
+.ui-v2-city-frame__primary-action-icon {
+  width: 1.75em;
+  height: 1.75em;
+  flex: 0 0 auto;
+  background:
+    url("ui-v2/icons/action-search.svg")
+    center / contain
+    no-repeat;
 }
 
 .ui-v2-city-frame__metrics {
@@ -675,6 +751,10 @@
 
 .ui-v2-city-frame__opportunity-header h3 {
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap:
+    var(--ui-space-4);
   font-size:
     var(--ui-font-section-title);
   line-height: 1.08;
@@ -684,6 +764,17 @@
 
 .ui-v2-city-frame__opportunity-header h3 span {
   color: #d64236;
+}
+
+.ui-v2-city-frame__opportunity-header h3::before {
+  content: "";
+  width: 1.25em;
+  height: 1.25em;
+  flex: 0 0 auto;
+  background:
+    url("ui-v2/icons/opportunity-crown.svg")
+    center / contain
+    no-repeat;
 }
 
 .ui-v2-city-frame__opportunity-header button {
@@ -966,29 +1057,105 @@
 .ui-v2-city-frame__thumbnail {
   background-color:
     var(--ui-color-surface-soft);
-  background-image:
-    url("ui-v2/illustrations/city-map-master.webp");
   background-position:
-    var(--district-thumb-x,50%)
-    var(--district-thumb-y,50%);
-  background-repeat: no-repeat;
-  background-size: 320% auto;
+    center;
+  background-repeat:
+    no-repeat;
+  background-size:
+    contain;
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,.55);
+}
+
+.ui-v2-city-frame__thumbnail[data-district-art="cbd"] {
+  background-image:
+    url("ui-v2/illustrations/district-cbd-v3.webp");
+}
+
+.ui-v2-city-frame__thumbnail[data-district-art="university"] {
+  background-image:
+    url("ui-v2/illustrations/district-university-v3.webp");
+}
+
+.ui-v2-city-frame__thumbnail[data-district-art="nightlife"] {
+  background-image:
+    url("ui-v2/illustrations/district-nightlife-v3.webp");
+}
+
+.ui-v2-city-frame__thumbnail[data-district-art="old_town"] {
+  background-image:
+    url("ui-v2/illustrations/district-oldtown-v3.webp");
+}
+
+.ui-v2-city-frame__thumbnail[data-district-art="waterfront_leisure"] {
+  background-image:
+    url("ui-v2/illustrations/district-waterfront-v3.webp");
+}
+
+.ui-v2-city-frame__thumbnail[data-district-art="city"] {
+  background-image:
+    url("ui-v2/illustrations/city-map-master-v3.webp");
 }
 
 .ui-v2-city-frame__opportunity-thumb {
   background-color:
     #d7e7f0;
   background-image:
-    url("ui-v2/illustrations/city-map-master.webp");
-  background-position:
-    var(--district-thumb-x,50%)
-    var(--district-thumb-y,50%);
-  background-repeat: no-repeat;
-  background-size: 360% auto;
+    url("ui-v2/illustrations/opportunity-sheet-v3.webp");
+  background-repeat:
+    no-repeat;
+  background-size:
+    400% 300%;
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,.55);
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="tech"] {
+  background-position: 0% 0%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="office"] {
+  background-position: 33.333% 0%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="expo"] {
+  background-position: 66.667% 0%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="plaza"] {
+  background-position: 100% 0%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="finance"] {
+  background-position: 0% 50%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="food"] {
+  background-position: 33.333% 50%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="culture"] {
+  background-position: 66.667% 50%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="community"] {
+  background-position: 100% 50%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="sports"] {
+  background-position: 0% 100%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="university"] {
+  background-position: 33.333% 100%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="marina"] {
+  background-position: 66.667% 100%;
+}
+
+.ui-v2-city-frame__opportunity-thumb[data-opportunity-art="creative"] {
+  background-position: 100% 100%;
 }
 
 .ui-v2-city-frame__map-controls

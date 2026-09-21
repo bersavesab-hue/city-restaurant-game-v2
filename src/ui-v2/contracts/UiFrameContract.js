@@ -248,30 +248,30 @@ const UI_PLACEMENTS =
             university:
               Object.freeze({
                 x: 366,
-                y: 79
+                y: 172
               }),
 
             cbd:
               Object.freeze({
-                x: 276,
-                y: 193
+                x: 269,
+                y: 308
               }),
 
             nightlife:
               Object.freeze({
-                x: 553,
-                y: 243
+                x: 580,
+                y: 329
               }),
 
             oldTown:
               Object.freeze({
-                x: 152,
-                y: 458
+                x: 124,
+                y: 473
               }),
 
             waterfront:
               Object.freeze({
-                x: 511,
+                x: 518,
                 y: 501
               })
           }),

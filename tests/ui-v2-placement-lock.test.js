@@ -94,26 +94,26 @@ test(
         university:
           {
             x: 366,
-            y: 79
+            y: 172
           },
         cbd:
           {
-            x: 276,
-            y: 193
+            x: 269,
+            y: 308
           },
         nightlife:
           {
-            x: 553,
-            y: 243
+            x: 580,
+            y: 329
           },
         oldTown:
           {
-            x: 152,
-            y: 458
+            x: 124,
+            y: 473
           },
         waterfront:
           {
-            x: 511,
+            x: 518,
             y: 501
           }
       }
@@ -293,7 +293,7 @@ test(
 
     assert.match(
       css,
-      /ui-v2\/illustrations\/city-map-master\.webp/
+      /ui-v2\/illustrations\/city-map-master-v3\.webp/
     );
 
     assert.match(
@@ -308,7 +308,7 @@ test(
 
     assert.match(
       css,
-      /ui-v2\/illustrations\/city-map-master\.webp/
+      /ui-v2\/illustrations\/city-map-master-v3\.webp/
     );
 
     assert.doesNotMatch(
@@ -331,14 +331,23 @@ test(
         "resources/ui-v2/icons/marker-cbd.svg",
         "resources/ui-v2/icons/metric-traffic.svg",
         "resources/ui-v2/icons/map-locate.svg",
-        "resources/ui-v2/illustrations/city-map-master.webp",
+        "resources/ui-v2/illustrations/city-map-master-v3.webp",
+        "resources/ui-v2/illustrations/city-hero-v3.webp",
+        "resources/ui-v2/illustrations/district-cbd-v3.webp",
+        "resources/ui-v2/illustrations/district-university-v3.webp",
+        "resources/ui-v2/illustrations/district-nightlife-v3.webp",
+        "resources/ui-v2/illustrations/district-oldtown-v3.webp",
+        "resources/ui-v2/illustrations/district-waterfront-v3.webp",
+        "resources/ui-v2/illustrations/opportunity-sheet-v3.webp",
+        "resources/ui-v2/icons/city-icon-sheet-v3.webp",
+        "resources/ui-v2/icons/system-icon-sheet-v3.webp",
         "resources/ui-v2/markers/frame-university.svg",
         "resources/ui-v2/markers/frame-cbd.svg",
         "resources/ui-v2/markers/frame-nightlife.svg",
         "resources/ui-v2/markers/frame-oldtown.svg",
         "resources/ui-v2/markers/frame-waterfront.svg",
         "resources/ui-v2/markers/pin-selected.svg",
-        "resources/ui-v2/illustrations/city-map-master.webp"
+        "resources/ui-v2/illustrations/city-map-master-v3.webp"
       ]
     ) {
       assert.equal(
@@ -349,6 +358,48 @@ test(
         path
       );
     }
+
+    const cityBinding =
+      fs.readFileSync(
+        "src/ui-v2/runtime/LiveUiBinding.js",
+        "utf8"
+      );
+
+    const cityFrame =
+      fs.readFileSync(
+        "src/ui-v2/pages/city/CityFrame.js",
+        "utf8"
+      );
+
+    assert.match(
+      city,
+      /city-hero-v3\.webp/
+    );
+
+    assert.match(
+      city,
+      /object-fit:\s*\n?\s*contain/
+    );
+
+    assert.match(
+      city,
+      /opportunity-sheet-v3\.webp/
+    );
+
+    assert.match(
+      city,
+      /district-cbd-v3\.webp/
+    );
+
+    assert.doesNotMatch(
+      cityBinding,
+      /applyDistrictThumb|getDistrictThumbPosition|--district-thumb-[xy]/
+    );
+
+    assert.doesNotMatch(
+      cityFrame,
+      />＋<|>－<|>◎</
+    );
 
     const build =
       fs.readFileSync(

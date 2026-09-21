@@ -27,62 +27,61 @@ function setText(
   return true;
 }
 
-const DISTRICT_THUMB_PRESETS =
-  Object.freeze({
-    university: [58,18],
-    cbd: [43,42],
-    nightlife: [82,45],
-    old_town: [19,72],
-    waterfront_leisure: [77,75]
-  });
+const DISTRICT_ART_IDS =
+  new Set([
+    "university",
+    "cbd",
+    "nightlife",
+    "old_town",
+    "waterfront_leisure"
+  ]);
 
-function getDistrictThumbPosition(
-  districtId
-) {
-  const preset =
-    DISTRICT_THUMB_PRESETS[
-      districtId
-    ];
+const OPPORTUNITY_ART_KEYS =
+  Object.freeze([
+    "tech",
+    "office",
+    "expo",
+    "plaza",
+    "finance",
+    "food",
+    "culture",
+    "community",
+    "sports",
+    "university",
+    "marina",
+    "creative"
+  ]);
 
-  if (preset) {
-    return preset;
-  }
+const OPPORTUNITY_ART_RULES =
+  Object.freeze([
+    Object.freeze(["科技","tech"]),
+    Object.freeze(["技术","tech"]),
+    Object.freeze(["写字楼","office"]),
+    Object.freeze(["办公","office"]),
+    Object.freeze(["会展","expo"]),
+    Object.freeze(["展览","expo"]),
+    Object.freeze(["广场","plaza"]),
+    Object.freeze(["金融","finance"]),
+    Object.freeze(["银行","finance"]),
+    Object.freeze(["美食","food"]),
+    Object.freeze(["餐饮","food"]),
+    Object.freeze(["文旅","culture"]),
+    Object.freeze(["古城","culture"]),
+    Object.freeze(["老城","culture"]),
+    Object.freeze(["社区","community"]),
+    Object.freeze(["居民","community"]),
+    Object.freeze(["体育","sports"]),
+    Object.freeze(["球场","sports"]),
+    Object.freeze(["大学","university"]),
+    Object.freeze(["校园","university"]),
+    Object.freeze(["码头","marina"]),
+    Object.freeze(["水岸","marina"]),
+    Object.freeze(["滨水","marina"]),
+    Object.freeze(["创意","creative"]),
+    Object.freeze(["市集","creative"])
+  ]);
 
-  const text =
-    String(
-      districtId ??
-      "district"
-    );
-
-  let hash = 0;
-
-  for (
-    let index = 0;
-    index < text.length;
-    index += 1
-  ) {
-    hash =
-      (
-        hash * 31 +
-        text.charCodeAt(
-          index
-        )
-      ) >>>
-      0;
-  }
-
-  return [
-    18 + hash % 65,
-    20 + (
-      Math.floor(
-        hash / 97
-      ) %
-      61
-    )
-  ];
-}
-
-function applyDistrictThumb(
+function applyDistrictArtwork(
   element,
   districtId
 ) {
@@ -90,32 +89,98 @@ function applyDistrictThumb(
     return;
   }
 
-  const [
-    x,
-    y
-  ] =
-    getDistrictThumbPosition(
+  element.dataset
+    .districtArt =
+    DISTRICT_ART_IDS.has(
       districtId
+    )
+      ? districtId
+      : "city";
+}
+
+function getOpportunityArtKey(
+  opportunity
+) {
+  const haystack =
+    String(
+      (
+        opportunity
+          ?.title ??
+        ""
+      ) +
+      " " +
+      (
+        opportunity
+          ?.body ??
+        ""
+      )
+    )
+      .toLowerCase();
+
+  for (
+    const [
+      keyword,
+      key
+    ]
+    of OPPORTUNITY_ART_RULES
+  ) {
+    if (
+      haystack.includes(
+        keyword
+      )
+    ) {
+      return key;
+    }
+  }
+
+  const seed =
+    String(
+      opportunity
+        ?.id ??
+      opportunity
+        ?.districtId ??
+      haystack ??
+      "opportunity"
     );
+
+  let hash = 0;
+
+  for (
+    let index = 0;
+    index < seed.length;
+    index += 1
+  ) {
+    hash =
+      (
+        hash * 31 +
+        seed.charCodeAt(
+          index
+        )
+      ) >>>
+      0;
+  }
+
+  return OPPORTUNITY_ART_KEYS[
+    hash %
+    OPPORTUNITY_ART_KEYS.length
+  ];
+}
+
+function applyOpportunityArtwork(
+  element,
+  opportunity
+) {
+  if (!element) {
+    return;
+  }
 
   element.dataset
-    .districtId =
-    String(
-      districtId ??
-      ""
-    );
-
-  element.style
-    .setProperty(
-      "--district-thumb-x",
-      x + "%"
-    );
-
-  element.style
-    .setProperty(
-      "--district-thumb-y",
-      y + "%"
-    );
+    .opportunityArt =
+    opportunity
+      ? getOpportunityArtKey(
+          opportunity
+        )
+      : "";
 }
 
 function scheduleRefresh(
@@ -637,7 +702,7 @@ function bindCityFrameLive(
         selected.description
       );
 
-      applyDistrictThumb(
+      applyDistrictArtwork(
         root.querySelector(
           ".ui-v2-city-frame__thumbnail"
         ),
@@ -701,13 +766,11 @@ function bindCityFrameLive(
           !opportunity
         );
 
-      applyDistrictThumb(
+      applyOpportunityArtwork(
         card?.querySelector(
           ".ui-v2-city-frame__opportunity-thumb"
         ),
         opportunity
-          ?.districtId ??
-        ""
       );
 
       setText(

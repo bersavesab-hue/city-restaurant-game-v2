@@ -29,39 +29,39 @@ const MAP_MARKERS =
       title: "大学城",
       meta: "观察中",
       x: 52.9667,
-      y: 11.0335
+      y: 24.0000
     }),
 
     Object.freeze({
       id: "cbd",
       title: "CBD商务区",
       meta: "高潜力",
-      x: 39.9421,
-      y: 26.9553
+      x: 39.0000,
+      y: 43.0000
     }),
 
     Object.freeze({
       id: "nightlife",
       title: "夜生活区",
       meta: "观察中",
-      x: 80.0289,
-      y: 33.9385
+      x: 84.0000,
+      y: 46.0000
     }),
 
     Object.freeze({
       id: "old_town",
       title: "老城商业区",
       meta: "观察中",
-      x: 21.9971,
-      y: 63.9665
+      x: 18.0000,
+      y: 66.0000
     }),
 
     Object.freeze({
       id: "waterfront_leisure",
       title: "水岸休闲区",
       meta: "观察中",
-      x: 73.9508,
-      y: 69.9721
+      x: 75.0000,
+      y: 70.0000
     })
   ]);
 
@@ -102,7 +102,7 @@ const OPPORTUNITIES =
 
 function renderCityFrame() {
   return (
-    '<div class="ui-v2-city-frame" data-ui="city-frame" data-ui-visual="approved-reference-v2">' +
+    '<div class="ui-v2-city-frame" data-ui="city-frame" data-ui-visual="city-art-v3">' +
 
       '<section class="ui-v2-city-frame__hero" data-ui-region="city-hero">' +
         '<div class="ui-v2-box ui-v2-box--hero-icon ui-v2-city-frame__hero-icon" data-ui-box="hero-icon"></div>' +
@@ -155,7 +155,7 @@ function renderCityFrame() {
       '</section>' +
 
       '<section class="ui-v2-city-frame__map" data-ui-region="city-map">' +
-        '<div class="ui-v2-city-frame__map-art" data-ui-box="city-map-art" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--university" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--cbd" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--nightlife" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--oldtown" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--waterfront" aria-hidden="true"></div>' +
+        '<div class="ui-v2-city-frame__map-art" data-ui-box="city-map-art" aria-hidden="true"><img class="ui-v2-city-frame__map-image" src="ui-v2/illustrations/city-map-master-v3.webp" alt="" draggable="false"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--university" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--cbd" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--nightlife" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--oldtown" aria-hidden="true"></div><div class="ui-v2-city-frame__region-glow ui-v2-city-frame__region-glow--waterfront" aria-hidden="true"></div>' +
         MAP_MARKERS
           .map(
             marker => (
@@ -186,9 +186,9 @@ function renderCityFrame() {
             ""
           ) +
         '<div class="ui-v2-city-frame__map-controls" data-ui-box="map-controls">' +
-          '<button type="button" data-ui-box="map-control">＋</button>' +
-          '<button type="button" data-ui-box="map-control">－</button>' +
-          '<button type="button" data-ui-box="map-control">◎</button>' +
+          '<button type="button" data-ui-box="map-control" data-map-control="zoom-in" aria-label="放大地图"><span class="ui-v2-city-frame__map-control-icon"></span></button>' +
+          '<button type="button" data-ui-box="map-control" data-map-control="zoom-out" aria-label="缩小地图"><span class="ui-v2-city-frame__map-control-icon"></span></button>' +
+          '<button type="button" data-ui-box="map-control" data-map-control="locate" aria-label="定位当前区域"><span class="ui-v2-city-frame__map-control-icon"></span></button>' +
         '</div>' +
       '</section>' +
 
@@ -205,7 +205,7 @@ function renderCityFrame() {
           '<p data-ui-text="detail-body" data-live="detail-body">正在读取商圈数据。</p>' +
         '</div>' +
 
-        '<button class="ui-v2-city-frame__primary-action" type="button" data-ui-box="primary-action">查看房源</button>' +
+        '<button class="ui-v2-city-frame__primary-action" type="button" data-ui-box="primary-action"><span class="ui-v2-city-frame__primary-action-icon" aria-hidden="true"></span>查看房源</button>' +
 
         '<div class="ui-v2-city-frame__metrics" data-ui-box="metrics-row">' +
           METRICS
