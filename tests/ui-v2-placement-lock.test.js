@@ -24,9 +24,6 @@ test("HUD和地图坐标与864母版一致", () => {
   assert.deepEqual(UI_PLACEMENTS.filters, {
     x: 8, y: 0, width: 848, height: 66, gap: 6
   });
-  assert.deepEqual(UI_PLACEMENTS.map.controls, {
-    x: 790, y: 430, width: 60, height: 200, gap: 10
-  });
   assert.deepEqual(UI_PLACEMENTS.map.markers.cbd, {
     x: 311, y: 206
   });
@@ -62,7 +59,8 @@ test("详情与文字盒固定，动态数据落在盒内", () => {
   assert.equal(UI_BOXES.filterIcon.width, 20);
   const html = renderCityFrame();
   assert.match(html, /data-ui-box="detail-handle"/);
-  assert.match(html, /data-ui-box="detail-close"/);
+  assert.doesNotMatch(html, /data-ui-box="detail-close"/);
+  assert.doesNotMatch(html, /data-city-map-action=/);
   assert.match(html, /data-live="metric-value-5"/);
   assert.match(html, /data-live="opportunity-count"/);
 });
@@ -80,6 +78,8 @@ test("地图是独立静态素材，状态文字和操作由DOM实时绘制", ()
   assert.match(cityCss, /city-map-master-v3\.webp/);
   assert.match(cityCss, /marker-cbd\.webp/);
   assert.match(cityCss, /pin-selected\.svg/);
+  assert.doesNotMatch(cityCss, /ui-v2-city-frame__map-controls/);
+  assert.doesNotMatch(cityCss, /ui-city-map-scale|ui-city-pan-x|ui-city-pan-y/);
   assert.doesNotMatch(cityCss, /ui-v2-city-frame__region-overlays/);
   assert.doesNotMatch(cityCss, /ui-v2-city-frame__map-motto/);
   assert.match(cityCss, /max\(\s*100cqw/);
@@ -121,7 +121,6 @@ test("地图是独立静态素材，状态文字和操作由DOM实时绘制", ()
     "icons/nav-business.svg",
     "icons/nav-staff.svg",
     "icons/nav-more.svg",
-    "icons/map-locate.svg",
     "markers/pin-selected.svg"
   ]) {
     assert.equal(fs.existsSync(`resources/ui-v2/${file}`), true, file);
