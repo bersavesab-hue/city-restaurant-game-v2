@@ -417,7 +417,7 @@
   align-content: center;
   gap:
     calc(5 * var(--nav-u));
-  margin-inline: 5%;
+  margin-inline: 12%;
   padding:
     calc(3 * var(--nav-u))
     calc(2 * var(--nav-u));
@@ -429,9 +429,9 @@
 
 .ui-v2-nav__icon-slot {
   width:
-    calc(48 * var(--nav-u));
+    calc(46 * var(--nav-u));
   height:
-    calc(48 * var(--nav-u));
+    calc(46 * var(--nav-u));
   display: block;
   background-position: center;
   background-repeat: no-repeat;
@@ -440,7 +440,7 @@
 
 .ui-v2-nav__label {
   font-size:
-    calc(24 * var(--nav-u));
+    calc(23 * var(--nav-u));
   line-height: 1;
   font-weight:
     var(--ui-weight-bold);
