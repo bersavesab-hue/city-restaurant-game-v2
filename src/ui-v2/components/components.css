@@ -417,6 +417,7 @@
     calc(20 * var(--hud-u));
 }
 
+/* Approved bottom navigation art; DOM buttons remain the interaction layer. */
 .ui-v2-nav {
   --nav-u: var(--ui-u);
   position: relative;
