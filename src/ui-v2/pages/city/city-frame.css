@@ -300,11 +300,18 @@
 .ui-v2-city-frame__map::before {
   content: "";
   position: absolute;
-  inset: -5%;
+  inset: 0;
   background:
+    linear-gradient(
+      rgba(0,52,81,.10),
+      rgba(0,52,81,.10)
+    ),
     url("ui-v2/illustrations/city-map-master.webp")
     center / cover no-repeat;
-  filter: blur(6px) saturate(1.08) brightness(.95);
+  filter:
+    saturate(1.02)
+    brightness(.90);
+  opacity: .96;
   pointer-events: none;
 }
 
@@ -490,9 +497,13 @@
       rgba(240,250,255,.96)
     );
   box-shadow:
-    0 0
-    calc(13 * var(--city-map-u))
-    var(--marker-accent);
+    0 2px
+    calc(9 * var(--city-map-u))
+    color-mix(
+      in srgb,
+      var(--marker-accent) 72%,
+      transparent
+    );
   text-align: left;
 }
 
@@ -699,7 +710,7 @@ span:last-child {
   position: absolute;
   z-index: 5;
   right: 1.8%;
-  bottom: 16%;
+  bottom: 14%;
   display: grid;
   gap:
     calc(12 * var(--city-stage-u));
