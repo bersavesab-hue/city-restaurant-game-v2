@@ -419,173 +419,59 @@
 
 .ui-v2-nav {
   --nav-u: var(--ui-u);
+  position: relative;
   display: grid;
   grid-template-columns:
     repeat(
       5,
       minmax(0,1fr)
     );
-  gap: 1.5%;
+  gap: 0;
   align-items: stretch;
   padding:
-    1.2%
-    max(1.6%,var(--ui-safe-right))
-    max(2.1%,var(--ui-safe-bottom))
-    max(1.6%,var(--ui-safe-left));
-  color: #ffffff;
-  border-top:
-    1px solid
-    rgba(61,184,236,.9);
+    0
+    max(0%,var(--ui-safe-right))
+    max(0%,var(--ui-safe-bottom))
+    max(0%,var(--ui-safe-left));
+  overflow: hidden;
   background:
-    linear-gradient(
-      #07558c,
-      #003766
-    );
-  box-shadow:
-    0 -4px 12px
-    rgba(0,29,55,.16);
+    url("ui-v2/illustrations/nav-bottom-city-v1.svg")
+    center /
+    100% 100%
+    no-repeat;
 }
 
 .ui-v2-nav__item {
   position: relative;
+  z-index: 1;
   min-width: 0;
   min-height: 0;
-  display: grid;
-  place-items: center;
-  align-content: center;
-  gap:
-    calc(5 * var(--nav-u));
-  margin-inline: 12%;
-  padding:
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: transparent;
+  background: transparent;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.ui-v2-nav__item:focus-visible {
+  outline:
     calc(3 * var(--nav-u))
-    calc(2 * var(--nav-u));
-  border-radius:
-    calc(15 * var(--nav-u));
-  color:
-    rgba(255,255,255,.88);
-}
-
-.ui-v2-nav__item:not(.is-active)::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  left: 50%;
-  top: 7%;
-  width:
-    calc(54 * var(--nav-u));
-  height:
-    calc(54 * var(--nav-u));
-  transform:
-    translateX(-50%);
-  border:
-    1px solid
-    rgba(105,207,255,.72);
-  border-radius: 50%;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(24,137,205,.96),
-      rgba(0,77,134,.96)
-    );
-  box-shadow:
-    inset 0 1px 2px
-    rgba(255,255,255,.30),
-    0 2px 5px
-    rgba(0,27,61,.24);
-  pointer-events: none;
-}
-
-.ui-v2-nav__icon-slot {
-  position: relative;
-  z-index: 1;
-  width:
-    calc(46 * var(--nav-u));
-  height:
-    calc(46 * var(--nav-u));
-  display: block;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-.ui-v2-nav__label {
-  position: relative;
-  z-index: 1;
-  font-size:
-    calc(23 * var(--nav-u));
-  line-height: 1;
-  font-weight:
-    var(--ui-weight-bold);
-  white-space: nowrap;
-}
-
-.ui-v2-nav__item.is-active {
-  color: #4b3200;
-  background:
-    linear-gradient(
-      180deg,
-      #ffe66c,
-      #ffc52a
-    );
-  border:
-    1px solid
-    rgba(255,242,159,.92);
-  box-shadow:
-    inset 0 0 3px #ffffff,
-    0 2px 8px rgba(255,218,74,.34);
-}
-
-.ui-v2-nav__item.is-active
-.ui-v2-nav__icon-slot {
-  opacity: .8;
-  filter:
-    brightness(0)
-    saturate(100%);
-}
-
-.ui-v2-nav__item[data-ui-destination="city"]
-.ui-v2-nav__icon-slot {
-  background-image:
-    url("ui-v2/icons/nav-city.svg");
-}
-
-.ui-v2-nav__item[data-ui-destination="store"]
-.ui-v2-nav__icon-slot {
-  background-image:
-    url("ui-v2/icons/nav-store.svg");
-}
-
-.ui-v2-nav__item[data-ui-destination="operations"]
-.ui-v2-nav__icon-slot {
-  background-image:
-    url("ui-v2/icons/nav-business.svg");
-}
-
-.ui-v2-nav__item[data-ui-destination="employees"]
-.ui-v2-nav__icon-slot {
-  background-image:
-    url("ui-v2/icons/nav-staff.svg");
-}
-
-.ui-v2-nav__item[data-ui-destination="more"]
-.ui-v2-nav__icon-slot {
-  background-image:
-    url("ui-v2/icons/nav-more.svg");
-}
-
-.ui-v2-nav__item[data-ui-destination="employees"]::after {
-  content: "";
-  position: absolute;
-  right: 25%;
-  top: 15%;
-  width:
-    calc(14 * var(--nav-u));
-  height:
-    calc(14 * var(--nav-u));
-  border:
-    calc(2 * var(--nav-u))
     solid
-    #ffffff;
-  border-radius: 50%;
-  background: #ef3340;
+    rgba(255,242,119,.95);
+  outline-offset:
+    calc(-5 * var(--nav-u));
+}
+
+.ui-v2-nav__icon-slot,
+.ui-v2-nav__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
