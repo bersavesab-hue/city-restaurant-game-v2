@@ -1256,7 +1256,7 @@ function buildCityModel(
             metrics: [
               {
                 label:
-                  "客流量",
+                  "客流",
                 value:
                   dailyTraffic
                     .toLocaleString(
@@ -1285,7 +1285,7 @@ function buildCityModel(
               },
               {
                 label:
-                  "消费力",
+                  "消费",
                 value:
                   "¥" +
                   spending +
@@ -1312,7 +1312,7 @@ function buildCityModel(
               },
               {
                 label:
-                  "平均租金",
+                  "租金",
                 value:
                   "¥" +
                   averageRentPerSqm +
@@ -1335,7 +1335,7 @@ function buildCityModel(
               },
               {
                 label:
-                  "竞争度",
+                  "竞争",
                 value:
                   competitionLabel,
                 trend:
@@ -1348,7 +1348,7 @@ function buildCityModel(
               },
               {
                 label:
-                  "外卖需求",
+                  "外卖",
                 value:
                   deliveryLabel,
                 trend:
@@ -1373,7 +1373,7 @@ function buildCityModel(
               },
               {
                 label:
-                  "可租房源",
+                  "房源",
                 value:
                   selectedProperties
                     .length +
