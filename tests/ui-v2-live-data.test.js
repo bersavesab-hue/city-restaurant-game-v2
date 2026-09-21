@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 
 import {
   formatCompactMoney,
@@ -503,3 +504,43 @@ test(
     );
   }
 );
+
+
+test("城市页使用固态地图与双字指标标签", () => {
+  const modelSource = fs.readFileSync(
+    "src/ui-v2/runtime/LiveUiModel.js",
+    "utf8"
+  );
+  const frameSource = fs.readFileSync(
+    "src/ui-v2/pages/city/CityFrame.js",
+    "utf8"
+  );
+  const bindingSource = fs.readFileSync(
+    "src/ui-v2/runtime/LiveUiBinding.js",
+    "utf8"
+  );
+
+  for (const label of ["客流","消费","租金","竞争","外卖","房源"]) {
+    assert.match(
+      modelSource,
+      new RegExp('"' + label + '"')
+    );
+    assert.match(
+      frameSource,
+      new RegExp('"' + label + '"')
+    );
+  }
+
+  assert.doesNotMatch(
+    frameSource,
+    /data-city-map-action=/
+  );
+  assert.doesNotMatch(
+    frameSource,
+    /close-detail/
+  );
+  assert.doesNotMatch(
+    bindingSource,
+    /mapScale|mapPanX|mapPanY|ResizeObserver/
+  );
+});
