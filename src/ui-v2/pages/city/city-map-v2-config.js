@@ -1,4 +1,5 @@
 // V2 城市地图页配置层
+// 地图视觉固定，商圈标签与经营数据继续动态更新
 // 静态UI框架与动态经营数据分离
 
 const CITY_MAP_DYNAMIC_KEYS = Object.freeze({
