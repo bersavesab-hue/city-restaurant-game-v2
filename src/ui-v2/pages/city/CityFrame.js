@@ -102,7 +102,7 @@ const OPPORTUNITIES =
 
 function renderCityFrame() {
   return (
-    '<div class="ui-v2-city-frame" data-ui="city-frame">' +
+    '<div class="ui-v2-city-frame" data-ui="city-frame" data-ui-visual="approved-reference-v2">' +
 
       '<section class="ui-v2-city-frame__hero" data-ui-region="city-hero">' +
         '<div class="ui-v2-box ui-v2-box--hero-icon ui-v2-city-frame__hero-icon" data-ui-box="hero-icon"></div>' +
