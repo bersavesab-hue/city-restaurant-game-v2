@@ -90,20 +90,10 @@ const UI_BOXES =
         width: 56,
         height: 56
       }),
-    mapControl:
-      Object.freeze({
-        width: 60,
-        height: 60
-      }),
     detailHandle:
       Object.freeze({
         width: 69,
         height: 5
-      }),
-    detailClose:
-      Object.freeze({
-        width: 32,
-        height: 32
       }),
     detailThumbnail:
       Object.freeze({
@@ -225,14 +215,6 @@ const UI_PLACEMENTS =
                 x: 648,
                 y: 480
               })
-          }),
-        controls:
-          Object.freeze({
-            x: 790,
-            y: 430,
-            width: 60,
-            height: 200,
-            gap: 10
           })
       }),
     detail:
@@ -243,13 +225,6 @@ const UI_PLACEMENTS =
             y: 7,
             width: 69,
             height: 5
-          }),
-        close:
-          Object.freeze({
-            x: 817,
-            y: 10,
-            width: 32,
-            height: 32
           }),
         thumbnail:
           Object.freeze({
