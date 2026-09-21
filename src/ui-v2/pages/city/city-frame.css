@@ -138,7 +138,7 @@
     1px solid
     #ffffff;
   border-radius:
-    calc(10 * var(--city-u));
+    calc(12 * var(--city-u));
   color: #15234c;
   background:
     linear-gradient(
@@ -152,7 +152,7 @@
   min-width: 0;
   overflow: hidden;
   font-size:
-    calc(22 * var(--city-u));
+    calc(24 * var(--city-u));
   line-height: 1;
   font-weight:
     var(--ui-weight-heavy);
@@ -177,7 +177,7 @@
   width:
     calc(20 * var(--city-u));
   height:
-    calc(20 * var(--city-u));
+    calc(22 * var(--city-u));
   flex: 0 0 auto;
   background-position: center;
   background-repeat: no-repeat;
@@ -316,38 +316,40 @@
     );
   top: var(--marker-y);
   min-width:
-    calc(172 * var(--city-map-u));
+    calc(184 * var(--city-map-u));
   max-width:
-    calc(214 * var(--city-map-u));
+    calc(226 * var(--city-map-u));
   min-height:
-    calc(58 * var(--city-map-u));
+    calc(62 * var(--city-map-u));
   display: grid;
   grid-template-columns:
-    calc(52 * var(--city-map-u))
+    calc(56 * var(--city-map-u))
     minmax(0,1fr);
   gap:
-    calc(7 * var(--city-map-u));
+    calc(8 * var(--city-map-u));
   align-items: center;
   padding:
-    calc(3 * var(--city-map-u))
-    calc(12 * var(--city-map-u))
-    calc(3 * var(--city-map-u))
-    calc(3 * var(--city-map-u));
+    calc(4 * var(--city-map-u))
+    calc(14 * var(--city-map-u))
+    calc(4 * var(--city-map-u))
+    calc(4 * var(--city-map-u));
   transform:
     translate(-50%,-50%);
   border:
-    calc(2.4 * var(--city-map-u))
+    calc(2.6 * var(--city-map-u))
     solid
     var(--marker-accent);
   border-radius:
-    calc(17 * var(--city-map-u));
+    calc(19 * var(--city-map-u));
   color: #0c2450;
   background:
     var(--marker-fill);
   box-shadow:
-    0 2px
-    calc(4 * var(--city-map-u))
-    rgba(0,43,78,.18);
+    0 3px
+    calc(7 * var(--city-map-u))
+    rgba(0,43,78,.22),
+    inset 0 1px 0
+    rgba(255,255,255,.72);
   text-align: left;
 }
 
@@ -405,9 +407,9 @@
   bottom:
     calc(-8 * var(--city-map-u));
   width:
-    calc(16 * var(--city-map-u));
+    calc(18 * var(--city-map-u));
   height:
-    calc(16 * var(--city-map-u));
+    calc(18 * var(--city-map-u));
   transform:
     translateX(-50%)
     rotate(45deg);
@@ -425,9 +427,9 @@
 
 .ui-v2-city-frame__marker-icon {
   width:
-    calc(52 * var(--city-map-u));
+    calc(56 * var(--city-map-u));
   height:
-    calc(52 * var(--city-map-u));
+    calc(56 * var(--city-map-u));
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
@@ -479,7 +481,7 @@
 
 .ui-v2-city-frame__marker-copy strong {
   font-size:
-    calc(19 * var(--city-map-u));
+    calc(20 * var(--city-map-u));
   line-height: 1.15;
   font-weight:
     var(--ui-weight-black);
@@ -488,7 +490,7 @@
 .ui-v2-city-frame__marker-copy small {
   color: #233e65;
   font-size:
-    calc(16 * var(--city-map-u));
+    calc(17 * var(--city-map-u));
   line-height: 1.15;
   font-weight:
     var(--ui-weight-bold);
@@ -509,9 +511,9 @@
       var(--city-map-u)
     );
   width:
-    calc(45 * var(--city-map-u));
+    calc(48 * var(--city-map-u));
   height:
-    calc(55 * var(--city-map-u));
+    calc(58 * var(--city-map-u));
   transform:
     translateX(-50%);
   background:
@@ -531,31 +533,37 @@
 .ui-v2-city-frame__map-controls {
   position: absolute;
   z-index: 5;
-  right: 1.8%;
-  bottom: 7%;
+  right: 1.4%;
+  bottom: 5.2%;
   display: grid;
   gap:
-    calc(12 * var(--city-stage-u));
+    calc(10 * var(--city-stage-u));
 }
 
 .ui-v2-city-frame__map-controls button {
   width:
-    calc(56 * var(--city-stage-u));
+    calc(60 * var(--city-stage-u));
   height:
-    calc(56 * var(--city-stage-u));
+    calc(60 * var(--city-stage-u));
   min-width: 0;
   min-height: 0;
   overflow: hidden;
   color: transparent;
+  border:
+    calc(1.5 * var(--city-stage-u))
+    solid
+    rgba(185,218,239,.92);
   border-radius:
-    calc(12 * var(--city-stage-u));
+    calc(14 * var(--city-stage-u));
   background-color: #ffffff;
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
   box-shadow:
-    0 3px 8px
-    rgba(0,43,78,.22);
+    0 4px 10px
+    rgba(0,43,78,.28),
+    inset 0 1px 0
+    rgba(255,255,255,.9);
 }
 
 .ui-v2-city-frame__map-controls button:disabled {
@@ -598,7 +606,7 @@ button[data-city-map-action="locate"] {
     26%
     29%
     minmax(0,1fr);
-  gap: 1%;
+  gap: 1.2%;
   padding:
     .7%
     1.8%
@@ -663,10 +671,10 @@ button[data-city-map-action="locate"] {
   min-height: 0;
   display: grid;
   grid-template-columns:
-    16%
+    17%
     minmax(0,1fr)
-    28%;
-  gap: 1.4%;
+    29%;
+  gap: 1.5%;
   align-items: center;
   padding:
     0
@@ -680,7 +688,7 @@ button[data-city-map-action="locate"] {
     1px solid
     var(--ui-color-border);
   border-radius:
-    calc(8 * var(--city-u));
+    calc(10 * var(--city-u));
   background-color:
     var(--ui-color-surface-soft);
   background-position: center;
@@ -753,7 +761,7 @@ button[data-city-map-action="locate"] {
   color: #ffffff;
   background: #f48b44;
   font-size:
-    calc(18 * var(--city-u));
+    calc(19 * var(--city-u));
   line-height: 1.1;
   font-weight:
     var(--ui-weight-bold);
@@ -809,8 +817,8 @@ button[data-city-map-action="locate"] {
 }
 
 .ui-v2-city-frame__primary-action {
-  width: 96%;
-  height: 76%;
+  width: 98%;
+  height: 82%;
   min-width: 0;
   min-height: 0;
   display: flex;
@@ -837,8 +845,8 @@ button[data-city-map-action="locate"] {
   background-repeat:
     no-repeat;
   background-size:
-    calc(35 * var(--city-u))
-    calc(35 * var(--city-u)),
+    calc(38 * var(--city-u))
+    calc(38 * var(--city-u)),
     100% 100%;
   box-shadow:
     inset 0 0 4px #ffffff,
@@ -867,8 +875,8 @@ button[data-city-map-action="locate"] {
       6,
       minmax(0,1fr)
     );
-  gap: .55%;
-  margin-top: .35%;
+  gap: .7%;
+  margin-top: 0;
 }
 
 .ui-v2-city-frame__metric {
@@ -876,8 +884,8 @@ button[data-city-map-action="locate"] {
   min-width: 0;
   min-height: 0;
   padding:
-    6%
-    3%
+    5%
+    2.4%
     2.5%;
   border:
     1px solid
@@ -886,8 +894,10 @@ button[data-city-map-action="locate"] {
     calc(10 * var(--city-u));
   background: #ffffff;
   box-shadow:
-    0 2px 8px
-    rgba(228,223,214,.17);
+    0 3px 10px
+    rgba(72,84,93,.10),
+    inset 0 1px 0
+    rgba(255,255,255,.9);
 }
 
 .ui-v2-city-frame__metric-icon {
@@ -895,9 +905,9 @@ button[data-city-map-action="locate"] {
   left: 7%;
   top: 10%;
   width:
-    calc(48 * var(--city-u));
+    calc(50 * var(--city-u));
   height:
-    calc(48 * var(--city-u));
+    calc(50 * var(--city-u));
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
@@ -920,7 +930,7 @@ button[data-city-map-action="locate"] {
   overflow: hidden;
   color: #14264c;
   font-size:
-    calc(17 * var(--city-u));
+    calc(18 * var(--city-u));
   line-height: 1;
   font-weight:
     var(--ui-weight-bold);
@@ -944,7 +954,7 @@ button[data-city-map-action="locate"] {
   overflow: hidden;
   color: #16a16e;
   font-size:
-    calc(16 * var(--city-u));
+    calc(18 * var(--city-u));
   line-height: 1;
   font-weight:
     var(--ui-weight-bold);
@@ -1003,9 +1013,9 @@ em[data-tone="neutral"] {
   min-height: 0;
   display: grid;
   grid-template-rows:
-    28%
+    30%
     minmax(0,1fr);
-  gap: 3%;
+  gap: 2%;
 }
 
 .ui-v2-city-frame__opportunity-header {
@@ -1074,19 +1084,22 @@ h3 span {
   min-height: 0;
   display: grid;
   grid-template-columns:
-    28%
+    30%
     minmax(0,1fr)
-    4%;
-  gap: 2.4%;
+    5%;
+  gap: 2%;
   align-items: center;
-  padding: 2.5%;
+  padding: 2%;
   overflow: hidden;
   border:
     1px solid
     #f0f3f6;
   border-radius:
-    calc(9 * var(--city-u));
+    calc(11 * var(--city-u));
   background: #ffffff;
+  box-shadow:
+    0 2px 8px
+    rgba(34,54,75,.08);
   text-align: left;
 }
 
@@ -1094,7 +1107,7 @@ h3 span {
   width: 100%;
   height: 100%;
   border-radius:
-    calc(6 * var(--city-u));
+    calc(8 * var(--city-u));
   background-color: #d7e7f0;
   background-image: url("ui-v2/illustrations/opportunity-sheet-v3.webp");
   background-position: center;
@@ -1144,7 +1157,7 @@ small {
   overflow: hidden;
   color: #4d668b;
   font-size:
-    calc(15 * var(--city-u));
+    calc(16 * var(--city-u));
   line-height: 1.35;
   font-weight:
     var(--ui-weight-medium);

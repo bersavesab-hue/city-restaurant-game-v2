@@ -82,18 +82,18 @@ const UI_BOXES =
       }),
     mapMarker:
       Object.freeze({
-        width: 214,
-        height: 58
+        width: 226,
+        height: 62
       }),
     mapMarkerIcon:
       Object.freeze({
-        width: 52,
-        height: 52
+        width: 56,
+        height: 56
       }),
     mapControl:
       Object.freeze({
-        width: 56,
-        height: 56
+        width: 60,
+        height: 60
       }),
     detailHandle:
       Object.freeze({
@@ -107,13 +107,13 @@ const UI_BOXES =
       }),
     detailThumbnail:
       Object.freeze({
-        width: 124,
-        height: 104
+        width: 132,
+        height: 108
       }),
     primaryAction:
       Object.freeze({
-        width: 221,
-        height: 81
+        width: 230,
+        height: 84
       }),
     metric:
       Object.freeze({
@@ -122,18 +122,18 @@ const UI_BOXES =
       }),
     metricIcon:
       Object.freeze({
-        width: 48,
-        height: 48
+        width: 50,
+        height: 50
       }),
     opportunity:
       Object.freeze({
         width: 271,
-        height: 102
+        height: 104
       }),
     opportunityThumbnail:
       Object.freeze({
-        width: 70,
-        height: 82
+        width: 76,
+        height: 84
       }),
     navigationCell:
       Object.freeze({
@@ -228,11 +228,11 @@ const UI_PLACEMENTS =
           }),
         controls:
           Object.freeze({
-            x: 793,
-            y: 442,
-            width: 56,
-            height: 192,
-            gap: 12
+            x: 790,
+            y: 430,
+            width: 60,
+            height: 200,
+            gap: 10
           })
       }),
     detail:
@@ -253,47 +253,47 @@ const UI_PLACEMENTS =
           }),
         thumbnail:
           Object.freeze({
-            x: 24,
-            y: 28,
-            width: 124,
-            height: 104
+            x: 20,
+            y: 27,
+            width: 132,
+            height: 108
           }),
         copy:
           Object.freeze({
-            x: 160,
-            y: 30,
-            width: 438,
-            height: 100
+            x: 164,
+            y: 29,
+            width: 422,
+            height: 104
           }),
         primaryAction:
           Object.freeze({
-            x: 612,
-            y: 39,
-            width: 221,
-            height: 81
+            x: 604,
+            y: 36,
+            width: 230,
+            height: 84
           }),
         metrics:
           Object.freeze({
-            x: 17,
-            y: 145,
-            width: 830,
-            height: 115,
-            gap: 7
+            x: 16,
+            y: 144,
+            width: 832,
+            height: 118,
+            gap: 8
           }),
         opportunityHeader:
           Object.freeze({
-            x: 17,
-            y: 274,
-            width: 830,
-            height: 43
+            x: 16,
+            y: 276,
+            width: 832,
+            height: 44
           }),
         opportunities:
           Object.freeze({
-            x: 17,
+            x: 16,
             y: 322,
-            width: 830,
-            height: 102,
-            gap: 8
+            width: 832,
+            height: 104,
+            gap: 10
           })
       }),
     navigation:
@@ -425,13 +425,13 @@ const UI_TYPOGRAPHY =
           }),
         markerTitle:
           Object.freeze({
-            size: 19,
+            size: 20,
             weight: 900,
             lineHeight: 1.15
           }),
         markerMeta:
           Object.freeze({
-            size: 16,
+            size: 17,
             weight: 700,
             lineHeight: 1.15
           }),
@@ -455,13 +455,13 @@ const UI_TYPOGRAPHY =
           }),
         metricLabel:
           Object.freeze({
-            size: 17,
+            size: 18,
             weight: 700,
             lineHeight: 1
           }),
         metricValue:
           Object.freeze({
-            size: 23,
+            size: 24,
             weight: 900,
             lineHeight: 1.1
           }),
@@ -473,13 +473,13 @@ const UI_TYPOGRAPHY =
           }),
         opportunityTitle:
           Object.freeze({
-            size: 17,
+            size: 18,
             weight: 800,
             lineHeight: 1.25
           }),
         opportunityBody:
           Object.freeze({
-            size: 15,
+            size: 16,
             weight: 600,
             lineHeight: 1.35
           }),

@@ -84,8 +84,8 @@ test(
     assert.deepEqual(
       UI_BOXES.mapMarker,
       {
-        width: 214,
-        height: 58
+        width: 226,
+        height: 62
       }
     );
 
@@ -146,7 +146,7 @@ test(
 
     assert.equal(
       UI_TYPOGRAPHY.roles.metricValue.size,
-      23
+      24
     );
   }
 );

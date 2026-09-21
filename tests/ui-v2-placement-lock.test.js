@@ -25,7 +25,7 @@ test("HUD和地图坐标与864母版一致", () => {
     x: 8, y: 0, width: 848, height: 66, gap: 6
   });
   assert.deepEqual(UI_PLACEMENTS.map.controls, {
-    x: 793, y: 442, width: 56, height: 192, gap: 12
+    x: 790, y: 430, width: 60, height: 200, gap: 10
   });
   assert.deepEqual(UI_PLACEMENTS.map.markers.cbd, {
     x: 320, y: 198
@@ -37,16 +37,16 @@ test("HUD和地图坐标与864母版一致", () => {
 
 test("详情与文字盒固定，动态数据落在盒内", () => {
   assert.deepEqual(UI_PLACEMENTS.detail.thumbnail, {
-    x: 24, y: 28, width: 124, height: 104
+    x: 20, y: 27, width: 132, height: 108
   });
   assert.deepEqual(UI_PLACEMENTS.detail.primaryAction, {
-    x: 612, y: 39, width: 221, height: 81
+    x: 604, y: 36, width: 230, height: 84
   });
   assert.deepEqual(UI_PLACEMENTS.detail.metrics, {
-    x: 17, y: 145, width: 830, height: 115, gap: 7
+    x: 16, y: 144, width: 832, height: 118, gap: 8
   });
   assert.deepEqual(UI_PLACEMENTS.detail.opportunities, {
-    x: 17, y: 322, width: 830, height: 102, gap: 8
+    x: 16, y: 322, width: 832, height: 104, gap: 10
   });
   assert.deepEqual(UI_BOXES.detailHandle, {
     width: 69, height: 5
@@ -55,8 +55,8 @@ test("详情与文字盒固定，动态数据落在盒内", () => {
     x: 70, y: 17, width: 780, height: 64
   });
   assert.equal(UI_TYPOGRAPHY.roles.hudPrimary.size, 26);
-  assert.equal(UI_TYPOGRAPHY.roles.markerTitle.size, 19);
-  assert.equal(UI_TYPOGRAPHY.roles.opportunityBody.size, 15);
+  assert.equal(UI_TYPOGRAPHY.roles.markerTitle.size, 20);
+  assert.equal(UI_TYPOGRAPHY.roles.opportunityBody.size, 16);
   assert.equal(UI_REGIONS.hero.height, 132);
   assert.equal(UI_REGIONS.filters.height, 66);
   assert.equal(UI_BOXES.filterIcon.width, 20);
