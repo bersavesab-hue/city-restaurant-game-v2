@@ -477,6 +477,47 @@ function districtMatchesFilter(
   }
 }
 
+function resolveDistrictSelectionForFilter(
+  districts,
+  selectedDistrictId,
+  filterId
+) {
+  const list =
+    Array.isArray(districts)
+      ? districts
+      : [];
+
+  const selected =
+    list.find(
+      district =>
+        district.id ===
+        selectedDistrictId
+    );
+
+  if (
+    selected &&
+    districtMatchesFilter(
+      selected,
+      filterId
+    )
+  ) {
+    return selected.id;
+  }
+
+  return (
+    list.find(
+      district =>
+        districtMatchesFilter(
+          district,
+          filterId
+        )
+    )
+      ?.id ??
+    selectedDistrictId ??
+    null
+  );
+}
+
 function bindGlobalNavLive(
   root,
   openQuickPanel
@@ -571,11 +612,34 @@ function bindCityFrameLive(
   let dragState = null;
 
   const refresh = () => {
-    const model =
+    let model =
       buildCityModel(
         app,
         selectedDistrictId
       );
+
+    const resolvedDistrictId =
+      resolveDistrictSelectionForFilter(
+        model.districts,
+        model.selected?.id ??
+          selectedDistrictId,
+        activeFilter
+      );
+
+    if (
+      resolvedDistrictId &&
+      resolvedDistrictId !==
+        model.selected?.id
+    ) {
+      selectedDistrictId =
+        resolvedDistrictId;
+
+      model =
+        buildCityModel(
+          app,
+          selectedDistrictId
+        );
+    }
 
     latestModel =
       model;
@@ -686,12 +750,22 @@ function bindCityFrameLive(
         );
       }
 
+      const isSelected =
+        id ===
+        selectedDistrictId;
+
       button.classList
         .toggle(
           "is-selected",
-          id ===
-            selectedDistrictId
+          isSelected
         );
+
+      button.setAttribute(
+        "aria-pressed",
+        String(
+          isSelected
+        )
+      );
 
       button.classList
         .toggle(
@@ -710,13 +784,23 @@ function bindCityFrameLive(
         "[data-city-filter]"
       )
     ) {
+      const isActive =
+        filter.dataset
+          .cityFilter ===
+        activeFilter;
+
       filter.classList
         .toggle(
           "is-active",
-          filter.dataset
-            .cityFilter ===
-            activeFilter
+          isActive
         );
+
+      filter.setAttribute(
+        "aria-selected",
+        String(
+          isActive
+        )
+      );
     }
 
     const selected =
@@ -895,6 +979,18 @@ function bindCityFrameLive(
         button.dataset
           .cityFilter ??
         "all";
+
+      const nextDistrictId =
+        resolveDistrictSelectionForFilter(
+          latestModel?.districts,
+          selectedDistrictId,
+          activeFilter
+        );
+
+      if (nextDistrictId) {
+        selectedDistrictId =
+          nextDistrictId;
+      }
 
       refresh();
     };
@@ -1290,6 +1386,9 @@ function bindCityFrameLive(
         return;
       }
 
+      activeFilter =
+        "all";
+
       selectedDistrictId =
         districtId;
 
@@ -1478,6 +1577,61 @@ function bindCityFrameLive(
         mapPanY +
         "px"
       );
+
+    const isZoomed =
+      mapScale >
+      1.001;
+
+    mapStage.classList
+      .toggle(
+        "is-zoomed",
+        isZoomed
+      );
+
+    for (
+      const control
+      of root.querySelectorAll(
+        "[data-city-map-action]"
+      )
+    ) {
+      const action =
+        control.dataset
+          .cityMapAction;
+
+      const disabled =
+        (
+          action ===
+            "zoom-in" &&
+          mapScale >=
+            2
+        ) ||
+        (
+          action ===
+            "zoom-out" &&
+          mapScale <=
+            1
+        ) ||
+        (
+          action ===
+            "locate" &&
+          mapScale <=
+            1 &&
+          Math.abs(mapPanX) <
+            .5 &&
+          Math.abs(mapPanY) <
+            .5
+        );
+
+      control.disabled =
+        disabled;
+
+      control.setAttribute(
+        "aria-disabled",
+        String(
+          disabled
+        )
+      );
+    }
   };
 
   const mapControlHandlers =
@@ -1543,6 +1697,8 @@ function bindCityFrameLive(
     if (
       event.button !==
         0 ||
+      mapScale <=
+        1.001 ||
       event.target
         ?.closest(
           "button"
@@ -1852,6 +2008,8 @@ function bindCityFrameLive(
 }
 
 export {
+  districtMatchesFilter,
+  resolveDistrictSelectionForFilter,
   bindGlobalHudLive,
   bindGlobalNavLive,
   bindCityFrameLive

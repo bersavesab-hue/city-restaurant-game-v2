@@ -7,6 +7,11 @@ import {
   buildCityModel
 } from "../src/ui-v2/runtime/LiveUiModel.js";
 
+import {
+  districtMatchesFilter,
+  resolveDistrictSelectionForFilter
+} from "../src/ui-v2/runtime/LiveUiBinding.js";
+
 test(
   "资金自动缩写避免HUD被大数字撑爆",
   () => {
@@ -306,6 +311,71 @@ test(
     assert.equal(
       model.opportunities.length,
       1
+    );
+  }
+);
+
+
+test(
+  "城市筛选会把详情选择切换到首个可见商圈",
+  () => {
+    const districts = [
+      {
+        id: "opened",
+        opened: true,
+        unlocked: true,
+        availablePropertyCount: 0,
+        opportunityScore: 72
+      },
+      {
+        id: "available",
+        opened: false,
+        unlocked: true,
+        availablePropertyCount: 3,
+        opportunityScore: 60
+      },
+      {
+        id: "locked",
+        opened: false,
+        unlocked: false,
+        availablePropertyCount: 0,
+        opportunityScore: 80
+      }
+    ];
+
+    assert.equal(
+      districtMatchesFilter(
+        districts[1],
+        "available"
+      ),
+      true
+    );
+
+    assert.equal(
+      resolveDistrictSelectionForFilter(
+        districts,
+        "opened",
+        "available"
+      ),
+      "available"
+    );
+
+    assert.equal(
+      resolveDistrictSelectionForFilter(
+        districts,
+        "available",
+        "locked"
+      ),
+      "locked"
+    );
+
+    assert.equal(
+      resolveDistrictSelectionForFilter(
+        districts,
+        "available",
+        "all"
+      ),
+      "available"
     );
   }
 );

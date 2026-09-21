@@ -294,6 +294,10 @@
   container-type: size;
   touch-action: none;
   background: #73b8af;
+  cursor: default;
+}
+
+.ui-v2-city-frame__map.is-zoomed {
   cursor: grab;
 }
 
@@ -754,6 +758,13 @@ span:last-child {
   box-shadow:
     0 3px 8px
     rgba(0,43,78,.22);
+}
+
+.ui-v2-city-frame__map-controls button:disabled {
+  opacity: .46;
+  filter: saturate(.55);
+  cursor: default;
+  pointer-events: none;
 }
 
 .ui-v2-city-frame__map-controls
