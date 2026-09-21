@@ -268,7 +268,7 @@ test(
 );
 
 test(
-  "正式图片仍未接入第二阶段骨架",
+  "正式静态资源填入锁定盒且禁止内嵌Base64",
   () => {
     const city =
       fs.readFileSync(
@@ -282,9 +282,62 @@ test(
         "utf8"
       );
 
+    const css =
+      city +
+      components;
+
+    assert.match(
+      css,
+      /url\("ui-v2\/icons\//
+    );
+
+    assert.match(
+      css,
+      /ui-v2\/illustrations\/district-thumb\.svg/
+    );
+
     assert.doesNotMatch(
-      city + components,
-      /url\(/
+      css,
+      /data:image|base64/
+    );
+
+    for (
+      const path
+      of [
+        "resources/ui-v2/icons/hud-store.svg",
+        "resources/ui-v2/icons/hud-money.svg",
+        "resources/ui-v2/icons/nav-city.svg",
+        "resources/ui-v2/icons/filter-opened.svg",
+        "resources/ui-v2/icons/marker-cbd.svg",
+        "resources/ui-v2/icons/metric-traffic.svg",
+        "resources/ui-v2/icons/map-locate.svg",
+        "resources/ui-v2/illustrations/district-thumb.svg",
+        "resources/ui-v2/illustrations/property-thumb.svg"
+      ]
+    ) {
+      assert.equal(
+        fs.existsSync(
+          path
+        ),
+        true,
+        path
+      );
+    }
+
+    const build =
+      fs.readFileSync(
+        "scripts/build-android-js.mjs",
+        "utf8"
+      );
+
+    assert.match(
+      build,
+      /resources\/ui-v2/
+    );
+
+    assert.match(
+      build,
+      /fs\.cpSync/
     );
   }
 );
