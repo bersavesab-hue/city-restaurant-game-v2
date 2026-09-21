@@ -29,12 +29,12 @@ const UI_REGIONS =
     detail:
       Object.freeze({
         y: 996,
-        height: 404
+        height: 384
       }),
     navigation:
       Object.freeze({
-        y: 1400,
-        height: 136
+        y: 1380,
+        height: 156
       })
   });
 
@@ -137,8 +137,8 @@ const UI_BOXES =
       }),
     navigationCell:
       Object.freeze({
-        width: 157,
-        height: 108
+        width: 173,
+        height: 156
       }),
     navigationIcon:
       Object.freeze({
@@ -298,12 +298,9 @@ const UI_PLACEMENTS =
       }),
     navigation:
       Object.freeze({
-        iconY: 24,
-        labelY: 91,
-        activeInsetX: 15,
-        activeInsetY: 8,
-        activeWidth: 145,
-        activeHeight: 132
+        assetWidth: 864,
+        assetHeight: 156,
+        hitCellWidth: 173
       })
   });
 
