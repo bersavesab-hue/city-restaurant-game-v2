@@ -92,8 +92,8 @@ test(
     assert.deepEqual(
       UI_BOXES.primaryAction,
       {
-        width: 221,
-        height: 81
+        width: 230,
+        height: 84
       }
     );
 
