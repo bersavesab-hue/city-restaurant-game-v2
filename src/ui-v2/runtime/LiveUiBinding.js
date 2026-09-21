@@ -27,160 +27,85 @@ function setText(
   return true;
 }
 
-const DISTRICT_ART_IDS =
-  new Set([
-    "university",
-    "cbd",
-    "nightlife",
-    "old_town",
-    "waterfront_leisure"
-  ]);
+function safeList(callback) {
+  try {
+    const value = callback();
+    return Array.isArray(value)
+      ? value
+      : [];
+  } catch {
+    return [];
+  }
+}
 
-const OPPORTUNITY_ART_KEYS =
-  Object.freeze([
-    "tech",
-    "office",
-    "expo",
-    "plaza",
-    "finance",
-    "food",
-    "culture",
-    "community",
-    "sports",
-    "university",
-    "marina",
-    "creative"
-  ]);
+const DISTRICT_ART_IDS = new Set([
+  "university",
+  "cbd",
+  "nightlife",
+  "old_town",
+  "waterfront_leisure"
+]);
 
-const OPPORTUNITY_ART_RULES =
-  Object.freeze([
-    Object.freeze(["科技","tech"]),
-    Object.freeze(["技术","tech"]),
-    Object.freeze(["写字楼","office"]),
-    Object.freeze(["办公","office"]),
-    Object.freeze(["会展","expo"]),
-    Object.freeze(["展览","expo"]),
-    Object.freeze(["广场","plaza"]),
-    Object.freeze(["金融","finance"]),
-    Object.freeze(["银行","finance"]),
-    Object.freeze(["美食","food"]),
-    Object.freeze(["餐饮","food"]),
-    Object.freeze(["文旅","culture"]),
-    Object.freeze(["古城","culture"]),
-    Object.freeze(["老城","culture"]),
-    Object.freeze(["社区","community"]),
-    Object.freeze(["居民","community"]),
-    Object.freeze(["体育","sports"]),
-    Object.freeze(["球场","sports"]),
-    Object.freeze(["大学","university"]),
-    Object.freeze(["校园","university"]),
-    Object.freeze(["码头","marina"]),
-    Object.freeze(["水岸","marina"]),
-    Object.freeze(["滨水","marina"]),
-    Object.freeze(["创意","creative"]),
-    Object.freeze(["市集","creative"])
-  ]);
+const OPPORTUNITY_ART_KEYS = Object.freeze([
+  "tech", "office", "expo", "plaza",
+  "finance", "food", "culture", "community",
+  "sports", "university", "marina", "creative"
+]);
 
-function applyDistrictArtwork(
-  element,
-  districtId
-) {
+const OPPORTUNITY_ART_RULES = Object.freeze([
+  ["科技", "tech"], ["技术", "tech"],
+  ["写字楼", "office"], ["办公", "office"],
+  ["会展", "expo"], ["展览", "expo"],
+  ["广场", "plaza"], ["金融", "finance"],
+  ["银行", "finance"], ["美食", "food"],
+  ["餐饮", "food"], ["文旅", "culture"],
+  ["古城", "culture"], ["老城", "culture"],
+  ["社区", "community"], ["居民", "community"],
+  ["体育", "sports"], ["球场", "sports"],
+  ["大学", "university"], ["校园", "university"],
+  ["码头", "marina"], ["水岸", "marina"],
+  ["滨水", "marina"], ["创意", "creative"],
+  ["市集", "creative"]
+]);
+
+function applyDistrictArtwork(element, districtId) {
+  if (element) {
+    element.dataset.districtArt =
+      DISTRICT_ART_IDS.has(districtId)
+        ? districtId
+        : "city";
+  }
+}
+
+function applyOpportunityArtwork(element, opportunity) {
   if (!element) {
     return;
   }
 
-  element.dataset
-    .districtArt =
-    DISTRICT_ART_IDS.has(
-      districtId
-    )
-      ? districtId
-      : "city";
-}
-
-function getOpportunityArtKey(
-  opportunity
-) {
-  const haystack =
-    String(
-      (
-        opportunity
-          ?.title ??
-        ""
-      ) +
-      " " +
-      (
-        opportunity
-          ?.body ??
-        ""
-      )
-    )
-      .toLowerCase();
-
-  for (
-    const [
-      keyword,
-      key
-    ]
-    of OPPORTUNITY_ART_RULES
-  ) {
-    if (
-      haystack.includes(
-        keyword
-      )
-    ) {
-      return key;
-    }
+  if (!opportunity) {
+    element.dataset.opportunityArt = "";
+    return;
   }
 
-  const seed =
-    String(
-      opportunity
-        ?.id ??
-      opportunity
-        ?.districtId ??
-      haystack ??
-      "opportunity"
-    );
-
+  const haystack = String(
+    (opportunity.title ?? "") + " " +
+    (opportunity.body ?? "")
+  );
+  const matched = OPPORTUNITY_ART_RULES.find(
+    ([keyword]) => haystack.includes(keyword)
+  );
+  const seed = String(
+    opportunity.id ?? opportunity.districtId ?? haystack
+  );
   let hash = 0;
 
-  for (
-    let index = 0;
-    index < seed.length;
-    index += 1
-  ) {
-    hash =
-      (
-        hash * 31 +
-        seed.charCodeAt(
-          index
-        )
-      ) >>>
-      0;
+  for (const character of seed) {
+    hash = (hash * 31 + character.codePointAt(0)) >>> 0;
   }
 
-  return OPPORTUNITY_ART_KEYS[
-    hash %
-    OPPORTUNITY_ART_KEYS.length
-  ];
-}
-
-function applyOpportunityArtwork(
-  element,
-  opportunity
-) {
-  if (!element) {
-    return;
-  }
-
-  element.dataset
-    .opportunityArt =
-    opportunity
-      ? getOpportunityArtKey(
-          opportunity
-        )
-      : "";
+  element.dataset.opportunityArt =
+    matched?.[1] ??
+    OPPORTUNITY_ART_KEYS[hash % OPPORTUNITY_ART_KEYS.length];
 }
 
 function scheduleRefresh(
@@ -219,7 +144,8 @@ function scheduleRefresh(
 
 function bindGlobalHudLive(
   root,
-  app
+  app,
+  openQuickPanel
 ) {
   if (
     !root ||
@@ -247,6 +173,19 @@ function bindGlobalHudLive(
       "hud-scope-subtitle",
       model.scopeSubtitle
     );
+
+    const scopeIcon =
+      root.querySelector(
+        ".ui-v2-hud__scope-icon"
+      );
+
+    scopeIcon
+      ?.classList
+      .toggle(
+        "is-store",
+        model.storeCount <=
+          1
+      );
 
     setText(
       root,
@@ -367,6 +306,32 @@ function bindGlobalHudLive(
       onPause
     );
 
+  const scopeButton =
+    root.querySelector(
+      ".ui-v2-hud__scope"
+    );
+
+  const moneyButton =
+    root.querySelector(
+      ".ui-v2-hud__resource-action"
+    );
+
+  const onScopeClick = () =>
+    openQuickPanel?.("scope");
+
+  const onMoneyClick = () =>
+    openQuickPanel?.("money");
+
+  scopeButton?.addEventListener(
+    "click",
+    onScopeClick
+  );
+
+  moneyButton?.addEventListener(
+    "click",
+    onMoneyClick
+  );
+
   const speedHandlers =
     [];
 
@@ -436,6 +401,16 @@ function bindGlobalHudLive(
     refresh,
 
     destroy() {
+      scopeButton?.removeEventListener(
+        "click",
+        onScopeClick
+      );
+
+      moneyButton?.removeEventListener(
+        "click",
+        onMoneyClick
+      );
+
       pauseButton
         ?.removeEventListener(
           "click",
@@ -502,6 +477,52 @@ function districtMatchesFilter(
   }
 }
 
+function bindGlobalNavLive(
+  root,
+  openQuickPanel
+) {
+  const handlers = [];
+
+  for (
+    const button
+    of root.querySelectorAll(
+      "[data-ui-destination]"
+    )
+  ) {
+    const handler = () => {
+      const destination =
+        button.dataset.uiDestination;
+
+      if (destination !== "city") {
+        openQuickPanel(destination);
+      }
+    };
+
+    button.addEventListener(
+      "click",
+      handler
+    );
+    handlers.push([
+      button,
+      handler
+    ]);
+  }
+
+  return Object.freeze({
+    destroy() {
+      for (
+        const [button,handler]
+        of handlers
+      ) {
+        button.removeEventListener(
+          "click",
+          handler
+        );
+      }
+    }
+  });
+}
+
 function bindCityFrameLive(
   root,
   app
@@ -523,6 +544,31 @@ function bindCityFrameLive(
 
   let latestModel =
     null;
+
+  const frame =
+    root.querySelector(
+      '[data-ui="city-frame"]'
+    );
+
+  const mapStage =
+    root.querySelector(
+      ".ui-v2-city-frame__map"
+    );
+
+  const mapWorld =
+    root.querySelector(
+      ".ui-v2-city-frame__map-world"
+    );
+
+  const dialog =
+    root.querySelector(
+      '[data-ui="city-dialog"]'
+    );
+
+  let mapScale = 1;
+  let mapPanX = 0;
+  let mapPanY = 0;
+  let dragState = null;
 
   const refresh = () => {
     const model =
@@ -552,10 +598,15 @@ function bindCityFrameLive(
       root,
       "city-summary-subtitle",
       model.regionCount +
-      "大区域 · 已开" +
-      model.counts.opened +
-      " · 可选" +
-      model.counts.available
+      "大区域 · " +
+      (
+        model.counts.opened >
+          0
+          ? "已开" +
+            model.counts.opened +
+            "家门店"
+          : "等待你的探索"
+      )
     );
 
     for (
@@ -600,7 +651,7 @@ function bindCityFrameLive(
     for (
       const button
       of root.querySelectorAll(
-        "[data-district-id]"
+        ".ui-v2-city-frame__marker[data-district-id]"
       )
     ) {
       const id =
@@ -728,6 +779,27 @@ function bindCityFrameLive(
               index,
               metric.value
             );
+
+            setText(
+              root,
+              "metric-trend-" +
+              index,
+              metric.trend ??
+              ""
+            );
+
+            const trend =
+              root.querySelector(
+                '[data-live="metric-trend-' +
+                index +
+                '"]'
+              );
+
+            if (trend) {
+              trend.dataset.tone =
+                metric.tone ??
+                "neutral";
+            }
           }
         );
     }
@@ -758,6 +830,13 @@ function bindCityFrameLive(
           index +
           '"]'
         );
+
+      if (card) {
+        card.dataset.districtId =
+          opportunity
+            ?.districtId ??
+          "";
+      }
 
       card
         ?.classList
@@ -837,7 +916,7 @@ function bindCityFrameLive(
   for (
     const button
     of root.querySelectorAll(
-      "[data-district-id]"
+      ".ui-v2-city-frame__marker[data-district-id]"
     )
   ) {
     const handler = () => {
@@ -845,6 +924,12 @@ function bindCityFrameLive(
         button.dataset
           .districtId ??
         selectedDistrictId;
+
+      frame
+        ?.classList
+        .remove(
+          "is-detail-closed"
+        );
 
       refresh();
     };
@@ -865,6 +950,99 @@ function bindCityFrameLive(
       ".ui-v2-city-frame__primary-action"
     );
 
+  const openDialog = (
+    title,
+    items,
+    emptyMessage
+  ) => {
+    if (!dialog) {
+      return;
+    }
+
+    const titleElement =
+      dialog.querySelector(
+        "[data-city-dialog-title]"
+      );
+
+    const listElement =
+      dialog.querySelector(
+        "[data-city-dialog-list]"
+      );
+
+    if (titleElement) {
+      titleElement.textContent =
+        title;
+    }
+
+    if (listElement) {
+      listElement.replaceChildren();
+
+      const records =
+        items.length
+          ? items
+          : [
+              {
+                title:
+                  emptyMessage,
+                body: ""
+              }
+            ];
+
+      for (
+        const record
+        of records
+      ) {
+        const article =
+          root.ownerDocument
+            .createElement(
+              "article"
+            );
+
+        const heading =
+          root.ownerDocument
+            .createElement(
+              "h3"
+            );
+
+        const body =
+          root.ownerDocument
+            .createElement(
+              "p"
+            );
+
+        heading.textContent =
+          record.title;
+
+        body.textContent =
+          record.body;
+
+        article.append(heading);
+
+        if (record.body) {
+          article.append(body);
+        }
+
+        listElement.append(
+          article
+        );
+      }
+    }
+
+    if (
+      typeof dialog.showModal ===
+        "function"
+    ) {
+      if (!dialog.open) {
+        dialog.showModal();
+      }
+    } else {
+      dialog.setAttribute(
+        "open",
+        ""
+      );
+    }
+  };
+
   const onPropertyClick = () => {
     if (
       !latestModel
@@ -872,6 +1050,37 @@ function bindCityFrameLive(
     ) {
       return;
     }
+
+    const properties =
+      latestModel
+        .selected
+        .properties ??
+      [];
+
+    openDialog(
+      latestModel
+        .selected
+        .name +
+      " · 可租房源",
+      properties.map(
+        property => ({
+          title:
+            property.name,
+          body:
+            property.area +
+            "㎡ · 月租 ¥" +
+            Math.round(
+              Number(
+                property.monthlyRent
+              ) ||
+              0
+            ).toLocaleString(
+              "zh-CN"
+            )
+        })
+      ),
+      "当前暂无可租房源"
+    );
 
     app.core
       .eventBus
@@ -886,11 +1095,586 @@ function bindCityFrameLive(
       );
   };
 
+  const openQuickPanel = kind => {
+    const restaurants =
+      safeList(() =>
+        app.systems
+          .restaurantSystem
+          .list()
+      );
+
+    const storeItems =
+      restaurants.map(
+        restaurant => {
+          const property =
+            restaurant.locationId
+              ? app.systems
+                  .propertySystem
+                  .get(
+                    restaurant.locationId
+                  )
+              : null;
+
+          return {
+            title:
+              restaurant.name ??
+              "未命名门店",
+            body:
+              (property?.name ??
+                "尚未选址") +
+              " · Lv." +
+              (restaurant.level ??
+                1)
+          };
+        }
+      );
+
+    if (
+      kind === "scope" ||
+      kind === "store"
+    ) {
+      openDialog(
+        kind === "scope"
+          ? "管理视角"
+          : "门店",
+        storeItems,
+        "尚未创建门店，可在城市地图查看房源"
+      );
+      return;
+    }
+
+    if (kind === "money") {
+      const hud =
+        buildHudModel(app);
+
+      openDialog(
+        "资金 · " +
+          hud.moneyFull,
+        restaurants.map(
+          restaurant => ({
+            title:
+              restaurant.name ??
+              "未命名门店",
+            body:
+              "账户余额 " +
+              Math.round(
+                Number(
+                  app.systems
+                    .financeSystem
+                    .findAccount(
+                      restaurant.id
+                    )
+                    ?.balance ??
+                    0
+                )
+              ).toLocaleString(
+                "zh-CN"
+              ) +
+              " 元"
+          })
+        ),
+        "开设门店后可查看资金账户"
+      );
+      return;
+    }
+
+    if (kind === "operations") {
+      openDialog(
+        "经营",
+        restaurants.map(
+          restaurant => ({
+            title:
+              restaurant.name ??
+              "未命名门店",
+            body:
+              "Lv." +
+              (restaurant.level ??
+                1) +
+              " · " +
+              (Number(
+                restaurant.totalReviews
+              ) ||
+                0) +
+              " 条评价"
+          })
+        ),
+        "开设门店后可查看经营数据"
+      );
+      return;
+    }
+
+    if (kind === "employees") {
+      const employees =
+        safeList(() =>
+          app.core
+            .entitySystem
+            .list("employee")
+        );
+
+      openDialog(
+        "员工 · " +
+          employees.length +
+          "人",
+        employees.map(
+          employee => ({
+            title:
+              employee.name ??
+              "员工",
+            body:
+              employee.position ??
+              employee.role ??
+              "待安排岗位"
+          })
+        ),
+        "暂无员工"
+      );
+      return;
+    }
+
+    if (kind === "more") {
+      const city =
+        buildCityModel(
+          app,
+          selectedDistrictId
+        );
+
+      const hud =
+        buildHudModel(app);
+
+      openDialog(
+        "城市进度",
+        [
+          {
+            title: hud.date,
+            body:
+              "当前时间 " +
+              hud.time
+          },
+          {
+            title:
+              city.totalDistricts +
+              " 个商圈",
+            body:
+              city.regionCount +
+              " 大区域 · 已开 " +
+              city.counts.opened +
+              " 家门店"
+          }
+        ],
+        "暂无城市数据"
+      );
+    }
+  };
+
   propertyButton
     ?.addEventListener(
       "click",
       onPropertyClick
     );
+
+  const opportunityHandlers =
+    [];
+
+  for (
+    const button
+    of root.querySelectorAll(
+      "[data-opportunity-index]"
+    )
+  ) {
+    const handler = () => {
+      const districtId =
+        button.dataset
+          .districtId;
+
+      if (!districtId) {
+        return;
+      }
+
+      selectedDistrictId =
+        districtId;
+
+      frame
+        ?.classList
+        .remove(
+          "is-detail-closed"
+        );
+
+      refresh();
+    };
+
+    opportunityHandlers.push([
+      button,
+      handler
+    ]);
+
+    button.addEventListener(
+      "click",
+      handler
+    );
+  }
+
+  const closeDetailButton =
+    root.querySelector(
+      '[data-city-action="close-detail"]'
+    );
+
+  const onCloseDetail = () => {
+    frame
+      ?.classList
+      .add(
+        "is-detail-closed"
+      );
+  };
+
+  closeDetailButton
+    ?.addEventListener(
+      "click",
+      onCloseDetail
+    );
+
+  const opportunityAllButton =
+    root.querySelector(
+      '[data-city-action="open-opportunities"]'
+    );
+
+  const onOpenOpportunities = () => {
+    const opportunities =
+      latestModel
+        ?.allOpportunities ??
+      [];
+
+    openDialog(
+      "今日机会",
+      opportunities.map(
+        opportunity => ({
+          title:
+            opportunity.title,
+          body:
+            opportunity.badge +
+            " · " +
+            opportunity.body
+        })
+      ),
+      "今日暂无新机会"
+    );
+  };
+
+  opportunityAllButton
+    ?.addEventListener(
+      "click",
+      onOpenOpportunities
+    );
+
+  const dialogCloseButton =
+    dialog?.querySelector(
+      "[data-city-dialog-close]"
+    );
+
+  const closeDialog = () => {
+    if (!dialog) {
+      return;
+    }
+
+    if (
+      typeof dialog.close ===
+        "function" &&
+      dialog.open
+    ) {
+      dialog.close();
+    } else {
+      dialog.removeAttribute(
+        "open"
+      );
+    }
+  };
+
+  const onDialogBackdrop = event => {
+    if (
+      event.target ===
+      dialog
+    ) {
+      closeDialog();
+    }
+  };
+
+  dialogCloseButton
+    ?.addEventListener(
+      "click",
+      closeDialog
+    );
+
+  dialog
+    ?.addEventListener(
+      "click",
+      onDialogBackdrop
+    );
+
+  const applyMapTransform = () => {
+    if (
+      !mapStage ||
+      !mapWorld
+    ) {
+      return;
+    }
+
+    const maximumX =
+      Math.max(
+        0,
+        (
+          mapWorld.offsetWidth *
+          mapScale -
+          mapStage.clientWidth
+        ) /
+        2
+      );
+
+    const maximumY =
+      Math.max(
+        0,
+        (
+          mapWorld.offsetHeight *
+          mapScale -
+          mapStage.clientHeight
+        ) /
+        2
+      );
+
+    mapPanX =
+      Math.max(
+        -maximumX,
+        Math.min(
+          maximumX,
+          mapPanX
+        )
+      );
+
+    mapPanY =
+      Math.max(
+        -maximumY,
+        Math.min(
+          maximumY,
+          mapPanY
+        )
+      );
+
+    mapWorld.style
+      .setProperty(
+        "--ui-city-map-scale",
+        String(
+          mapScale
+        )
+      );
+
+    mapWorld.style
+      .setProperty(
+        "--ui-city-pan-x",
+        mapPanX +
+        "px"
+      );
+
+    mapWorld.style
+      .setProperty(
+        "--ui-city-pan-y",
+        mapPanY +
+        "px"
+      );
+  };
+
+  const mapControlHandlers =
+    [];
+
+  for (
+    const button
+    of root.querySelectorAll(
+      "[data-city-map-action]"
+    )
+  ) {
+    const handler = () => {
+      const action =
+        button.dataset
+          .cityMapAction;
+
+      if (
+        action ===
+        "locate"
+      ) {
+        mapScale = 1;
+        mapPanX = 0;
+        mapPanY = 0;
+      } else {
+        const delta =
+          action ===
+            "zoom-in"
+            ? .12
+            : -.12;
+
+        mapScale =
+          Math.max(
+            1,
+            Math.min(
+              2,
+              Number(
+                (
+                  mapScale +
+                  delta
+                ).toFixed(
+                  2
+                )
+              )
+            )
+          );
+      }
+
+      applyMapTransform();
+    };
+
+    mapControlHandlers.push([
+      button,
+      handler
+    ]);
+
+    button.addEventListener(
+      "click",
+      handler
+    );
+  }
+
+  const onPointerDown = event => {
+    if (
+      event.button !==
+        0 ||
+      event.target
+        ?.closest(
+          "button"
+        )
+    ) {
+      return;
+    }
+
+    dragState = {
+      pointerId:
+        event.pointerId,
+      clientX:
+        event.clientX,
+      clientY:
+        event.clientY,
+      panX:
+        mapPanX,
+      panY:
+        mapPanY
+    };
+
+    mapStage
+      ?.classList
+      .add(
+        "is-dragging"
+      );
+
+    mapStage
+      ?.setPointerCapture
+      ?.(
+        event.pointerId
+      );
+  };
+
+  const onPointerMove = event => {
+    if (
+      !dragState ||
+      dragState.pointerId !==
+        event.pointerId
+    ) {
+      return;
+    }
+
+    mapPanX =
+      dragState.panX +
+      event.clientX -
+      dragState.clientX;
+
+    mapPanY =
+      dragState.panY +
+      event.clientY -
+      dragState.clientY;
+
+    applyMapTransform();
+  };
+
+  const onPointerUp = event => {
+    if (
+      !dragState ||
+      dragState.pointerId !==
+        event.pointerId
+    ) {
+      return;
+    }
+
+    dragState = null;
+
+    mapStage
+      ?.classList
+      .remove(
+        "is-dragging"
+      );
+
+    if (
+      mapStage
+        ?.hasPointerCapture
+        ?.(
+          event.pointerId
+        )
+    ) {
+      mapStage.releasePointerCapture(
+        event.pointerId
+      );
+    }
+  };
+
+  mapStage
+    ?.addEventListener(
+      "pointerdown",
+      onPointerDown
+    );
+
+  mapStage
+    ?.addEventListener(
+      "pointermove",
+      onPointerMove
+    );
+
+  mapStage
+    ?.addEventListener(
+      "pointerup",
+      onPointerUp
+    );
+
+  mapStage
+    ?.addEventListener(
+      "pointercancel",
+      onPointerUp
+    );
+
+  let resizeObserver = null;
+
+  if (
+    typeof globalThis
+      .ResizeObserver ===
+      "function" &&
+    mapStage
+  ) {
+    resizeObserver =
+      new globalThis.ResizeObserver(
+        applyMapTransform
+      );
+
+    resizeObserver.observe(
+      mapStage
+    );
+  } else {
+    globalThis.addEventListener?.(
+      "resize",
+      applyMapTransform
+    );
+  }
 
   const unsubscribers = [
     app.core
@@ -916,14 +1700,25 @@ function bindCityFrameLive(
   ];
 
   refresh();
+  applyMapTransform();
 
   return Object.freeze({
     refresh,
+    openQuickPanel,
 
     getState() {
       return {
         activeFilter,
         selectedDistrictId,
+        mapScale,
+        mapPanX,
+        mapPanY,
+        detailOpen:
+          !frame
+            ?.classList
+            .contains(
+              "is-detail-closed"
+            ),
         model:
           latestModel
       };
@@ -963,6 +1758,90 @@ function bindCityFrameLive(
         );
 
       for (
+        const [
+          button,
+          handler
+        ]
+        of opportunityHandlers
+      ) {
+        button.removeEventListener(
+          "click",
+          handler
+        );
+      }
+
+      for (
+        const [
+          button,
+          handler
+        ]
+        of mapControlHandlers
+      ) {
+        button.removeEventListener(
+          "click",
+          handler
+        );
+      }
+
+      closeDetailButton
+        ?.removeEventListener(
+          "click",
+          onCloseDetail
+        );
+
+      opportunityAllButton
+        ?.removeEventListener(
+          "click",
+          onOpenOpportunities
+        );
+
+      dialogCloseButton
+        ?.removeEventListener(
+          "click",
+          closeDialog
+        );
+
+      dialog
+        ?.removeEventListener(
+          "click",
+          onDialogBackdrop
+        );
+
+      mapStage
+        ?.removeEventListener(
+          "pointerdown",
+          onPointerDown
+        );
+
+      mapStage
+        ?.removeEventListener(
+          "pointermove",
+          onPointerMove
+        );
+
+      mapStage
+        ?.removeEventListener(
+          "pointerup",
+          onPointerUp
+        );
+
+      mapStage
+        ?.removeEventListener(
+          "pointercancel",
+          onPointerUp
+        );
+
+      resizeObserver
+        ?.disconnect();
+
+      if (!resizeObserver) {
+        globalThis.removeEventListener?.(
+          "resize",
+          applyMapTransform
+        );
+      }
+
+      for (
         const unsubscribe
         of unsubscribers
       ) {
@@ -974,5 +1853,6 @@ function bindCityFrameLive(
 
 export {
   bindGlobalHudLive,
+  bindGlobalNavLive,
   bindCityFrameLive
 };

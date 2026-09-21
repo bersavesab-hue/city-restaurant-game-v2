@@ -14,7 +14,7 @@ test(
       formatCompactMoney(
         52800
       ),
-      "¥5.3万"
+      "¥52,800"
     );
 
     assert.equal(

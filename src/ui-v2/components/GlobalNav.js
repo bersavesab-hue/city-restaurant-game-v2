@@ -13,16 +13,17 @@ function renderGlobalNav() {
           ) => (
             '<button class="ui-v2-nav__item' +
               (
-                index ===
-                0
+                index === 0
                   ? ' is-active'
                   : ''
               ) +
               '" type="button" data-ui-box="nav-cell" data-ui-destination="' +
               item.id +
-            '">' +
-              '<span class="ui-v2-box ui-v2-box--nav-icon" data-ui-box="nav-icon"></span>' +
-              '<strong data-ui-text="nav-label">' +
+              (item.id === "city"
+                ? '" aria-current="page">'
+                : '" aria-haspopup="dialog">') +
+              '<span class="ui-v2-nav__icon-slot" data-ui-box="nav-icon"></span>' +
+              '<strong class="ui-v2-nav__label" data-ui-text="nav-label">' +
                 item.label +
               '</strong>' +
             '</button>'

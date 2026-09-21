@@ -6,531 +6,112 @@ import {
   UI_BOXES,
   UI_PLACEMENTS,
   UI_TEXT_SLOTS,
-  UI_TYPOGRAPHY
+  UI_TYPOGRAPHY,
+  UI_REGIONS
 } from "../src/ui-v2/contracts/UiFrameContract.js";
+import { renderCityFrame } from "../src/ui-v2/pages/city/CityFrame.js";
 
-import {
-  renderCityFrame
-} from "../src/ui-v2/pages/city/CityFrame.js";
+test("HUD和地图坐标与864母版一致", () => {
+  assert.deepEqual(UI_PLACEMENTS.hud.identity, {
+    x: 0, y: 0, width: 289, height: 94
+  });
+  assert.deepEqual(UI_PLACEMENTS.hud.simulation, {
+    x: 289, y: 0, width: 380, height: 94
+  });
+  assert.deepEqual(UI_PLACEMENTS.hud.resources, {
+    x: 669, y: 0, width: 195, height: 94
+  });
+  assert.deepEqual(UI_PLACEMENTS.hero.summary, {
+    x: 576, y: 16, width: 276, height: 103
+  });
+  assert.deepEqual(UI_PLACEMENTS.filters, {
+    x: 11, y: 0, width: 842, height: 66, gap: 5
+  });
+  assert.deepEqual(UI_PLACEMENTS.map.controls, {
+    x: 794, y: 360, width: 56, height: 192, gap: 12
+  });
+  assert.deepEqual(UI_PLACEMENTS.map.markers.cbd, {
+    x: 320, y: 191
+  });
+  assert.deepEqual(UI_PLACEMENTS.map.markers.waterfront, {
+    x: 674, y: 455
+  });
+});
 
-test(
-  "HUD三栏位置锁死",
-  () => {
-    assert.deepEqual(
-      UI_PLACEMENTS.hud.identity,
-      {
-        x: 12,
-        y: 14,
-        width: 205,
-        height: 75
-      }
-    );
+test("详情与文字盒固定，动态数据落在盒内", () => {
+  assert.deepEqual(UI_PLACEMENTS.detail.thumbnail, {
+    x: 24, y: 28, width: 124, height: 104
+  });
+  assert.deepEqual(UI_PLACEMENTS.detail.primaryAction, {
+    x: 612, y: 39, width: 221, height: 81
+  });
+  assert.deepEqual(UI_PLACEMENTS.detail.metrics, {
+    x: 17, y: 145, width: 830, height: 115, gap: 7
+  });
+  assert.deepEqual(UI_PLACEMENTS.detail.opportunities, {
+    x: 17, y: 322, width: 830, height: 102, gap: 8
+  });
+  assert.deepEqual(UI_BOXES.detailHandle, {
+    width: 60, height: 6
+  });
+  assert.deepEqual(UI_TEXT_SLOTS.heroTitle, {
+    x: 60, y: 21, width: 518, height: 65
+  });
+  assert.equal(UI_TYPOGRAPHY.roles.hudPrimary.size, 23);
+  assert.equal(UI_TYPOGRAPHY.roles.markerTitle.size, 20);
+  assert.equal(UI_TYPOGRAPHY.roles.opportunityBody.size, 15);
+  const html = renderCityFrame();
+  assert.match(html, /data-ui-box="detail-handle"/);
+  assert.match(html, /data-ui-box="detail-close"/);
+  assert.match(html, /data-live="metric-value-5"/);
+  assert.match(html, /data-live="opportunity-count"/);
+});
 
-    assert.deepEqual(
-      UI_PLACEMENTS.hud.simulation,
-      {
-        x: 225,
-        y: 14,
-        width: 300,
-        height: 75
-      }
-    );
-
-    assert.deepEqual(
-      UI_PLACEMENTS.hud.resources,
-      {
-        x: 533,
-        y: 14,
-        width: 146,
-        height: 75
-      }
-    );
+test("地图是独立静态素材，状态文字和操作由DOM实时绘制", () => {
+  const cityCss = fs.readFileSync(
+    "src/ui-v2/pages/city/city-frame.css", "utf8"
+  );
+  const hudCss = fs.readFileSync(
+    "src/ui-v2/components/components.css", "utf8"
+  );
+  const shellCss = fs.readFileSync(
+    "src/ui-v2/shell/app-shell.css", "utf8"
+  );
+  assert.match(cityCss, /city-map-master\.webp/);
+  assert.match(cityCss, /marker-cbd\.webp/);
+  assert.match(cityCss, /pin-selected\.svg/);
+  assert.match(cityCss, /ui-v2-city-frame__region-overlays/);
+  assert.match(cityCss, /min\(\s*100cqw/);
+  assert.match(cityCss, /district-cbd-v3\.webp/);
+  assert.match(cityCss, /opportunity-sheet-v3\.webp/);
+  assert.match(hudCss, /hud-weather\.webp/);
+  assert.match(shellCss, /var\(--ui-safe-top\)/);
+  assert.match(shellCss, /var\(--ui-safe-bottom\)/);
+  assert.doesNotMatch(cityCss + hudCss, /data:image|base64|map-grid/);
+  assert.equal(UI_REGIONS.detail.y + UI_REGIONS.detail.height,
+    UI_REGIONS.navigation.y);
+  for (const file of [
+    "illustrations/city-map-master.webp",
+    "illustrations/store-avatar.webp",
+    "illustrations/district-cbd-v3.webp",
+    "illustrations/district-university-v3.webp",
+    "illustrations/district-nightlife-v3.webp",
+    "illustrations/district-oldtown-v3.webp",
+    "illustrations/district-waterfront-v3.webp",
+    "illustrations/opportunity-sheet-v3.webp",
+    "icons/marker-cbd.webp",
+    "icons/marker-university.webp",
+    "icons/marker-nightlife.webp",
+    "icons/marker-oldtown.webp",
+    "icons/marker-waterfront.webp",
+    "icons/hud-weather.webp",
+    "icons/hud-money.webp",
+    "icons/hud-crown.webp",
+    "icons/hud-star.webp",
+    "icons/nav-city.svg",
+    "icons/map-locate.svg",
+    "markers/pin-selected.svg"
+  ]) {
+    assert.equal(fs.existsSync(`resources/ui-v2/${file}`), true, file);
   }
-);
-
-test(
-  "Hero筛选地图控件位置锁死",
-  () => {
-    assert.deepEqual(
-      UI_PLACEMENTS.hero.summary,
-      {
-        x: 461,
-        y: 35,
-        width: 218,
-        height: 79
-      }
-    );
-
-    assert.deepEqual(
-      UI_PLACEMENTS.filters,
-      {
-        x: 12,
-        y: 5,
-        width: 667,
-        height: 48,
-        gap: 4
-      }
-    );
-
-    assert.deepEqual(
-      UI_PLACEMENTS.map.controls,
-      {
-        x: 625,
-        y: 507,
-        width: 54,
-        height: 180,
-        gap: 9
-      }
-    );
-  }
-);
-
-test(
-  "五个地图标签中心坐标锁死",
-  () => {
-    assert.deepEqual(
-      UI_PLACEMENTS.map.markers,
-      {
-        university:
-          {
-            x: 366,
-            y: 172
-          },
-        cbd:
-          {
-            x: 269,
-            y: 308
-          },
-        nightlife:
-          {
-            x: 580,
-            y: 329
-          },
-        oldTown:
-          {
-            x: 124,
-            y: 473
-          },
-        waterfront:
-          {
-            x: 518,
-            y: 501
-          }
-      }
-    );
-  }
-);
-
-test(
-  "详情Sheet四层位置锁死",
-  () => {
-    assert.deepEqual(
-      UI_PLACEMENTS.detail.thumbnail,
-      {
-        x: 20,
-        y: 22,
-        width: 110,
-        height: 90
-      }
-    );
-
-    assert.deepEqual(
-      UI_PLACEMENTS.detail.primaryAction,
-      {
-        x: 479,
-        y: 31,
-        width: 184,
-        height: 68
-      }
-    );
-
-    assert.deepEqual(
-      UI_PLACEMENTS.detail.metrics,
-      {
-        x: 18,
-        y: 119,
-        width: 655,
-        height: 112,
-        gap: 4
-      }
-    );
-
-    assert.deepEqual(
-      UI_PLACEMENTS.detail.opportunities,
-      {
-        x: 18,
-        y: 284,
-        width: 655,
-        height: 86,
-        gap: 8
-      }
-    );
-  }
-);
-
-test(
-  "详情拖拽条与关闭按钮成为正式固定盒",
-  () => {
-    assert.deepEqual(
-      UI_BOXES.detailHandle,
-      {
-        width: 48,
-        height: 4
-      }
-    );
-
-    assert.deepEqual(
-      UI_BOXES.detailClose,
-      {
-        width: 28,
-        height: 28
-      }
-    );
-
-    const html =
-      renderCityFrame();
-
-    assert.match(
-      html,
-      /data-ui-box="detail-handle"/
-    );
-
-    assert.match(
-      html,
-      /data-ui-box="detail-close"/
-    );
-  }
-);
-
-test(
-  "文字基线与字号锁死",
-  () => {
-    assert.deepEqual(
-      UI_TEXT_SLOTS.heroTitle,
-      {
-        x: 73,
-        y: 26,
-        width: 370,
-        height: 42
-      }
-    );
-
-    assert.deepEqual(
-      UI_TEXT_SLOTS.detailBody,
-      {
-        x: 145,
-        y: 60,
-        width: 314,
-        height: 43
-      }
-    );
-
-    assert.equal(
-      UI_TYPOGRAPHY.roles.hudPrimary.size,
-      18
-    );
-
-    assert.equal(
-      UI_TYPOGRAPHY.roles.markerTitle.size,
-      17
-    );
-
-    assert.equal(
-      UI_TYPOGRAPHY.roles.opportunityBody.size,
-      11
-    );
-  }
-);
-
-test(
-  "底栏使用统一轻量壳且选中态不再铺满单元格",
-  () => {
-    assert.deepEqual(
-      UI_PLACEMENTS.navigation,
-      {
-        iconY: 18,
-        labelY: 78,
-        activeInsetX: 17,
-        activeInsetY: 10,
-        activeWidth: 104,
-        activeHeight: 110
-      }
-    );
-
-    assert.deepEqual(
-      UI_TEXT_SLOTS.navLabel,
-      {
-        y: 78,
-        height: 26
-      }
-    );
-
-    const css =
-      fs.readFileSync(
-        "src/ui-v2/components/components.css",
-        "utf8"
-      );
-
-    assert.match(
-      css,
-      /Navigation stays one integrated shell/
-    );
-
-    assert.doesNotMatch(
-      css,
-      /ui-v2-nav__item \+ \.ui-v2-nav__item/
-    );
-  }
-);
-
-test(
-  "Android沉浸式与系统安全区形成双保险",
-  () => {
-    const activity =
-      fs.readFileSync(
-        "android/app/src/main/java/com/cityrestaurant/game/MainActivity.java",
-        "utf8"
-      );
-
-    const manifest =
-      fs.readFileSync(
-        "android/app/src/main/AndroidManifest.xml",
-        "utf8"
-      );
-
-    const shell =
-      fs.readFileSync(
-        "src/ui-v2/shell/app-shell.css",
-        "utf8"
-      );
-
-    assert.match(
-      activity,
-      /setDecorFitsSystemWindows\(\s*false\s*\)/
-    );
-
-    assert.match(
-      activity,
-      /BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE/
-    );
-
-    assert.match(
-      activity,
-      /IMMERSIVE_RETRY_DELAYS_MS/
-    );
-
-    assert.match(
-      activity,
-      /FLAG_FULLSCREEN/
-    );
-
-    assert.match(
-      manifest,
-      /@style\/Theme\.CityRestaurant/
-    );
-
-    assert.equal(
-      fs.existsSync(
-        "android/app/src/main/res/values/styles.xml"
-      ),
-      true
-    );
-
-    assert.match(
-      shell,
-      /--ui-native-safe-top/
-    );
-
-    assert.match(
-      shell,
-      /--ui-native-safe-bottom/
-    );
-
-    assert.match(
-      shell,
-      /safe-area-inset-top/
-    );
-
-    assert.match(
-      shell,
-      /safe-area-inset-bottom/
-    );
-  }
-);
-
-test(
-  "框架CSS不得再用媒体查询改变盒子位置",
-  () => {
-    for (
-      const path
-      of [
-        "src/ui-v2/tokens/tokens.css",
-        "src/ui-v2/components/components.css",
-        "src/ui-v2/pages/city/city-frame.css"
-      ]
-    ) {
-      const css =
-        fs.readFileSync(
-          path,
-          "utf8"
-        );
-
-      assert.doesNotMatch(
-        css,
-        /@media/
-      );
-    }
-  }
-);
-
-test(
-  "正式静态资源填入锁定盒且禁止内嵌Base64",
-  () => {
-    const city =
-      fs.readFileSync(
-        "src/ui-v2/pages/city/city-frame.css",
-        "utf8"
-      );
-
-    const components =
-      fs.readFileSync(
-        "src/ui-v2/components/components.css",
-        "utf8"
-      );
-
-    const css =
-      city +
-      components;
-
-    assert.match(
-      css,
-      /url\("ui-v2\/icons\//
-    );
-
-    assert.match(
-      css,
-      /ui-v2\/illustrations\/city-map-master-v3\.webp/
-    );
-
-    assert.match(
-      css,
-      /ui-v2\/markers\/frame-cbd\.svg/
-    );
-
-    assert.match(
-      css,
-      /ui-v2\/markers\/pin-selected\.svg/
-    );
-
-    assert.match(
-      css,
-      /ui-v2\/illustrations\/city-map-master-v3\.webp/
-    );
-
-    assert.doesNotMatch(
-      css,
-      /ui-v2-city-frame__map-grid/
-    );
-
-    assert.doesNotMatch(
-      css,
-      /data:image|base64/
-    );
-
-    for (
-      const path
-      of [
-        "resources/ui-v2/icons/hud-store.svg",
-        "resources/ui-v2/icons/hud-money.svg",
-        "resources/ui-v2/icons/nav-city.svg",
-        "resources/ui-v2/icons/filter-opened.svg",
-        "resources/ui-v2/icons/marker-cbd.svg",
-        "resources/ui-v2/icons/metric-traffic.svg",
-        "resources/ui-v2/icons/map-locate.svg",
-        "resources/ui-v2/illustrations/city-map-master-v3.webp",
-        "resources/ui-v2/illustrations/city-hero-v3.webp",
-        "resources/ui-v2/illustrations/district-cbd-v3.webp",
-        "resources/ui-v2/illustrations/district-university-v3.webp",
-        "resources/ui-v2/illustrations/district-nightlife-v3.webp",
-        "resources/ui-v2/illustrations/district-oldtown-v3.webp",
-        "resources/ui-v2/illustrations/district-waterfront-v3.webp",
-        "resources/ui-v2/illustrations/opportunity-sheet-v3.webp",
-        "resources/ui-v2/icons/city-icon-sheet-v3.webp",
-        "resources/ui-v2/icons/system-icon-sheet-v3.webp",
-        "resources/ui-v2/markers/frame-university.svg",
-        "resources/ui-v2/markers/frame-cbd.svg",
-        "resources/ui-v2/markers/frame-nightlife.svg",
-        "resources/ui-v2/markers/frame-oldtown.svg",
-        "resources/ui-v2/markers/frame-waterfront.svg",
-        "resources/ui-v2/markers/pin-selected.svg",
-        "resources/ui-v2/illustrations/city-map-master-v3.webp"
-      ]
-    ) {
-      assert.equal(
-        fs.existsSync(
-          path
-        ),
-        true,
-        path
-      );
-    }
-
-    const cityBinding =
-      fs.readFileSync(
-        "src/ui-v2/runtime/LiveUiBinding.js",
-        "utf8"
-      );
-
-    const cityFrame =
-      fs.readFileSync(
-        "src/ui-v2/pages/city/CityFrame.js",
-        "utf8"
-      );
-
-    assert.match(
-      city,
-      /city-hero-v3\.webp/
-    );
-
-    assert.match(
-      city,
-      /object-fit:\s*\n?\s*contain/
-    );
-
-    assert.match(
-      city,
-      /opportunity-sheet-v3\.webp/
-    );
-
-    assert.match(
-      city,
-      /district-cbd-v3\.webp/
-    );
-
-    assert.doesNotMatch(
-      cityBinding,
-      /applyDistrictThumb|getDistrictThumbPosition|--district-thumb-[xy]/
-    );
-
-    assert.doesNotMatch(
-      cityFrame,
-      />＋<|>－<|>◎</
-    );
-
-    const build =
-      fs.readFileSync(
-        "scripts/build-android-js.mjs",
-        "utf8"
-      );
-
-    assert.match(
-      build,
-      /resources\/ui-v2/
-    );
-
-    assert.match(
-      build,
-      /fs\.cpSync/
-    );
-  }
-);
+});

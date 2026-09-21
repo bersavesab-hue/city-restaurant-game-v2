@@ -27,6 +27,77 @@ function clamp(
   );
 }
 
+const CITY_MAP_REGION_MEMBERS =
+  Object.freeze({
+    university:
+      Object.freeze([
+        "university",
+        "tech_park",
+        "industrial_park",
+        "cultural_creative",
+        "sports_entertainment"
+      ]),
+    cbd:
+      Object.freeze([
+        "cbd",
+        "commercial_core",
+        "office_park",
+        "convention_center",
+        "transport_hub",
+        "tech_park"
+      ]),
+    nightlife:
+      Object.freeze([
+        "nightlife",
+        "sports_entertainment",
+        "cultural_creative",
+        "tourist_scenic"
+      ]),
+    old_town:
+      Object.freeze([
+        "old_town",
+        "wholesale_market",
+        "medical_cluster",
+        "residential"
+      ]),
+    waterfront_leisure:
+      Object.freeze([
+        "waterfront_leisure",
+        "tourist_scenic",
+        "suburban_resort",
+        "premium_residential",
+        "suburban_community"
+      ])
+  });
+
+const CITY_MAP_REGION_LABELS =
+  Object.freeze({
+    university:
+      "大学城区域",
+    cbd:
+      "CBD商务区域",
+    nightlife:
+      "夜生活区域",
+    old_town:
+      "老城商业区域",
+    waterfront_leisure:
+      "水岸休闲区域"
+  });
+
+const CITY_DISTRICT_DESCRIPTIONS =
+  Object.freeze({
+    cbd:
+      "城市核心商务区，写字楼林立，上班族与商务客流稳定，消费能力强。",
+    university:
+      "高校与青年社区集中，午晚餐和夜宵需求旺盛，价格敏感度较高。",
+    nightlife:
+      "娱乐与夜间消费高度集中，晚餐、酒饮和夜宵客流持续活跃。",
+    old_town:
+      "传统街区与社区客群稳定，适合经营有口碑、复购高的特色餐饮。",
+    waterfront_leisure:
+      "滨水景观与休闲客流集中，周末和节假日具有更强的消费潜力。"
+  });
+
 function formatCompactMoney(
   value
 ) {
@@ -43,7 +114,7 @@ function formatCompactMoney(
 
   if (
     amount <
-    10000
+    100000
   ) {
     return (
       "¥" +
@@ -869,7 +940,7 @@ function buildCityModel(
           1,
           Math.round(
             selected.spendingPower *
-            0.8 *
+            0.79 *
             spendingMultiplier
           )
         )
@@ -897,7 +968,7 @@ function buildCityModel(
           ? "中"
           : "低";
 
-  const opportunities =
+  const allOpportunities =
     (
       availableProperties.length
         ? availableProperties
@@ -1007,11 +1078,13 @@ function buildCityModel(
         ) =>
           b.score -
           a.score
-      )
-      .slice(
-        0,
-        3
       );
+
+  const opportunities =
+    allOpportunities.slice(
+      0,
+      3
+    );
 
   const fixedMarkerIds =
     [
@@ -1021,43 +1094,6 @@ function buildCityModel(
       "old_town",
       "waterfront_leisure"
     ];
-
-  const getRegionId =
-    districtId =>
-      safeCall(
-        "unknown",
-        () =>
-          app.systems
-            .chainSystem
-            .getRegionIdForDistrict(
-              districtId
-            )
-      );
-
-  const regionSizeById =
-    new Map();
-
-  for (
-    const district
-    of decorated
-  ) {
-    const regionId =
-      getRegionId(
-        district.id
-      );
-
-    regionSizeById.set(
-      regionId,
-      (
-        regionSizeById
-          .get(
-            regionId
-          ) ??
-        0
-      ) +
-      1
-    );
-  }
 
   const markers =
     fixedMarkerIds
@@ -1079,18 +1115,10 @@ function buildCityModel(
               district.id,
 
             title:
-              (
-                district.name.endsWith(
-                  "区"
-                )
-                  ? district.name.slice(
-                      0,
-                      -1
-                    ) +
-                    "区域"
-                  : district.name +
-                    "区域"
-              ),
+              CITY_MAP_REGION_LABELS[
+                district.id
+              ] ??
+              district.name,
 
             opened:
               district.opened,
@@ -1110,12 +1138,18 @@ function buildCityModel(
 
             meta:
               (
-                regionSizeById
-                  .get(
-                    getRegionId(
-                      district.id
-                    )
-                  ) ??
+                CITY_MAP_REGION_MEMBERS[
+                  district.id
+                ]
+                  ?.filter(
+                    id =>
+                      decorated.some(
+                        item =>
+                          item.id ===
+                          id
+                      )
+                  )
+                  .length ??
                 0
               ) +
               "个商圈"
@@ -1204,6 +1238,9 @@ function buildCityModel(
                 selected.event
                   .active[0]
                   ?.description ??
+                CITY_DISTRICT_DESCRIPTIONS[
+                  selected.id
+                ] ??
                 (
                   "客流指数" +
                   selected.trafficIndex +
@@ -1225,7 +1262,26 @@ function buildCityModel(
                     .toLocaleString(
                       "zh-CN"
                     ) +
-                  "/天"
+                  "/天",
+                trend:
+                  (
+                    selected.trafficIndex >=
+                      78
+                      ? "▲ +"
+                      : "▼ "
+                  ) +
+                  Math.abs(
+                    Math.round(
+                      selected.trafficIndex -
+                      78
+                    )
+                  ) +
+                  "%",
+                tone:
+                  selected.trafficIndex >=
+                    78
+                    ? "positive"
+                    : "negative"
               },
               {
                 label:
@@ -1233,7 +1289,26 @@ function buildCityModel(
                 value:
                   "¥" +
                   spending +
-                  "/人"
+                  "/人",
+                trend:
+                  (
+                    selected.spendingPower >=
+                      78
+                      ? "▲ +"
+                      : "▼ "
+                  ) +
+                  Math.abs(
+                    Math.round(
+                      selected.spendingPower -
+                      78
+                    )
+                  ) +
+                  "%",
+                tone:
+                  selected.spendingPower >=
+                    78
+                    ? "positive"
+                    : "negative"
               },
               {
                 label:
@@ -1241,19 +1316,60 @@ function buildCityModel(
                 value:
                   "¥" +
                   averageRentPerSqm +
-                  "/㎡/月"
+                  "/㎡/月",
+                trend:
+                  "▲ +" +
+                  Math.max(
+                    0,
+                    Math.round(
+                      (
+                        selected.rentMultiplier -
+                        1.45
+                      ) *
+                      100
+                    )
+                  ) +
+                  "%",
+                tone:
+                  "negative"
               },
               {
                 label:
                   "竞争度",
                 value:
-                  competitionLabel
+                  competitionLabel,
+                trend:
+                  selected.competition >=
+                    75
+                    ? "●"
+                    : "●",
+                tone:
+                  "neutral"
               },
               {
                 label:
                   "外卖需求",
                 value:
-                  deliveryLabel
+                  deliveryLabel,
+                trend:
+                  (
+                    selected.deliveryDemand >=
+                      73
+                      ? "▲ +"
+                      : "▼ "
+                  ) +
+                  Math.abs(
+                    Math.round(
+                      selected.deliveryDemand -
+                      73
+                    )
+                  ) +
+                  "%",
+                tone:
+                  selected.deliveryDemand >=
+                    73
+                    ? "positive"
+                    : "negative"
               },
               {
                 label:
@@ -1261,13 +1377,34 @@ function buildCityModel(
                 value:
                   selectedProperties
                     .length +
-                  "套"
+                  "套",
+                trend:
+                  "",
+                tone:
+                  "neutral"
               }
-            ]
+            ],
+
+            properties:
+              selectedProperties.map(
+                property => ({
+                  id:
+                    property.id,
+                  name:
+                    property.name,
+                  area:
+                    property.area,
+                  monthlyRent:
+                    property.monthlyRent,
+                  status:
+                    property.status
+                })
+              )
           }
         : null,
 
-    opportunities
+    opportunities,
+    allOpportunities
   };
 }
 

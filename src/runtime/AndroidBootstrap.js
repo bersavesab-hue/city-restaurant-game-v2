@@ -12,6 +12,7 @@ import {
 
 import {
   bindGlobalHudLive,
+  bindGlobalNavLive,
   bindCityFrameLive
 } from "../ui-v2/runtime/LiveUiBinding.js";
 
@@ -39,16 +40,23 @@ const cityFrame =
     shell.pageRoot
   );
 
-const hudLive =
-  bindGlobalHudLive(
-    root,
-    app
-  );
-
 const cityLive =
   bindCityFrameLive(
     shell.pageRoot,
     app
+  );
+
+const hudLive =
+  bindGlobalHudLive(
+    root,
+    app,
+    cityLive.openQuickPanel
+  );
+
+const navLive =
+  bindGlobalNavLive(
+    root,
+    cityLive.openQuickPanel
   );
 
 globalThis.__CITY_RESTAURANT_UI__ =
@@ -56,6 +64,7 @@ globalThis.__CITY_RESTAURANT_UI__ =
     shell,
     cityFrame,
     hudLive,
+    navLive,
     cityLive,
 
     refresh() {
@@ -64,6 +73,7 @@ globalThis.__CITY_RESTAURANT_UI__ =
     },
 
     destroy() {
+      navLive.destroy();
       cityLive.destroy();
       hudLive.destroy();
       cityFrame.destroy();

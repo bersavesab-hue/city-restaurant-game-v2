@@ -18,12 +18,12 @@ import {
 } from "../src/ui-v2/pages/city/CityFrame.js";
 
 test(
-  "691x1536六段框架严格闭合",
+  "864x1536母版六段框架严格闭合",
   () => {
     assert.deepEqual(
       UI_REFERENCE,
       {
-        width: 691,
+        width: 864,
         height: 1536
       }
     );
@@ -45,22 +45,22 @@ test(
 
     assert.equal(
       UI_REGIONS.hud.height,
-      103
+      94
     );
 
     assert.equal(
       UI_REGIONS.map.height,
-      716
+      657
     );
 
     assert.equal(
       UI_REGIONS.detail.height,
-      394
+      435
     );
 
     assert.equal(
       UI_REGIONS.navigation.y,
-      1399
+      1387
     );
   }
 );
@@ -71,40 +71,40 @@ test(
     assert.deepEqual(
       UI_BOXES.hudAvatar,
       {
-        width: 68,
-        height: 68
+        width: 82,
+        height: 82
       }
     );
 
     assert.deepEqual(
       UI_BOXES.mapMarker,
       {
-        width: 176,
-        height: 60
+        width: 223,
+        height: 68
       }
     );
 
     assert.deepEqual(
       UI_BOXES.primaryAction,
       {
-        width: 184,
-        height: 68
+        width: 221,
+        height: 81
       }
     );
 
     assert.deepEqual(
       UI_BOXES.metric,
       {
-        width: 105,
-        height: 112
+        width: 133,
+        height: 115
       }
     );
 
     assert.deepEqual(
       UI_BOXES.navigationIcon,
       {
-        width: 42,
-        height: 42
+        width: 52,
+        height: 52
       }
     );
   }
@@ -126,7 +126,7 @@ test(
 
     assert.equal(
       UI_TYPOGRAPHY.roles.pageTitle.size,
-      38
+      54
     );
 
     assert.equal(
@@ -136,12 +136,12 @@ test(
 
     assert.equal(
       UI_TYPOGRAPHY.roles.navigation.size,
-      20
+      27
     );
 
     assert.equal(
       UI_TYPOGRAPHY.roles.metricValue.size,
-      17
+      22
     );
   }
 );

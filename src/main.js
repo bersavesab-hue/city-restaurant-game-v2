@@ -104,7 +104,7 @@ import { propertyLeaseMarketSystem } from "./systems/PropertyLeaseMarketSystem.j
 import { leaseSystem } from "./systems/LeaseSystem.js";
 function bootstrap() {
   gameFoundationSystem.initialize({
-    seedProperties: false,
+    seedProperties: true,
     overwriteReferenceData: true
   });
 

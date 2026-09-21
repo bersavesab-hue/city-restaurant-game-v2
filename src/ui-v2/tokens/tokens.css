@@ -1,5 +1,5 @@
 :root {
-  --ui-ref-width: 691;
+  --ui-ref-width: 864;
   --ui-ref-height: 1536;
 
   --ui-font-family:
@@ -7,6 +7,9 @@
     "PingFang SC",
     "Microsoft YaHei",
     system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
     sans-serif;
 
   --ui-weight-regular: 500;
@@ -18,348 +21,60 @@
   --ui-color-bg: #eaf4fb;
   --ui-color-hud: #07548d;
   --ui-color-hud-deep: #043f6f;
-  --ui-color-nav: #064d82;
-  --ui-color-nav-deep: #023b67;
+  --ui-color-nav: #07558c;
+  --ui-color-nav-deep: #003766;
   --ui-color-accent: #ffd22d;
   --ui-color-accent-deep: #f2b900;
   --ui-color-surface: #ffffff;
   --ui-color-surface-soft: #f4f7fa;
   --ui-color-border: #d8e3ec;
-  --ui-color-text: #103252;
-  --ui-color-text-secondary: #60788d;
-  --ui-color-guide: rgba(18,99,154,.28);
+  --ui-color-text: #102352;
+  --ui-color-text-secondary: #526d8c;
+  --ui-color-focus: #4db4ff;
 
-  --ui-space-4:
-    min(
-      .5789vw,
-      .2604dvh
-    );
-  --ui-space-8:
-    min(
-      1.1577vw,
-      .5208dvh
-    );
-  --ui-space-12:
-    min(
-      1.7366vw,
-      .7812dvh
-    );
-  --ui-space-16:
-    min(
-      2.3155vw,
-      1.0417dvh
-    );
-  --ui-space-20:
-    min(
-      2.8944vw,
-      1.3021dvh
-    );
-  --ui-space-24:
-    min(
-      3.4732vw,
-      1.5625dvh
-    );
-  --ui-space-32:
-    min(
-      4.6309vw,
-      2.0833dvh
-    );
-
-  --ui-radius-sm:
-    min(
-      1.7366vw,
-      .7812dvh
-    );
-  --ui-radius-md:
-    min(
-      2.3155vw,
-      1.0417dvh
-    );
-  --ui-radius-lg:
-    min(
-      3.4732vw,
-      1.5625dvh
-    );
-  --ui-radius-xl:
-    min(
-      4.6309vw,
-      2.0833dvh
-    );
+  --ui-radius-sm: calc(6 * var(--ui-u));
+  --ui-radius-md: calc(10 * var(--ui-u));
+  --ui-radius-lg: calc(16 * var(--ui-u));
+  --ui-radius-xl: calc(26 * var(--ui-u));
   --ui-radius-pill: 999px;
 
-  /* Locked typography roles. */
-  --ui-font-hud-primary:
-    min(
-      2.6049vw,
-      1.1719dvh
+  --ui-native-safe-top: 0px;
+  --ui-native-safe-right: 0px;
+  --ui-native-safe-bottom: 0px;
+  --ui-native-safe-left: 0px;
+
+  --ui-safe-top:
+    max(
+      env(safe-area-inset-top,0px),
+      var(--ui-native-safe-top)
     );
-  --ui-font-hud-money:
-    min(
-      2.4602vw,
-      1.1068dvh
+  --ui-safe-right:
+    max(
+      env(safe-area-inset-right,0px),
+      var(--ui-native-safe-right)
     );
-  --ui-font-hud-level:
-    min(
-      2.3155vw,
-      1.0417dvh
+  --ui-safe-bottom:
+    max(
+      env(safe-area-inset-bottom,0px),
+      var(--ui-native-safe-bottom)
     );
-  --ui-font-hud-secondary:
-    min(
-      1.7366vw,
-      .7812dvh
-    );
-  --ui-font-hud-time:
-    min(
-      3.6179vw,
-      1.6276dvh
-    );
-  --ui-font-page-title:
-    min(
-      5.4993vw,
-      2.4740dvh
-    );
-  --ui-font-page-subtitle:
-    min(
-      2.3155vw,
-      1.0417dvh
-    );
-  --ui-font-filter:
-    min(
-      2.3155vw,
-      1.0417dvh
-    );
-  --ui-font-marker-title:
-    min(
-      2.4602vw,
-      1.1068dvh
-    );
-  --ui-font-marker-meta:
-    min(
-      2.0260vw,
-      .9115dvh
-    );
-  --ui-font-detail-title:
-    min(
-      3.4732vw,
-      1.5625dvh
-    );
-  --ui-font-detail-body:
-    min(
-      2.0260vw,
-      .9115dvh
-    );
-  --ui-font-detail-button:
-    min(
-      2.6049vw,
-      1.1719dvh
-    );
-  --ui-font-metric-label:
-    min(
-      1.8813vw,
-      .8464dvh
-    );
-  --ui-font-metric-value:
-    min(
-      2.4602vw,
-      1.1068dvh
-    );
-  --ui-font-section-title:
-    min(
-      2.8944vw,
-      1.3021dvh
-    );
-  --ui-font-opportunity-title:
-    min(
-      1.8813vw,
-      .8464dvh
-    );
-  --ui-font-opportunity-body:
-    min(
-      1.5919vw,
-      .7161dvh
-    );
-  --ui-font-nav:
-    min(
-      2.8944vw,
-      1.3021dvh
+  --ui-safe-left:
+    max(
+      env(safe-area-inset-left,0px),
+      var(--ui-native-safe-left)
     );
 
-  /* Locked visual boxes. */
-  --ui-box-hud-avatar:
+  --ui-u:
     min(
-      9.8408vw,
-      4.4271dvh
+      calc(100vw / 864),
+      calc(100dvh / 1536)
     );
-  --ui-box-hud-weather:
-    min(
-      5.2098vw,
-      2.3438dvh
-    );
-  --ui-box-hud-speed:
-    min(
-      4.9204vw,
-      2.2135dvh
-    );
-  --ui-box-hud-resource:
-    min(
-      4.0521vw,
-      1.8229dvh
-    );
-  --ui-box-hud-icon:
-    min(
-      3.4732vw,
-      1.5625dvh
-    );
-  --ui-box-hero-icon:
-    min(
-      6.0781vw,
-      2.7344dvh
-    );
-  --ui-box-filter-width: 18.6686vw;
-  --ui-box-filter-height: 3.1250dvh;
-  --ui-box-filter-icon:
-    min(
-      2.3155vw,
-      1.0417dvh
-    );
-  --ui-box-marker-width: 25.4703vw;
-  --ui-box-marker-height: 3.9062dvh;
-  --ui-box-marker-icon:
-    min(
-      5.4993vw,
-      2.4740dvh
-    );
-  --ui-box-map-control:
-    min(
-      7.8148vw,
-      3.5156dvh
-    );
-  --ui-box-detail-handle-width: 6.9465vw;
-  --ui-box-detail-handle-height: .2604dvh;
-  --ui-box-detail-close:
-    min(
-      4.0521vw,
-      1.8229dvh
-    );
-  --ui-box-detail-thumb-width: 15.9190vw;
-  --ui-box-detail-thumb-height: 5.8594dvh;
-  --ui-box-primary-action-width: 26.6281vw;
-  --ui-box-primary-action-height: 4.4271dvh;
-  --ui-box-metric-width: 15.1954vw;
-  --ui-box-metric-height: 7.2917dvh;
-  --ui-box-metric-icon:
-    min(
-      5.4993vw,
-      2.4740dvh
-    );
-  --ui-box-opportunity-width: 30.6802vw;
-  --ui-box-opportunity-height: 5.5990dvh;
-  --ui-box-opportunity-thumb:
-    min(
-      8.6831vw,
-      3.9062dvh
-    );
-  --ui-box-nav-icon:
-    min(
-      6.0781vw,
-      2.7344dvh
-    );
-
-  /* Locked HUD group placement. */
-  --ui-hud-identity-x: 1.7366vw;
-  --ui-hud-identity-y: .9115dvh;
-  --ui-hud-identity-width: 29.6671vw;
-  --ui-hud-group-height: 4.8828dvh;
-
-  --ui-hud-simulation-x: 32.5615vw;
-  --ui-hud-simulation-y: .9115dvh;
-  --ui-hud-simulation-width: 43.4153vw;
-
-  --ui-hud-resources-x: 77.1346vw;
-  --ui-hud-resources-y: .9115dvh;
-  --ui-hud-resources-width: 21.1288vw;
-
-  /* Locked hero placement. */
-  --ui-hero-icon-x: 2.8944vw;
-  --ui-hero-icon-y: 2.2786dvh;
-  --ui-hero-copy-x: 10.5644vw;
-  --ui-hero-copy-y: 1.6927dvh;
-  --ui-hero-copy-width: 53.5456vw;
-  --ui-hero-copy-height: 5.0781dvh;
-  --ui-hero-summary-x: 66.7149vw;
-  --ui-hero-summary-y: 2.2786dvh;
-  --ui-hero-summary-width: 31.5485vw;
-  --ui-hero-summary-height: 5.1432dvh;
-
-  /* Locked filter placement. */
-  --ui-filter-row-x: 1.7366vw;
-  --ui-filter-row-y: .3255dvh;
-  --ui-filter-row-width: 96.5268vw;
-  --ui-filter-row-height: 3.1250dvh;
-  --ui-filter-gap: .5789vw;
-
-  /* Locked map controls. */
-  --ui-map-controls-x: 90.4486vw;
-  --ui-map-controls-y: 33.0078dvh;
-  --ui-map-controls-width: 7.8148vw;
-  --ui-map-controls-height: 11.7188dvh;
-  --ui-map-controls-gap: .5859dvh;
-
-  /* Locked detail placement. */
-  --ui-detail-handle-x: 46.4544vw;
-  --ui-detail-handle-y: .4557dvh;
-  --ui-detail-close-x: 93.7771vw;
-  --ui-detail-close-y: .5859dvh;
-
-  --ui-detail-thumb-x: 2.8944vw;
-  --ui-detail-thumb-y: 1.4323dvh;
-
-  --ui-detail-copy-x: 20.9841vw;
-  --ui-detail-copy-y: 1.4974dvh;
-  --ui-detail-copy-width: 45.4414vw;
-  --ui-detail-copy-height: 5.5990dvh;
-
-  --ui-detail-action-x: 69.3198vw;
-  --ui-detail-action-y: 2.0182dvh;
-
-  --ui-detail-metrics-x: 2.6049vw;
-  --ui-detail-metrics-y: 7.7474dvh;
-  --ui-detail-metrics-width: 94.7902vw;
-  --ui-detail-metrics-height: 7.2917dvh;
-  --ui-detail-metrics-gap: .5789vw;
-
-  --ui-detail-opportunity-header-x: 2.6049vw;
-  --ui-detail-opportunity-header-y: 15.7552dvh;
-  --ui-detail-opportunity-header-width: 94.7902vw;
-  --ui-detail-opportunity-header-height: 2.2135dvh;
-
-  --ui-detail-opportunities-x: 2.6049vw;
-  --ui-detail-opportunities-y: 18.4896dvh;
-  --ui-detail-opportunities-width: 94.7902vw;
-  --ui-detail-opportunities-height: 5.5990dvh;
-  --ui-detail-opportunities-gap: 1.1577vw;
-
-  /* Locked navigation placement. */
-  --ui-nav-icon-y: 1.1719dvh;
-  --ui-nav-label-y: 5.0781dvh;
-  --ui-nav-active-inset-x: 2.4602vw;
-  --ui-nav-active-inset-y: .6510dvh;
-  --ui-nav-active-width: 15.0507vw;
-  --ui-nav-active-height: 7.1615dvh;
 }
 
 *,
 *::before,
 *::after {
-  box-sizing:
-    border-box;
-}
-
-html,
-body,
-button {
-  font-family:
-    var(--ui-font-family);
+  box-sizing: border-box;
 }
 
 html,
@@ -371,25 +86,43 @@ body,
   padding: 0;
 }
 
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--ui-font-family);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 button {
   border: 0;
   padding: 0;
   color: inherit;
   background: transparent;
-  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   overflow: hidden;
-  background:
-    var(--ui-color-bg);
+  background: var(--ui-color-bg);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-.ui-v2-no-wrap {
-  white-space: nowrap;
+:focus-visible {
+  outline: 3px solid var(--ui-color-focus);
+  outline-offset: 2px;
 }
 
 .ui-v2-tabular {
-  font-variant-numeric:
-    tabular-nums;
+  font-variant-numeric: tabular-nums;
 }
