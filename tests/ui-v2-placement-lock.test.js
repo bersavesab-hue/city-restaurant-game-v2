@@ -293,7 +293,17 @@ test(
 
     assert.match(
       css,
-      /ui-v2\/illustrations\/district-thumb\.svg/
+      /ui-v2\/illustrations\/city-map-master\.webp/
+    );
+
+    assert.match(
+      css,
+      /ui-v2\/markers\/frame-cbd\.svg/
+    );
+
+    assert.match(
+      css,
+      /ui-v2\/markers\/pin-selected\.svg/
     );
 
     assert.match(
@@ -321,8 +331,13 @@ test(
         "resources/ui-v2/icons/marker-cbd.svg",
         "resources/ui-v2/icons/metric-traffic.svg",
         "resources/ui-v2/icons/map-locate.svg",
-        "resources/ui-v2/illustrations/district-thumb.svg",
-        "resources/ui-v2/illustrations/property-thumb.svg",
+        "resources/ui-v2/illustrations/city-map-master.webp",
+        "resources/ui-v2/markers/frame-university.svg",
+        "resources/ui-v2/markers/frame-cbd.svg",
+        "resources/ui-v2/markers/frame-nightlife.svg",
+        "resources/ui-v2/markers/frame-oldtown.svg",
+        "resources/ui-v2/markers/frame-waterfront.svg",
+        "resources/ui-v2/markers/pin-selected.svg",
         "resources/ui-v2/illustrations/city-map-master.webp"
       ]
     ) {
