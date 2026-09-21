@@ -606,29 +606,6 @@
     url("ui-v2/icons/nav-more.svg");
 }
 
-.ui-v2-nav__item[data-ui-destination="employees"]::after {
-  content: "";
-  position: absolute;
-  z-index: 3;
-  left: 62%;
-  top: 7%;
-  width:
-    calc(12 * var(--nav-u));
-  height:
-    calc(12 * var(--nav-u));
-  border:
-    calc(1.5 * var(--nav-u))
-    solid
-    #ffffff;
-  border-radius: 50%;
-  background: #ff3141;
-  box-shadow:
-    0
-    calc(1 * var(--nav-u))
-    calc(3 * var(--nav-u))
-    rgba(96,0,14,.35);
-}
-
 .ui-v2-nav__item:focus-visible {
   outline:
     calc(3 * var(--nav-u))
