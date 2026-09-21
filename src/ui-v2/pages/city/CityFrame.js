@@ -155,7 +155,7 @@ function renderCityFrame() {
       '</section>' +
 
       '<section class="ui-v2-city-frame__map" data-ui-region="city-map">' +
-        '<div class="ui-v2-city-frame__map-grid" aria-hidden="true"></div>' +
+        '<div class="ui-v2-city-frame__map-art" data-ui-box="city-map-art" aria-hidden="true"></div>' +
         MAP_MARKERS
           .map(
             marker => (

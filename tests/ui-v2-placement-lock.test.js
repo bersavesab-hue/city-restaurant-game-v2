@@ -296,6 +296,16 @@ test(
       /ui-v2\/illustrations\/district-thumb\.svg/
     );
 
+    assert.match(
+      css,
+      /ui-v2\/illustrations\/city-map-master\.webp/
+    );
+
+    assert.doesNotMatch(
+      css,
+      /ui-v2-city-frame__map-grid/
+    );
+
     assert.doesNotMatch(
       css,
       /data:image|base64/
@@ -312,7 +322,8 @@ test(
         "resources/ui-v2/icons/metric-traffic.svg",
         "resources/ui-v2/icons/map-locate.svg",
         "resources/ui-v2/illustrations/district-thumb.svg",
-        "resources/ui-v2/illustrations/property-thumb.svg"
+        "resources/ui-v2/illustrations/property-thumb.svg",
+        "resources/ui-v2/illustrations/city-map-master.webp"
       ]
     ) {
       assert.equal(

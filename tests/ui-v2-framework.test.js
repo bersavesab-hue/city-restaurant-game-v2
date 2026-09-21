@@ -194,6 +194,21 @@ test(
       ).length,
       5
     );
+
+    assert.equal(
+      (
+        city.match(
+          /data-ui-box="city-map-art"/g
+        ) ??
+        []
+      ).length,
+      1
+    );
+
+    assert.doesNotMatch(
+      city,
+      /ui-v2-city-frame__map-grid/
+    );
   }
 );
 

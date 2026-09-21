@@ -2,6 +2,10 @@
 
 ## 0.9.4 - 2026-09-21
 
+- 城市地图正式底图接入锁定的691×1536新框架：恢复此前用户确认的 `approved-user-city-map` 主图为 `resources/ui-v2/illustrations/city-map-master.webp`，只作为地图静态底层，不恢复旧 assets/ui-v2、旧Atlas、旧坐标层或旧页面实现。
+- 物理删除运行结构中的 `map-grid` 校准占位层，改为唯一 `city-map-art` 正式底图层；五个商圈标签、筛选、详情Sheet、今日机会和所有文字/数值继续由DOM与真实数据动态绘制，不烘焙进地图图片。
+- UI V2框架与资源门禁新增正式地图检查：要求 `city-map-master.webp` 随Android资源递归打包，并禁止 `ui-v2-city-frame__map-grid` 再次回流。
+
 - UI V2正式进入“锁框后填充”阶段：新增独立SVG视觉资源，覆盖HUD门店/天气/资金/等级/评分、底部五导航、四筛选状态、五个地图商圈标签、六项商圈指标、地图缩放/定位、查看房源搜索图标与今日机会皇冠。
 - 所有新视觉资源只填入既有691×1536固定盒，不修改HUD、Hero、筛选、地图标签、Detail Sheet、指标卡和底栏坐标；CSS禁止Base64内嵌，避免后续资源替换污染布局。
 - 新增商圈详情与房源机会卡独立矢量缩略图；Android构建改为从resources/ui-v2复制到APK内ui-v2目录，资源离线随包携带。

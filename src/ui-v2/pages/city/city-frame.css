@@ -221,7 +221,7 @@
     var(--ui-color-accent);
 }
 
-/* MAP: blank calibration grid + five locked marker centers. */
+/* MAP: approved formal city art + five locked dynamic marker centers. */
 .ui-v2-city-frame__map {
   position: relative;
   min-width: 0;
@@ -231,25 +231,19 @@
     #dcebf2;
 }
 
-.ui-v2-city-frame__map-grid {
+.ui-v2-city-frame__map-art {
   position: absolute;
   inset: 0;
-  opacity: .7;
+  background-color:
+    #dcebf2;
   background-image:
-    linear-gradient(
-      var(--ui-color-guide)
-      1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      var(--ui-color-guide)
-      1px,
-      transparent 1px
-    );
+    url("ui-v2/illustrations/city-map-master.webp");
+  background-position:
+    center;
+  background-repeat:
+    no-repeat;
   background-size:
-    10vw
-    10vw;
+    cover;
 }
 
 .ui-v2-city-frame__marker {
