@@ -14,6 +14,11 @@ const outputDirectory =
     "android/app/src/main/assets"
   );
 
+const uiResourceDirectory =
+  path.resolve(
+    "resources/ui-v2"
+  );
+
 const styleSources =
   Object.freeze([
     "src/ui-v2/tokens/tokens.css",
@@ -32,6 +37,27 @@ fs.rmSync(
 
 fs.mkdirSync(
   outputDirectory,
+  {
+    recursive: true
+  }
+);
+
+if (
+  !fs.existsSync(
+    uiResourceDirectory
+  )
+) {
+  throw new Error(
+    "Formal UI resource directory is missing"
+  );
+}
+
+fs.cpSync(
+  uiResourceDirectory,
+  path.join(
+    outputDirectory,
+    "ui-v2"
+  ),
   {
     recursive: true
   }
