@@ -17,7 +17,7 @@
   grid-template-rows:
     calc(6.1198dvh + var(--ui-safe-top))
     minmax(0,1fr)
-    calc(8.8500dvh + var(--ui-safe-bottom));
+    calc(10.15625dvh + var(--ui-safe-bottom));
   padding-inline:
     var(--ui-safe-left)
     var(--ui-safe-right);
