@@ -435,6 +435,7 @@
     max(0%,var(--ui-safe-bottom))
     max(0%,var(--ui-safe-left));
   overflow: hidden;
+  /* Approved 853x166 art is scaled as one piece; buttons stay transparent. */
   background:
     url("ui-v2/illustrations/nav-bottom-city-approved.webp")
     center /
