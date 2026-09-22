@@ -1960,52 +1960,6 @@ function bindStoreFrameLive(
     );
   }
 
-  const actionHandlers = [];
-
-  for (
-    const button
-    of root.querySelectorAll(
-      "[data-store-action]"
-    )
-  ) {
-    const handler = () => {
-      const action =
-        button.dataset.storeAction;
-
-      if (
-        action === "go-city" ||
-        (
-          action === "opening" &&
-          !latestModel?.stores.length
-        )
-      ) {
-        navigate?.("city");
-        return;
-      }
-
-      app.core.eventBus.emit(
-        "ui:storeAction",
-        {
-          action,
-          storeCount:
-            latestModel?.stores.length ?? 0,
-          displayMode:
-            latestModel?.displayMode ?? "empty"
-        }
-      );
-    };
-
-    actionHandlers.push([
-      button,
-      handler
-    ]);
-
-    button.addEventListener(
-      "click",
-      handler
-    );
-  }
-
   const openDialog = (
     title,
     items
@@ -2067,6 +2021,127 @@ function bindStoreFrameLive(
       );
     }
   };
+
+  const actionHandlers = [];
+
+  const showOverview = () => {
+    const model =
+      latestModel ??
+      buildStoreModel(app);
+
+    openDialog(
+      "门店经营概况",
+      [
+        {
+          title:
+            "今日营业额 " +
+            formatCompactMoney(
+              model.totalRevenue
+            ),
+          body:
+            "今日利润 " +
+            formatCompactMoney(
+              model.totalProfit
+            ) +
+            " · 平均满意度 " +
+            model.averageSatisfaction +
+            "%"
+        },
+        {
+          title:
+            "门店状态",
+          body:
+            "营业 " +
+            model.counts.open +
+            " 家 · 筹备 " +
+            model.counts.preparing +
+            " 家 · 异常 " +
+            model.counts.abnormal +
+            " 家"
+        }
+      ]
+    );
+  };
+
+  const showActionPanel =
+    action => {
+      const model =
+        latestModel ??
+        buildStoreModel(app);
+
+      const storeItems =
+        model.stores.map(
+          store => ({
+            title:
+              store.name +
+              " · " +
+              store.statusLabel,
+            body:
+              store.district +
+              " · " +
+              store.manager
+          })
+        );
+
+      if (action === "overview") {
+        showOverview();
+        return;
+      }
+
+      if (
+        action === "opening" ||
+        action === "go-city"
+      ) {
+        navigate?.("city");
+        return;
+      }
+
+      if (action === "renovation") {
+        openDialog(
+          "装修布局",
+          storeItems
+        );
+        return;
+      }
+
+      if (action === "equipment") {
+        openDialog(
+          "门店设施",
+          storeItems
+        );
+        return;
+      }
+
+      if (action === "lease") {
+        openDialog(
+          "租约管理",
+          storeItems
+        );
+      }
+    };
+
+  for (
+    const button
+    of root.querySelectorAll(
+      "[data-store-action]"
+    )
+  ) {
+    const handler = () => {
+      showActionPanel(
+        button.dataset.storeAction
+      );
+    };
+
+    actionHandlers.push([
+      button,
+      handler
+    ]);
+
+    button.addEventListener(
+      "click",
+      handler
+    );
+  }
 
   const openQuickPanel =
     kind => {
@@ -2147,14 +2222,47 @@ function bindStoreFrameLive(
       const storeId =
         button.dataset.storeCardOpen;
 
-      app.core.eventBus.emit(
-        "ui:storeOpen",
-        {
-          storeId,
-          displayMode:
-            latestModel?.displayMode ??
-            "empty"
-        }
+      const store =
+        latestModel?.stores.find(
+          item =>
+            String(item.id) ===
+            String(storeId)
+        );
+
+      if (!store) {
+        return;
+      }
+
+      openDialog(
+        store.name,
+        [
+          {
+            title:
+              store.statusLabel +
+              " · " +
+              store.district,
+            body:
+              "负责人 " +
+              store.manager +
+              " · Lv." +
+              store.level
+          },
+          {
+            title:
+              "今日营业额 " +
+              formatCompactMoney(
+                store.revenue
+              ),
+            body:
+              "今日利润 " +
+              formatCompactMoney(
+                store.profit
+              ) +
+              " · 满意度 " +
+              store.satisfaction +
+              "%"
+          }
+        ]
       );
     };
 
