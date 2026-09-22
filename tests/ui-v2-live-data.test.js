@@ -911,3 +911,51 @@ test("门店页按钮必须有可见响应而不是只派发无人消费事件",
     /"ui:storeOpen"|"ui:storeAction"/
   );
 });
+
+
+test("门店页不允许用disabled制造死按钮", () => {
+  const bindingSource =
+    fs.readFileSync(
+      new URL(
+        "../src/ui-v2/runtime/LiveUiBinding.js",
+        import.meta.url
+      ),
+      "utf8"
+    );
+
+  const cssSource =
+    fs.readFileSync(
+      new URL(
+        "../src/ui-v2/pages/store/store-frame.css",
+        import.meta.url
+      ),
+      "utf8"
+    );
+
+  const storeSection =
+    bindingSource.slice(
+      bindingSource.indexOf(
+        "function bindStoreFrameLive"
+      )
+    );
+
+  assert.doesNotMatch(
+    storeSection,
+    /button\.disabled\s*=/
+  );
+
+  assert.match(
+    storeSection,
+    /请先开设门店/
+  );
+
+  assert.match(
+    cssSource,
+    /data-store-layout="empty".*ui-v2-store-frame__filters/s
+  );
+
+  assert.match(
+    cssSource,
+    /touch-action:\s*manipulation/
+  );
+});
