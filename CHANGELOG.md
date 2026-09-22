@@ -9,8 +9,8 @@
 - 新增独立场景测试壳：6张桌、厨师、服务员、收银员、持续客流、1x/2x/4x速度、手动加顾客以及实时营业统计；该画面仅用于场景底层实机验证，不作为正式 UI。
 - 新增 scene-runtime 自动测试与 A* 寻路回归测试。
 - 新增独立 Android 场景测试工程和 GitHub Actions 构建流程，产出 restaurant-scene-playtest-apk 测试 APK 与浏览器测试包；生产底层与测试壳保持目录隔离。
-
-# Changelog
+- 清理单店重构遗漏：LeaseSystem 去除连锁区域校验，OperatingCycleSystem 去除连锁每日处理，不再保留已删除 ChainSystem 的断引用。
+- 修正场景 APK 流水线的 Android SDK 安装方式，直接使用 GitHub Runner 自带 sdkmanager，不再请求已下架的 legacy tools 包。
 
 ## 0.10.0 - 2026-09-22
 
