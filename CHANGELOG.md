@@ -2,6 +2,12 @@
 
 ## 0.9.4 - 2026-09-21
 
+- 门店页统一为单一StoreFrame自适应结构，不再拆“集团视角/单店视角”两套页面；根据真实门店数量自动进入0店空状态、1店大号主门店卡、2店及以上横向多门店列表。
+- 门店经营概况改为统一展示今日营业额、今日利润、营业门店数与平均满意度；今日待办和门店管理功能在三种门店数量状态下完全共用。
+- buildStoreModel新增displayMode正式字段，LiveUiBinding只维护一个门店入口并负责empty/single/multi布局切换；单店状态自动关闭无意义筛选，多店状态恢复四类筛选。
+- 增加0/1/多店模式回归测试，并锁定门店页不得重新出现“集团视角/单店视角”双入口。
+
+
 - 正式开始门店管理页第一步：新增StoreFrame与独立store-frame.css，页面固定为门店Hero、四项概况、状态筛选、旗下门店、今日待办、四个管理功能和正式0门店空状态。
 - 新增buildStoreModel实时模型：直接读取RestaurantSystem、PropertySystem、DistrictSystem和当日FinanceTransaction，统一派生营业中/筹备中/异常状态、门店位置、当日营收利润、满意度与待办，不写死演示门店数据。
 - 底部“门店”导航从临时弹窗升级为真正一级页面；AndroidBootstrap新增城市/门店页面生命周期管理，切换时销毁旧Frame与LiveBinding，避免双入口和重复监听。
