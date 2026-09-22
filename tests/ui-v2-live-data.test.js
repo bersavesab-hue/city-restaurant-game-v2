@@ -854,7 +854,12 @@ test("门店卡升级为参考稿式图片卡并保留唯一自适应入口", ()
 
   assert.match(
     bindingSource,
-    /ui:storeOpen/
+    /data-store-card-open/
+  );
+
+  assert.doesNotMatch(
+    bindingSource,
+    /"ui:storeOpen"/
   );
 
   assert.match(
