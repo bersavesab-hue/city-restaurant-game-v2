@@ -543,7 +543,8 @@ function buildHomeDashboardModel(
       }),
 
     schedule:
-      buildSchedule(time)  };
+      buildSchedule(time)
+  };
 }
 
 export {
