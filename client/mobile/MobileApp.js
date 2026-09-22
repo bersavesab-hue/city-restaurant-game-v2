@@ -10,6 +10,10 @@ import {
   ensureUiPlaytestSeed
 } from "./DemoSeed.js";
 
+import {
+  createDevToolkit
+} from "./DevToolkit.js";
+
 ensureUiPlaytestSeed(app);
 
 const root =
@@ -29,6 +33,19 @@ const NAV_ITEMS = [
   ["staff", "员工", "♟"],
   ["more", "更多", "•••"]
 ];
+
+// Development-only switch. Set to false for production releases.
+const DEV_MODE = true;
+
+const devToolkit = DEV_MODE
+  ? createDevToolkit({
+      app,
+      root,
+      sheetRoot,
+      allowedPages: NAV_ITEMS.map(([id]) => id),
+      getActivePage: () => activePage
+    })
+  : null;
 
 function money(value) {
   return (
@@ -551,6 +568,7 @@ function render() {
   `;
 
   bindEvents();
+  devToolkit?.afterRender();
 }
 
 function bindEvents() {
@@ -704,9 +722,12 @@ function openSheet(type) {
         "click",
         () => {
           sheetRoot.innerHTML = "";
+          devToolkit?.afterRender();
         }
       );
     });
+
+  devToolkit?.afterRender();
 }
 
 setInterval(
