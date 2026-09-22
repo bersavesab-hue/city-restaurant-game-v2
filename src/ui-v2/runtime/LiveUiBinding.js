@@ -2234,6 +2234,11 @@ function bindStoreFrameLive(
         );
       }
 
+      list?.removeEventListener(
+        "click",
+        onStoreCardClick
+      );
+
       dialogCloseButton
         ?.removeEventListener(
           "click",
