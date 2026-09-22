@@ -70,6 +70,16 @@ test(
       mobileApp,
       /class="home-metric-grid home-metric-overlay"/
     );
+
+    assert.match(
+      mobileApp,
+      /class="hero-static-scene"/
+    );
+
+    assert.doesNotMatch(
+      mobileApp,
+      /scene-speed|character chef|character server|steam-a|flame/
+    );
   }
 );
 
@@ -109,6 +119,11 @@ test(
     assert.doesNotMatch(
       css,
       /\.speed-bar\s*\{/
+    );
+
+    assert.doesNotMatch(
+      css,
+      /@keyframes (flame|steam|cook-arm|chef-bob|guest-breathe|server-loop|light-breathe)/
     );
   }
 );
