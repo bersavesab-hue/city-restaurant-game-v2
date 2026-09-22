@@ -14,6 +14,12 @@ import {
   createDevToolkit
 } from "./DevToolkit.js";
 
+import {
+  renderActionGrid,
+  renderListCardRows,
+  renderSegmentTabs
+} from "./UiPrimitives.js";
+
 ensureUiPlaytestSeed(app);
 
 const root =
@@ -369,13 +375,10 @@ function renderBusiness() {
     </header>
 
     <div class="page-scroll compact-page">
-      <div class="segment-tabs">
-        <button class="is-active">菜单</button>
-        <button>采购</button>
-        <button>库存</button>
-        <button>商圈</button>
-        <button>营销</button>
-      </div>
+      ${renderSegmentTabs(
+        ["菜单", "采购", "库存", "商圈", "营销"],
+        { componentId: "business-tabs" }
+      )}
 
       <section class="feature-card management-hero">
         <span class="eyebrow">经营概况</span>
@@ -402,12 +405,15 @@ function renderBusiness() {
         </div>
       </section>
 
-      <section class="list-card">
-        <button><span>菜单与定价</span><b>统一管理 ›</b></button>
-        <button><span>供应商与采购</span><b>统一管理 ›</b></button>
-        <button><span>库存与损耗</span><b>统一管理 ›</b></button>
-        <button><span>商圈与客流</span><b>统一管理 ›</b></button>
-      </section>
+      ${renderListCardRows(
+        [
+          { label: "菜单与定价", value: "统一管理 ›" },
+          { label: "供应商与采购", value: "统一管理 ›" },
+          { label: "库存与损耗", value: "统一管理 ›" },
+          { label: "商圈与客流", value: "统一管理 ›" }
+        ],
+        { componentId: "business-list" }
+      )}
     </div>
   `;
 }
@@ -437,12 +443,10 @@ function renderStaff() {
     </header>
 
     <div class="page-scroll compact-page">
-      <div class="segment-tabs">
-        <button class="is-active">在职</button>
-        <button>招聘</button>
-        <button>排班</button>
-        <button>培训</button>
-      </div>
+      ${renderSegmentTabs(
+        ["在职", "招聘", "排班", "培训"],
+        { componentId: "staff-tabs" }
+      )}
 
       <section class="staff-list">
         ${employees.map(
@@ -475,12 +479,10 @@ function renderResearch() {
     </header>
 
     <div class="page-scroll compact-page">
-      <div class="segment-tabs">
-        <button class="is-active">研发</button>
-        <button>配方</button>
-        <button>菜品成长</button>
-        <button>菜单策略</button>
-      </div>
+      ${renderSegmentTabs(
+        ["研发", "配方", "菜品成长", "菜单策略"],
+        { componentId: "research-tabs" }
+      )}
 
       <section class="feature-card research-hero">
         <span class="eyebrow">研发工作台</span>
@@ -488,24 +490,15 @@ function renderResearch() {
         <p>后续正式美术只需要设计这一套研发框架，不再为每个细分功能单独制作页面。</p>
       </section>
 
-      <section class="research-grid">
-        <button>
-          <b>自研菜品</b>
-          <span>从食材与工艺开始研发</span>
-        </button>
-        <button>
-          <b>标准配方</b>
-          <span>查看与调整现有配方</span>
-        </button>
-        <button>
-          <b>菜品升级</b>
-          <span>品质、熟练度与招牌化</span>
-        </button>
-        <button>
-          <b>菜单策略</b>
-          <span>上架、下架与价格组合</span>
-        </button>
-      </section>
+      ${renderActionGrid(
+        [
+          { title: "自研菜品", detail: "从食材与工艺开始研发" },
+          { title: "标准配方", detail: "查看与调整现有配方" },
+          { title: "菜品升级", detail: "品质、熟练度与招牌化" },
+          { title: "菜单策略", detail: "上架、下架与价格组合" }
+        ],
+        { componentId: "research-actions" }
+      )}
     </div>
   `;
 }
@@ -525,14 +518,17 @@ function renderMore() {
     </header>
 
     <div class="page-scroll compact-page">
-      <section class="list-card">
-        <button><span>财务</span><b>${money(model.money.balance)} ›</b></button>
-        <button><span>会员体系</span><b>查看 ›</b></button>
-        <button><span>评价与口碑</span><b>★ ${model.restaurant.reviewScore.toFixed(1)} ›</b></button>
-        <button><span>排行榜与颁奖</span><b>查看 ›</b></button>
-        <button><span>任务与成就</span><b>查看 ›</b></button>
-        <button><span>设置</span><b>›</b></button>
-      </section>
+      ${renderListCardRows(
+        [
+          { label: "财务", value: `${money(model.money.balance)} ›` },
+          { label: "会员体系", value: "查看 ›" },
+          { label: "评价与口碑", value: `★ ${model.restaurant.reviewScore.toFixed(1)} ›` },
+          { label: "排行榜与颁奖", value: "查看 ›" },
+          { label: "任务与成就", value: "查看 ›" },
+          { label: "设置", value: "›" }
+        ],
+        { componentId: "more-list" }
+      )}
     </div>
   `;
 }
