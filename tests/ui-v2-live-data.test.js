@@ -695,3 +695,120 @@ test("门店管理模型区分营业筹备和异常状态", () => {
     1
   );
 });
+
+
+test("门店统一页面按0/1/多店自动切换", () => {
+  const makeApp =
+    restaurants => ({
+      systems: {
+        restaurantSystem: {
+          list() {
+            return restaurants;
+          }
+        },
+        propertySystem: {
+          get() {
+            return null;
+          }
+        },
+        districtSystem: {
+          get() {
+            return null;
+          }
+        }
+      },
+      core: {
+        gameState: {
+          getSection() {
+            return {day: 1};
+          }
+        },
+        entitySystem: {
+          list() {
+            return [];
+          }
+        }
+      }
+    });
+
+  assert.equal(
+    buildStoreModel(
+      makeApp([])
+    ).displayMode,
+    "empty"
+  );
+
+  assert.equal(
+    buildStoreModel(
+      makeApp([
+        {
+          id: "single",
+          name: "唯一门店",
+          status: "open",
+          firstOpenedAt: 1,
+          customerSatisfaction: 90,
+          level: 1,
+          locationId: null
+        }
+      ])
+    ).displayMode,
+    "single"
+  );
+
+  assert.equal(
+    buildStoreModel(
+      makeApp([
+        {
+          id: "a",
+          name: "甲店",
+          status: "open",
+          firstOpenedAt: 1,
+          customerSatisfaction: 90,
+          level: 1,
+          locationId: null
+        },
+        {
+          id: "b",
+          name: "乙店",
+          status: "closed",
+          firstOpenedAt: null,
+          customerSatisfaction: 80,
+          level: 1,
+          locationId: null
+        }
+      ])
+    ).displayMode,
+    "multi"
+  );
+});
+
+test("门店页只保留一个StoreFrame并含单店和多店自适应槽位", () => {
+  const source =
+    fs.readFileSync(
+      new URL(
+        "../src/ui-v2/pages/store/StoreFrame.js",
+        import.meta.url
+      ),
+      "utf8"
+    );
+
+  assert.match(
+    source,
+    /data-store-layout="empty"/
+  );
+
+  assert.match(
+    source,
+    /data-store-list/
+  );
+
+  assert.match(
+    source,
+    /\+ 新开门店/
+  );
+
+  assert.doesNotMatch(
+    source,
+    /集团视角|单店视角/
+  );
+});
