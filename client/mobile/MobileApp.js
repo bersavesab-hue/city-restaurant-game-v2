@@ -583,6 +583,7 @@ function bindEvents() {
           render();
         }
       );
+      button.dataset.devBound = "click";
     });
 
   root
@@ -603,6 +604,7 @@ function bindEvents() {
           render();
         }
       );
+      button.dataset.devBound = "click";
     });
 
   root
@@ -615,6 +617,7 @@ function bindEvents() {
           render();
         }
       );
+      button.dataset.devBound = "click";
     });
 
   root
@@ -632,6 +635,7 @@ function bindEvents() {
           render();
         }
       );
+      button.dataset.devBound = "click";
     });
 
   root
@@ -644,6 +648,7 @@ function bindEvents() {
             button.dataset.openSheet
           )
       );
+      button.dataset.devBound = "click";
     });
 }
 
@@ -725,6 +730,7 @@ function openSheet(type) {
           devToolkit?.afterRender();
         }
       );
+      node.dataset.devBound = "click";
     });
 
   devToolkit?.afterRender();
