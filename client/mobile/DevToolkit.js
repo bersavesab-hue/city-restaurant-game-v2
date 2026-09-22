@@ -258,6 +258,15 @@ export function auditUi({
         height: image.naturalHeight,
         ok: image.naturalWidth > 0
       })),
+    components: Object.entries(
+      nodes
+        .filter(node => node?.dataset?.uiComponent)
+        .reduce((result, node) => {
+          const key = node.dataset.uiComponent;
+          result[key] = (result[key] || 0) + 1;
+          return result;
+        }, {})
+    ).map(([id, count]) => ({ id, count })),
     issues
   };
 }
@@ -419,6 +428,35 @@ export function createDevToolkit({
     `).join("");
   }
 
+  function assetsMarkup(report) {
+    const assets = report?.assets || [];
+    if (!assets.length) {
+      return '<div class="dev-empty">当前页面没有 img 素材。CSS 场景元素不会误报为图片资源。</div>';
+    }
+
+    return assets.map(item => `
+      <article class="dev-binding">
+        <strong>${item.ok ? "正常" : "缺失"}</strong>
+        <span>${item.width}×${item.height}</span>
+        <small>${item.src}</small>
+      </article>
+    `).join("");
+  }
+
+  function componentsMarkup(report) {
+    const components = report?.components || [];
+    if (!components.length) {
+      return '<div class="dev-empty">当前页面还没有登记 data-ui-component 组件。</div>';
+    }
+
+    return components.map(item => `
+      <article class="dev-binding">
+        <strong>${item.id}</strong>
+        <span>实例 × ${item.count}</span>
+      </article>
+    `).join("");
+  }
+
   function editorMarkup() {
     const info = selectedInfo();
     if (!info) {
@@ -490,7 +528,8 @@ export function createDevToolkit({
           <nav class="ui-dev-tabs">
             <button class="${state.tab === "audit" ? "is-active" : ""}" data-dev-tab="audit">体检</button>
             <button class="${state.tab === "editor" ? "is-active" : ""}" data-dev-tab="editor">UI编辑</button>
-            <button class="${state.tab === "bindings" ? "is-active" : ""}" data-dev-tab="bindings">数据绑定</button>
+            <button class="${state.tab === "bindings" ? "is-active" : ""}" data-dev-tab="bindings">数据</button>
+            <button class="${state.tab === "assets" ? "is-active" : ""}" data-dev-tab="assets">素材</button>
             <button class="${state.tab === "export" ? "is-active" : ""}" data-dev-tab="export">配置</button>
           </nav>
 
@@ -519,7 +558,16 @@ export function createDevToolkit({
               <div class="dev-bindings">${bindingsMarkup(report)}</div>
             ` : ""}
 
+            ${state.tab === "assets" ? `
+              <div class="dev-toolbar">
+                <button type="button" data-dev-audit>刷新素材</button>
+              </div>
+              <div class="dev-bindings">${assetsMarkup(report)}</div>
+            ` : ""}
+
             ${state.tab === "export" ? `
+              <p class="dev-help">已登记组件</p>
+              <div class="dev-bindings dev-component-list">${componentsMarkup(report)}</div>
               <p class="dev-help">这里保存的是开发期 UI 覆盖配置。正式发布前可以关闭 DEV_MODE，玩家不会看到工具箱。</p>
               <textarea data-dev-export spellcheck="false">${JSON.stringify(state.overrides, null, 2)}</textarea>
               <div class="dev-toolbar">
@@ -592,10 +640,25 @@ export function createDevToolkit({
     host.querySelector("[data-dev-copy]")?.addEventListener("click", exportJson);
 
     host.querySelector("[data-dev-clear]")?.addEventListener("click", () => {
+      const candidates = [
+        ...root.querySelectorAll("[data-dev-id]"),
+        ...sheetRoot.querySelectorAll("[data-dev-id]")
+      ];
+
+      for (const [id, styles] of Object.entries(state.overrides)) {
+        const node = candidates.find(item => item.dataset.devId === id);
+        if (!node) continue;
+
+        for (const key of Object.keys(styles)) {
+          node.style.removeProperty(
+            key.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`)
+          );
+        }
+      }
+
       state.overrides = {};
       writeOverrides({});
       afterRender();
-      renderPanel();
     });
 
     host.querySelectorAll("[data-dev-jump]").forEach(button => {
