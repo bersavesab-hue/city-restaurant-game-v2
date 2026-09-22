@@ -69,7 +69,7 @@
 
 .ui-dev-summary {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 7px;
   padding: 10px 12px;
   background: #131419;
@@ -99,7 +99,7 @@
 
 .ui-dev-tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   padding: 0 10px;
   border-bottom: 1px solid #292b31;
   background: #17181d;
