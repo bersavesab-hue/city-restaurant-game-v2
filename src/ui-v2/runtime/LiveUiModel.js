@@ -1711,7 +1711,15 @@ function buildStoreModel(
       0
     );
 
+  const displayMode =
+    stores.length === 0
+      ? "empty"
+      : stores.length === 1
+        ? "single"
+        : "multi";
+
   return {
+    displayMode,
     counts: {
       all:
         stores.length,
