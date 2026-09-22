@@ -26,7 +26,7 @@ const STORE_ACTIONS =
     Object.freeze({
       id: "opening",
       title: "开店准备",
-      subtitle: "推进新店筹备流程"
+      subtitle: "选址、装修与开业筹备"
     })
   ]);
 
@@ -41,7 +41,7 @@ function renderStoreFilters() {
         '">' +
         '<strong>' +
         filter.label +
-        '(<span data-live="store-filter-' +
+        ' (<span data-live="store-filter-' +
         filter.id +
         '">0</span>)</strong>' +
         '</button>'
@@ -69,36 +69,41 @@ function renderStoreActions() {
 
 function renderStoreFrame() {
   return (
-    '<div class="ui-v2-store-frame" data-ui="store-frame">' +
+    '<div class="ui-v2-store-frame" data-ui="store-frame" data-store-layout="empty">' +
       '<section class="ui-v2-store-frame__hero">' +
         '<div class="ui-v2-store-frame__hero-art" aria-hidden="true"></div>' +
         '<div class="ui-v2-store-frame__hero-copy">' +
           '<h1>门店管理</h1>' +
-          '<p>统筹旗下门店，掌握经营状态</p>' +
+          '<p>经营门店 · 扩大规模 · 打造人气餐饮品牌</p>' +
         '</div>' +
       '</section>' +
 
-      '<section class="ui-v2-store-frame__summary" aria-label="门店概况">' +
-        '<article><small>门店总数</small><strong data-live="store-total">0</strong><em>家</em></article>' +
-        '<article><small>营业中</small><strong data-live="store-open">0</strong><em>家</em></article>' +
-        '<article><small>筹备中</small><strong data-live="store-preparing">0</strong><em>家</em></article>' +
-        '<article><small>异常</small><strong data-live="store-abnormal">0</strong><em>家</em></article>' +
-      '</section>' +
-
-      '<section class="ui-v2-store-frame__filters" role="tablist" aria-label="门店筛选">' +
-        renderStoreFilters() +
+      '<section class="ui-v2-store-frame__summary" aria-label="门店经营概况">' +
+        '<article><small>今日营业额</small><strong data-live="store-revenue">¥0</strong></article>' +
+        '<article><small>今日利润</small><strong data-live="store-profit">¥0</strong></article>' +
+        '<article><small>营业门店</small><strong data-live="store-open">0</strong><em>家</em></article>' +
+        '<article><small>顾客满意度</small><strong data-live="store-satisfaction">0%</strong></article>' +
       '</section>' +
 
       '<section class="ui-v2-store-frame__stores">' +
         '<header>' +
-          '<div><h2>旗下门店</h2><p data-live="store-overview">当前暂无门店</p></div>' +
-          '<span data-live="store-capacity">0 家</span>' +
+          '<div>' +
+            '<h2>旗下门店 <span data-live="store-heading-count">(0)</span></h2>' +
+            '<p data-live="store-overview">当前暂无门店</p>' +
+          '</div>' +
+          '<button class="ui-v2-store-frame__new-store" type="button" data-store-action="opening">+ 新开门店</button>' +
         '</header>' +
+
+        '<div class="ui-v2-store-frame__filters" role="tablist" aria-label="门店筛选">' +
+          renderStoreFilters() +
+        '</div>' +
+
         '<div class="ui-v2-store-frame__store-list" data-store-list></div>' +
+
         '<div class="ui-v2-store-frame__empty" data-store-empty>' +
           '<span class="ui-v2-store-frame__empty-icon" aria-hidden="true"></span>' +
-          '<strong>尚未开设门店</strong>' +
-          '<p>先在城市地图选择商圈与房源，再开始第一家门店的筹备。</p>' +
+          '<strong>开设第一家门店</strong>' +
+          '<p>从城市地图选择商圈与房源，开始你的第一家餐厅。</p>' +
           '<button type="button" data-store-action="go-city">前往城市选址</button>' +
         '</div>' +
       '</section>' +
@@ -111,7 +116,7 @@ function renderStoreFrame() {
       '</section>' +
 
       '<section class="ui-v2-store-frame__actions">' +
-        '<header><h2>门店管理</h2><p>门店开设后逐步开放管理功能</p></header>' +
+        '<header><h2>门店管理功能</h2><p>统一入口，随门店状态自动开放</p></header>' +
         '<div class="ui-v2-store-frame__action-grid">' +
           renderStoreActions() +
         '</div>' +
