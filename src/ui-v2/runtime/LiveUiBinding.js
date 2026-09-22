@@ -1891,9 +1891,13 @@ function bindStoreFrameLive(
         id === activeFilter
       );
 
-      button.disabled =
-        model.displayMode !==
-        "multi";
+      button.setAttribute(
+        "aria-disabled",
+        String(
+          model.displayMode !==
+          "multi"
+        )
+      );
     }
 
     const hasStores =
@@ -1913,13 +1917,13 @@ function bindStoreFrameLive(
         ".ui-v2-store-frame__action[data-store-action]"
       )
     ) {
-      const action =
-        button.dataset.storeAction;
-
-      button.disabled =
-        !hasStores &&
-        action !==
-          "opening";
+      button.removeAttribute(
+        "disabled"
+      );
+      button.setAttribute(
+        "aria-disabled",
+        "false"
+      );
     }
   };
 
@@ -2082,6 +2086,31 @@ function bindStoreFrameLive(
               store.manager
           })
         );
+
+      if (
+        model.stores.length === 0 &&
+        (
+          action === "renovation" ||
+          action === "equipment" ||
+          action === "lease"
+        )
+      ) {
+        openDialog(
+          action === "renovation"
+            ? "装修布局"
+            : action === "equipment"
+              ? "门店设施"
+              : "租约管理",
+          [
+            {
+              title: "请先开设门店",
+              body:
+                "当前还没有门店。点击“新开门店”前往城市选址并完成开店筹备。"
+            }
+          ]
+        );
+        return;
+      }
 
       if (action === "overview") {
         showOverview();
