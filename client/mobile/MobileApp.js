@@ -87,68 +87,109 @@ function sceneMarkup(model) {
 
   return `
     <section
-      class="micro-scene mood-${scene.mood}"
-      data-scene
+      class="home-hero-shell"
       data-ui-component="home-hero-scene"
-      aria-label="门店微动态场景"
+      aria-label="门店主页主视觉"
     >
-      <div class="scene-light scene-light-a"></div>
-      <div class="scene-light scene-light-b"></div>
+      <div
+        class="micro-scene mood-${scene.mood}"
+        data-scene
+      >
+        <div class="scene-light scene-light-a"></div>
+        <div class="scene-light scene-light-b"></div>
 
-      <div class="scene-back-wall">
-        <div class="scene-sign">
-          <strong>${model.restaurant.name}</strong>
-          <small>认真经营 · 用心待客</small>
+        <div class="scene-back-wall">
+          <div class="scene-sign">
+            <strong>${model.restaurant.name}</strong>
+            <small>认真经营 · 用心待客</small>
+          </div>
+        </div>
+
+        <div class="scene-kitchen">
+          <div class="stove">
+            <span class="flame"></span>
+            <span class="steam steam-a"></span>
+            <span class="steam steam-b"></span>
+          </div>
+
+          <div class="character chef ${scene.chefActive ? "is-active" : "is-off"}">
+            <span class="head"></span>
+            <span class="hat"></span>
+            <span class="body"></span>
+            <span class="arm"></span>
+          </div>
+        </div>
+
+        <div class="scene-floor">
+          <div class="table table-left">
+            <span class="plate"></span>
+            <span class="plate plate-b"></span>
+          </div>
+
+          <div class="table table-right">
+            <span class="plate"></span>
+            <span class="cup"></span>
+          </div>
+
+          <div class="character guest guest-a">
+            <span class="head"></span>
+            <span class="body"></span>
+          </div>
+
+          <div class="character guest guest-b">
+            <span class="head"></span>
+            <span class="body"></span>
+          </div>
+
+          <div class="character server ${scene.serverActive ? "is-active" : "is-off"}">
+            <span class="head"></span>
+            <span class="body"></span>
+            <span class="tray"></span>
+          </div>
+
+          <div class="scene-plant"></div>
+          <div class="scene-window"></div>
         </div>
       </div>
 
-      <div class="scene-kitchen">
-        <div class="stove">
-          <span class="flame"></span>
-          <span class="steam steam-a"></span>
-          <span class="steam steam-b"></span>
+      <header
+        class="home-hud home-hud-overlay"
+        data-ui-component="home-top-hud"
+      >
+        <div class="hud-card hud-day">
+          <small>经营日</small>
+          <strong>第 ${model.time.day} 天</strong>
         </div>
 
-        <div class="character chef ${scene.chefActive ? "is-active" : "is-off"}">
-          <span class="head"></span>
-          <span class="hat"></span>
-          <span class="body"></span>
-          <span class="arm"></span>
-        </div>
-      </div>
-
-      <div class="scene-floor">
-        <div class="table table-left">
-          <span class="plate"></span>
-          <span class="plate plate-b"></span>
+        <div class="hud-card hud-clock">
+          <small>时间</small>
+          <strong data-bind="clock">${model.time.clock}</strong>
         </div>
 
-        <div class="table table-right">
-          <span class="plate"></span>
-          <span class="cup"></span>
+        <div class="hud-card hud-money">
+          <small>资金</small>
+          <strong data-bind="balance">${money(model.money.balance)}</strong>
         </div>
 
-        <div class="character guest guest-a">
-          <span class="head"></span>
-          <span class="body"></span>
+        <div class="hud-card hud-rating">
+          <small>星级评价</small>
+          <strong>★ ${model.restaurant.reviewScore.toFixed(1)}</strong>
         </div>
 
-        <div class="character guest guest-b">
-          <span class="head"></span>
-          <span class="body"></span>
+        <div class="hud-card hud-level">
+          <small>Lv.${model.restaurant.level}</small>
+          <strong>${model.restaurant.title}</strong>
         </div>
 
-        <div class="character server ${scene.serverActive ? "is-active" : "is-off"}">
-          <span class="head"></span>
-          <span class="body"></span>
-          <span class="tray"></span>
-        </div>
+        <button
+          class="hud-settings"
+          type="button"
+          data-nav="more"
+          aria-label="设置"
+        >⚙</button>
+      </header>
 
-        <div class="scene-plant"></div>
-        <div class="scene-window"></div>
-      </div>
-
-      <div class="scene-overlay">
+      <div class="hero-control-strip">
         <span class="scene-state">
           <i></i>
           ${model.restaurant.status === "open" ? "营业中" : "已打烊"}
@@ -181,6 +222,46 @@ function sceneMarkup(model) {
           装修
         </button>
       </div>
+
+      <section
+        class="home-metric-grid home-metric-overlay"
+        data-ui-component="home-metrics"
+      >
+        <article class="home-metric-card revenue">
+          <span class="metric-symbol">¥</span>
+          <div>
+            <small>今日营业额</small>
+            <strong data-bind="todayRevenue">${money(model.money.todayRevenue)}</strong>
+          </div>
+        </article>
+
+        <article class="home-metric-card profit">
+          <span class="metric-symbol">↗</span>
+          <div>
+            <small>今日利润</small>
+            <strong
+              class="${model.money.todayProfit >= 0 ? "positive" : "negative"}"
+              data-bind="todayProfit"
+            >${money(model.money.todayProfit)}</strong>
+          </div>
+        </article>
+
+        <article class="home-metric-card satisfaction">
+          <span class="metric-symbol">☺</span>
+          <div>
+            <small>满意度</small>
+            <strong>${Math.round(model.restaurant.satisfaction)}%</strong>
+          </div>
+        </article>
+
+        <article class="home-metric-card staff">
+          <span class="metric-symbol">人</span>
+          <div>
+            <small>在岗员工</small>
+            <strong>${model.operations.employees}</strong>
+          </div>
+        </article>
+      </section>
     </section>
   `;
 }
@@ -241,85 +322,9 @@ function renderStore() {
         ];
 
   return `
-    <header
-      class="home-hud"
-      data-ui-component="home-top-hud"
-    >
-      <div class="hud-card hud-day">
-        <small>经营日</small>
-        <strong>第 ${model.time.day} 天</strong>
-      </div>
-
-      <div class="hud-card hud-clock">
-        <small>时间</small>
-        <strong data-bind="clock">${model.time.clock}</strong>
-      </div>
-
-      <div class="hud-card hud-money">
-        <small>资金</small>
-        <strong data-bind="balance">${money(model.money.balance)}</strong>
-      </div>
-
-      <div class="hud-card hud-rating">
-        <small>星级评价</small>
-        <strong>★ ${model.restaurant.reviewScore.toFixed(1)}</strong>
-      </div>
-
-      <div class="hud-card hud-level">
-        <small>Lv.${model.restaurant.level}</small>
-        <strong>${model.restaurant.title}</strong>
-      </div>
-
-      <button
-        class="hud-settings"
-        type="button"
-        data-nav="more"
-        aria-label="设置"
-      >⚙</button>
-    </header>
-
     <div class="page-scroll home-scroll">
       ${sceneMarkup(model)}
 
-      <section
-        class="home-metric-grid"
-        data-ui-component="home-metrics"
-      >
-        <article class="home-metric-card revenue">
-          <span class="metric-symbol">¥</span>
-          <div>
-            <small>今日营业额</small>
-            <strong data-bind="todayRevenue">${money(model.money.todayRevenue)}</strong>
-          </div>
-        </article>
-
-        <article class="home-metric-card profit">
-          <span class="metric-symbol">↗</span>
-          <div>
-            <small>今日利润</small>
-            <strong
-              class="${model.money.todayProfit >= 0 ? "positive" : "negative"}"
-              data-bind="todayProfit"
-            >${money(model.money.todayProfit)}</strong>
-          </div>
-        </article>
-
-        <article class="home-metric-card satisfaction">
-          <span class="metric-symbol">☺</span>
-          <div>
-            <small>满意度</small>
-            <strong>${Math.round(model.restaurant.satisfaction)}%</strong>
-          </div>
-        </article>
-
-        <article class="home-metric-card staff">
-          <span class="metric-symbol">人</span>
-          <div>
-            <small>在岗员工</small>
-            <strong>${model.operations.employees}</strong>
-          </div>
-        </article>
-      </section>
 
       <section
         class="home-opportunity ${model.opportunity.tone}"
