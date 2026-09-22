@@ -24,7 +24,8 @@ const styleSources =
     "src/ui-v2/tokens/tokens.css",
     "src/ui-v2/shell/app-shell.css",
     "src/ui-v2/components/components.css",
-    "src/ui-v2/pages/city/city-frame.css"
+    "src/ui-v2/pages/city/city-frame.css",
+    "src/ui-v2/pages/store/store-frame.css"
   ]);
 
 fs.rmSync(
@@ -136,6 +137,6 @@ fs.writeFileSync(
 );
 
 console.log(
-  "Android 864x1536 city UI and offline assets ready:",
+  "Android 864x1536 primary UI and offline assets ready:",
   outputDirectory
 );

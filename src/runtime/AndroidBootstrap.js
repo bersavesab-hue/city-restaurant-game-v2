@@ -11,9 +11,14 @@ import {
 } from "../ui-v2/pages/city/CityFrame.js";
 
 import {
+  mountStoreFrame
+} from "../ui-v2/pages/store/StoreFrame.js";
+
+import {
   bindGlobalHudLive,
   bindGlobalNavLive,
-  bindCityFrameLive
+  bindCityFrameLive,
+  bindStoreFrameLive
 } from "../ui-v2/runtime/LiveUiBinding.js";
 
 import {
@@ -39,28 +44,139 @@ const shell =
     root
   );
 
-const cityFrame =
-  mountCityFrame(
-    shell.pageRoot
+let activePage =
+  null;
+
+let pageFrame =
+  null;
+
+let pageLive =
+  null;
+
+let hudLive =
+  null;
+
+function setActiveNavigation(
+  destination
+) {
+  for (
+    const button
+    of root.querySelectorAll(
+      "[data-ui-destination]"
+    )
+  ) {
+    const isActive =
+      button.dataset
+        .uiDestination ===
+      destination;
+
+    button.classList
+      .toggle(
+        "is-active",
+        isActive
+      );
+
+    if (isActive) {
+      button.setAttribute(
+        "aria-current",
+        "page"
+      );
+    } else {
+      button.removeAttribute(
+        "aria-current"
+      );
+    }
+  }
+}
+
+function mountPrimaryPage(
+  destination
+) {
+  if (
+    destination !==
+      "city" &&
+    destination !==
+      "store"
+  ) {
+    pageLive
+      ?.openQuickPanel
+      ?.(
+        destination
+      );
+
+    return false;
+  }
+
+  if (
+    destination ===
+    activePage
+  ) {
+    return true;
+  }
+
+  pageLive?.destroy();
+  pageFrame?.destroy();
+
+  if (
+    destination ===
+    "store"
+  ) {
+    pageFrame =
+      mountStoreFrame(
+        shell.pageRoot
+      );
+
+    pageLive =
+      bindStoreFrameLive(
+        shell.pageRoot,
+        app,
+        mountPrimaryPage
+      );
+  } else {
+    pageFrame =
+      mountCityFrame(
+        shell.pageRoot
+      );
+
+    pageLive =
+      bindCityFrameLive(
+        shell.pageRoot,
+        app
+      );
+  }
+
+  activePage =
+    destination;
+
+  setActiveNavigation(
+    destination
   );
 
-const cityLive =
-  bindCityFrameLive(
-    shell.pageRoot,
-    app
-  );
+  hudLive?.refresh();
 
-const hudLive =
+  return true;
+}
+
+mountPrimaryPage(
+  "city"
+);
+
+hudLive =
   bindGlobalHudLive(
     root,
     app,
-    cityLive.openQuickPanel
+    kind =>
+      pageLive
+        ?.openQuickPanel
+        ?.(
+          kind
+        )
   );
 
 const navLive =
   bindGlobalNavLive(
     root,
-    cityLive.openQuickPanel
+    mountPrimaryPage
   );
 
 const simulationClock =
@@ -82,15 +198,20 @@ document.addEventListener(
 globalThis.__CITY_RESTAURANT_UI__ =
   Object.freeze({
     shell,
-    cityFrame,
     hudLive,
     navLive,
-    cityLive,
     simulationClock,
+
+    get activePage() {
+      return activePage;
+    },
+
+    navigate:
+      mountPrimaryPage,
 
     refresh() {
       hudLive.refresh();
-      cityLive.refresh();
+      pageLive?.refresh();
     },
 
     destroy() {
@@ -102,9 +223,9 @@ globalThis.__CITY_RESTAURANT_UI__ =
       );
 
       navLive.destroy();
-      cityLive.destroy();
+      pageLive?.destroy();
       hudLive.destroy();
-      cityFrame.destroy();
+      pageFrame?.destroy();
       shell.destroy();
     }
   });

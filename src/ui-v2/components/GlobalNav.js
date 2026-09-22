@@ -21,9 +21,13 @@ function renderGlobalNav() {
               item.id +
               '" data-ui-destination="' +
               item.id +
-              (item.id === "city"
-                ? '" aria-current="page">'
-                : '" aria-haspopup="dialog">') +
+              (
+                item.id === "city"
+                  ? '" aria-current="page">'
+                  : item.id === "store"
+                    ? '">'
+                    : '" aria-haspopup="dialog">'
+              ) +
               '<span class="ui-v2-nav__icon-slot" data-ui-box="nav-icon"></span>' +
               '<strong class="ui-v2-nav__label" data-ui-text="nav-label">' +
                 item.label +

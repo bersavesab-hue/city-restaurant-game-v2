@@ -5,7 +5,8 @@ import fs from "node:fs";
 import {
   formatCompactMoney,
   buildHudModel,
-  buildCityModel
+  buildCityModel,
+  buildStoreModel
 } from "../src/ui-v2/runtime/LiveUiModel.js";
 
 import {
@@ -542,5 +543,155 @@ test("城市页使用固态地图与双字指标标签", () => {
   assert.doesNotMatch(
     bindingSource,
     /mapScale|mapPanX|mapPanY|ResizeObserver/
+  );
+});
+
+
+test("门店管理模型支持0家门店正式空状态", () => {
+  const app = {
+    systems: {
+      restaurantSystem: {
+        list() {
+          return [];
+        }
+      },
+      propertySystem: {
+        get() {
+          return null;
+        }
+      },
+      districtSystem: {
+        get() {
+          return null;
+        }
+      }
+    },
+    core: {
+      gameState: {
+        getSection() {
+          return {
+            day: 1
+          };
+        }
+      },
+      entitySystem: {
+        list() {
+          return [];
+        }
+      }
+    }
+  };
+
+  const model =
+    buildStoreModel(
+      app
+    );
+
+  assert.deepEqual(
+    model.counts,
+    {
+      all: 0,
+      open: 0,
+      preparing: 0,
+      abnormal: 0
+    }
+  );
+
+  assert.equal(
+    model.stores.length,
+    0
+  );
+
+  assert.equal(
+    model.tasks.length,
+    0
+  );
+});
+
+test("门店管理模型区分营业筹备和异常状态", () => {
+  const restaurants = [
+    {
+      id: "a",
+      name: "甲店",
+      status: "open",
+      firstOpenedAt: 10,
+      customerSatisfaction: 88,
+      level: 2,
+      locationId: null
+    },
+    {
+      id: "b",
+      name: "乙店",
+      status: "closed",
+      firstOpenedAt: null,
+      customerSatisfaction: 50,
+      level: 1,
+      locationId: null
+    },
+    {
+      id: "c",
+      name: "丙店",
+      status: "paused",
+      firstOpenedAt: 20,
+      customerSatisfaction: 72,
+      level: 3,
+      locationId: null
+    }
+  ];
+
+  const app = {
+    systems: {
+      restaurantSystem: {
+        list() {
+          return restaurants;
+        }
+      },
+      propertySystem: {
+        get() {
+          return null;
+        }
+      },
+      districtSystem: {
+        get() {
+          return null;
+        }
+      }
+    },
+    core: {
+      gameState: {
+        getSection() {
+          return {
+            day: 1
+          };
+        }
+      },
+      entitySystem: {
+        list() {
+          return [];
+        }
+      }
+    }
+  };
+
+  const model =
+    buildStoreModel(
+      app
+    );
+
+  assert.equal(
+    model.counts.all,
+    3
+  );
+  assert.equal(
+    model.counts.open,
+    1
+  );
+  assert.equal(
+    model.counts.preparing,
+    1
+  );
+  assert.equal(
+    model.counts.abnormal,
+    1
   );
 });
