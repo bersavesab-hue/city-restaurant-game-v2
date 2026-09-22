@@ -20,6 +20,15 @@ const css =
     "utf8"
   );
 
+const androidActivity =
+  fs.readFileSync(
+    new URL(
+      "../mobile/android/app/src/main/java/com/cityrestaurant/mobileui/MainActivity.java",
+      import.meta.url
+    ),
+    "utf8"
+  );
+
 test(
   "home master keeps the approved reference-inspired module structure",
   () => {
@@ -100,6 +109,27 @@ test(
     assert.doesNotMatch(
       css,
       /\.speed-bar\s*\{/
+    );
+  }
+);
+
+
+test(
+  "home hero stays full-height on narrow phones and Android avoids system-bar overlap",
+  () => {
+    assert.doesNotMatch(
+      css,
+      /@media \(max-width: 370px\)[\s\S]*?\.micro-scene\s*\{[\s\S]*?height:\s*246px/
+    );
+
+    assert.doesNotMatch(
+      androidActivity,
+      /SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN/
+    );
+
+    assert.doesNotMatch(
+      androidActivity,
+      /SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION/
     );
   }
 );
