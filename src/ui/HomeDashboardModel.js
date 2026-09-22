@@ -236,7 +236,8 @@ function buildHomeDashboardModel(
     employeeSystem,
     storeProgressSystem,
     menuSystem,
-    renovationSystem
+    renovationSystem,
+    districtSystem
   } = app.systems;
 
   const time =
@@ -254,6 +255,33 @@ function buildHomeDashboardModel(
         formatClock(time)
     };
   }
+
+  const district =
+    safeCall(
+      () => {
+        if (
+          !districtSystem ||
+          !restaurant.locationId
+        ) {
+          return null;
+        }
+
+        const property =
+          entitySystem.get(
+            "property",
+            restaurant.locationId
+          );
+
+        if (!property?.districtId) {
+          return null;
+        }
+
+        return districtSystem.get(
+          property.districtId
+        );
+      },
+      null
+    );
 
   const balance =
     safeCall(
@@ -470,6 +498,47 @@ function buildHomeDashboardModel(
 
     progress,
     renovation,
+
+    district: district
+      ? {
+          id: district.id,
+          name: district.name,
+          trafficIndex:
+            Number(
+              district.trafficIndex ??
+              0
+            ),
+          spendingPower:
+            Number(
+              district.spendingPower ??
+              0
+            ),
+          competition:
+            Number(
+              district.competition ??
+              0
+            ),
+          deliveryDemand:
+            Number(
+              district.deliveryDemand ??
+              0
+            ),
+          rentMultiplier:
+            Number(
+              district.rentMultiplier ??
+              1
+            ),
+          opportunityScore:
+            safeCall(
+              () =>
+                districtSystem
+                  .getOpportunityScore(
+                    district
+                  ),
+              0
+            )
+        }
+      : null,
 
     opportunity,
 
