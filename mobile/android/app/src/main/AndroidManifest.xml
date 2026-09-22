@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
         android:allowBackup="false"
-        android:label="餐厅场景原型"
+        android:label="餐饮经营UI原型"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false">
         <activity

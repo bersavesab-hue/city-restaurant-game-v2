@@ -1,4 +1,4 @@
-package com.cityrestaurant.sceneplaytest;
+package com.cityrestaurant.mobileui;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -36,7 +36,7 @@ public final class MainActivity extends Activity {
         );
 
         webView.setBackgroundColor(
-            0xFF1F2428
+            0xFF17130F
         );
 
         setContentView(webView);

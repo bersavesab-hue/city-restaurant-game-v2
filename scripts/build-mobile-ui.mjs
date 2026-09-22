@@ -5,20 +5,20 @@ import {
   build
 } from "esbuild";
 
-const webOutput =
+const output =
   path.resolve(
-    "dist/scene-playtest"
+    "dist/mobile-ui"
   );
 
 const androidAssets =
   path.resolve(
-    "playtest/android/app/src/main/assets"
+    "mobile/android/app/src/main/assets"
   );
 
 for (
   const directory
   of [
-    webOutput,
+    output,
     androidAssets
   ]
 ) {
@@ -40,12 +40,12 @@ for (
 
 await build({
   entryPoints: [
-    "playtest/scene/ScenePlaytest.js"
+    "client/mobile/MobileApp.js"
   ],
   outfile:
     path.join(
-      webOutput,
-      "scene.js"
+      output,
+      "app.js"
     ),
   bundle: true,
   platform: "browser",
@@ -54,7 +54,7 @@ await build({
     "chrome100"
   ],
   sourcemap: false,
-  minify: false,
+  minify: true,
   logLevel: "info"
 });
 
@@ -62,23 +62,23 @@ for (
   const file
   of [
     "index.html",
-    "scene.css"
+    "app.css"
   ]
 ) {
   fs.copyFileSync(
     path.resolve(
-      "playtest/scene",
+      "client/mobile",
       file
     ),
     path.join(
-      webOutput,
+      output,
       file
     )
   );
 }
 
 fs.cpSync(
-  webOutput,
+  output,
   androidAssets,
   {
     recursive: true
@@ -86,11 +86,11 @@ fs.cpSync(
 );
 
 console.log(
-  "Scene playtest built:",
-  webOutput
+  "Mobile UI built:",
+  output
 );
 
 console.log(
-  "Android playtest assets built:",
+  "Android assets built:",
   androidAssets
 );

@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "RestaurantScenePlaytest"
+rootProject.name = "RestaurantMobileUI"
 include(":app")

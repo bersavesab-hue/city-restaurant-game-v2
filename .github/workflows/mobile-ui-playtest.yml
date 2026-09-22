@@ -1,4 +1,4 @@
-name: Scene Playtest APK
+name: Mobile UI Playtest
 
 on:
   push:
@@ -6,12 +6,13 @@ on:
       - main
     paths:
       - "src/**"
-      - "playtest/**"
-      - "tests/scene-runtime.test.js"
-      - "scripts/build-scene-playtest.mjs"
+      - "client/**"
+      - "mobile/**"
+      - "tests/ui-home-dashboard.test.js"
+      - "scripts/build-mobile-ui.mjs"
       - "package.json"
       - "package-lock.json"
-      - ".github/workflows/scene-playtest.yml"
+      - ".github/workflows/mobile-ui-playtest.yml"
   workflow_dispatch:
 
 permissions:
@@ -34,11 +35,11 @@ jobs:
       - name: Install JavaScript dependencies
         run: npm ci
 
-      - name: Test scene runtime
-        run: npm run test:scene
+      - name: Test home dashboard model
+        run: npm run test:ui
 
-      - name: Build scene web assets
-        run: npm run build:scene-playtest
+      - name: Build mobile UI
+        run: npm run build:mobile-ui
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -63,18 +64,18 @@ jobs:
           gradle-version: "8.9"
 
       - name: Build debug APK
-        run: gradle -p playtest/android :app:assembleDebug --stacktrace
+        run: gradle -p mobile/android :app:assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: restaurant-scene-playtest-apk
-          path: playtest/android/app/build/outputs/apk/debug/app-debug.apk
+          name: restaurant-mobile-ui-apk
+          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
-      - name: Upload browser playtest
+      - name: Upload browser UI
         uses: actions/upload-artifact@v4
         with:
-          name: restaurant-scene-playtest-web
-          path: dist/scene-playtest
+          name: restaurant-mobile-ui-web
+          path: dist/mobile-ui
           if-no-files-found: error
