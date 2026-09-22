@@ -35,7 +35,7 @@
     "test:phase3:longrun": "node scripts/phase3-longrun-gate.mjs",
     "test:phase3:performance": "node scripts/phase3-performance-gate.mjs",
     "test:save-compat": "node scripts/save-compatibility-gate.mjs",
-    "test:ui": "node --test tests/ui-home-dashboard.test.js tests/ui-primitives.test.js tests/ui-home-master-contract.test.js",
+    "test:ui": "node --test tests/ui-home-dashboard.test.js tests/ui-primitives.test.js tests/ui-home-master-contract.test.js tests/ui-dev-toolkit-contract.test.js",
     "build:mobile-ui": "node scripts/build-mobile-ui.mjs"
   },
   "devDependencies": {
