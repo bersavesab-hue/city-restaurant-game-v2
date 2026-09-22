@@ -51,12 +51,27 @@ test(
       mobileApp,
       /speed-bar/
     );
+
+    assert.match(
+      mobileApp,
+      /class="home-hud home-hud-overlay"/
+    );
+
+    assert.match(
+      mobileApp,
+      /class="home-metric-grid home-metric-overlay"/
+    );
   }
 );
 
 test(
   "home master CSS contains one responsive grid implementation",
   () => {
+    assert.match(
+      css,
+      /\.home-hero-shell\s*\{/
+    );
+
     assert.match(
       css,
       /\.home-hud\s*\{/
