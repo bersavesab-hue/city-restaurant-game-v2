@@ -78,7 +78,7 @@ function renderStoreFrame() {
         '</div>' +
       '</section>' +
 
-      '<section class="ui-v2-store-frame__summary" aria-label="门店经营概况">' +
+      '<section class="ui-v2-store-frame__summary-wrap"><header class="ui-v2-store-frame__section-head"><div><span class="ui-v2-store-frame__section-icon" aria-hidden="true"></span><h2>门店经营概况</h2></div><button type="button" data-store-action="overview">经营详情</button></header><section class="ui-v2-store-frame__summary" aria-label="门店经营概况">' +
         '<article><small>今日营业额</small><strong data-live="store-revenue">¥0</strong></article>' +
         '<article><small>今日利润</small><strong data-live="store-profit">¥0</strong></article>' +
         '<article><small>营业门店</small><strong data-live="store-open">0</strong><em>家</em></article>' +
