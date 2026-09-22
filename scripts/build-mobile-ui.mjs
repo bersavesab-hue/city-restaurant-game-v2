@@ -62,7 +62,8 @@ for (
   const file
   of [
     "index.html",
-    "app.css"
+    "app.css",
+    "devtools.css"
   ]
 ) {
   fs.copyFileSync(
