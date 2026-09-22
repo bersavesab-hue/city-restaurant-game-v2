@@ -12,10 +12,6 @@ import {
   PROPERTY_STATUS
 } from "./PropertySystem.js";
 
-import {
-  chainSystem
-} from "./ChainSystem.js";
-
 function requireRestaurant(id) {
   const restaurant =
     entitySystem.get("restaurant", id);
@@ -68,14 +64,7 @@ class LeaseSystem {
 
     const property =
       propertySystem.get(propertyId);
-
-    chainSystem
-      .validatePropertyRegion(
-        restaurantId,
-        propertyId
-      );
-
-    if (
+if (
       property.status !==
       PROPERTY_STATUS.AVAILABLE
     ) {
