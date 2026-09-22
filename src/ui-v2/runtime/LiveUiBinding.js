@@ -2117,7 +2117,19 @@ function bindStoreFrameLive(
           "租约管理",
           storeItems
         );
+        return;
       }
+
+      openDialog(
+        "门店管理",
+        [
+          {
+            title: "暂不可用",
+            body:
+              "该操作尚未接入正式门店功能。"
+          }
+        ]
+      );
     };
 
   for (
