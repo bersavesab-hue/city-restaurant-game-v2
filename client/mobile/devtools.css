@@ -6,8 +6,8 @@
 
 .ui-dev-fab {
   position: fixed;
-  top: max(10px, env(safe-area-inset-top));
-  right: 10px;
+  top: calc(max(10px, env(safe-area-inset-top)) + 72px);
+  right: 8px;
   z-index: 100002;
   min-width: 48px;
   height: 34px;
