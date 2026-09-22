@@ -1,4 +1,4 @@
-export const LATE_GAME_INVESTMENT_SCHEMA_VERSION = 1;
+export const LATE_GAME_INVESTMENT_SCHEMA_VERSION = 2;
 
 export const LATE_GAME_INVESTMENTS =
   Object.freeze([
@@ -23,26 +23,6 @@ export const LATE_GAME_INVESTMENTS =
         customerRecognitionRateBonus: 0.02,
         memberRetentionMultiplierBonus: 0.02,
         relationshipRiskGraceDays: 7
-      })
-    }),
-    Object.freeze({
-      id: "cold_chain_upgrade",
-      name: "冷链仓配升级",
-      requiredLevel: 9,
-      cost: 260000,
-      description: "中央厨房冷链升级，延长集中库存有效期。",
-      modifiers: Object.freeze({
-        centralKitchenShelfLifeMultiplier: 1.2
-      })
-    }),
-    Object.freeze({
-      id: "regional_brand_hq",
-      name: "区域品牌总部",
-      requiredLevel: 10,
-      cost: 480000,
-      description: "建立区域总部，降低后续进入新经营区的扩张成本。",
-      modifiers: Object.freeze({
-        regionUnlockCostMultiplier: 0.85
       })
     })
   ]);

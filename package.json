@@ -1,6 +1,6 @@
 {
   "name": "city-restaurant-game-v2",
-  "version": "0.9.4",
+  "version": "0.10.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,6 @@
     "stress": "node scripts/stress-longrun.mjs",
     "stress20": "node scripts/stress-20year.mjs",
     "aging": "node scripts/aging-performance.mjs",
-    "build:android-js": "node scripts/build-android-js.mjs",
     "test:data:ingredients": "node --test tests/ingredient-data-v1.test.js",
     "test:data:dishes": "node --test tests/formal-dish-recipe-data.test.js tests/formal-dish-growth-rules.test.js tests/dish-quality-semantics-integration.test.js tests/dish-rules.test.js tests/dish-catalog-schema.test.js tests/restaurant-dish-progress.test.js tests/dish-research.test.js tests/dish-growth.test.js tests/dish-lifecycle.test.js tests/dish-research-preview.test.js tests/cooking-flow.test.js tests/dish-management-system.test.js",
     "test:data:recipes": "node --test tests/formal-dish-recipe-data.test.js tests/cooking-method-recipe-schema.test.js tests/dish-research-preview.test.js tests/dish-research.test.js",
@@ -35,9 +34,7 @@
     "test:phase3:balance": "node scripts/phase3-balance-gate.mjs",
     "test:phase3:longrun": "node scripts/phase3-longrun-gate.mjs",
     "test:phase3:performance": "node scripts/phase3-performance-gate.mjs",
-    "test:save-compat": "node scripts/save-compatibility-gate.mjs",
-    "test:phase5:chain": "node scripts/chain-expansion-gate.mjs",
-    "test:ui-v2:framework": "node --test tests/ui-v2-framework.test.js tests/ui-v2-placement-lock.test.js tests/ui-v2-live-data.test.js"
+    "test:save-compat": "node scripts/save-compatibility-gate.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"

@@ -17,7 +17,6 @@ import { propertyVenueSystem } from "./systems/PropertyVenueSystem.js";
 import { priceHistorySystem } from "./systems/PriceHistorySystem.js";
 import { trafficDemandIntegrationSystem } from "./systems/TrafficDemandIntegrationSystem.js";
 import { supplierPriceIntegrationSystem } from "./systems/SupplierPriceIntegrationSystem.js";
-import { mapViewportSystem } from "./systems/MapViewportSystem.js";
 
 import { restaurantSystem } from "./systems/RestaurantSystem.js";
 import { openingFlowSystem } from "./systems/OpeningFlowSystem.js";
@@ -32,7 +31,6 @@ import { employeeCareerSystem } from "./systems/EmployeeCareerSystem.js";
 import { employeeDynamicsSystem } from "./systems/EmployeeDynamicsSystem.js";
 import { staffingRecommendationSystem } from "./systems/StaffingRecommendationSystem.js";
 import { storeProgressSystem } from "./systems/StoreProgressSystem.js";
-import { chainSystem } from "./systems/ChainSystem.js";
 import { lateGameInvestmentSystem } from "./systems/LateGameInvestmentSystem.js";
 import { onboardingSystem } from "./systems/OnboardingSystem.js";
 import { operatingAdvisorSystem } from "./systems/OperatingAdvisorSystem.js";
@@ -129,7 +127,6 @@ function bootstrap() {
       priceHistorySystem,
       trafficDemandIntegrationSystem,
       supplierPriceIntegrationSystem,
-      mapViewportSystem,
 
       restaurantSystem,
       openingFlowSystem,
@@ -144,7 +141,6 @@ function bootstrap() {
       employeeDynamicsSystem,
       staffingRecommendationSystem,
       storeProgressSystem,
-      chainSystem,
       lateGameInvestmentSystem,
       onboardingSystem,
       operatingAdvisorSystem,

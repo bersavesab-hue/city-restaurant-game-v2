@@ -16,10 +16,6 @@ import {
 } from "./FinanceSystem.js";
 
 import {
-  storeProgressSystem
-} from "./StoreProgressSystem.js";
-
-import {
   LATE_GAME_INVESTMENTS,
   LATE_GAME_INVESTMENT_SCHEMA_VERSION,
   getLateGameInvestment
@@ -27,51 +23,19 @@ import {
 
 
 class LateGameInvestmentSystem {
-  getAnchorRestaurantId(
-    restaurantId
-  ) {
-    const restaurant =
-      restaurantSystem.get(
-        restaurantId
-      );
-
-    if (
-      restaurant.brandRole ===
-        "branch" &&
-      restaurant.parentRestaurantId
-    ) {
-      return restaurant.parentRestaurantId;
-    }
-
-    return restaurantId;
-  }
-
-
-  getAnchorRestaurant(
-    restaurantId
-  ) {
-    return restaurantSystem.get(
-      this.getAnchorRestaurantId(
-        restaurantId
-      )
-    );
-  }
-
-
   getInvestments(
     restaurantId
   ) {
-    const anchorId =
-      this.getAnchorRestaurantId(
-        restaurantId
-      );
+    restaurantSystem.get(
+      restaurantId
+    );
 
     return entitySystem
       .filter(
-        "brand_investment",
+        "store_investment",
         item =>
           item.restaurantId ===
-            anchorId &&
+            restaurantId &&
           item.status ===
             "active"
       );
@@ -101,9 +65,7 @@ class LateGameInvestmentSystem {
       customerRecognitionRateBonus: 0,
       recognizedCustomerCapacityBonus: 0,
       memberRetentionMultiplierBonus: 0,
-      relationshipRiskGraceDays: 0,
-      centralKitchenShelfLifeMultiplier: 1,
-      regionUnlockCostMultiplier: 1
+      relationshipRiskGraceDays: 0
     };
 
     for (
@@ -157,18 +119,6 @@ class LateGameInvestmentSystem {
             ) || 0
           )
         );
-
-      result.centralKitchenShelfLifeMultiplier *=
-        Number(
-          modifiers
-            .centralKitchenShelfLifeMultiplier
-        ) || 1;
-
-      result.regionUnlockCostMultiplier *=
-        Number(
-          modifiers
-            .regionUnlockCostMultiplier
-        ) || 1;
     }
 
     return result;
@@ -190,23 +140,14 @@ class LateGameInvestmentSystem {
       );
     }
 
-    const anchor =
-      this.getAnchorRestaurant(
+    const restaurant =
+      restaurantSystem.get(
         restaurantId
       );
 
     if (
-      !storeProgressSystem
-        .isUnlocked(
-          anchor.id,
-          config.requiredLevel >= 10
-            ? "regional_expansion"
-            : config.requiredLevel >= 9
-              ? "central_kitchen"
-              : config.requiredLevel >= 8
-                ? "chain_management"
-                : "membership"
-        )
+      (restaurant.level ?? 1) <
+      config.requiredLevel
     ) {
       throw new Error(
         `Investment requires Lv.${config.requiredLevel}`
@@ -215,13 +156,13 @@ class LateGameInvestmentSystem {
 
     if (
       this.hasInvestment(
-        anchor.id,
+        restaurantId,
         investmentId
       )
     ) {
       return this
         .getInvestments(
-          anchor.id
+          restaurantId
         )
         .find(
           item =>
@@ -231,21 +172,20 @@ class LateGameInvestmentSystem {
     }
 
     financeSystem.expense(
-      anchor.id,
+      restaurantId,
       config.cost,
       FINANCE_CATEGORY.OTHER,
-      `长期品牌基建：${config.name}`
+      `长期门店建设：${config.name}`
     );
 
     const investment =
       entitySystem.create(
-        "brand_investment",
+        "store_investment",
         {
           schemaVersion:
             LATE_GAME_INVESTMENT_SCHEMA_VERSION,
 
-          restaurantId:
-            anchor.id,
+          restaurantId,
 
           investmentId:
             config.id,
@@ -259,14 +199,11 @@ class LateGameInvestmentSystem {
       );
 
     eventBus.emit(
-      "brandInvestment:purchased",
+      "storeInvestment:purchased",
       {
-        restaurantId:
-          anchor.id,
-
+        restaurantId,
         investmentId:
           config.id,
-
         cost:
           config.cost
       }
@@ -279,8 +216,8 @@ class LateGameInvestmentSystem {
   getDashboard(
     restaurantId
   ) {
-    const anchor =
-      this.getAnchorRestaurant(
+    const restaurant =
+      restaurantSystem.get(
         restaurantId
       );
 
@@ -288,7 +225,7 @@ class LateGameInvestmentSystem {
       new Set(
         this
           .getInvestments(
-            anchor.id
+            restaurantId
           )
           .map(
             item =>
@@ -298,23 +235,21 @@ class LateGameInvestmentSystem {
 
     const balance =
       financeSystem.getBalance(
-        anchor.id
+        restaurantId
       );
 
     return {
       restaurantId,
-      anchorRestaurantId:
-        anchor.id,
 
       level:
-        anchor.level ?? 1,
+        restaurant.level ?? 1,
 
       balance,
 
       totalInvested:
         this
           .getInvestments(
-            anchor.id
+            restaurantId
           )
           .reduce(
             (
@@ -331,7 +266,7 @@ class LateGameInvestmentSystem {
 
       modifiers:
         this.getModifiers(
-          anchor.id
+          restaurantId
         ),
 
       projects:
@@ -349,7 +284,7 @@ class LateGameInvestmentSystem {
 
               unlocked:
                 (
-                  anchor.level ??
+                  restaurant.level ??
                   1
                 ) >=
                 config.requiredLevel,

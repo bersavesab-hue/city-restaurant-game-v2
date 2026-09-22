@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.10.0 - 2026-09-22
+
+- 项目正式切换为单店成长制：删除多店、连锁、分店、集团/总部扩张链路，后续只围绕唯一玩家餐厅做深度经营。
+- 删除 ChainSystem、chainRules、连锁扩张 Gate 与集成测试；RestaurantSystem 现在禁止创建第二家玩家餐厅。
+- Lv.6-Lv.10 成长路线改为单店扩容、会员名店、品质餐厅、大型餐厅、城市旗舰店，不再解锁 second_store / chain_management / central_kitchen / regional_expansion。
+- 晚期建设系统去除分店锚点、区域总部与中央厨房语义，保留纯单店 CRM 与会员服务建设，持久化实体统一为 store_investment。
+- 删除全部现有 UI V2 页面、UI 运行时、CSS、图标、插画、地图视觉资源、UI 配置、UI 回归测试，以及旧 Android 展示入口与 Android UI 构建脚本。
+- 删除纯展示交互的 MapViewportSystem；本阶段只保留经营底层、数据、规则、模拟、存档与测试代码，UI 将在底层打磨完成后重新设计。
+
 ## 0.9.4 - 2026-09-21
 
 - 修复门店页大量按钮表面可见但实际disabled导致“点不动”：0门店状态不再禁用装修/设施/租约，点击后给出明确开店引导；1门店状态直接隐藏无意义筛选栏，不再展示不可点击筛选按钮。

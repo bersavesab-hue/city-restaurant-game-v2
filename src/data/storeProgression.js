@@ -102,7 +102,7 @@ export const STORE_LEVELS =
     }),
     level({
       level: 6,
-      title: "多店准备",
+      title: "扩容餐厅",
       requiredExperience: 12000,
       limits: {
         employees: 18,
@@ -111,12 +111,12 @@ export const STORE_LEVELS =
         kitchenStations: 7
       },
       unlocks: [
-        "second_store"
+        "service_expansion"
       ]
     }),
     level({
       level: 7,
-      title: "品牌会员店",
+      title: "会员名店",
       requiredExperience: 20000,
       limits: {
         employees: 24,
@@ -130,7 +130,7 @@ export const STORE_LEVELS =
     }),
     level({
       level: 8,
-      title: "连锁门店",
+      title: "品质餐厅",
       requiredExperience: 32000,
       limits: {
         employees: 30,
@@ -139,12 +139,12 @@ export const STORE_LEVELS =
         kitchenStations: 10
       },
       unlocks: [
-        "chain_management"
+        "premium_operations"
       ]
     }),
     level({
       level: 9,
-      title: "供应中枢",
+      title: "大型餐厅",
       requiredExperience: 50000,
       limits: {
         employees: 38,
@@ -153,12 +153,12 @@ export const STORE_LEVELS =
         kitchenStations: 12
       },
       unlocks: [
-        "central_kitchen"
+        "facility_expansion"
       ]
     }),
     level({
       level: 10,
-      title: "区域品牌",
+      title: "城市旗舰店",
       requiredExperience: 75000,
       limits: {
         employees: 48,
@@ -167,7 +167,7 @@ export const STORE_LEVELS =
         kitchenStations: 14
       },
       unlocks: [
-        "regional_expansion"
+        "flagship_operations"
       ]
     })
   ]);

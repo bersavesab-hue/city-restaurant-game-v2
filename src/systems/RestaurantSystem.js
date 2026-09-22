@@ -36,6 +36,14 @@ class RestaurantSystem {
       );
     }
 
+    if (
+      this.count() >= 1
+    ) {
+      throw new Error(
+        "Single-store mode supports only one player restaurant"
+      );
+    }
+
     const time =
       gameState.getSection("time");
 

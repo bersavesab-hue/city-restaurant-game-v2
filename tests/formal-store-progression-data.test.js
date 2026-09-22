@@ -147,3 +147,41 @@ test(
     );
   }
 );
+
+
+test(
+  "单店成长体系不得重新出现多店和总部解锁",
+  () => {
+    const legacyUnlocks =
+      new Set([
+        "second_store",
+        "chain_management",
+        "central_kitchen",
+        "regional_expansion"
+      ]);
+
+    for (
+      const level
+      of STORE_LEVELS
+    ) {
+      assert.equal(
+        level.unlocks.some(
+          item =>
+            legacyUnlocks.has(
+              item
+            )
+        ),
+        false,
+        `Lv.${level.level} contains legacy multi-store unlock`
+      );
+
+      assert.equal(
+        /多店|连锁|总部|区域品牌/.test(
+          level.title
+        ),
+        false,
+        `Lv.${level.level} contains legacy multi-store title`
+      );
+    }
+  }
+);
