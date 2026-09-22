@@ -485,6 +485,7 @@
   font-weight: var(--ui-weight-black);
 }
 
+.ui-v2-store-frame[data-store-layout="empty"] .ui-v2-store-frame__filters,
 .ui-v2-store-frame[data-store-layout="single"] .ui-v2-store-frame__filters {
   display: none;
 }
@@ -775,4 +776,19 @@
   color: #486387;
   font-size: 14px;
   line-height: 1.45;
+}
+
+
+.ui-v2-store-frame[data-store-layout="empty"] .ui-v2-store-frame__empty {
+  height: calc(100% - 47 * var(--store-u));
+}
+
+.ui-v2-store-frame button,
+.ui-v2-store-card button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.ui-v2-store-frame button[aria-disabled="true"] {
+  pointer-events: auto;
 }
