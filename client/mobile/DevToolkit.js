@@ -140,6 +140,15 @@ export function auditUi({
           button
         )
       );
+    } else if (!button.dataset.devBound) {
+      issues.push(
+        makeIssue(
+          "error",
+          "action-not-bound",
+          `声明了动作但没有实际绑定点击事件：${action}`,
+          button
+        )
+      );
     }
 
     const rect = button.getBoundingClientRect();
@@ -321,7 +330,8 @@ export function createDevToolkit({
       label: elementLabel(state.selected),
       rect: rectOf(state.selected),
       style: getComputedStyle(state.selected),
-      action: actionLabel(state.selected)
+      action: actionLabel(state.selected),
+      bound: Boolean(state.selected.dataset.devBound)
     };
   }
 
@@ -424,7 +434,7 @@ export function createDevToolkit({
         <strong>${info.label}</strong>
         <small>${info.id}</small>
         <p>位置 ${info.rect.x}, ${info.rect.y} · 尺寸 ${info.rect.width}×${info.rect.height}</p>
-        <p>动作：${info.action || "未绑定"}</p>
+        <p>动作：${info.action || "未声明"} · 事件：${info.bound ? "已绑定" : "未绑定"}</p>
       </section>
 
       <div class="dev-control-grid">
