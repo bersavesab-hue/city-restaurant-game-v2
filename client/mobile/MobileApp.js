@@ -82,74 +82,24 @@ function navMarkup() {
 }
 
 function sceneMarkup(model) {
-  const scene =
-    model.microScene;
-
   return `
     <section
       class="home-hero-shell"
       data-ui-component="home-hero-scene"
-      aria-label="门店主页主视觉"
+      aria-label="门店主页静态主视觉"
     >
       <div
-        class="micro-scene mood-${scene.mood}"
-        data-scene
+        class="hero-static-scene"
+        role="img"
+        aria-label="温暖餐厅门店静态场景"
       >
-        <div class="scene-light scene-light-a"></div>
-        <div class="scene-light scene-light-b"></div>
-
-        <div class="scene-back-wall">
-          <div class="scene-sign">
-            <strong>${model.restaurant.name}</strong>
-            <small>认真经营 · 用心待客</small>
-          </div>
+        <div class="hero-static-sign">
+          <strong>${model.restaurant.name}</strong>
+          <small>认真经营 · 用心待客</small>
         </div>
 
-        <div class="scene-kitchen">
-          <div class="stove">
-            <span class="flame"></span>
-            <span class="steam steam-a"></span>
-            <span class="steam steam-b"></span>
-          </div>
-
-          <div class="character chef ${scene.chefActive ? "is-active" : "is-off"}">
-            <span class="head"></span>
-            <span class="hat"></span>
-            <span class="body"></span>
-            <span class="arm"></span>
-          </div>
-        </div>
-
-        <div class="scene-floor">
-          <div class="table table-left">
-            <span class="plate"></span>
-            <span class="plate plate-b"></span>
-          </div>
-
-          <div class="table table-right">
-            <span class="plate"></span>
-            <span class="cup"></span>
-          </div>
-
-          <div class="character guest guest-a">
-            <span class="head"></span>
-            <span class="body"></span>
-          </div>
-
-          <div class="character guest guest-b">
-            <span class="head"></span>
-            <span class="body"></span>
-          </div>
-
-          <div class="character server ${scene.serverActive ? "is-active" : "is-off"}">
-            <span class="head"></span>
-            <span class="body"></span>
-            <span class="tray"></span>
-          </div>
-
-          <div class="scene-plant"></div>
-          <div class="scene-window"></div>
-        </div>
+        <div class="hero-static-depth hero-static-depth-back"></div>
+        <div class="hero-static-depth hero-static-depth-front"></div>
       </div>
 
       <header
@@ -164,6 +114,7 @@ function sceneMarkup(model) {
         <div class="hud-card hud-clock">
           <small>时间</small>
           <strong data-bind="clock">${model.time.clock}</strong>
+          <span>${model.restaurant.status === "open" ? "营业中" : "已打烊"}</span>
         </div>
 
         <div class="hud-card hud-money">
@@ -188,40 +139,6 @@ function sceneMarkup(model) {
           aria-label="设置"
         >⚙</button>
       </header>
-
-      <div class="hero-control-strip">
-        <span class="scene-state">
-          <i></i>
-          ${model.restaurant.status === "open" ? "营业中" : "已打烊"}
-        </span>
-
-        <div class="scene-speed">
-          <button
-            class="${running ? "" : "is-active"}"
-            data-run="toggle"
-            type="button"
-            aria-label="${running ? "暂停" : "继续"}"
-          >${running ? "Ⅱ" : "▶"}</button>
-
-          ${[1,2,4].map(
-            value => `
-              <button
-                class="${speed === value ? "is-active" : ""}"
-                data-speed="${value}"
-                type="button"
-              >${value}×</button>
-            `
-          ).join("")}
-        </div>
-
-        <button
-          type="button"
-          class="scene-action"
-          data-open-sheet="renovation"
-        >
-          装修
-        </button>
-      </div>
 
       <section
         class="home-metric-grid home-metric-overlay"
