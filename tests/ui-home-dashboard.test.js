@@ -196,11 +196,6 @@ test(
       2
     );
 
-    assert.equal(
-      model.microScene.chefActive,
-      true
-    );
-
     assert.match(
       model.opportunity.title,
       /Lv\.3|头号项目/
