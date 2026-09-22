@@ -812,3 +812,58 @@ test("门店页只保留一个StoreFrame并含单店和多店自适应槽位", (
     /集团视角|单店视角/
   );
 });
+
+
+test("门店卡升级为参考稿式图片卡并保留唯一自适应入口", () => {
+  const frameSource =
+    fs.readFileSync(
+      new URL(
+        "../src/ui-v2/pages/store/StoreFrame.js",
+        import.meta.url
+      ),
+      "utf8"
+    );
+
+  const cssSource =
+    fs.readFileSync(
+      new URL(
+        "../src/ui-v2/pages/store/store-frame.css",
+        import.meta.url
+      ),
+      "utf8"
+    );
+
+  const bindingSource =
+    fs.readFileSync(
+      new URL(
+        "../src/ui-v2/runtime/LiveUiBinding.js",
+        import.meta.url
+      ),
+      "utf8"
+    );
+
+  assert.match(
+    cssSource,
+    /ui-v2-store-card__visual/
+  );
+
+  assert.match(
+    bindingSource,
+    /data-store-card-open/
+  );
+
+  assert.match(
+    bindingSource,
+    /ui:storeOpen/
+  );
+
+  assert.match(
+    frameSource,
+    /门店经营概况/
+  );
+
+  assert.doesNotMatch(
+    frameSource,
+    /集团视角|单店视角/
+  );
+});
