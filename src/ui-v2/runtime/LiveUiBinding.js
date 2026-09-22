@@ -1574,6 +1574,11 @@ function bindCityFrameLive(
           onOpenOpportunities
         );
 
+      list?.removeEventListener(
+        "click",
+        onStoreCardClick
+      );
+
       dialogCloseButton
         ?.removeEventListener(
           "click",
@@ -1676,48 +1681,83 @@ function bindStoreFrameLive(
 
       list.innerHTML =
         source.map(
-          store =>
-            '<article class="ui-v2-store-card">' +
-              '<header>' +
-                '<h3>' +
-                  escapeMarkup(store.name) +
-                '</h3>' +
+          (store,index) =>
+            '<article class="ui-v2-store-card" data-state="' +
+              escapeMarkup(store.status) +
+              '" style="--store-card-index:' +
+              index +
+              '">' +
+              '<div class="ui-v2-store-card__visual">' +
+                '<span class="ui-v2-store-card__visual-shade" aria-hidden="true"></span>' +
                 '<span class="ui-v2-store-card__status" data-state="' +
                   escapeMarkup(store.status) +
                 '">' +
                   escapeMarkup(store.statusLabel) +
                 '</span>' +
-              '</header>' +
-              '<div class="ui-v2-store-card__location">' +
-                escapeMarkup(store.district) +
-              '</div>' +
-              '<div class="ui-v2-store-card__primary">' +
-                '<strong>主门店</strong>' +
-                '<small>当前唯一门店</small>' +
-              '</div>' +
-              '<div class="ui-v2-store-card__stats">' +
-                '<span><small>今日营业额</small><strong>' +
-                  escapeMarkup(
-                    formatCompactMoney(store.revenue)
-                  ) +
-                '</strong></span>' +
-                '<span><small>今日利润</small><strong>' +
-                  escapeMarkup(
-                    formatCompactMoney(store.profit)
-                  ) +
-                '</strong></span>' +
-                '<span><small>满意度</small><strong>' +
-                  escapeMarkup(store.satisfaction) +
-                  '%</strong></span>' +
-              '</div>' +
-              '<footer>' +
-                '<span>Lv.' +
+                '<span class="ui-v2-store-card__level">Lv.' +
                   escapeMarkup(store.level) +
                 '</span>' +
-                '<span>' +
-                  escapeMarkup(store.manager) +
-                '</span>' +
-              '</footer>' +
+              '</div>' +
+              '<div class="ui-v2-store-card__body">' +
+                '<header>' +
+                  '<div>' +
+                    '<h3>' +
+                      escapeMarkup(store.name) +
+                    '</h3>' +
+                    '<div class="ui-v2-store-card__location">' +
+                      escapeMarkup(store.district) +
+                    '</div>' +
+                  '</div>' +
+                '</header>' +
+                '<div class="ui-v2-store-card__primary">' +
+                  '<strong>当前主门店</strong>' +
+                  '<small>唯一门店自动放大展示</small>' +
+                '</div>' +
+                '<div class="ui-v2-store-card__stats">' +
+                  '<span><small>今日营业额</small><strong>' +
+                    escapeMarkup(
+                      formatCompactMoney(
+                        store.revenue
+                      )
+                    ) +
+                  '</strong></span>' +
+                  '<span><small>今日利润</small><strong data-tone="' +
+                    (store.profit < 0 ? "negative" : "positive") +
+                    '">' +
+                    escapeMarkup(
+                      formatCompactMoney(
+                        store.profit
+                      )
+                    ) +
+                  '</strong></span>' +
+                  '<span><small>顾客满意度</small><strong>' +
+                    escapeMarkup(
+                      store.satisfaction
+                    ) +
+                    '%</strong></span>' +
+                '</div>' +
+                '<footer>' +
+                  '<span class="ui-v2-store-card__manager">' +
+                    '<i aria-hidden="true"></i>' +
+                    '<span><small>负责人</small><strong>' +
+                      escapeMarkup(
+                        store.manager
+                      ) +
+                    '</strong></span>' +
+                  '</span>' +
+                  '<button type="button" data-store-card-open="' +
+                    escapeMarkup(store.id) +
+                    '">' +
+                    (
+                      store.status === "preparing"
+                        ? "继续筹备"
+                        : store.status === "abnormal"
+                          ? "查看详情"
+                          : "进入门店"
+                    ) +
+                  '</button>' +
+                '</footer>' +
+              '</div>' +
             '</article>'
         ).join("");
     };
@@ -2092,6 +2132,36 @@ function bindStoreFrameLive(
         ]
       );
     };
+
+  const onStoreCardClick =
+    event => {
+      const button =
+        event.target?.closest?.(
+          "[data-store-card-open]"
+        );
+
+      if (!button) {
+        return;
+      }
+
+      const storeId =
+        button.dataset.storeCardOpen;
+
+      app.core.eventBus.emit(
+        "ui:storeOpen",
+        {
+          storeId,
+          displayMode:
+            latestModel?.displayMode ??
+            "empty"
+        }
+      );
+    };
+
+  list?.addEventListener(
+    "click",
+    onStoreCardClick
+  );
 
   const dialogCloseButton =
     dialog?.querySelector(
