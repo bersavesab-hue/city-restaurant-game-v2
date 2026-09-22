@@ -35,6 +35,19 @@
   max-height: 82dvh;
 }
 
+.ui-dev-sheet.is-top {
+  top: 0;
+  bottom: auto;
+  border-radius: 0 0 22px 22px;
+  border-top: 0;
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.10);
+  box-shadow:
+    0 16px 44px
+    rgba(0,0,0,.32);
+}
+
 .ui-dev-grabber {
   flex: 0 0 auto;
   width: 44px;
