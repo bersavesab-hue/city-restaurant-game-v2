@@ -132,7 +132,7 @@ button {
     1.28fr
     .92fr
     1.12fr
-    38px;
+    44px;
   gap: 5px;
   align-items: stretch;
   color: #f7fbff;
@@ -220,8 +220,8 @@ button {
 }
 
 .hud-settings {
-  width: 38px;
-  min-width: 38px;
+  width: 44px;
+  min-width: 44px;
   border-radius: 11px;
   background:
     rgba(255,255,255,.12);
@@ -652,6 +652,7 @@ button {
 }
 
 .scene-action {
+  min-width: 44px;
   background: #f0c36b;
   color: #402b18;
 }
@@ -1082,8 +1083,9 @@ button {
 }
 
 .home-panel-title button {
+  min-width: 44px;
   min-height: 36px;
-  padding: 0 2px;
+  padding: 0 6px;
   background: transparent;
   color: #e1edf5;
   font-size: 9px;
@@ -1866,7 +1868,7 @@ button {
       1.18fr
       .86fr
       1fr
-      36px;
+      44px;
     gap: 4px;
     padding-left: 5px;
     padding-right: 5px;
@@ -1878,8 +1880,8 @@ button {
   }
 
   .hud-settings {
-    width: 36px;
-    min-width: 36px;
+    width: 44px;
+    min-width: 44px;
   }
 
   .opportunity-band span {
