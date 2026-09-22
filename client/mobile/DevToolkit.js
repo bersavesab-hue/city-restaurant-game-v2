@@ -95,13 +95,21 @@ function selectorFor(node, root) {
     return id;
   }
 
-  if (node.dataset.nav) {
+  if (
+    node.dataset.nav &&
+    document.querySelectorAll(`[data-nav="${node.dataset.nav}"]`).length === 1
+  ) {
     const id = `[data-nav="${node.dataset.nav}"]`;
     node.dataset.devId = id;
     return id;
   }
 
-  if (node.dataset.openSheet) {
+  if (
+    node.dataset.openSheet &&
+    document.querySelectorAll(
+      `[data-open-sheet="${node.dataset.openSheet}"]`
+    ).length === 1
+  ) {
     const id = `[data-open-sheet="${node.dataset.openSheet}"]`;
     node.dataset.devId = id;
     return id;
@@ -110,8 +118,26 @@ function selectorFor(node, root) {
   const parts = [];
   let current = node;
 
-  while (current && current !== root && parts.length < 5) {
+  while (current && current !== root && parts.length < 6) {
+    if (
+      current !== node &&
+      current.dataset?.uiComponent
+    ) {
+      parts.unshift(
+        `component:${current.dataset.uiComponent}`
+      );
+      break;
+    }
+
     let part = current.tagName.toLowerCase();
+
+    if (current.dataset?.nav) {
+      part += `[nav=${current.dataset.nav}]`;
+    }
+
+    if (current.dataset?.openSheet) {
+      part += `[sheet=${current.dataset.openSheet}]`;
+    }
 
     const parent = current.parentElement;
     if (parent) {
@@ -420,12 +446,28 @@ export function createDevToolkit({
     state.redoStack = [];
   }
 
-  function restoreSnapshot(snapshot) {
+  function removeOverrideStyles(overrides) {
+    assignIds();
+
     const all = candidates();
 
-    for (const node of all) {
-      node.removeAttribute("style");
+    for (const [id, styles] of Object.entries(overrides)) {
+      const node = all.find(item => item.dataset.devId === id);
+      if (!node) continue;
+
+      for (const key of Object.keys(styles)) {
+        node.style.removeProperty(
+          key.replace(
+            /[A-Z]/g,
+            match => `-${match.toLowerCase()}`
+          )
+        );
+      }
     }
+  }
+
+  function restoreSnapshot(snapshot) {
+    removeOverrideStyles(state.overrides);
 
     state.overrides = clone(snapshot);
     writeOverrides(state.overrides);
@@ -529,9 +571,7 @@ export function createDevToolkit({
 
     pushHistory();
 
-    for (const node of candidates()) {
-      node.removeAttribute("style");
-    }
+    removeOverrideStyles(state.overrides);
 
     state.overrides = {};
     writeOverrides(state.overrides);
