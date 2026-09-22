@@ -427,14 +427,6 @@ function buildHomeDashboardModel(
       100
     );
 
-  const sceneMood =
-    restaurant.status !== "open"
-      ? "closed"
-      : todayOrders.length >= 8 ||
-        todayRevenue >= 3000
-        ? "busy"
-        : "steady";
-
   const opportunity =
     buildOpportunity({
       restaurant,
@@ -551,37 +543,7 @@ function buildHomeDashboardModel(
       }),
 
     schedule:
-      buildSchedule(time),
-
-    microScene: {
-      mood:
-        sceneMood,
-      chefActive:
-        employees.some(
-          item =>
-            item.roleId === "chef"
-        ),
-      serverActive:
-        employees.some(
-          item =>
-            item.roleId === "server"
-        ),
-      cashierActive:
-        employees.some(
-          item =>
-            item.roleId ===
-            "cashier"
-        ),
-      guests:
-        Math.max(
-          2,
-          Math.min(
-            6,
-            todayOrders.length || 3
-          )
-        )
-    }
-  };
+      buildSchedule(time)  };
 }
 
 export {
