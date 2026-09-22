@@ -89,14 +89,16 @@ function sceneMarkup(model) {
     <section
       class="micro-scene mood-${scene.mood}"
       data-scene
+      data-ui-component="home-hero-scene"
       aria-label="门店微动态场景"
     >
       <div class="scene-light scene-light-a"></div>
       <div class="scene-light scene-light-b"></div>
+
       <div class="scene-back-wall">
         <div class="scene-sign">
           <strong>${model.restaurant.name}</strong>
-          <small>一餐一味 · 认真经营</small>
+          <small>认真经营 · 用心待客</small>
         </div>
       </div>
 
@@ -152,12 +154,31 @@ function sceneMarkup(model) {
           ${model.restaurant.status === "open" ? "营业中" : "已打烊"}
         </span>
 
+        <div class="scene-speed">
+          <button
+            class="${running ? "" : "is-active"}"
+            data-run="toggle"
+            type="button"
+            aria-label="${running ? "暂停" : "继续"}"
+          >${running ? "Ⅱ" : "▶"}</button>
+
+          ${[1,2,4].map(
+            value => `
+              <button
+                class="${speed === value ? "is-active" : ""}"
+                data-speed="${value}"
+                type="button"
+              >${value}×</button>
+            `
+          ).join("")}
+        </div>
+
         <button
           type="button"
           class="scene-action"
           data-open-sheet="renovation"
         >
-          装修管理
+          装修
         </button>
       </div>
     </section>
@@ -185,176 +206,260 @@ function renderStore() {
       100
     );
 
+  const district =
+    model.district;
+
+  const districtName =
+    district?.name ??
+    "暂未选址";
+
+  const districtSignals =
+    district
+      ? [
+          ["客流", district.trafficIndex],
+          ["消费", district.spendingPower],
+          ["竞争", district.competition],
+          ["外卖", district.deliveryDemand]
+        ]
+      : [
+          ["客流", "--"],
+          ["消费", "--"],
+          ["竞争", "--"],
+          ["外卖", "--"]
+        ];
+
+  const opportunityTags =
+    district
+      ? [
+          district.name,
+          `客流 ${district.trafficIndex}`,
+          `消费 ${district.spendingPower}`,
+          `竞争 ${district.competition}`
+        ]
+      : [
+          "选址后显示商圈情报"
+        ];
+
   return `
-    <header class="topbar">
-      <div class="time-block">
+    <header
+      class="home-hud"
+      data-ui-component="home-top-hud"
+    >
+      <div class="hud-card hud-day">
+        <small>经营日</small>
         <strong>第 ${model.time.day} 天</strong>
-        <span data-bind="clock">${model.time.clock}</span>
       </div>
 
-      <div class="top-resource">
+      <div class="hud-card hud-clock">
+        <small>时间</small>
+        <strong data-bind="clock">${model.time.clock}</strong>
+      </div>
+
+      <div class="hud-card hud-money">
         <small>资金</small>
         <strong data-bind="balance">${money(model.money.balance)}</strong>
       </div>
 
-      <div class="top-resource">
-        <small>口碑</small>
-        <strong>${Math.round(model.restaurant.reputation)}</strong>
+      <div class="hud-card hud-rating">
+        <small>星级评价</small>
+        <strong>★ ${model.restaurant.reviewScore.toFixed(1)}</strong>
+      </div>
+
+      <div class="hud-card hud-level">
+        <small>Lv.${model.restaurant.level}</small>
+        <strong>${model.restaurant.title}</strong>
       </div>
 
       <button
-        class="icon-button"
+        class="hud-settings"
         type="button"
         data-nav="more"
         aria-label="设置"
       >⚙</button>
     </header>
 
-    <div class="page-scroll">
-      <section class="store-heading">
-        <div>
-          <span class="eyebrow">Lv.${model.restaurant.level} · ${model.restaurant.title}</span>
-          <h1>${model.restaurant.name}</h1>
-        </div>
-
-        <div class="review-chip">
-          ★ ${model.restaurant.reviewScore.toFixed(1)}
-        </div>
-      </section>
-
+    <div class="page-scroll home-scroll">
       ${sceneMarkup(model)}
 
-      <section class="speed-bar">
-        <button
-          class="${running ? "" : "is-active"}"
-          data-run="toggle"
-          type="button"
-        >
-          ${running ? "暂停" : "继续"}
-        </button>
+      <section
+        class="home-metric-grid"
+        data-ui-component="home-metrics"
+      >
+        <article class="home-metric-card revenue">
+          <span class="metric-symbol">¥</span>
+          <div>
+            <small>今日营业额</small>
+            <strong data-bind="todayRevenue">${money(model.money.todayRevenue)}</strong>
+          </div>
+        </article>
 
-        ${[1,2,4].map(
-          value => `
-            <button
-              class="${speed === value ? "is-active" : ""}"
-              data-speed="${value}"
-              type="button"
-            >
-              ${value}×
+        <article class="home-metric-card profit">
+          <span class="metric-symbol">↗</span>
+          <div>
+            <small>今日利润</small>
+            <strong
+              class="${model.money.todayProfit >= 0 ? "positive" : "negative"}"
+              data-bind="todayProfit"
+            >${money(model.money.todayProfit)}</strong>
+          </div>
+        </article>
+
+        <article class="home-metric-card satisfaction">
+          <span class="metric-symbol">☺</span>
+          <div>
+            <small>满意度</small>
+            <strong>${Math.round(model.restaurant.satisfaction)}%</strong>
+          </div>
+        </article>
+
+        <article class="home-metric-card staff">
+          <span class="metric-symbol">人</span>
+          <div>
+            <small>在岗员工</small>
+            <strong>${model.operations.employees}</strong>
+          </div>
+        </article>
+      </section>
+
+      <section
+        class="home-opportunity ${model.opportunity.tone}"
+        data-ui-component="home-opportunity"
+      >
+        <header class="opportunity-band">
+          <strong>今日机会</strong>
+          <span>根据当前经营和商圈状态动态生成</span>
+          <button type="button" data-nav="business">查看经营 ›</button>
+        </header>
+
+        <div class="opportunity-body">
+          <div class="opportunity-copy">
+            <h2>${model.opportunity.title}</h2>
+            <p>${model.opportunity.detail}</p>
+
+            <div class="opportunity-tags">
+              ${opportunityTags.map(
+                tag => `<span>${tag}</span>`
+              ).join("")}
+            </div>
+          </div>
+
+          <div class="opportunity-side">
+            <div class="district-miniature">
+              <span>${districtName}</span>
+              <small>
+                ${district
+                  ? `机会指数 ${district.opportunityScore}`
+                  : "等待正式选址"}
+              </small>
+            </div>
+            <button type="button" data-nav="business">
+              去经营
+              <span>›</span>
             </button>
-          `
-        ).join("")}
-      </section>
-
-      <section class="metric-grid">
-        <article>
-          <span>今日营业额</span>
-          <strong data-bind="todayRevenue">${money(model.money.todayRevenue)}</strong>
-        </article>
-
-        <article>
-          <span>今日利润</span>
-          <strong
-            class="${model.money.todayProfit >= 0 ? "positive" : "negative"}"
-            data-bind="todayProfit"
-          >${money(model.money.todayProfit)}</strong>
-        </article>
-
-        <article>
-          <span>满意度</span>
-          <strong>${Math.round(model.restaurant.satisfaction)}%</strong>
-        </article>
-
-        <article>
-          <span>在岗员工</span>
-          <strong>${model.operations.employees}</strong>
-        </article>
-      </section>
-
-      <section class="feature-card opportunity ${model.opportunity.tone}">
-        <div>
-          <span class="eyebrow">动态经营目标</span>
-          <h2>${model.opportunity.title}</h2>
-          <p>${model.opportunity.detail}</p>
-        </div>
-        <button
-          type="button"
-          data-nav="business"
-        >${model.opportunity.action}</button>
-      </section>
-
-      <section class="feature-card progress-card">
-        <div class="section-title-row">
-          <div>
-            <span class="eyebrow">门店成长</span>
-            <h2>下一阶段：${model.progress.nextTitle ?? "已满级"}</h2>
-          </div>
-          <strong>${progressPercent}%</strong>
-        </div>
-
-        <div class="progress-track">
-          <i
-            data-bind="progress"
-            style="width:${progressPercent}%"
-          ></i>
-        </div>
-
-        <div class="quick-actions">
-          <button type="button" data-open-sheet="renovation">装修</button>
-          <button type="button" data-nav="staff">员工</button>
-          <button type="button" data-nav="research">研发</button>
-          <button type="button" data-nav="business">经营</button>
-        </div>
-      </section>
-
-      <section class="feature-card dialogue-card">
-        <div class="section-title-row">
-          <div>
-            <span class="eyebrow">少量场景反馈</span>
-            <h2>店里正在发生</h2>
           </div>
         </div>
+      </section>
 
-        <div class="dialogue-list">
-          ${model.dialogue.map(
-            item => `
-              <article>
-                <div class="avatar">${item.speaker.slice(0,1)}</div>
-                <div>
-                  <strong>${item.speaker} <small>${item.role}</small></strong>
-                  <p>${item.text}</p>
+      <div
+        class="home-dual-grid"
+        data-ui-component="home-growth-and-dialogue"
+      >
+        <section class="home-panel growth-panel">
+          <header class="home-panel-title">
+            <strong>门店成长</strong>
+            <span>${progressPercent}%</span>
+          </header>
+
+          <div class="home-panel-body">
+            <small>下一阶段</small>
+            <h3>${model.progress.nextTitle ?? "已满级"}</h3>
+
+            <div class="progress-track">
+              <i
+                data-bind="progress"
+                style="width:${progressPercent}%"
+              ></i>
+            </div>
+
+            <div class="quick-actions">
+              <button type="button" data-open-sheet="renovation">装修</button>
+              <button type="button" data-nav="staff">员工</button>
+              <button type="button" data-nav="research">研发</button>
+              <button type="button" data-nav="business">经营</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="home-panel dialogue-panel">
+          <header class="home-panel-title">
+            <strong>店内动态</strong>
+            <button type="button" data-nav="staff">更多 ›</button>
+          </header>
+
+          <div class="home-panel-body dialogue-list">
+            ${model.dialogue.slice(0, 2).map(
+              item => `
+                <article>
+                  <div class="avatar">${item.speaker.slice(0,1)}</div>
+                  <div>
+                    <strong>${item.speaker} <small>${item.role}</small></strong>
+                    <p>${item.text}</p>
+                  </div>
+                </article>
+              `
+            ).join("")}
+          </div>
+        </section>
+      </div>
+
+      <div
+        class="home-dual-grid"
+        data-ui-component="home-district-and-schedule"
+      >
+        <section class="home-panel district-panel">
+          <header class="home-panel-title">
+            <strong>商圈情报</strong>
+            <button type="button" data-nav="business">更多 ›</button>
+          </header>
+
+          <div class="home-panel-body">
+            <p class="district-name">${districtName}</p>
+
+            <div class="district-signal-grid">
+              ${districtSignals.map(
+                ([label, value]) => `
+                  <article>
+                    <small>${label}</small>
+                    <strong>${value}</strong>
+                  </article>
+                `
+              ).join("")}
+            </div>
+          </div>
+        </section>
+
+        <section class="home-panel schedule-panel">
+          <header class="home-panel-title">
+            <strong>今日日程</strong>
+            <button
+              type="button"
+              data-advance="30"
+            >推进 30m ›</button>
+          </header>
+
+          <div class="home-panel-body schedule-list">
+            ${model.schedule.slice(0, 4).map(
+              item => `
+                <div class="${item.done ? "done" : ""}">
+                  <time>${item.time}</time>
+                  <span>${item.title}</span>
+                  <i></i>
                 </div>
-              </article>
-            `
-          ).join("")}
-        </div>
-      </section>
-
-      <section class="feature-card schedule-card">
-        <div class="section-title-row">
-          <div>
-            <span class="eyebrow">推进日程</span>
-            <h2>今日日程</h2>
+              `
+            ).join("")}
           </div>
-          <button
-            type="button"
-            class="text-button"
-            data-advance="30"
-          >推进30分钟</button>
-        </div>
-
-        <div class="schedule-list">
-          ${model.schedule.map(
-            item => `
-              <div class="${item.done ? "done" : ""}">
-                <time>${item.time}</time>
-                <span>${item.title}</span>
-                <i></i>
-              </div>
-            `
-          ).join("")}
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   `;
 }
