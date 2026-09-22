@@ -82,7 +82,7 @@ button {
 }
 
 .home-scroll {
-  padding: 8px 8px 18px;
+  padding: 0 8px 18px;
   background:
     linear-gradient(
       180deg,
@@ -112,19 +112,8 @@ button {
 }
 
 .home-hud {
-  flex: 0 0 auto;
-  min-height:
-    calc(
-      64px +
-      env(safe-area-inset-top)
-    );
-  padding:
-    calc(
-      7px +
-      env(safe-area-inset-top)
-    )
-    7px
-    7px;
+  min-height: 58px;
+  padding: 0;
   display: grid;
   grid-template-columns:
     1.04fr
@@ -136,19 +125,9 @@ button {
   gap: 5px;
   align-items: stretch;
   color: #f7fbff;
-  background:
-    linear-gradient(
-      180deg,
-      #284b69 0%,
-      #173751 56%,
-      #112b42 100%
-    );
-  border-bottom:
-    1px solid
-    rgba(255,255,255,.12);
-  box-shadow:
-    0 5px 16px
-    rgba(15,36,54,.22);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .hud-card {
@@ -230,16 +209,68 @@ button {
   font-weight: 900;
 }
 
-.micro-scene {
+.home-hero-shell {
   position: relative;
   height:
     clamp(
-      270px,
-      35dvh,
-      350px
+      390px,
+      48dvh,
+      500px
     );
   overflow: hidden;
-  border-radius: 18px;
+  border-radius:
+    0 0 20px 20px;
+  box-shadow:
+    0 10px 24px
+    rgba(39,50,57,.14);
+  isolation: isolate;
+}
+
+.home-hud-overlay {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  z-index: 12;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.home-metric-overlay {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  z-index: 12;
+  margin: 0;
+}
+
+.hero-control-strip {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 98px;
+  z-index: 12;
+  display: grid;
+  grid-template-columns:
+    auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.hero-control-strip .scene-speed {
+  justify-content: center;
+}
+
+.micro-scene {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
   background:
     linear-gradient(
       180deg,
@@ -616,14 +647,7 @@ button {
 }
 
 .scene-overlay {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: none;
 }
 
 .scene-state,
@@ -688,7 +712,7 @@ button {
 }
 
 .home-metric-grid {
-  margin-top: 8px;
+  margin-top: 0;
   display: grid;
   grid-template-columns:
     repeat(4, minmax(0, 1fr));
@@ -698,13 +722,13 @@ button {
 .home-metric-card {
   position: relative;
   min-width: 0;
-  min-height: 76px;
+  min-height: 82px;
   padding: 10px 7px 9px;
   overflow: hidden;
   border-radius: 14px;
   display: grid;
   align-content: end;
-  background: rgba(255,255,255,.96);
+  background: rgba(255,255,255,.94);
   border:
     1px solid
     rgba(34,68,93,.08);
@@ -1870,8 +1894,7 @@ button {
       1fr
       44px;
     gap: 4px;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 0;
   }
 
   .hud-card {
