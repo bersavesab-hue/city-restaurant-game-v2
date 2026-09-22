@@ -1847,10 +1847,6 @@ button {
 }
 
 @media (max-width: 370px) {
-  .micro-scene {
-    height: 246px;
-  }
-
   .quick-actions {
     grid-template-columns:
       repeat(2, minmax(0,1fr));
