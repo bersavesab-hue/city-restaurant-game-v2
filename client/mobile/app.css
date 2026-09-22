@@ -628,8 +628,8 @@ button {
 
 .scene-state,
 .scene-action {
-  min-height: 34px;
-  padding: 0 12px;
+  min-height: 36px;
+  padding: 0 8px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
@@ -637,7 +637,7 @@ button {
   background: rgba(32,25,20,.80);
   backdrop-filter: blur(10px);
   color: #fff;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -664,12 +664,12 @@ button {
 .scene-speed {
   display: grid;
   grid-template-columns:
-    repeat(4, minmax(30px, 1fr));
+    repeat(4, 44px);
   gap: 4px;
 }
 
 .scene-speed button {
-  min-width: 30px;
+  min-width: 44px;
   min-height: 36px;
   padding: 0 6px;
   border-radius: 999px;
@@ -902,7 +902,7 @@ button {
 }
 
 .opportunity-band button {
-  min-height: 32px;
+  min-height: 36px;
   padding: 0 9px;
   border-radius: 999px;
   background: rgba(255,255,255,.90);
