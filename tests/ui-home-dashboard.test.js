@@ -21,6 +21,20 @@ test(
         },
 
         entitySystem: {
+          get(type, id) {
+            if (
+              type === "property" &&
+              id === "p1"
+            ) {
+              return {
+                id: "p1",
+                districtId: "d1"
+              };
+            }
+
+            return null;
+          },
+
           list(type) {
             if (type === "order") {
               return [
@@ -47,6 +61,7 @@ test(
               {
                 id: "r1",
                 name: "测试小馆",
+                locationId: "p1",
                 status: "open",
                 level: 2,
                 customerSatisfaction: 82,
@@ -132,6 +147,26 @@ test(
               itemCount: 8
             };
           }
+        },
+
+        districtSystem: {
+          get(id) {
+            assert.equal(id, "d1");
+
+            return {
+              id: "d1",
+              name: "大学城",
+              trafficIndex: 82,
+              spendingPower: 68,
+              competition: 57,
+              deliveryDemand: 76,
+              rentMultiplier: 1.1
+            };
+          },
+
+          getOpportunityScore() {
+            return 71;
+          }
         }
       }
     };
@@ -169,6 +204,20 @@ test(
     assert.match(
       model.opportunity.title,
       /Lv\.3|头号项目/
+    );
+
+    assert.deepEqual(
+      model.district,
+      {
+        id: "d1",
+        name: "大学城",
+        trafficIndex: 82,
+        spendingPower: 68,
+        competition: 57,
+        deliveryDemand: 76,
+        rentMultiplier: 1.1,
+        opportunityScore: 71
+      }
     );
   }
 );
