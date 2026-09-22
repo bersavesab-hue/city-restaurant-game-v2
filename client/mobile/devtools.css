@@ -69,7 +69,7 @@
 
 .ui-dev-summary {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 7px;
   padding: 10px 12px;
   background: #131419;
@@ -288,4 +288,8 @@
 .dev-selected-outline {
   outline: 2px dashed #5fd4ff !important;
   outline-offset: 2px !important;
+}
+
+.dev-component-list {
+  margin-bottom: 14px;
 }
