@@ -84,6 +84,7 @@ function renderStoreFrame() {
         '<article><small>营业门店</small><strong data-live="store-open">0</strong><em>家</em></article>' +
         '<article><small>顾客满意度</small><strong data-live="store-satisfaction">0%</strong></article>' +
       '</section>' +
+      '</section>' +
 
       '<section class="ui-v2-store-frame__stores">' +
         '<header>' +
