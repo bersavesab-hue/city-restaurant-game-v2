@@ -867,3 +867,42 @@ test("门店卡升级为参考稿式图片卡并保留唯一自适应入口", ()
     /集团视角|单店视角/
   );
 });
+
+
+test("门店页按钮必须有可见响应而不是只派发无人消费事件", () => {
+  const source =
+    fs.readFileSync(
+      new URL(
+        "../src/ui-v2/runtime/LiveUiBinding.js",
+        import.meta.url
+      ),
+      "utf8"
+    );
+
+  const storeSection =
+    source.slice(
+      source.indexOf(
+        "function bindStoreFrameLive"
+      )
+    );
+
+  assert.match(
+    storeSection,
+    /showActionPanel/
+  );
+
+  assert.match(
+    storeSection,
+    /openDialog\(/
+  );
+
+  assert.match(
+    storeSection,
+    /navigate\?\.\("city"\)/
+  );
+
+  assert.doesNotMatch(
+    storeSection,
+    /"ui:storeOpen"|"ui:storeAction"/
+  );
+});
