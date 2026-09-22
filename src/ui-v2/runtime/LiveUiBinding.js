@@ -1,6 +1,7 @@
 import {
   buildHudModel,
-  buildCityModel
+  buildCityModel,
+  buildStoreModel
 } from "./LiveUiModel.js";
 
 function setText(
@@ -520,7 +521,7 @@ function resolveDistrictSelectionForFilter(
 
 function bindGlobalNavLive(
   root,
-  openQuickPanel
+  navigate
 ) {
   const handlers = [];
 
@@ -531,18 +532,17 @@ function bindGlobalNavLive(
     )
   ) {
     const handler = () => {
-      const destination =
-        button.dataset.uiDestination;
-
-      if (destination !== "city") {
-        openQuickPanel(destination);
-      }
+      navigate?.(
+        button.dataset
+          .uiDestination
+      );
     };
 
     button.addEventListener(
       "click",
       handler
     );
+
     handlers.push([
       button,
       handler
@@ -1595,10 +1595,633 @@ function bindCityFrameLive(
   });
 }
 
+function escapeMarkup(
+  value
+) {
+  return String(
+    value ??
+    ""
+  )
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
+}
+
+function bindStoreFrameLive(
+  root,
+  app,
+  navigate
+) {
+  if (
+    !root ||
+    !app
+  ) {
+    throw new TypeError(
+      "Store live binding requires root and app"
+    );
+  }
+
+  let activeFilter =
+    "all";
+
+  let latestModel =
+    null;
+
+  const list =
+    root.querySelector(
+      "[data-store-list]"
+    );
+
+  const empty =
+    root.querySelector(
+      "[data-store-empty]"
+    );
+
+  const taskList =
+    root.querySelector(
+      "[data-store-task-list]"
+    );
+
+  const dialog =
+    root.querySelector(
+      '[data-ui="store-dialog"]'
+    );
+
+  const renderStores =
+    model => {
+      if (!list) {
+        return;
+      }
+
+      const stores =
+        activeFilter ===
+        "all"
+          ? model.stores
+          : model.stores
+              .filter(
+                store =>
+                  store.status ===
+                  activeFilter
+              );
+
+      list.innerHTML =
+        stores.map(
+          store =>
+            '<article class="ui-v2-store-card">' +
+              '<header>' +
+                '<h3>' +
+                  escapeMarkup(
+                    store.name
+                  ) +
+                '</h3>' +
+                '<span class="ui-v2-store-card__status" data-state="' +
+                  escapeMarkup(
+                    store.status
+                  ) +
+                '">' +
+                  escapeMarkup(
+                    store.statusLabel
+                  ) +
+                '</span>' +
+              '</header>' +
+              '<div class="ui-v2-store-card__location">' +
+                escapeMarkup(
+                  store.district
+                ) +
+              '</div>' +
+              '<div class="ui-v2-store-card__stats">' +
+                '<span><small>营收</small><strong>' +
+                  escapeMarkup(
+                    formatCompactMoney(
+                      store.revenue
+                    )
+                  ) +
+                '</strong></span>' +
+                '<span><small>利润</small><strong>' +
+                  escapeMarkup(
+                    formatCompactMoney(
+                      Math.max(
+                        0,
+                        store.profit
+                      )
+                    )
+                  ) +
+                '</strong></span>' +
+                '<span><small>满意</small><strong>' +
+                  escapeMarkup(
+                    store.satisfaction
+                  ) +
+                  '%</strong></span>' +
+              '</div>' +
+              '<footer>' +
+                '<span>Lv.' +
+                  escapeMarkup(
+                    store.level
+                  ) +
+                '</span>' +
+                '<span>' +
+                  escapeMarkup(
+                    store.manager
+                  ) +
+                '</span>' +
+              '</footer>' +
+            '</article>'
+        ).join("");
+    };
+
+  const renderTasks =
+    model => {
+      if (!taskList) {
+        return;
+      }
+
+      if (
+        model.tasks.length ===
+        0
+      ) {
+        taskList.innerHTML =
+          '<div class="ui-v2-store-frame__task-empty">暂无待办，门店运营正常。</div>';
+        return;
+      }
+
+      taskList.innerHTML =
+        model.tasks
+          .slice(
+            0,
+            6
+          )
+          .map(
+            task =>
+              '<article class="ui-v2-store-task">' +
+                '<strong>' +
+                  escapeMarkup(
+                    task.title
+                  ) +
+                '</strong>' +
+                '<small>' +
+                  escapeMarkup(
+                    task.body
+                  ) +
+                '</small>' +
+              '</article>'
+          )
+          .join("");
+    };
+
+  const refresh = () => {
+    const model =
+      buildStoreModel(
+        app
+      );
+
+    latestModel =
+      model;
+
+    setText(
+      root,
+      "store-total",
+      model.counts.all
+    );
+    setText(
+      root,
+      "store-open",
+      model.counts.open
+    );
+    setText(
+      root,
+      "store-preparing",
+      model.counts.preparing
+    );
+    setText(
+      root,
+      "store-abnormal",
+      model.counts.abnormal
+    );
+    setText(
+      root,
+      "store-capacity",
+      model.counts.all +
+      " 家"
+    );
+    setText(
+      root,
+      "store-overview",
+      model.counts.all
+        ? (
+            "营业 " +
+            model.counts.open +
+            " · 筹备 " +
+            model.counts.preparing
+          )
+        : "当前暂无门店"
+    );
+    setText(
+      root,
+      "store-task-count",
+      model.tasks.length +
+      "项"
+    );
+
+    for (
+      const button
+      of root.querySelectorAll(
+        "[data-store-filter]"
+      )
+    ) {
+      const id =
+        button.dataset
+          .storeFilter;
+
+      setText(
+        root,
+        "store-filter-" +
+        id,
+        model.counts[id] ??
+        0
+      );
+
+      button.classList
+        .toggle(
+          "is-active",
+          id ===
+          activeFilter
+        );
+    }
+
+    const hasStores =
+      model.stores.length >
+      0;
+
+    empty?.classList
+      .toggle(
+        "is-hidden",
+        hasStores
+      );
+
+    renderStores(
+      model
+    );
+
+    renderTasks(
+      model
+    );
+
+    for (
+      const button
+      of root.querySelectorAll(
+        ".ui-v2-store-frame__action[data-store-action]"
+      )
+    ) {
+      const action =
+        button.dataset
+          .storeAction;
+
+      button.disabled =
+        !hasStores &&
+        action !==
+          "opening";
+    }
+  };
+
+  const scheduled =
+    scheduleRefresh(
+      refresh
+    );
+
+  const filterHandlers =
+    [];
+
+  for (
+    const button
+    of root.querySelectorAll(
+      "[data-store-filter]"
+    )
+  ) {
+    const handler = () => {
+      activeFilter =
+        button.dataset
+          .storeFilter ??
+        "all";
+
+      refresh();
+    };
+
+    filterHandlers.push([
+      button,
+      handler
+    ]);
+
+    button.addEventListener(
+      "click",
+      handler
+    );
+  }
+
+  const actionHandlers =
+    [];
+
+  for (
+    const button
+    of root.querySelectorAll(
+      "[data-store-action]"
+    )
+  ) {
+    const handler = () => {
+      const action =
+        button.dataset
+          .storeAction;
+
+      if (
+        action ===
+          "go-city" ||
+        (
+          action ===
+            "opening" &&
+          !latestModel
+            ?.stores
+            .length
+        )
+      ) {
+        navigate?.(
+          "city"
+        );
+        return;
+      }
+
+      app.core
+        .eventBus
+        .emit(
+          "ui:storeAction",
+          {
+            action,
+            storeCount:
+              latestModel
+                ?.stores
+                .length ??
+              0
+          }
+        );
+    };
+
+    actionHandlers.push([
+      button,
+      handler
+    ]);
+
+    button.addEventListener(
+      "click",
+      handler
+    );
+  }
+
+  const openDialog = (
+    title,
+    items
+  ) => {
+    if (!dialog) {
+      return;
+    }
+
+    const titleElement =
+      dialog.querySelector(
+        "[data-store-dialog-title]"
+      );
+
+    const listElement =
+      dialog.querySelector(
+        "[data-store-dialog-list]"
+      );
+
+    if (titleElement) {
+      titleElement.textContent =
+        title;
+    }
+
+    if (listElement) {
+      listElement.innerHTML =
+        (
+          items.length
+            ? items
+            : [
+                {
+                  title:
+                    "暂无数据",
+                  body: ""
+                }
+              ]
+        )
+          .map(
+            item =>
+              '<article><h3>' +
+                escapeMarkup(
+                  item.title
+                ) +
+              '</h3>' +
+              (
+                item.body
+                  ? '<p>' +
+                    escapeMarkup(
+                      item.body
+                    ) +
+                    '</p>'
+                  : ''
+              ) +
+              '</article>'
+          )
+          .join("");
+    }
+
+    if (
+      typeof dialog.showModal ===
+      "function"
+    ) {
+      if (!dialog.open) {
+        dialog.showModal();
+      }
+    } else {
+      dialog.setAttribute(
+        "open",
+        ""
+      );
+    }
+  };
+
+  const openQuickPanel =
+    kind => {
+      const model =
+        latestModel ??
+        buildStoreModel(
+          app
+        );
+
+      if (
+        kind === "scope" ||
+        kind === "store"
+      ) {
+        openDialog(
+          "旗下门店",
+          model.stores.map(
+            store => ({
+              title:
+                store.name,
+              body:
+                store.statusLabel +
+                " · " +
+                store.district
+            })
+          )
+        );
+        return;
+      }
+
+      if (
+        kind === "money"
+      ) {
+        openDialog(
+          "今日经营",
+          [
+            {
+              title:
+                "今日营业额 " +
+                formatCompactMoney(
+                  model.totalRevenue
+                ),
+              body:
+                "今日利润 " +
+                formatCompactMoney(
+                  Math.max(
+                    0,
+                    model.totalProfit
+                  )
+                )
+            }
+          ]
+        );
+        return;
+      }
+
+      openDialog(
+        kind === "operations"
+          ? "经营"
+          : kind === "employees"
+            ? "员工"
+            : "更多",
+        [
+          {
+            title:
+              "该一级页面将在后续接入",
+            body:
+              "当前门店页与城市页已使用正式页面切换。"
+          }
+        ]
+      );
+    };
+
+  const dialogCloseButton =
+    dialog?.querySelector(
+      "[data-store-dialog-close]"
+    );
+
+  const closeDialog = () => {
+    if (!dialog) {
+      return;
+    }
+
+    if (
+      typeof dialog.close ===
+        "function" &&
+      dialog.open
+    ) {
+      dialog.close();
+    } else {
+      dialog.removeAttribute(
+        "open"
+      );
+    }
+  };
+
+  dialogCloseButton
+    ?.addEventListener(
+      "click",
+      closeDialog
+    );
+
+  const unsubscribers = [
+    app.core
+      .eventBus
+      .on(
+        "state:changed",
+        scheduled
+      ),
+    app.core
+      .eventBus
+      .on(
+        "state:replaced",
+        scheduled
+      ),
+    app.core
+      .eventBus
+      .on(
+        "state:reset",
+        scheduled
+      )
+  ];
+
+  refresh();
+
+  return Object.freeze({
+    refresh,
+    openQuickPanel,
+
+    destroy() {
+      for (
+        const [
+          button,
+          handler
+        ]
+        of filterHandlers
+      ) {
+        button.removeEventListener(
+          "click",
+          handler
+        );
+      }
+
+      for (
+        const [
+          button,
+          handler
+        ]
+        of actionHandlers
+      ) {
+        button.removeEventListener(
+          "click",
+          handler
+        );
+      }
+
+      dialogCloseButton
+        ?.removeEventListener(
+          "click",
+          closeDialog
+        );
+
+      for (
+        const unsubscribe
+        of unsubscribers
+      ) {
+        unsubscribe();
+      }
+    }
+  });
+}
+
 export {
   districtMatchesFilter,
   resolveDistrictSelectionForFilter,
   bindGlobalHudLive,
   bindGlobalNavLive,
-  bindCityFrameLive
+  bindCityFrameLive,
+  bindStoreFrameLive
 };

@@ -1408,9 +1408,343 @@ function buildCityModel(
   };
 }
 
+function buildStoreModel(
+  app
+) {
+  const restaurants =
+    safeCall(
+      [],
+      () =>
+        app.systems
+          .restaurantSystem
+          .list()
+    );
+
+  const time =
+    safeCall(
+      {day: 1},
+      () =>
+        app.core
+          .gameState
+          .getSection(
+            "time"
+          )
+    );
+
+  const transactions =
+    safeCall(
+      [],
+      () =>
+        app.core
+          .entitySystem
+          .list(
+            "finance_transaction"
+          )
+    )
+      .filter(
+        item =>
+          Number(
+            item.day
+          ) ===
+          Number(
+            time.day
+          )
+      );
+
+  const getRestaurantTransactions =
+    restaurantId =>
+      transactions.filter(
+        item =>
+          item.restaurantId ===
+          restaurantId
+      );
+
+  const stores =
+    restaurants.map(
+      restaurant => {
+        const property =
+          restaurant.locationId
+            ? safeCall(
+                null,
+                () =>
+                  app.systems
+                    .propertySystem
+                    .get(
+                      restaurant.locationId
+                    )
+              )
+            : null;
+
+        const district =
+          property?.districtId
+            ? safeCall(
+                null,
+                () =>
+                  app.systems
+                    .districtSystem
+                    .get(
+                      property.districtId
+                    )
+              )
+            : null;
+
+        const todayTransactions =
+          getRestaurantTransactions(
+            restaurant.id
+          );
+
+        const revenue =
+          todayTransactions
+            .filter(
+              item =>
+                item.transactionType ===
+                "income"
+            )
+            .reduce(
+              (sum,item) =>
+                sum +
+                (
+                  Number(
+                    item.amount
+                  ) ||
+                  0
+                ),
+              0
+            );
+
+        const expense =
+          todayTransactions
+            .filter(
+              item =>
+                item.transactionType ===
+                  "expense" ||
+                item.transactionType ===
+                  "apply_hold"
+            )
+            .reduce(
+              (sum,item) =>
+                sum +
+                (
+                  Number(
+                    item.amount
+                  ) ||
+                  0
+                ),
+              0
+            );
+
+        const satisfaction =
+          Math.round(
+            Number(
+              restaurant
+                .customerSatisfaction
+            ) ||
+            0
+          );
+
+        let status =
+          "closed";
+
+        if (
+          restaurant.status ===
+          "open"
+        ) {
+          status = "open";
+        } else if (
+          restaurant.status ===
+            "paused" ||
+          satisfaction <
+            35
+        ) {
+          status = "abnormal";
+        } else if (
+          restaurant.firstOpenedAt ===
+            null ||
+          restaurant.firstOpenedAt ===
+            undefined
+        ) {
+          status = "preparing";
+        }
+
+        return {
+          id:
+            restaurant.id,
+          name:
+            restaurant.name ??
+            "未命名门店",
+          level:
+            Number(
+              restaurant.level
+            ) ||
+            1,
+          status,
+          statusLabel:
+            status === "open"
+              ? "营业中"
+              : status === "preparing"
+                ? "筹备中"
+                : status === "abnormal"
+                  ? "异常"
+                  : "已打烊",
+          district:
+            district?.name ??
+            property?.name ??
+            "尚未选址",
+          propertyName:
+            property?.name ??
+            "尚未选址",
+          revenue,
+          profit:
+            revenue -
+            expense,
+          satisfaction,
+          manager:
+            restaurant.managerName ??
+            "暂无负责人"
+        };
+      }
+    );
+
+  const openCount =
+    stores.filter(
+      store =>
+        store.status ===
+        "open"
+    ).length;
+
+  const preparingCount =
+    stores.filter(
+      store =>
+        store.status ===
+        "preparing"
+    ).length;
+
+  const abnormalCount =
+    stores.filter(
+      store =>
+        store.status ===
+        "abnormal"
+    ).length;
+
+  const tasks = [];
+
+  for (
+    const store
+    of stores
+  ) {
+    if (
+      store.status ===
+      "preparing"
+    ) {
+      tasks.push({
+        id:
+          store.id +
+          ":opening",
+        title:
+          store.name,
+        body:
+          "继续完成开店筹备"
+      });
+    }
+
+    if (
+      store.status ===
+      "abnormal"
+    ) {
+      tasks.push({
+        id:
+          store.id +
+          ":abnormal",
+        title:
+          store.name,
+        body:
+          "存在经营异常，需要处理"
+      });
+    }
+
+    if (
+      store.satisfaction >
+        0 &&
+      store.satisfaction <
+        60
+    ) {
+      tasks.push({
+        id:
+          store.id +
+          ":satisfaction",
+        title:
+          store.name,
+        body:
+          "顾客满意度偏低"
+      });
+    }
+
+    if (
+      store.propertyName ===
+      "尚未选址"
+    ) {
+      tasks.push({
+        id:
+          store.id +
+          ":location",
+        title:
+          store.name,
+        body:
+          "尚未完成门店选址"
+      });
+    }
+  }
+
+  const totalRevenue =
+    stores.reduce(
+      (sum,store) =>
+        sum +
+        store.revenue,
+      0
+    );
+
+  const totalProfit =
+    stores.reduce(
+      (sum,store) =>
+        sum +
+        store.profit,
+      0
+    );
+
+  return {
+    counts: {
+      all:
+        stores.length,
+      open:
+        openCount,
+      preparing:
+        preparingCount,
+      abnormal:
+        abnormalCount
+    },
+    totalRevenue,
+    totalProfit,
+    averageSatisfaction:
+      stores.length
+        ? Math.round(
+            stores.reduce(
+              (sum,store) =>
+                sum +
+                store.satisfaction,
+              0
+            ) /
+            stores.length
+          )
+        : 0,
+    stores,
+    tasks
+  };
+}
+
 export {
   formatCompactMoney,
   formatFullMoney,
   buildHudModel,
-  buildCityModel
+  buildCityModel,
+  buildStoreModel
 };
