@@ -363,6 +363,7 @@ export function createDevToolkit({
   const state = {
     open: false,
     expanded: false,
+    dock: "bottom",
     tab: "edit",
     selecting: false,
     selected: null,
@@ -428,6 +429,7 @@ export function createDevToolkit({
       values: {
         fontSize: Math.round(parseFloat(style.fontSize) || 0),
         padding: Math.round(parseFloat(style.paddingTop) || 0),
+        minWidth: Math.round(parseFloat(style.minWidth) || state.selected.getBoundingClientRect().width),
         minHeight: Math.round(parseFloat(style.minHeight) || state.selected.getBoundingClientRect().height),
         borderRadius: Math.round(parseFloat(style.borderRadius) || 0),
         left: style.left === "auto" ? 0 : Math.round(parseFloat(style.left) || 0),
@@ -510,6 +512,11 @@ export function createDevToolkit({
 
     if (property === "padding") {
       current = parseFloat(computed.paddingTop) || 0;
+    } else if (property === "minWidth") {
+      current =
+        parseFloat(computed.minWidth) ||
+        state.selected.getBoundingClientRect().width ||
+        0;
     } else if (property === "minHeight") {
       current =
         parseFloat(computed.minHeight) ||
@@ -531,8 +538,10 @@ export function createDevToolkit({
     const min =
       property === "fontSize"
         ? 8
-        : property === "minHeight"
+        : property === "minWidth"
           ? 24
+          : property === "minHeight"
+            ? 24
           : property === "left" || property === "top"
             ? -200
             : 0;
@@ -727,6 +736,7 @@ export function createDevToolkit({
       <div class="dev-editor-grid">
         ${stepper("字号", "fontSize", info.values.fontSize, 1)}
         ${stepper("内边距", "padding", info.values.padding, 2)}
+        ${stepper("宽度", "minWidth", info.values.minWidth, 4)}
         ${stepper("高度", "minHeight", info.values.minHeight, 4)}
         ${stepper("圆角", "borderRadius", info.values.borderRadius, 2)}
         ${stepper("左右", "left", info.values.left, 4)}
@@ -803,7 +813,7 @@ export function createDevToolkit({
     }
 
     host.innerHTML = `
-      <section class="ui-dev-sheet ${state.expanded ? "is-expanded" : ""}">
+      <section class="ui-dev-sheet ${state.expanded ? "is-expanded" : ""} ${state.dock === "top" ? "is-top" : ""}">
         <div class="ui-dev-grabber"></div>
 
         <header class="ui-dev-sheet-header">
@@ -815,6 +825,7 @@ export function createDevToolkit({
           <div class="dev-header-actions">
             <button type="button" data-dev-undo ${state.undoStack.length ? "" : "disabled"}>↶</button>
             <button type="button" data-dev-redo ${state.redoStack.length ? "" : "disabled"}>↷</button>
+            <button type="button" data-dev-dock>${state.dock === "bottom" ? "上移" : "下移"}</button>
             <button type="button" data-dev-expand>${state.expanded ? "收起" : "展开"}</button>
             <button type="button" data-dev-close>×</button>
           </div>
@@ -866,6 +877,14 @@ export function createDevToolkit({
   function bindPanelEvents() {
     host.querySelector("[data-dev-close]")?.addEventListener("click", () => {
       state.open = false;
+      renderPanel();
+    });
+
+    host.querySelector("[data-dev-dock]")?.addEventListener("click", () => {
+      state.dock =
+        state.dock === "bottom"
+          ? "top"
+          : "bottom";
       renderPanel();
     });
 
