@@ -1,0 +1,75 @@
+name: Scene Playtest APK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "playtest/**"
+      - "tests/scene-runtime.test.js"
+      - "scripts/build-scene-playtest.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/scene-playtest.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Test scene runtime
+        run: npm run test:scene
+
+      - name: Build scene web assets
+        run: npm run build:scene-playtest
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Build debug APK
+        run: gradle -p playtest/android :app:assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: restaurant-scene-playtest-apk
+          path: playtest/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Upload browser playtest
+        uses: actions/upload-artifact@v4
+        with:
+          name: restaurant-scene-playtest-web
+          path: dist/scene-playtest
+          if-no-files-found: error

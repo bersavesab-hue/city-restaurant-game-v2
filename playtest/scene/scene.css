@@ -1,0 +1,138 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  background: #1f2428;
+  font-family:
+    system-ui,
+    "Noto Sans SC",
+    sans-serif;
+  color: #f5f3ef;
+}
+
+body {
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+button {
+  border: 0;
+  font: inherit;
+  touch-action: manipulation;
+}
+
+.playtest {
+  width: 100vw;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows:
+    calc(64px + env(safe-area-inset-top))
+    minmax(0, 1fr)
+    64px
+    calc(68px + env(safe-area-inset-bottom));
+  background: #252a2f;
+}
+
+.playtest__hud {
+  padding:
+    calc(10px + env(safe-area-inset-top))
+    14px
+    10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #30363c;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.playtest__hud div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.playtest__hud strong {
+  font-size: 18px;
+}
+
+.playtest__hud small {
+  color: #f1c46f;
+  font-size: 13px;
+}
+
+.playtest__hud button,
+.playtest__controls button {
+  min-height: 42px;
+  border-radius: 12px;
+  padding: 0 16px;
+  background: #434b53;
+  color: #fff;
+  font-weight: 800;
+}
+
+.playtest__stage {
+  min-height: 0;
+  padding: 8px;
+}
+
+#scene {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 16px;
+  background: #171b1f;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.06);
+}
+
+.playtest__info {
+  min-width: 0;
+  padding: 10px 14px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  background: #30363c;
+  border-top: 1px solid rgba(255,255,255,.08);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.playtest__info strong {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playtest__info span {
+  color: #b9c1c9;
+  font-size: 12px;
+}
+
+.playtest__controls {
+  padding:
+    10px
+    12px
+    calc(10px + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns:
+    1fr
+    1fr
+    1fr
+    1.5fr;
+  gap: 8px;
+  background: #262c31;
+}
+
+.playtest__controls button.is-active {
+  background: #d69d42;
+  color: #1f2428;
+}
+
+#spawn {
+  background: #4079b8;
+}

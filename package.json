@@ -1,6 +1,6 @@
 {
   "name": "city-restaurant-game-v2",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -34,9 +34,11 @@
     "test:phase3:balance": "node scripts/phase3-balance-gate.mjs",
     "test:phase3:longrun": "node scripts/phase3-longrun-gate.mjs",
     "test:phase3:performance": "node scripts/phase3-performance-gate.mjs",
-    "test:save-compat": "node scripts/save-compatibility-gate.mjs"
+    "test:save-compat": "node scripts/save-compatibility-gate.mjs",
+    "test:scene": "node --test tests/scene-runtime.test.js",
+    "build:scene-playtest": "node scripts/build-scene-playtest.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
   }
-}
+}\n
