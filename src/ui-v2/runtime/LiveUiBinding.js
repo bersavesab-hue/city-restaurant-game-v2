@@ -1629,6 +1629,11 @@ function bindStoreFrameLive(
   let latestModel =
     null;
 
+  const frame =
+    root.querySelector(
+      '[data-ui="store-frame"]'
+    );
+
   const list =
     root.querySelector(
       "[data-store-list]"
@@ -1655,76 +1660,62 @@ function bindStoreFrameLive(
         return;
       }
 
-      const stores =
-        activeFilter ===
-        "all"
+      const source =
+        model.displayMode ===
+          "single"
           ? model.stores
-          : model.stores
-              .filter(
-                store =>
-                  store.status ===
-                  activeFilter
-              );
+          : activeFilter ===
+              "all"
+            ? model.stores
+            : model.stores
+                .filter(
+                  store =>
+                    store.status ===
+                    activeFilter
+                );
 
       list.innerHTML =
-        stores.map(
+        source.map(
           store =>
             '<article class="ui-v2-store-card">' +
               '<header>' +
                 '<h3>' +
-                  escapeMarkup(
-                    store.name
-                  ) +
+                  escapeMarkup(store.name) +
                 '</h3>' +
                 '<span class="ui-v2-store-card__status" data-state="' +
-                  escapeMarkup(
-                    store.status
-                  ) +
+                  escapeMarkup(store.status) +
                 '">' +
-                  escapeMarkup(
-                    store.statusLabel
-                  ) +
+                  escapeMarkup(store.statusLabel) +
                 '</span>' +
               '</header>' +
               '<div class="ui-v2-store-card__location">' +
-                escapeMarkup(
-                  store.district
-                ) +
+                escapeMarkup(store.district) +
+              '</div>' +
+              '<div class="ui-v2-store-card__primary">' +
+                '<strong>主门店</strong>' +
+                '<small>当前唯一门店</small>' +
               '</div>' +
               '<div class="ui-v2-store-card__stats">' +
-                '<span><small>营收</small><strong>' +
+                '<span><small>今日营业额</small><strong>' +
                   escapeMarkup(
-                    formatCompactMoney(
-                      store.revenue
-                    )
+                    formatCompactMoney(store.revenue)
                   ) +
                 '</strong></span>' +
-                '<span><small>利润</small><strong>' +
+                '<span><small>今日利润</small><strong>' +
                   escapeMarkup(
-                    formatCompactMoney(
-                      Math.max(
-                        0,
-                        store.profit
-                      )
-                    )
+                    formatCompactMoney(store.profit)
                   ) +
                 '</strong></span>' +
-                '<span><small>满意</small><strong>' +
-                  escapeMarkup(
-                    store.satisfaction
-                  ) +
+                '<span><small>满意度</small><strong>' +
+                  escapeMarkup(store.satisfaction) +
                   '%</strong></span>' +
               '</div>' +
               '<footer>' +
                 '<span>Lv.' +
-                  escapeMarkup(
-                    store.level
-                  ) +
+                  escapeMarkup(store.level) +
                 '</span>' +
                 '<span>' +
-                  escapeMarkup(
-                    store.manager
-                  ) +
+                  escapeMarkup(store.manager) +
                 '</span>' +
               '</footer>' +
             '</article>'
@@ -1748,22 +1739,15 @@ function bindStoreFrameLive(
 
       taskList.innerHTML =
         model.tasks
-          .slice(
-            0,
-            6
-          )
+          .slice(0,6)
           .map(
             task =>
               '<article class="ui-v2-store-task">' +
                 '<strong>' +
-                  escapeMarkup(
-                    task.title
-                  ) +
+                  escapeMarkup(task.title) +
                 '</strong>' +
                 '<small>' +
-                  escapeMarkup(
-                    task.body
-                  ) +
+                  escapeMarkup(task.body) +
                 '</small>' +
               '</article>'
           )
@@ -1772,17 +1756,37 @@ function bindStoreFrameLive(
 
   const refresh = () => {
     const model =
-      buildStoreModel(
-        app
-      );
+      buildStoreModel(app);
 
     latestModel =
       model;
 
+    if (frame) {
+      frame.dataset.storeLayout =
+        model.displayMode;
+    }
+
+    if (
+      model.displayMode ===
+      "single"
+    ) {
+      activeFilter =
+        "all";
+    }
+
     setText(
       root,
-      "store-total",
-      model.counts.all
+      "store-revenue",
+      formatCompactMoney(
+        model.totalRevenue
+      )
+    );
+    setText(
+      root,
+      "store-profit",
+      formatCompactMoney(
+        model.totalProfit
+      )
     );
     setText(
       root,
@@ -1791,31 +1795,34 @@ function bindStoreFrameLive(
     );
     setText(
       root,
-      "store-preparing",
-      model.counts.preparing
+      "store-satisfaction",
+      model.averageSatisfaction +
+      "%"
     );
     setText(
       root,
-      "store-abnormal",
-      model.counts.abnormal
-    );
-    setText(
-      root,
-      "store-capacity",
+      "store-heading-count",
+      "(" +
       model.counts.all +
-      " 家"
+      ")"
     );
     setText(
       root,
       "store-overview",
-      model.counts.all
-        ? (
-            "营业 " +
-            model.counts.open +
-            " · 筹备 " +
-            model.counts.preparing
-          )
-        : "当前暂无门店"
+      model.displayMode ===
+        "empty"
+        ? "当前暂无门店"
+        : model.displayMode ===
+            "single"
+          ? "当前仅有 1 家门店，直接展示完整经营信息"
+          : (
+              "营业 " +
+              model.counts.open +
+              " · 筹备 " +
+              model.counts.preparing +
+              " · 异常 " +
+              model.counts.abnormal
+            )
     );
     setText(
       root,
@@ -1831,42 +1838,34 @@ function bindStoreFrameLive(
       )
     ) {
       const id =
-        button.dataset
-          .storeFilter;
+        button.dataset.storeFilter;
 
       setText(
         root,
-        "store-filter-" +
-        id,
-        model.counts[id] ??
-        0
+        "store-filter-" + id,
+        model.counts[id] ?? 0
       );
 
-      button.classList
-        .toggle(
-          "is-active",
-          id ===
-          activeFilter
-        );
+      button.classList.toggle(
+        "is-active",
+        id === activeFilter
+      );
+
+      button.disabled =
+        model.displayMode !==
+        "multi";
     }
 
     const hasStores =
-      model.stores.length >
-      0;
+      model.stores.length > 0;
 
-    empty?.classList
-      .toggle(
-        "is-hidden",
-        hasStores
-      );
-
-    renderStores(
-      model
+    empty?.classList.toggle(
+      "is-hidden",
+      hasStores
     );
 
-    renderTasks(
-      model
-    );
+    renderStores(model);
+    renderTasks(model);
 
     for (
       const button
@@ -1875,8 +1874,7 @@ function bindStoreFrameLive(
       )
     ) {
       const action =
-        button.dataset
-          .storeAction;
+        button.dataset.storeAction;
 
       button.disabled =
         !hasStores &&
@@ -1886,12 +1884,9 @@ function bindStoreFrameLive(
   };
 
   const scheduled =
-    scheduleRefresh(
-      refresh
-    );
+    scheduleRefresh(refresh);
 
-  const filterHandlers =
-    [];
+  const filterHandlers = [];
 
   for (
     const button
@@ -1900,9 +1895,15 @@ function bindStoreFrameLive(
     )
   ) {
     const handler = () => {
+      if (
+        latestModel?.displayMode !==
+        "multi"
+      ) {
+        return;
+      }
+
       activeFilter =
-        button.dataset
-          .storeFilter ??
+        button.dataset.storeFilter ??
         "all";
 
       refresh();
@@ -1919,8 +1920,7 @@ function bindStoreFrameLive(
     );
   }
 
-  const actionHandlers =
-    [];
+  const actionHandlers = [];
 
   for (
     const button
@@ -1930,39 +1930,29 @@ function bindStoreFrameLive(
   ) {
     const handler = () => {
       const action =
-        button.dataset
-          .storeAction;
+        button.dataset.storeAction;
 
       if (
-        action ===
-          "go-city" ||
+        action === "go-city" ||
         (
-          action ===
-            "opening" &&
-          !latestModel
-            ?.stores
-            .length
+          action === "opening" &&
+          !latestModel?.stores.length
         )
       ) {
-        navigate?.(
-          "city"
-        );
+        navigate?.("city");
         return;
       }
 
-      app.core
-        .eventBus
-        .emit(
-          "ui:storeAction",
-          {
-            action,
-            storeCount:
-              latestModel
-                ?.stores
-                .length ??
-              0
-          }
-        );
+      app.core.eventBus.emit(
+        "ui:storeAction",
+        {
+          action,
+          storeCount:
+            latestModel?.stores.length ?? 0,
+          displayMode:
+            latestModel?.displayMode ?? "empty"
+        }
+      );
     };
 
     actionHandlers.push([
@@ -2004,27 +1994,17 @@ function bindStoreFrameLive(
         (
           items.length
             ? items
-            : [
-                {
-                  title:
-                    "暂无数据",
-                  body: ""
-                }
-              ]
+            : [{title:"暂无数据",body:""}]
         )
           .map(
             item =>
               '<article><h3>' +
-                escapeMarkup(
-                  item.title
-                ) +
+                escapeMarkup(item.title) +
               '</h3>' +
               (
                 item.body
                   ? '<p>' +
-                    escapeMarkup(
-                      item.body
-                    ) +
+                    escapeMarkup(item.body) +
                     '</p>'
                   : ''
               ) +
@@ -2052,9 +2032,7 @@ function bindStoreFrameLive(
     kind => {
       const model =
         latestModel ??
-        buildStoreModel(
-          app
-        );
+        buildStoreModel(app);
 
       if (
         kind === "scope" ||
@@ -2064,8 +2042,7 @@ function bindStoreFrameLive(
           "旗下门店",
           model.stores.map(
             store => ({
-              title:
-                store.name,
+              title: store.name,
               body:
                 store.statusLabel +
                 " · " +
@@ -2091,10 +2068,7 @@ function bindStoreFrameLive(
               body:
                 "今日利润 " +
                 formatCompactMoney(
-                  Math.max(
-                    0,
-                    model.totalProfit
-                  )
+                  model.totalProfit
                 )
             }
           ]
@@ -2149,24 +2123,18 @@ function bindStoreFrameLive(
     );
 
   const unsubscribers = [
-    app.core
-      .eventBus
-      .on(
-        "state:changed",
-        scheduled
-      ),
-    app.core
-      .eventBus
-      .on(
-        "state:replaced",
-        scheduled
-      ),
-    app.core
-      .eventBus
-      .on(
-        "state:reset",
-        scheduled
-      )
+    app.core.eventBus.on(
+      "state:changed",
+      scheduled
+    ),
+    app.core.eventBus.on(
+      "state:replaced",
+      scheduled
+    ),
+    app.core.eventBus.on(
+      "state:reset",
+      scheduled
+    )
   ];
 
   refresh();
@@ -2177,10 +2145,7 @@ function bindStoreFrameLive(
 
     destroy() {
       for (
-        const [
-          button,
-          handler
-        ]
+        const [button,handler]
         of filterHandlers
       ) {
         button.removeEventListener(
@@ -2190,10 +2155,7 @@ function bindStoreFrameLive(
       }
 
       for (
-        const [
-          button,
-          handler
-        ]
+        const [button,handler]
         of actionHandlers
       ) {
         button.removeEventListener(
