@@ -40,12 +40,118 @@ function formatClock(time) {
   );
 }
 
+function formatClockOffset(time, offsetMinutes = 0) {
+  const total =
+    (
+      Number(time.hour) * 60 +
+      Number(time.minute) +
+      offsetMinutes +
+      1440
+    ) % 1440;
+
+  return (
+    String(
+      Math.floor(total / 60)
+    ).padStart(2, "0") +
+    ":" +
+    String(total % 60)
+      .padStart(2, "0")
+  );
+}
+
+function percentTrend(current, previous) {
+  const now =
+    Number(current) || 0;
+
+  const before =
+    Number(previous) || 0;
+
+  if (before === 0) {
+    return now === 0
+      ? 0
+      : 100;
+  }
+
+  return Math.max(
+    -999,
+    Math.min(
+      999,
+      Math.round(
+        (
+          (now - before) /
+          Math.abs(before)
+        ) * 100
+      )
+    )
+  );
+}
+
+const CUSTOMER_LABELS =
+  Object.freeze({
+    student: "学生/年轻人",
+    office_worker: "上班族",
+    business_guest: "商务客",
+    high_income: "高消费客群",
+    young_professional: "年轻白领",
+    delivery_heavy: "外卖用户",
+    takeaway_commuter: "通勤客",
+    foodie: "美食爱好者",
+    premium_foodie: "品质食客",
+    resident: "周边居民",
+    senior: "银发客群",
+    tourist: "游客",
+    local_regular: "熟客",
+    freelancer: "自由职业者",
+    budget_family: "家庭客",
+    social_group: "聚会社交",
+    nightlife: "夜间客群"
+  });
+
+function topCustomerLabel(district) {
+  const mix =
+    district?.customerMix;
+
+  if (
+    !mix ||
+    typeof mix !== "object"
+  ) {
+    return "综合客群";
+  }
+
+  const top =
+    Object.entries(mix)
+      .sort(
+        (a, b) =>
+          Number(b[1]) -
+          Number(a[1])
+      )[0];
+
+  if (!top) {
+    return "综合客群";
+  }
+
+  return (
+    CUSTOMER_LABELS[top[0]] ??
+    top[0]
+  );
+}
+
+function periodLabel(hour) {
+  if (hour < 10) return "早餐";
+  if (hour < 14) return "午间";
+  if (hour < 17) return "下午";
+  if (hour < 22) return "晚间";
+  return "夜间";
+}
+
 function buildOpportunity({
   restaurant,
   progress,
   employees,
   todayProfit,
-  balance
+  balance,
+  district,
+  time
 }) {
   if (
     restaurant.status !== "open"
@@ -90,6 +196,68 @@ function buildOpportunity({
           balance
         ).toLocaleString("zh-CN")}，暂缓大额投入。`,
       action: "查看财务"
+    };
+  }
+
+  if (district) {
+    const traffic =
+      Number(
+        district.trafficIndex ??
+        0
+      );
+
+    const spending =
+      Number(
+        district.spendingPower ??
+        0
+      );
+
+    const delivery =
+      Number(
+        district.deliveryDemand ??
+        0
+      );
+
+    const competition =
+      Number(
+        district.competition ??
+        0
+      );
+
+    const period =
+      periodLabel(
+        time?.hour ?? 12
+      );
+
+    const trafficWord =
+      traffic >= 80
+        ? "明显上升"
+        : traffic >= 65
+          ? "保持活跃"
+          : "相对平稳";
+
+    const suggestion =
+      delivery >= 75
+        ? "建议提前备菜，并关注外卖高峰与出餐效率。"
+        : competition >= 75
+          ? "建议强化招牌菜和服务差异，避免陷入价格竞争。"
+          : spending >= 70
+            ? "消费力较强，可重点推高毛利菜和套餐组合。"
+            : "建议控制备货节奏，优先提高桌台周转和复购。";
+
+    return {
+      tone: "positive",
+      title:
+        `商圈动态：${district.name}${period}客流${trafficWord}`,
+      detail:
+        `客流 ${traffic} · 消费力 ${spending} · 外卖需求 ${delivery} · 竞争强度 ${competition}。 ${suggestion}`,
+      action: "去经营",
+      tags: [
+        district.name,
+        `客流 ${traffic}`,
+        `外卖 ${delivery}`,
+        topCustomerLabel(district)
+      ]
     };
   }
 
@@ -379,6 +547,41 @@ function buildHomeDashboardModel(
     todayRevenue -
     todayExpense;
 
+  const previousTransactions =
+    transactions.filter(
+      item =>
+        item.day ===
+        time.day - 1
+    );
+
+  const previousRevenue =
+    sum(
+      previousTransactions.filter(
+        item =>
+          item.transactionType ===
+          "income"
+      ),
+      item => item.amount
+    );
+
+  const previousExpense =
+    sum(
+      previousTransactions.filter(
+        item =>
+          [
+            "expense",
+            "apply_hold"
+          ].includes(
+            item.transactionType
+          )
+      ),
+      item => item.amount
+    );
+
+  const previousProfit =
+    previousRevenue -
+    previousExpense;
+
   const renovation =
     safeCall(
       () =>
@@ -433,7 +636,9 @@ function buildHomeDashboardModel(
       progress,
       employees,
       todayProfit,
-      balance
+      balance,
+      district,
+      time
     });
 
   return {
@@ -472,7 +677,17 @@ function buildHomeDashboardModel(
       balance,
       todayRevenue,
       todayExpense,
-      todayProfit
+      todayProfit,
+      revenueTrend:
+        percentTrend(
+          todayRevenue,
+          previousRevenue
+        ),
+      profitTrend:
+        percentTrend(
+          todayProfit,
+          previousProfit
+        )
     },
 
     operations: {
@@ -520,6 +735,10 @@ function buildHomeDashboardModel(
               district.rentMultiplier ??
               1
             ),
+          mainCustomer:
+            topCustomerLabel(
+              district
+            ),
           opportunityScore:
             safeCall(
               () =>
@@ -540,10 +759,37 @@ function buildHomeDashboardModel(
         employees,
         todayRevenue,
         todayProfit
-      }),
+      }).map(
+        (item, index) => ({
+          ...item,
+          time:
+            formatClockOffset(
+              time,
+              -index * 4
+            )
+        })
+      ),
 
     schedule:
-      buildSchedule(time)
+      buildSchedule(time).map(
+        (item, index, items) => {
+          const firstPending =
+            items.findIndex(
+              entry =>
+                !entry.done
+            );
+
+          return {
+            ...item,
+            status:
+              item.done
+                ? "done"
+                : index === firstPending
+                  ? "active"
+                  : "upcoming"
+          };
+        }
+      )
   };
 }
 
