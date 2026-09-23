@@ -887,48 +887,45 @@ function openSheet(type) {
   devToolkit?.afterRender();
 }
 
-setInterval(
-  () => {
-    if (!running) {
-      return;
-    }
+const clockTimer =
+  setInterval(
+    () => {
+      try {
+        app.core.timeSystem
+          .advance(10);
 
-    try {
-      app.core.timeSystem
-        .advance(
-          10 * speed
-        );
+        if (
+          activePage === "store"
+        ) {
+          const model =
+            buildHomeDashboardModel(
+              app
+            );
 
-      if (
-        activePage === "store"
-      ) {
-        const model =
-          buildHomeDashboardModel(
-            app
-          );
+          const clock =
+            root.querySelector(
+              '[data-bind="clock"]'
+            );
 
-        const clock =
-          root.querySelector(
-            '[data-bind="clock"]'
-          );
-
-        if (clock) {
-          clock.textContent =
-            model.time.clock;
+          if (clock) {
+            clock.textContent =
+              model.time.clock;
+          }
         }
-      }
-    } catch (error) {
-      app.systems
-        .feedbackSystem
-        .captureRuntimeError(
-          error,
-          "mobile-ui-clock"
-        );
+      } catch (error) {
+        app.systems
+          .feedbackSystem
+          .captureRuntimeError(
+            error,
+            "mobile-ui-clock"
+          );
 
-      running = false;
-    }
-  },
-  1200
-);
+        clearInterval(
+          clockTimer
+        );
+      }
+    },
+    1200
+  );
 
 render();
