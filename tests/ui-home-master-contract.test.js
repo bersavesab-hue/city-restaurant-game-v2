@@ -29,6 +29,24 @@ const androidActivity =
     "utf8"
   );
 
+const demoSeed =
+  fs.readFileSync(
+    new URL(
+      "../client/mobile/DemoSeed.js",
+      import.meta.url
+    ),
+    "utf8"
+  );
+
+const buildScript =
+  fs.readFileSync(
+    new URL(
+      "../scripts/build-mobile-ui.mjs",
+      import.meta.url
+    ),
+    "utf8"
+  );
+
 test(
   "home master keeps the approved reference-inspired module structure",
   () => {
@@ -170,6 +188,47 @@ test(
     assert.doesNotMatch(
       androidActivity,
       /SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION/
+    );
+  }
+);
+
+
+test(
+  "reference seed and hero asset stay wired into the APK build",
+  () => {
+    assert.match(
+      demoSeed,
+      /districtId:\s*"university"/
+    );
+
+    assert.match(
+      demoSeed,
+      /day:\s*18/
+    );
+
+    assert.match(
+      demoSeed,
+      /hour:\s*11/
+    );
+
+    assert.match(
+      demoSeed,
+      /minute:\s*40/
+    );
+
+    assert.doesNotMatch(
+      mobileApp,
+      /timeSystem\s*\.advance\(10\)/
+    );
+
+    assert.match(
+      buildScript,
+      /client\/mobile\/assets/
+    );
+
+    assert.match(
+      buildScript,
+      /path\.join\(\s*output,\s*"assets"\s*\)/
     );
   }
 );
