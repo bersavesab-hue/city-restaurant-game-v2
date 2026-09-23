@@ -18,7 +18,7 @@ body {
   margin: 0;
   width: 100%;
   min-height: 100%;
-  background: #102a42;
+  background: #ede8df;
 }
 
 body {
@@ -57,13 +57,11 @@ button {
   width:
     min(
       100vw,
-      540px,
-      calc(100dvh * 9 / 16)
+      540px
     );
-  aspect-ratio: 9 / 16;
-  height: auto;
+  height: 100dvh;
   max-height: 100dvh;
-  margin: auto;
+  margin: 0 auto;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   background:
@@ -1846,5 +1844,20 @@ button {
 
   .home-metric-grid {
     gap: 4px;
+  }
+}
+
+
+/* 9:16 is the design baseline. Taller phones extend the game canvas
+   instead of letterboxing the interface with large empty bars. */
+@media (min-aspect-ratio: 9 / 18) {
+  .home-hero-shell {
+    min-height:
+      clamp(
+        450px,
+        44dvh,
+        540px
+      );
+    aspect-ratio: auto;
   }
 }
