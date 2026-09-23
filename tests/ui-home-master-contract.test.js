@@ -73,7 +73,12 @@ test(
 
     assert.match(
       mobileApp,
-      /class="hero-static-scene"/
+      /class="hero-artwork"/
+    );
+
+    assert.match(
+      mobileApp,
+      /assets\/home\/restaurant-hero\.jpg/
     );
 
     assert.doesNotMatch(
