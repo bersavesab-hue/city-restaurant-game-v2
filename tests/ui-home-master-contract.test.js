@@ -173,21 +173,26 @@ test(
 
 
 test(
-  "home hero stays full-height on narrow phones and Android avoids system-bar overlap",
+  "home uses immersive Android viewport without legacy narrow hero collapse",
   () => {
     assert.doesNotMatch(
       css,
       /@media \(max-width: 370px\)[\s\S]*?\.micro-scene\s*\{[\s\S]*?height:\s*246px/
     );
 
-    assert.doesNotMatch(
+    assert.match(
       androidActivity,
-      /SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN/
+      /SYSTEM_UI_FLAG_IMMERSIVE_STICKY/
     );
 
-    assert.doesNotMatch(
+    assert.match(
       androidActivity,
-      /SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION/
+      /SYSTEM_UI_FLAG_FULLSCREEN/
+    );
+
+    assert.match(
+      androidActivity,
+      /SYSTEM_UI_FLAG_HIDE_NAVIGATION/
     );
   }
 );
@@ -223,12 +228,27 @@ test(
 
     assert.match(
       buildScript,
-      /client\/mobile\/assets/
+      /client\/mobile\/assets-src\/home/
     );
 
     assert.match(
       buildScript,
-      /path\.join\(\s*output,\s*"assets"\s*\)/
+      /Expected 4 restaurant hero chunks/
+    );
+
+    assert.match(
+      buildScript,
+      /Buffer\.from\(\s*heroBase64,\s*"base64"\s*\)/
+    );
+
+    assert.match(
+      buildScript,
+      /Restaurant hero asset decode failed/
+    );
+
+    assert.match(
+      buildScript,
+      /path\.join\(\s*heroOutputDirectory,\s*"restaurant-hero\.jpg"\s*\)/
     );
   }
 );
