@@ -24,8 +24,26 @@ body {
 body {
   min-height: 100dvh;
   overflow: hidden;
-  display: grid;
-  place-items: center;
+  position: relative;
+}
+
+#app {
+  width: 100vw;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#sheet-root {
+  position: fixed;
+  inset: 0;
+  z-index: 90000;
+  pointer-events: none;
+}
+
+#sheet-root > * {
+  pointer-events: auto;
 }
 
 button {
@@ -312,10 +330,7 @@ button {
   left: 0;
   z-index: 1;
   width: 100%;
-  height:
-    calc(
-      100% - 78px
-    );
+  height: 100%;
   display: block;
   object-fit: cover;
   object-position: center top;
@@ -662,6 +677,10 @@ button {
   min-width: 0;
 }
 
+.opportunity-copy {
+  overflow: hidden;
+}
+
 .opportunity-copy h2 {
   margin: 0;
   color: #153f5d;
@@ -671,7 +690,11 @@ button {
       3.25vw,
       16px
     );
-  line-height: 1.3;
+  line-height: 1.22;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .opportunity-copy p {
@@ -729,16 +752,32 @@ button {
 
 .opportunity-side {
   min-width: 0;
+  min-height: 0;
   display: grid;
   grid-template-rows:
-    minmax(0,1fr) 34px;
-  gap: 7px;
+    minmax(0,1fr)
+    clamp(
+      24px,
+      6.4vw,
+      34px
+    );
+  gap:
+    clamp(
+      3px,
+      .8vw,
+      5px
+    );
 }
 
 .district-miniature {
   position: relative;
-  min-height: 76px;
-  padding: 9px;
+  min-height: 0;
+  padding:
+    clamp(
+      4px,
+      1.1vw,
+      7px
+    );
   overflow: hidden;
   border-radius: 11px;
   display: grid;
@@ -797,7 +836,12 @@ button {
 }
 
 .opportunity-side > button {
-  min-height: 38px;
+  min-height:
+    clamp(
+      24px,
+      6.4vw,
+      34px
+    );
   border-radius: 10px;
   display: flex;
   align-items: center;
