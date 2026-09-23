@@ -134,22 +134,22 @@ button {
 }
 
 .home-hud {
-  min-height: 62px;
+  min-height: 52px;
   display: grid;
   grid-template-columns:
-    1.05fr
-    1.05fr
-    1.33fr
-    1.05fr
-    1.14fr
-    42px;
-  gap: 5px;
+    1.08fr
+    1fr
+    1.26fr
+    1fr
+    1.08fr
+    38px;
+  gap: 4px;
   align-items: stretch;
 }
 
 .hud-card {
   min-width: 0;
-  padding: 6px 7px;
+  padding: 5px 6px;
   border-radius: 11px;
   display: grid;
   grid-template-columns:
@@ -180,13 +180,13 @@ button {
 }
 
 .hud-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 8px;
   display: grid;
   place-items: center;
   color: #ffd258;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 950;
   background:
     rgba(255,255,255,.08);
@@ -212,9 +212,9 @@ button {
   color: #fff;
   font-size:
     clamp(
-      10px,
-      3vw,
-      15px
+      9px,
+      2.7vw,
+      13px
     );
   line-height: 1.12;
   text-overflow: ellipsis;
@@ -279,8 +279,8 @@ button {
 }
 
 .hud-settings {
-  width: 42px;
-  min-width: 42px;
+  width: 38px;
+  min-width: 38px;
   border-radius: 11px;
   display: grid;
   place-items: center;
@@ -291,7 +291,7 @@ button {
       rgba(23,54,79,.98)
     );
   color: #fff;
-  font-size: 19px;
+  font-size: 17px;
   box-shadow:
     0 3px 8px
     rgba(12,31,46,.20);
@@ -328,8 +328,8 @@ button {
 
 .home-metric-card {
   min-width: 0;
-  min-height: 100px;
-  padding: 9px 8px 8px;
+  min-height: 82px;
+  padding: 7px 7px 6px;
   border-radius: 14px;
   display: grid;
   grid-template-rows:
@@ -374,9 +374,9 @@ button {
   color: #153e58;
   font-size:
     clamp(
-      18px,
-      4.8vw,
-      25px
+      16px,
+      4.3vw,
+      22px
     );
   line-height: 1.05;
   letter-spacing: -.04em;
@@ -386,8 +386,8 @@ button {
 
 .metric-symbol {
   flex: 0 0 auto;
-  width: 25px;
-  height: 25px;
+  width: 22px;
+  height: 22px;
   border-radius: 9px;
   display: grid;
   place-items: center;
@@ -528,7 +528,7 @@ button {
 }
 
 .opportunity-band {
-  min-height: 48px;
+  min-height: 42px;
   padding: 7px 10px;
   display: grid;
   grid-template-columns:
@@ -591,7 +591,7 @@ button {
 }
 
 .opportunity-body {
-  min-height: 128px;
+  min-height: 104px;
   padding: 10px;
   display: grid;
   grid-template-columns:
@@ -739,7 +739,7 @@ button {
 }
 
 .opportunity-side > button {
-  min-height: 43px;
+  min-height: 38px;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -757,11 +757,11 @@ button {
 }
 
 .home-dual-grid {
-  margin-top: 8px;
+  margin-top: 6px;
   display: grid;
   grid-template-columns:
     repeat(2, minmax(0,1fr));
-  gap: 8px;
+  gap: 6px;
   align-items: stretch;
 }
 
