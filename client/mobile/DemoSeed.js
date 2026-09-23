@@ -3,11 +3,13 @@ function ensureUiPlaytestSeed(app) {
     restaurantSystem,
     financeSystem,
     employeeSystem,
-    storeProgressSystem
+    storeProgressSystem,
+    propertySystem
   } = app.systems;
 
   const {
-    entitySystem
+    entitySystem,
+    gameState
   } = app.core;
 
   const existing =
@@ -17,10 +19,62 @@ function ensureUiPlaytestSeed(app) {
     return existing;
   }
 
+  const universityProperty =
+    propertySystem
+      .list({
+        districtId:
+          "university",
+        availableOnly:
+          true
+      })[0] ??
+    propertySystem.create({
+      districtId:
+        "university",
+      name:
+        "大学城临街店",
+      area: 118,
+      usableArea: 106,
+      baseMonthlyRent: 18000,
+      seats: 48,
+      frontageMeters: 8.5,
+      ceilingHeight: 3.6,
+      parkingSpaces: 8,
+      tags: [
+        "campus",
+        "street_shop"
+      ]
+    });
+
+  gameState.setSection(
+    "time",
+    {
+      day: 18,
+      hour: 11,
+      minute: 40,
+      totalMinutes:
+        17 * 1440 +
+        11 * 60 +
+        40
+    },
+    "mobile-ui:demo-time"
+  );
+
   const restaurant =
     restaurantSystem.create({
-      name: "寻味小馆"
+      name: "寻味小馆",
+      locationId:
+        universityProperty.id
     });
+
+  if (
+    universityProperty.status ===
+      "available"
+  ) {
+    propertySystem.markLeased(
+      universityProperty.id,
+      restaurant.id
+    );
+  }
 
   financeSystem.createAccount(
     restaurant.id,
