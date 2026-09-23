@@ -891,9 +891,6 @@ const clockTimer =
   setInterval(
     () => {
       try {
-        app.core.timeSystem
-          .advance(10);
-
         if (
           activePage === "store"
         ) {
@@ -925,7 +922,7 @@ const clockTimer =
         );
       }
     },
-    1200
+    1000
   );
 
 render();
