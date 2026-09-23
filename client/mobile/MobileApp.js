@@ -130,30 +130,13 @@ function sceneMarkup(model) {
       data-ui-component="home-hero-scene"
       aria-label="门店主页静态主视觉"
     >
-      <div
-        class="hero-static-scene"
-        role="img"
-        aria-label="温暖餐厅门店静态场景"
-      >
-        <div class="hero-static-sign hero-sign-left">
-          <strong>食在烟火</strong>
-          <small>人间有味</small>
-        </div>
-
-        <div class="hero-static-sign hero-sign-center">
-          <strong>${model.restaurant.name}</strong>
-          <small>认真经营 · 用心待客</small>
-        </div>
-
-        <div class="hero-static-sign hero-sign-right">
-          <strong>用心做菜</strong>
-          <small>用爱待客</small>
-        </div>
-
-        <div class="hero-static-counter"></div>
-        <div class="hero-static-table hero-table-left"></div>
-        <div class="hero-static-table hero-table-right"></div>
-      </div>
+      <img
+        class="hero-artwork"
+        src="assets/home/restaurant-hero.jpg"
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+      />
 
       <header
         class="home-hud home-hud-overlay"
