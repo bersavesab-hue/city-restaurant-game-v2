@@ -159,27 +159,27 @@ button {
 }
 
 .home-hud {
-  min-height: 48px;
+  min-height: 44px;
   display: grid;
   grid-template-columns:
-    1.08fr
     1.05fr
-    1.34fr
-    1.04fr
-    1.10fr
-    38px;
+    1.02fr
+    1.30fr
+    1.02fr
+    1.12fr
+    34px;
   gap: 4px;
   align-items: stretch;
 }
 
 .hud-card {
   min-width: 0;
-  padding: 4px 5px;
+  padding: 3px;
   border-radius: 11px;
   display: grid;
   grid-template-columns:
     auto minmax(0,1fr);
-  gap: 5px;
+  gap: 2px;
   align-items: center;
   color: #f8fbfd;
   background:
@@ -205,13 +205,13 @@ button {
 }
 
 .hud-icon {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   border-radius: 8px;
   display: grid;
   place-items: center;
   color: #ffd258;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 950;
   background:
     rgba(255,255,255,.08);
@@ -222,9 +222,9 @@ button {
   color: #c9d9e5;
   font-size:
     clamp(
-      7px,
-      2vw,
-      9px
+      6px,
+      1.65vw,
+      8px
     );
   line-height: 1.15;
   text-overflow: ellipsis;
@@ -238,8 +238,8 @@ button {
   font-size:
     clamp(
       8px,
-      2.35vw,
-      12px
+      2.55vw,
+      10px
     );
   line-height: 1.12;
   text-overflow: ellipsis;
@@ -297,15 +297,15 @@ button {
 .hud-level strong {
   font-size:
     clamp(
-      8px,
-      2.4vw,
-      12px
+      7px,
+      2vw,
+      9px
     );
 }
 
 .hud-settings {
-  width: 38px;
-  min-width: 38px;
+  width: 34px;
+  min-width: 34px;
   border-radius: 11px;
   display: grid;
   place-items: center;
@@ -316,7 +316,7 @@ button {
       rgba(23,54,79,.98)
     );
   color: #fff;
-  font-size: 17px;
+  font-size: 15px;
   box-shadow:
     0 3px 8px
     rgba(12,31,46,.20);
@@ -394,9 +394,9 @@ button {
   color: #36536a;
   font-size:
     clamp(
-      8px,
-      2.3vw,
-      11px
+      7px,
+      2vw,
+      9px
     );
   font-weight: 850;
   text-overflow: ellipsis;
@@ -408,9 +408,9 @@ button {
   color: #153e58;
   font-size:
     clamp(
-      16px,
-      4.3vw,
-      22px
+      15px,
+      4.2vw,
+      19px
     );
   line-height: 1.05;
   letter-spacing: -.04em;
@@ -420,8 +420,8 @@ button {
 
 .metric-symbol {
   flex: 0 0 auto;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 9px;
   display: grid;
   place-items: center;
