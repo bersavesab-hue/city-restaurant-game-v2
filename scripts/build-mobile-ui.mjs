@@ -78,6 +78,29 @@ for (
   );
 }
 
+const mobileAssets =
+  path.resolve(
+    "client/mobile/assets"
+  );
+
+if (
+  fs.existsSync(
+    mobileAssets
+  )
+) {
+  fs.cpSync(
+    mobileAssets,
+    path.join(
+      output,
+      "assets"
+    ),
+    {
+      recursive: true
+    }
+  );
+}
+
+
 fs.cpSync(
   output,
   androidAssets,
