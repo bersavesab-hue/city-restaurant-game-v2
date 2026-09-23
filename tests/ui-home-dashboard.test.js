@@ -160,7 +160,11 @@ test(
               spendingPower: 68,
               competition: 57,
               deliveryDemand: 76,
-              rentMultiplier: 1.1
+              rentMultiplier: 1.1,
+              customerMix: {
+                student: 48,
+                young_professional: 12
+              }
             };
           },
 
@@ -198,7 +202,17 @@ test(
 
     assert.match(
       model.opportunity.title,
-      /Lv\.3|头号项目/
+      /商圈动态：大学城/
+    );
+
+    assert.equal(
+      model.opportunity.tags[3],
+      "学生/年轻人"
+    );
+
+    assert.equal(
+      model.money.revenueTrend,
+      100
     );
 
     assert.deepEqual(
@@ -211,6 +225,7 @@ test(
         competition: 57,
         deliveryDemand: 76,
         rentMultiplier: 1.1,
+        mainCustomer: "学生/年轻人",
         opportunityScore: 71
       }
     );
