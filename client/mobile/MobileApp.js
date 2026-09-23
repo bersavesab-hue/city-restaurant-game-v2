@@ -29,9 +29,6 @@ const sheetRoot =
   document.querySelector("#sheet-root");
 
 let activePage = "store";
-let running = true;
-let speed = 1;
-
 const NAV_ITEMS = [
   ["store", "门店", "⌂"],
   ["business", "经营", "▦"],
@@ -60,6 +57,51 @@ function money(value) {
       Number(value) || 0
     ).toLocaleString("zh-CN")
   );
+}
+
+function signedPercent(value) {
+  const number =
+    Math.round(
+      Number(value) || 0
+    );
+
+  return (
+    number > 0
+      ? `+${number}%`
+      : number < 0
+        ? `${number}%`
+        : "0%"
+  );
+}
+
+function trendTone(value) {
+  const number =
+    Number(value) || 0;
+
+  return number > 0
+    ? "positive"
+    : number < 0
+      ? "negative"
+      : "neutral";
+}
+
+function signalTone(value, inverse = false) {
+  const number =
+    Number(value) || 0;
+
+  if (inverse) {
+    return number >= 75
+      ? "hot"
+      : number >= 55
+        ? "medium"
+        : "good";
+  }
+
+  return number >= 75
+    ? "hot"
+    : number >= 55
+      ? "medium"
+      : "low";
 }
 
 function navMarkup() {
@@ -93,13 +135,24 @@ function sceneMarkup(model) {
         role="img"
         aria-label="温暖餐厅门店静态场景"
       >
-        <div class="hero-static-sign">
+        <div class="hero-static-sign hero-sign-left">
+          <strong>食在烟火</strong>
+          <small>人间有味</small>
+        </div>
+
+        <div class="hero-static-sign hero-sign-center">
           <strong>${model.restaurant.name}</strong>
           <small>认真经营 · 用心待客</small>
         </div>
 
-        <div class="hero-static-depth hero-static-depth-back"></div>
-        <div class="hero-static-depth hero-static-depth-front"></div>
+        <div class="hero-static-sign hero-sign-right">
+          <strong>用心做菜</strong>
+          <small>用爱待客</small>
+        </div>
+
+        <div class="hero-static-counter"></div>
+        <div class="hero-static-table hero-table-left"></div>
+        <div class="hero-static-table hero-table-right"></div>
       </div>
 
       <header
@@ -107,29 +160,43 @@ function sceneMarkup(model) {
         data-ui-component="home-top-hud"
       >
         <div class="hud-card hud-day">
-          <small>经营日</small>
-          <strong>第 ${model.time.day} 天</strong>
+          <span class="hud-icon">☀</span>
+          <div>
+            <strong>第 ${model.time.day} 天</strong>
+            <small>经营日</small>
+          </div>
         </div>
 
         <div class="hud-card hud-clock">
-          <small>时间</small>
-          <strong data-bind="clock">${model.time.clock}</strong>
-          <span>${model.restaurant.status === "open" ? "营业中" : "已打烊"}</span>
+          <span class="hud-icon">◷</span>
+          <div>
+            <strong data-bind="clock">${model.time.clock}</strong>
+            <small>${model.restaurant.status === "open" ? "● 营业中" : "已打烊"}</small>
+          </div>
         </div>
 
         <div class="hud-card hud-money">
-          <small>资金</small>
-          <strong data-bind="balance">${money(model.money.balance)}</strong>
+          <span class="hud-icon">¥</span>
+          <div>
+            <small>资金</small>
+            <strong data-bind="balance">${money(model.money.balance)}</strong>
+          </div>
         </div>
 
         <div class="hud-card hud-rating">
-          <small>星级评价</small>
-          <strong>★ ${model.restaurant.reviewScore.toFixed(1)}</strong>
+          <span class="hud-icon">★</span>
+          <div>
+            <small>星级评价</small>
+            <strong>${model.restaurant.reviewScore.toFixed(1)}分</strong>
+          </div>
         </div>
 
         <div class="hud-card hud-level">
-          <small>Lv.${model.restaurant.level}</small>
-          <strong>${model.restaurant.title}</strong>
+          <span class="hud-icon">♛</span>
+          <div>
+            <small>Lv.${model.restaurant.level}</small>
+            <strong>${model.restaurant.title}</strong>
+          </div>
         </div>
 
         <button
@@ -145,38 +212,50 @@ function sceneMarkup(model) {
         data-ui-component="home-metrics"
       >
         <article class="home-metric-card revenue">
-          <span class="metric-symbol">¥</span>
-          <div>
+          <header>
+            <span class="metric-symbol">¥</span>
             <small>今日营业额</small>
-            <strong data-bind="todayRevenue">${money(model.money.todayRevenue)}</strong>
-          </div>
+          </header>
+          <strong data-bind="todayRevenue">${money(model.money.todayRevenue)}</strong>
+          <span class="metric-trend ${trendTone(model.money.revenueTrend)}">
+            ${model.money.revenueTrend >= 0 ? "↑" : "↓"} ${signedPercent(model.money.revenueTrend)}
+          </span>
         </article>
 
         <article class="home-metric-card profit">
-          <span class="metric-symbol">↗</span>
-          <div>
+          <header>
+            <span class="metric-symbol">▮</span>
             <small>今日利润</small>
-            <strong
-              class="${model.money.todayProfit >= 0 ? "positive" : "negative"}"
-              data-bind="todayProfit"
-            >${money(model.money.todayProfit)}</strong>
-          </div>
+          </header>
+          <strong
+            class="${model.money.todayProfit >= 0 ? "positive" : "negative"}"
+            data-bind="todayProfit"
+          >${money(model.money.todayProfit)}</strong>
+          <span class="metric-trend ${trendTone(model.money.profitTrend)}">
+            ${model.money.profitTrend >= 0 ? "↑" : "↓"} ${signedPercent(model.money.profitTrend)}
+          </span>
         </article>
 
         <article class="home-metric-card satisfaction">
-          <span class="metric-symbol">☺</span>
-          <div>
+          <header>
+            <span class="metric-symbol">☺</span>
             <small>满意度</small>
-            <strong>${Math.round(model.restaurant.satisfaction)}%</strong>
-          </div>
+          </header>
+          <strong>${Math.round(model.restaurant.satisfaction)}%</strong>
+          <span class="metric-trend ${model.restaurant.satisfaction >= 80 ? "positive" : "neutral"}">
+            ${model.restaurant.satisfaction >= 80 ? "口碑良好" : "继续提升"}
+          </span>
         </article>
 
         <article class="home-metric-card staff">
-          <span class="metric-symbol">人</span>
-          <div>
+          <header>
+            <span class="metric-symbol">人</span>
             <small>在岗员工</small>
-            <strong>${model.operations.employees}</strong>
-          </div>
+          </header>
+          <strong>${model.operations.employees}</strong>
+          <span class="metric-trend neutral">
+            ${model.operations.employees >= 2 ? "工作正常" : "人手不足"} ›
+          </span>
         </article>
       </section>
     </section>
@@ -211,46 +290,114 @@ function renderStore() {
     district?.name ??
     "暂未选址";
 
+  const opportunityTags =
+    model.opportunity.tags ??
+    (
+      district
+        ? [
+            district.name,
+            `客流 ${district.trafficIndex}`,
+            `外卖 ${district.deliveryDemand}`,
+            district.mainCustomer
+          ]
+        : [
+            "选址后显示商圈情报"
+          ]
+    );
+
   const districtSignals =
     district
       ? [
-          ["客流", district.trafficIndex],
-          ["消费", district.spendingPower],
-          ["竞争", district.competition],
-          ["外卖", district.deliveryDemand]
+          {
+            icon: "♨",
+            label: "本区热度",
+            value:
+              district.trafficIndex >= 75
+                ? "较高 ↑"
+                : district.trafficIndex >= 55
+                  ? "中等"
+                  : "偏低",
+            tone:
+              signalTone(
+                district.trafficIndex
+              )
+          },
+          {
+            icon: "●●",
+            label: "主力客群",
+            value:
+              district.mainCustomer,
+            tone: "blue"
+          },
+          {
+            icon: "↗",
+            label: "外卖热度",
+            value:
+              district.deliveryDemand >= 75
+                ? "上升 ↑"
+                : district.deliveryDemand >= 55
+                  ? "稳定"
+                  : "偏低",
+            tone:
+              signalTone(
+                district.deliveryDemand
+              )
+          },
+          {
+            icon: "▮",
+            label: "竞争强度",
+            value:
+              district.competition >= 75
+                ? "较高"
+                : district.competition >= 55
+                  ? "中等"
+                  : "较低",
+            tone:
+              signalTone(
+                district.competition,
+                true
+              )
+          }
         ]
       : [
-          ["客流", "--"],
-          ["消费", "--"],
-          ["竞争", "--"],
-          ["外卖", "--"]
-        ];
-
-  const opportunityTags =
-    district
-      ? [
-          district.name,
-          `客流 ${district.trafficIndex}`,
-          `消费 ${district.spendingPower}`,
-          `竞争 ${district.competition}`
-        ]
-      : [
-          "选址后显示商圈情报"
+          {
+            icon: "♨",
+            label: "本区热度",
+            value: "--",
+            tone: "neutral"
+          },
+          {
+            icon: "●●",
+            label: "主力客群",
+            value: "--",
+            tone: "neutral"
+          },
+          {
+            icon: "↗",
+            label: "外卖热度",
+            value: "--",
+            tone: "neutral"
+          },
+          {
+            icon: "▮",
+            label: "竞争强度",
+            value: "--",
+            tone: "neutral"
+          }
         ];
 
   return `
     <div class="page-scroll home-scroll">
       ${sceneMarkup(model)}
 
-
       <section
         class="home-opportunity ${model.opportunity.tone}"
         data-ui-component="home-opportunity"
       >
         <header class="opportunity-band">
-          <strong>今日机会</strong>
-          <span>根据当前经营和商圈状态动态生成</span>
-          <button type="button" data-nav="business">查看经营 ›</button>
+          <strong><span>⌖</span> 今日机会</strong>
+          <em>把握商圈动态，让小店更进一步！</em>
+          <button type="button" data-nav="business">查看完整商圈情报 ›</button>
         </header>
 
         <div class="opportunity-body">
@@ -260,7 +407,9 @@ function renderStore() {
 
             <div class="opportunity-tags">
               ${opportunityTags.map(
-                tag => `<span>${tag}</span>`
+                (tag, index) => `
+                  <span class="tag-${index + 1}">${tag}</span>
+                `
               ).join("")}
             </div>
           </div>
@@ -274,6 +423,7 @@ function renderStore() {
                   : "等待正式选址"}
               </small>
             </div>
+
             <button type="button" data-nav="business">
               去经营
               <span>›</span>
@@ -288,13 +438,18 @@ function renderStore() {
       >
         <section class="home-panel growth-panel">
           <header class="home-panel-title">
-            <strong>门店成长</strong>
-            <span>${progressPercent}%</span>
+            <strong><span>▣</span> 门店成长</strong>
+            <small>从一家小店，做出一座城市的味道！</small>
           </header>
 
-          <div class="home-panel-body">
-            <small>下一阶段</small>
-            <h3>${model.progress.nextTitle ?? "已满级"}</h3>
+          <div class="home-panel-body growth-body">
+            <div class="growth-stage">
+              <div>
+                <small>下一阶段</small>
+                <h3>${model.progress.nextTitle ?? "已满级"}</h3>
+              </div>
+              <strong>${progressPercent}%</strong>
+            </div>
 
             <div class="progress-track">
               <i
@@ -303,18 +458,31 @@ function renderStore() {
               ></i>
             </div>
 
+            <div class="growth-storefront">
+              <span>门店升级</span>
+              <small>当前 Lv.${model.restaurant.level}</small>
+            </div>
+
             <div class="quick-actions">
-              <button type="button" data-open-sheet="renovation">装修</button>
-              <button type="button" data-nav="staff">员工</button>
-              <button type="button" data-nav="research">研发</button>
-              <button type="button" data-nav="business">经营</button>
+              <button type="button" data-open-sheet="renovation">
+                <b>◆</b><span>装修</span>
+              </button>
+              <button type="button" data-nav="staff">
+                <b>●</b><span>员工</span>
+              </button>
+              <button type="button" data-nav="research">
+                <b>♨</b><span>研发</span>
+              </button>
+              <button type="button" data-nav="business">
+                <b>▮</b><span>经营</span>
+              </button>
             </div>
           </div>
         </section>
 
         <section class="home-panel dialogue-panel">
           <header class="home-panel-title">
-            <strong>店内动态</strong>
+            <strong><span>●</span> 店内动态</strong>
             <button type="button" data-nav="staff">更多 ›</button>
           </header>
 
@@ -323,8 +491,11 @@ function renderStore() {
               item => `
                 <article>
                   <div class="avatar">${item.speaker.slice(0,1)}</div>
-                  <div>
-                    <strong>${item.speaker} <small>${item.role}</small></strong>
+                  <div class="dialogue-copy">
+                    <div>
+                      <strong>${item.speaker} <small>${item.role}</small></strong>
+                      <time>${item.time}</time>
+                    </div>
                     <p>${item.text}</p>
                   </div>
                 </article>
@@ -335,24 +506,23 @@ function renderStore() {
       </div>
 
       <div
-        class="home-dual-grid"
+        class="home-dual-grid lower-grid"
         data-ui-component="home-district-and-schedule"
       >
         <section class="home-panel district-panel">
           <header class="home-panel-title">
-            <strong>商圈情报</strong>
+            <strong><span>⌖</span> 商圈情报</strong>
             <button type="button" data-nav="business">更多 ›</button>
           </header>
 
           <div class="home-panel-body">
-            <p class="district-name">${districtName}</p>
-
             <div class="district-signal-grid">
               ${districtSignals.map(
-                ([label, value]) => `
-                  <article>
-                    <small>${label}</small>
-                    <strong>${value}</strong>
+                item => `
+                  <article class="${item.tone}">
+                    <b>${item.icon}</b>
+                    <small>${item.label}</small>
+                    <strong>${item.value}</strong>
                   </article>
                 `
               ).join("")}
@@ -362,20 +532,27 @@ function renderStore() {
 
         <section class="home-panel schedule-panel">
           <header class="home-panel-title">
-            <strong>今日日程</strong>
+            <strong><span>▦</span> 今日日程</strong>
             <button
               type="button"
               data-advance="30"
-            >推进 30m ›</button>
+            >推进 ›</button>
           </header>
 
           <div class="home-panel-body schedule-list">
             ${model.schedule.slice(0, 4).map(
               item => `
-                <div class="${item.done ? "done" : ""}">
+                <div class="${item.status}">
+                  <i></i>
                   <time>${item.time}</time>
                   <span>${item.title}</span>
-                  <i></i>
+                  <b>
+                    ${item.status === "done"
+                      ? "已完成"
+                      : item.status === "active"
+                        ? "进行中"
+                        : "未开始"}
+                  </b>
                 </div>
               `
             ).join("")}
@@ -609,39 +786,7 @@ function bindEvents() {
       button.dataset.devBound = "click";
     });
 
-  root
-    .querySelectorAll("[data-speed]")
-    .forEach(button => {
-      button.addEventListener(
-        "click",
-        () => {
-          speed =
-            Number(
-              button.dataset.speed
-            );
 
-          app.systems
-            .feedbackSystem
-            ?.captureRuntimeError;
-
-          render();
-        }
-      );
-      button.dataset.devBound = "click";
-    });
-
-  root
-    .querySelectorAll("[data-run]")
-    .forEach(button => {
-      button.addEventListener(
-        "click",
-        () => {
-          running = !running;
-          render();
-        }
-      );
-      button.dataset.devBound = "click";
-    });
 
   root
     .querySelectorAll("[data-advance]")
