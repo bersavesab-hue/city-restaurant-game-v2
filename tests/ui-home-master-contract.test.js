@@ -47,6 +47,14 @@ const buildScript =
     "utf8"
   );
 
+const heroAsset =
+  fs.statSync(
+    new URL(
+      "../client/mobile/assets/home/restaurant-hero.jpg",
+      import.meta.url
+    )
+  );
+
 test(
   "home master keeps the approved reference-inspired module structure",
   () => {
@@ -228,27 +236,17 @@ test(
 
     assert.match(
       buildScript,
-      /client\/mobile\/assets-src\/home/
+      /client\/mobile\/assets/
     );
 
-    assert.match(
+    assert.doesNotMatch(
       buildScript,
-      /Expected 4 restaurant hero chunks/
+      /assets-src\/home|heroBase64|restaurant hero chunks/
     );
 
-    assert.match(
-      buildScript,
-      /Buffer\.from\(\s*heroBase64,\s*"base64"\s*\)/
-    );
-
-    assert.match(
-      buildScript,
-      /Restaurant hero asset decode failed/
-    );
-
-    assert.match(
-      buildScript,
-      /path\.join\(\s*heroOutputDirectory,\s*"restaurant-hero\.jpg"\s*\)/
+    assert.ok(
+      heroAsset.size > 12000,
+      "restaurant hero asset should be a non-placeholder JPEG"
     );
   }
 );
