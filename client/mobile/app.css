@@ -113,18 +113,14 @@ button {
 
 .home-hero-shell {
   position: relative;
-  height:
-    clamp(
-      450px,
-      50dvh,
-      535px
-    );
+  width: 100%;
+  aspect-ratio: 6 / 5;
+  min-height: 0;
   overflow: hidden;
-  border-radius:
-    0 0 18px 18px;
-  background: #d7ae78;
+  border-radius: 0 0 16px 16px;
+  background: #d8b27c;
   box-shadow:
-    0 9px 22px
+    0 8px 20px
     rgba(34,53,66,.14);
   isolation: isolate;
 }
@@ -301,182 +297,17 @@ button {
     rgba(12,31,46,.20);
 }
 
-.hero-static-scene {
+.hero-artwork {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  background:
-    radial-gradient(
-      circle at 16% 17%,
-      rgba(255,247,205,.75),
-      transparent 16%
-    ),
-    radial-gradient(
-      circle at 64% 21%,
-      rgba(255,225,149,.55),
-      transparent 15%
-    ),
-    linear-gradient(
-      180deg,
-      #dcc08e 0 20%,
-      #d3a66f 20% 52%,
-      #b97842 52% 54%,
-      #d7a46e 54% 100%
-    );
-}
-
-.hero-static-scene::before {
-  content: "";
-  position: absolute;
-  left: 3%;
-  right: 3%;
-  top: 36%;
-  height: 27%;
-  border-radius: 16px 16px 4px 4px;
-  background:
-    linear-gradient(
-      180deg,
-      #d8d5c8 0 12%,
-      #888a80 12% 100%
-    );
-  box-shadow:
-    inset 0 8px 0 #55574f,
-    0 8px 0 rgba(86,49,24,.15);
-}
-
-.hero-static-scene::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 41%;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(93,58,33,.055) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      rgba(93,58,33,.055) 1px,
-      transparent 1px
-    );
-  background-size:
-    32px 32px;
-}
-
-.hero-static-sign {
-  position: absolute;
-  z-index: 3;
-  padding: 7px 9px;
-  border-radius: 7px;
-  display: grid;
-  gap: 2px;
-  text-align: center;
-  color: #4a3425;
-  background:
-    rgba(255,248,229,.90);
-  border:
-    1px solid
-    rgba(103,70,43,.20);
-  box-shadow:
-    0 3px 8px
-    rgba(73,43,20,.10);
-}
-
-.hero-static-sign strong {
-  font-size:
-    clamp(
-      13px,
-      4vw,
-      20px
-    );
-  letter-spacing: .06em;
-}
-
-.hero-static-sign small {
-  color: #795f48;
-  font-size:
-    clamp(
-      7px,
-      2vw,
-      10px
-    );
-}
-
-.hero-sign-left {
-  top: 19%;
-  left: 7%;
-  width: 28%;
-}
-
-.hero-sign-center {
-  top: 17%;
-  left: 50%;
-  width: 31%;
-  transform: translateX(-50%);
-  color: #f5dfaa;
-  background:
-    rgba(54,38,28,.93);
-  border-color: #9a7342;
-}
-
-.hero-sign-center small {
-  color: #cdb88d;
-}
-
-.hero-sign-right {
-  top: 18%;
-  right: 6%;
-  width: 26%;
-}
-
-.hero-static-counter {
-  position: absolute;
-  z-index: 3;
-  left: 7%;
-  right: 7%;
-  top: 47%;
-  height: 17%;
-  border-radius:
-    14px 14px 7px 7px;
-  background:
-    linear-gradient(
-      180deg,
-      #6e736c 0 16%,
-      #9a9b91 16% 70%,
-      #76512f 70% 100%
-    );
-  box-shadow:
-    0 7px 0
-    rgba(94,58,31,.20);
-}
-
-.hero-static-table {
-  position: absolute;
-  z-index: 4;
-  bottom: 18%;
-  width: 31%;
-  height: 12%;
-  border-radius: 15px;
-  background:
-    linear-gradient(
-      180deg,
-      #9b6031,
-      #6c401f
-    );
-  box-shadow:
-    0 9px 0
-    rgba(75,43,21,.26);
-}
-
-.hero-table-left {
-  left: 5%;
-}
-
-.hero-table-right {
-  right: 5%;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center center;
+  user-select: none;
+  pointer-events: none;
 }
 
 .home-metric-overlay {
