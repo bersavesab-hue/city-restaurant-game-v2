@@ -78,7 +78,27 @@ test(
 
     assert.doesNotMatch(
       mobileApp,
-      /scene-speed|character chef|character server|steam-a|flame/
+      /scene-speed|character chef|character server|steam-a|flame|data-speed|data-run/
+    );
+
+    assert.match(
+      mobileApp,
+      /查看完整商圈情报/
+    );
+
+    assert.match(
+      mobileApp,
+      /门店成长/
+    );
+
+    assert.match(
+      mobileApp,
+      /商圈情报/
+    );
+
+    assert.match(
+      mobileApp,
+      /今日日程/
     );
   }
 );
