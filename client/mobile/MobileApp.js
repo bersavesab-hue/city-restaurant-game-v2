@@ -132,6 +132,7 @@ function renderStore() {
     <section
       class="home-master-page"
       data-ui-component="home-master"
+      data-home-master-version="1"
       aria-label="门店首页静态母版"
     >
       <img
