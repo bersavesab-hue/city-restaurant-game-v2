@@ -376,6 +376,9 @@ export function createDevToolkit({
     selecting: false,
     selectionScope: "any",
     selected: null,
+    dragMode: false,
+    dragPointer: null,
+    snap: 4,
     report: null,
     overrides: readOverrides(),
     undoStack: [],
@@ -435,6 +438,7 @@ export function createDevToolkit({
       rect: rectOf(state.selected),
       action: actionLabel(state.selected),
       bound: Boolean(state.selected.dataset.devBound),
+      layoutKey: state.selected.dataset.layoutKey || "",
       values: {
         fontSize: Math.round(parseFloat(style.fontSize) || 0),
         padding: Math.round(parseFloat(style.paddingTop) || 0),
@@ -688,6 +692,27 @@ export function createDevToolkit({
 
   function startLayoutSelecting() {
     startSelecting("layout");
+  }
+
+  function startDragMode() {
+    const info = selectedInfo();
+
+    if (!info || !info.layoutKey) {
+      showToast("请先选择母版区块");
+      return;
+    }
+
+    state.dragMode = true;
+    state.open = false;
+    renderPanel();
+  }
+
+  function finishDragMode() {
+    state.dragMode = false;
+    state.dragPointer = null;
+    state.open = true;
+    writeOverrides(state.overrides);
+    renderPanel();
   }
 
   function issueMarkup() {
