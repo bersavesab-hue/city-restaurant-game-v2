@@ -185,19 +185,12 @@ button {
   align-items: center;
   color: #f8fbfd;
   background:
-    linear-gradient(
-      180deg,
-      rgba(43,78,107,.97),
-      rgba(23,54,79,.98)
-    );
-  border:
-    1px solid
-    rgba(255,255,255,.17);
-  box-shadow:
-    inset 0 1px 0
-    rgba(255,255,255,.10),
-    0 3px 8px
-    rgba(12,31,46,.20);
+    transparent
+    url("assets/home/hud-card-dark.svg")
+    center / 100% 100%
+    no-repeat;
+  border: 0;
+  box-shadow: none;
 }
 
 .hud-card > div {
@@ -251,14 +244,11 @@ button {
 .hud-day {
   color: #173c5a;
   background:
-    linear-gradient(
-      180deg,
-      rgba(255,253,245,.98),
-      rgba(255,244,224,.98)
-    );
-  border:
-    2px solid
-    rgba(227,96,57,.50);
+    transparent
+    url("assets/home/hud-card-light.svg")
+    center / 100% 100%
+    no-repeat;
+  border: 0;
 }
 
 .hud-day .hud-icon {
@@ -312,16 +302,13 @@ button {
   display: grid;
   place-items: center;
   background:
-    linear-gradient(
-      180deg,
-      rgba(43,78,107,.98),
-      rgba(23,54,79,.98)
-    );
+    transparent
+    url("assets/home/hud-card-dark.svg")
+    center / 100% 100%
+    no-repeat;
   color: #fff;
   font-size: 15px;
-  box-shadow:
-    0 3px 8px
-    rgba(12,31,46,.20);
+  box-shadow: none;
 }
 
 .hero-artwork {
@@ -374,13 +361,12 @@ button {
   gap: 3px;
   overflow: hidden;
   background:
-    rgba(255,255,255,.96);
-  border:
-    1px solid
-    rgba(35,74,99,.10);
-  box-shadow:
-    0 5px 13px
-    rgba(40,58,68,.14);
+    transparent
+    url("assets/home/kpi-card.svg")
+    center / 100% 100%
+    no-repeat;
+  border: 0;
+  box-shadow: none;
 }
 
 .home-metric-card header {
@@ -558,20 +544,19 @@ button {
       135px
     );
   margin-top:
-    clamp(
-      4px,
-      1.1vw,
+    var(
+      --home-section-gap,
       6px
     );
   overflow: hidden;
   border-radius: 15px;
-  background: rgba(255,255,255,.98);
-  border:
-    1px solid
-    rgba(38,70,92,.10);
-  box-shadow:
-    0 5px 15px
-    rgba(45,62,72,.09);
+  background:
+    transparent
+    url("assets/home/opportunity-card.svg")
+    center / 100% 100%
+    no-repeat;
+  border: 0;
+  box-shadow: none;
 }
 
 .opportunity-band {
@@ -598,13 +583,7 @@ button {
   gap: 8px;
   align-items: center;
   color: #fff;
-  background:
-    linear-gradient(
-      90deg,
-      #f05c23,
-      #ff8b1b 52%,
-      #ffd37b
-    );
+  background: transparent;
 }
 
 .opportunity-band strong {
@@ -859,7 +838,11 @@ button {
 }
 
 .home-dual-grid {
-  margin-top: 6px;
+  margin-top:
+    var(
+      --home-section-gap,
+      6px
+    );
   display: grid;
   grid-template-columns:
     repeat(2, minmax(0,1fr));
@@ -890,13 +873,13 @@ button {
   height: 100%;
   overflow: hidden;
   border-radius: 14px;
-  background: rgba(255,255,255,.98);
-  border:
-    1px solid
-    rgba(39,73,96,.10);
-  box-shadow:
-    0 5px 14px
-    rgba(44,61,71,.08);
+  background:
+    transparent
+    url("assets/home/panel-card.svg")
+    center / 100% 100%
+    no-repeat;
+  border: 0;
+  box-shadow: none;
 }
 
 .home-panel-title {
@@ -917,12 +900,7 @@ button {
   align-items: center;
   gap: 7px;
   color: #fff;
-  background:
-    linear-gradient(
-      90deg,
-      #244d6c,
-      #376b86
-    );
+  background: transparent;
 }
 
 .home-panel-title > strong {
@@ -1365,14 +1343,11 @@ button {
   grid-template-columns:
     repeat(5, minmax(0,1fr));
   background:
-    linear-gradient(
-      180deg,
-      #173550,
-      #102a42
-    );
-  border-top:
-    1px solid
-    rgba(255,255,255,.08);
+    #102a42
+    url("assets/home/nav-base.svg")
+    center / 100% 100%
+    no-repeat;
+  border-top: 0;
 }
 
 .nav-item {
@@ -1863,15 +1838,15 @@ button {
   .home-hero-shell {
     height:
       clamp(
-        360px,
-        46dvh,
-        500px
+        var(--home-hero-min, 360px),
+        var(--home-hero-vh, 46dvh),
+        var(--home-hero-max, 500px)
       );
     min-height:
       clamp(
-        360px,
-        46dvh,
-        500px
+        var(--home-hero-min, 360px),
+        var(--home-hero-vh, 46dvh),
+        var(--home-hero-max, 500px)
       );
     aspect-ratio: auto;
   }
@@ -1879,18 +1854,18 @@ button {
   .home-opportunity {
     height:
       clamp(
-        110px,
-        15dvh,
-        140px
+        var(--home-opportunity-min, 110px),
+        var(--home-opportunity-vh, 15dvh),
+        var(--home-opportunity-max, 140px)
       );
   }
 
   [data-ui-component="home-growth-and-dialogue"] {
     height:
       clamp(
-        142px,
-        18dvh,
-        168px
+        var(--home-upper-min, 142px),
+        var(--home-upper-vh, 18dvh),
+        var(--home-upper-max, 168px)
       );
   }
 
@@ -1898,9 +1873,9 @@ button {
     height: auto;
     min-height:
       clamp(
-        108px,
-        14dvh,
-        150px
+        var(--home-lower-min, 108px),
+        var(--home-lower-vh, 14dvh),
+        var(--home-lower-max, 150px)
       );
   }
 
