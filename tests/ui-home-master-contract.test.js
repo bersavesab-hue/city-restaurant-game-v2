@@ -303,7 +303,7 @@ test(
   () => {
     assert.equal(
       homeLayout.version,
-      "hybrid-static-v1"
+      "hybrid-static-v2"
     );
 
     assert.deepEqual(
@@ -312,6 +312,16 @@ test(
         width: 360,
         height: 640,
         aspect: "9:16"
+      }
+    );
+
+    assert.deepEqual(
+      homeLayout.editor,
+      {
+        mode: "touch-drag",
+        snapOptions: [1, 4, 8],
+        defaultSnap: 4,
+        stableTargetAttribute: "data-layout-key"
       }
     );
 
