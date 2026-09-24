@@ -1773,70 +1773,60 @@ button {
 @media (max-width: 370px) {
   .home-hud {
     grid-template-columns:
-      .98fr
-      .88fr
-      1.18fr
-      .86fr
       1fr
-      44px;
-    gap: 4px;
+      .96fr
+      1.24fr
+      .96fr
+      1.06fr
+      32px;
+    gap: 3px;
     padding: 0;
   }
 
   .hud-card {
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .hud-icon {
+    width: 15px;
+    height: 15px;
+    font-size: 9px;
   }
 
   .hud-settings {
-    width: 44px;
-    min-width: 44px;
-  }
-
-  .opportunity-band span {
-    display: none;
+    width: 32px;
+    min-width: 32px;
   }
 
   .opportunity-band {
     grid-template-columns:
-      auto 1fr;
+      68px
+      minmax(0,1fr)
+      80px;
+    gap: 5px;
+  }
+
+  .opportunity-band strong {
+    font-size: 13px;
+  }
+
+  .opportunity-band em {
+    font-size: 7px;
   }
 
   .opportunity-band button {
-    justify-self: end;
+    min-height: 24px;
+    padding: 0 4px;
+    font-size: 6.5px;
+    justify-self: stretch;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
 
 @media (max-width: 380px) {
-  .home-hud {
-    grid-template-columns:
-      1.02fr
-      .95fr
-      1.18fr
-      .95fr
-      1fr
-      36px;
-    gap: 3px;
-  }
-
-  .hud-card {
-    padding:
-      4px 5px;
-    gap: 3px;
-  }
-
-  .hud-icon {
-    width: 18px;
-    height: 18px;
-    font-size: 11px;
-  }
-
-  .hud-settings {
-    width: 36px;
-    min-width: 36px;
-  }
-
   .home-metric-card {
     padding:
       6px 5px 5px;
@@ -1845,19 +1835,66 @@ button {
   .home-metric-grid {
     gap: 4px;
   }
+
+  .home-metric-card header {
+    gap: 3px;
+  }
+
+  .metric-symbol {
+    width: 17px;
+    height: 17px;
+    font-size: 10px;
+  }
 }
 
 
 /* 9:16 is the design baseline. Taller phones extend the game canvas
    instead of letterboxing the interface with large empty bars. */
-@media (min-aspect-ratio: 9 / 18) {
+@media (max-aspect-ratio: 9 / 18) {
   .home-hero-shell {
+    height:
+      clamp(
+        340px,
+        43dvh,
+        460px
+      );
     min-height:
       clamp(
-        450px,
-        44dvh,
-        540px
+        340px,
+        43dvh,
+        460px
       );
     aspect-ratio: auto;
+  }
+
+  .home-opportunity {
+    height:
+      clamp(
+        104px,
+        14dvh,
+        128px
+      );
+  }
+
+  [data-ui-component="home-growth-and-dialogue"] {
+    height:
+      clamp(
+        116px,
+        15dvh,
+        142px
+      );
+  }
+
+  [data-ui-component="home-district-and-schedule"] {
+    height:
+      clamp(
+        88px,
+        11.5dvh,
+        108px
+      );
+  }
+
+  .home-scroll {
+    padding-bottom: 4px;
   }
 }
