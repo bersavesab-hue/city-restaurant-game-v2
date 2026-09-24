@@ -282,3 +282,65 @@ test(
     );
   }
 );
+
+
+test(
+  "second live homepage batch uses real model data and neutral live dialogue avatars",
+  () => {
+    for (
+      const marker
+      of [
+        "live-opportunity",
+        "live-growth",
+        "live-dialogue",
+        "live-district",
+        "live-schedule"
+      ]
+    ) {
+      assert.match(
+        mobileApp,
+        new RegExp(marker)
+      );
+    }
+
+    assert.match(
+      mobileApp,
+      /model\.opportunity\.title/
+    );
+
+    assert.match(
+      mobileApp,
+      /model\.progress\.progress/
+    );
+
+    assert.match(
+      mobileApp,
+      /model\.dialogue\.slice\(0,3\)/
+    );
+
+    assert.match(
+      mobileApp,
+      /item\.speaker\.slice\(0,1\)/
+    );
+
+    assert.match(
+      mobileApp,
+      /model\.district\.trafficIndex/
+    );
+
+    assert.match(
+      mobileApp,
+      /model\.schedule\.slice\(0,4\)/
+    );
+
+    assert.match(
+      css,
+      /\.live-dialogue-avatar\s*\{/
+    );
+
+    assert.doesNotMatch(
+      mobileApp,
+      /avatar.*\.(png|jpg|jpeg|webp)/i
+    );
+  }
+);
