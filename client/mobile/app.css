@@ -1854,15 +1854,15 @@ button {
   .home-hero-shell {
     height:
       clamp(
-        340px,
-        43dvh,
-        460px
+        360px,
+        46dvh,
+        500px
       );
     min-height:
       clamp(
-        340px,
-        43dvh,
-        460px
+        360px,
+        46dvh,
+        500px
       );
     aspect-ratio: auto;
   }
@@ -1870,27 +1870,27 @@ button {
   .home-opportunity {
     height:
       clamp(
-        104px,
-        14dvh,
-        128px
+        110px,
+        15dvh,
+        140px
       );
   }
 
   [data-ui-component="home-growth-and-dialogue"] {
     height:
       clamp(
-        116px,
-        15dvh,
-        142px
+        124px,
+        16dvh,
+        150px
       );
   }
 
   [data-ui-component="home-district-and-schedule"] {
     height:
       clamp(
-        88px,
-        11.5dvh,
-        108px
+        96px,
+        12.5dvh,
+        118px
       );
   }
 
