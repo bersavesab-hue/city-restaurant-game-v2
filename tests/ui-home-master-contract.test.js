@@ -218,3 +218,67 @@ test(
     );
   }
 );
+
+
+test(
+  "live HUD and KPI overlay replaces master sample values without rebuilding the master",
+  () => {
+    for (
+      const marker
+      of [
+        "home-live-overlay",
+        "live-day",
+        "live-clock",
+        "live-money",
+        "live-rating",
+        "live-level",
+        "live-kpi-grid"
+      ]
+    ) {
+      assert.match(
+        mobileApp,
+        new RegExp(marker)
+      );
+    }
+
+    assert.match(
+      mobileApp,
+      /data-bind="clock"/
+    );
+
+    assert.match(
+      mobileApp,
+      /model\.money\.balance/
+    );
+
+    assert.match(
+      mobileApp,
+      /model\.money\.todayRevenue/
+    );
+
+    assert.match(
+      mobileApp,
+      /model\.money\.todayProfit/
+    );
+
+    assert.match(
+      mobileApp,
+      /model\.restaurant\.satisfaction/
+    );
+
+    assert.match(
+      mobileApp,
+      /model\.operations\.employees/
+    );
+
+    assert.match(
+      css,
+      /\.home-live-overlay\s*\{[\s\S]*?pointer-events:\s*none/
+    );
+
+    assert.match(
+      css,
+      /\.live-kpi-grid\s*\{/
+    );
+  }
+);
