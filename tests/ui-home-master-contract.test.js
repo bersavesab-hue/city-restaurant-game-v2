@@ -171,3 +171,50 @@ test(
     );
   }
 );
+
+
+test(
+  "20x9 long-screen master fills tall phones without changing the 9x16 fallback",
+  () => {
+    const longMaster =
+      new URL(
+        "../client/mobile/assets/home/home-master-20x9.webp",
+        import.meta.url
+      );
+
+    assert.ok(
+      fs.statSync(longMaster).size > 150000,
+      "20x9 master should be the full long-screen WebP"
+    );
+
+    assert.match(
+      mobileApp,
+      /max-aspect-ratio:\s*1\/2/
+    );
+
+    assert.match(
+      mobileApp,
+      /home-master-20x9\.webp/
+    );
+
+    assert.match(
+      mobileApp,
+      /home-master\.webp/
+    );
+
+    assert.match(
+      css,
+      /@media \(max-aspect-ratio: 1 \/ 2\)/
+    );
+
+    assert.match(
+      css,
+      /@media \(max-aspect-ratio: 1 \/ 2\)[\s\S]*?height:\s*100dvh/
+    );
+
+    assert.match(
+      css,
+      /@media \(max-aspect-ratio: 1 \/ 2\)[\s\S]*?\.hotspot-nav-store/
+    );
+  }
+);
