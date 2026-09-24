@@ -132,16 +132,21 @@ function renderStore() {
     <section
       class="home-master-page"
       data-ui-component="home-master"
-      data-home-master-version="1"
+      data-home-master-version="2"
       aria-label="门店首页静态母版"
     >
-      <img
-        class="home-master-artwork"
-        src="assets/home/home-master.webp"
-        alt=""
-        aria-hidden="true"
-        decoding="async"
-      />
+      <picture class="home-master-picture" aria-hidden="true">
+        <source
+          media="(max-aspect-ratio: 1/2)"
+          srcset="assets/home/home-master-20x9.webp"
+        />
+        <img
+          class="home-master-artwork"
+          src="assets/home/home-master.webp"
+          alt=""
+          decoding="async"
+        />
+      </picture>
 
       <div class="home-master-hotspots" aria-label="首页交互热区">
         <button class="home-hotspot hotspot-settings" type="button" data-nav="more" aria-label="设置"></button>
