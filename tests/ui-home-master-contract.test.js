@@ -374,3 +374,44 @@ test(
     );
   }
 );
+
+
+test(
+  "touch drag layout editor exposes snap-grid controls for stable master regions",
+  () => {
+    assert.match(
+      devToolkit,
+      /dragMode:\s*false/
+    );
+
+    assert.match(
+      devToolkit,
+      /snap:\s*4/
+    );
+
+    assert.match(
+      devToolkit,
+      /data-dev-drag/
+    );
+
+    assert.match(
+      devToolkit,
+      /data-dev-snap/
+    );
+
+    assert.match(
+      devToolkit,
+      /beginLayoutDrag/
+    );
+
+    assert.match(
+      devToolkit,
+      /moveLayoutDrag/
+    );
+
+    assert.match(
+      devToolkit,
+      /finishDragMode/
+    );
+  }
+);
