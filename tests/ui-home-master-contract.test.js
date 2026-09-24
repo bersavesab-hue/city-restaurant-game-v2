@@ -55,6 +55,26 @@ const heroAsset =
     )
   );
 
+const homeLayout =
+  JSON.parse(
+    fs.readFileSync(
+      new URL(
+        "../client/mobile/layout/home.layout.json",
+        import.meta.url
+      ),
+      "utf8"
+    )
+  );
+
+const devToolkit =
+  fs.readFileSync(
+    new URL(
+      "../client/mobile/DevToolkit.js",
+      import.meta.url
+    ),
+    "utf8"
+  );
+
 test(
   "home master keeps the approved reference-inspired module structure",
   () => {
@@ -273,6 +293,84 @@ test(
     assert.match(
       css,
       /@media \(max-width: 370px\)[\s\S]*?grid-template-columns:\s*68px\s+minmax\(0,1fr\)\s+80px/
+    );
+  }
+);
+
+
+test(
+  "home uses the hybrid static skin architecture with dynamic overlays",
+  () => {
+    assert.equal(
+      homeLayout.version,
+      "hybrid-static-v1"
+    );
+
+    assert.deepEqual(
+      homeLayout.design,
+      {
+        width: 360,
+        height: 640,
+        aspect: "9:16"
+      }
+    );
+
+    for (
+      const key
+      of [
+        "hero",
+        "top-hud",
+        "kpi-grid",
+        "opportunity",
+        "upper-panels",
+        "growth-panel",
+        "dialogue-panel",
+        "lower-panels",
+        "district-panel",
+        "schedule-panel",
+        "bottom-nav"
+      ]
+    ) {
+      assert.match(
+        mobileApp,
+        new RegExp(
+          `data-layout-key="${key}"`
+        )
+      );
+    }
+
+    for (
+      const skin
+      of [
+        "hud-card-light.svg",
+        "hud-card-dark.svg",
+        "kpi-card.svg",
+        "opportunity-card.svg",
+        "panel-card.svg",
+        "nav-base.svg"
+      ]
+    ) {
+      assert.match(
+        css,
+        new RegExp(
+          skin.replace(".", "\\.")
+        )
+      );
+    }
+
+    assert.match(
+      mobileApp,
+      /homeLayoutStyle\(\)/
+    );
+
+    assert.match(
+      devToolkit,
+      /dataset\.layoutKey/
+    );
+
+    assert.match(
+      devToolkit,
+      /layoutMode:\s*"hybrid-static"/
     );
   }
 );
