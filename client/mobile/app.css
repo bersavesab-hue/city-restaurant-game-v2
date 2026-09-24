@@ -382,6 +382,293 @@ button {
   color: #687d8b;
 }
 
+
+.live-opportunity {
+  position: absolute;
+  left: 2.3%;
+  top: 49.2%;
+  width: 68.8%;
+  height: 9.2%;
+  padding: 1.2% 1.4%;
+  overflow: hidden;
+  background: rgba(255,255,255,.98);
+}
+
+.live-opportunity > strong,
+.live-opportunity > p {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.live-opportunity > strong {
+  color: #16415c;
+  font-size: clamp(9px, 2.7vw, 14px);
+  line-height: 1.2;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.live-opportunity > p {
+  margin: 2px 0 4px;
+  color: #61727e;
+  font-size: clamp(6px, 1.85vw, 9px);
+  line-height: 1.28;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.live-opportunity-tags {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 3px;
+}
+
+.live-opportunity-tags span {
+  min-width: 0;
+  padding: 3px 4px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f7f7f4;
+  color: #3b6280;
+  font-size: clamp(5px,1.5vw,8px);
+  font-weight: 850;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.live-growth {
+  position: absolute;
+  left: 2.2%;
+  top: 63.7%;
+  width: 45.3%;
+  height: 7.9%;
+  padding: 1.2% 1.8%;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  grid-template-rows: auto auto 1fr;
+  column-gap: 8px;
+  align-content: start;
+  background: rgba(255,255,255,.98);
+}
+
+.live-growth > span {
+  grid-column: 1;
+  color: #82909a;
+  font-size: clamp(5px,1.5vw,8px);
+}
+
+.live-growth > strong {
+  grid-column: 1;
+  color: #16415c;
+  font-size: clamp(9px,2.6vw,14px);
+  font-weight: 950;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.live-growth > b {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: end;
+  color: #245875;
+  font-size: clamp(8px,2.4vw,13px);
+}
+
+.live-growth > i {
+  grid-column: 1 / -1;
+  height: 7px;
+  margin-top: 5px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #dce5e9;
+}
+
+.live-growth > i > u {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #12c7a0;
+  text-decoration: none;
+}
+
+.live-dialogue {
+  position: absolute;
+  left: 53.1%;
+  top: 63%;
+  width: 43.7%;
+  height: 9%;
+  padding: .5% 1%;
+  overflow: hidden;
+  background: rgba(255,255,255,.99);
+}
+
+.live-dialogue article {
+  display: grid;
+  grid-template-columns: 30px minmax(0,1fr);
+  gap: 6px;
+  align-items: center;
+  min-height: 31px;
+  padding: 2px 0;
+}
+
+.live-dialogue-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #405e75;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.live-dialogue article:nth-child(2) .live-dialogue-avatar {
+  background: #7a5f47;
+}
+
+.live-dialogue article:nth-child(3) .live-dialogue-avatar {
+  background: #6d7189;
+}
+
+.live-dialogue header {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  gap: 4px;
+  align-items: baseline;
+}
+
+.live-dialogue header strong {
+  color: #263f52;
+  font-size: clamp(6px,1.75vw,9px);
+  white-space: nowrap;
+}
+
+.live-dialogue header em,
+.live-dialogue header time {
+  color: #8b969f;
+  font-size: clamp(5px,1.4vw,7px);
+  font-style: normal;
+}
+
+.live-dialogue header time {
+  justify-self: end;
+}
+
+.live-dialogue p {
+  margin: 1px 0 0;
+  color: #4c606f;
+  font-size: clamp(5px,1.45vw,7.5px);
+  line-height: 1.18;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.live-district {
+  position: absolute;
+  left: 2.2%;
+  top: 81.5%;
+  width: 45.4%;
+  height: 5.8%;
+  padding: .6% 1.2%;
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 4px;
+  background: rgba(255,255,255,.97);
+}
+
+.live-district > div {
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1px;
+  border-radius: 6px;
+  background: #f7f9fa;
+}
+
+.live-district strong {
+  max-width: 100%;
+  overflow: hidden;
+  color: #1e5873;
+  font-size: clamp(6px,1.8vw,9px);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.live-district span {
+  color: #788995;
+  font-size: clamp(5px,1.3vw,7px);
+}
+
+.live-schedule {
+  position: absolute;
+  left: 53.2%;
+  top: 79.4%;
+  width: 43.5%;
+  height: 8.4%;
+  padding: .5% 1%;
+  overflow: hidden;
+  background: rgba(255,255,255,.99);
+}
+
+.live-schedule article {
+  min-width: 0;
+  height: 25%;
+  display: grid;
+  grid-template-columns: 7px 36px minmax(0,1fr) auto;
+  gap: 4px;
+  align-items: center;
+  color: #647681;
+  font-size: clamp(5px,1.45vw,7.5px);
+}
+
+.live-schedule article > i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #9eabb4;
+}
+
+.live-schedule article.done > i {
+  background: #2fc29a;
+}
+
+.live-schedule article.active > i {
+  background: #ff8a1f;
+}
+
+.live-schedule article time {
+  font-weight: 850;
+  color: #526b7d;
+}
+
+.live-schedule article span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.live-schedule article strong {
+  font-size: inherit;
+  white-space: nowrap;
+  color: #8b969f;
+}
+
+.live-schedule article.done strong {
+  color: #33ae8d;
+}
+
+.live-schedule article.active strong {
+  color: #f17b1b;
+}
+
 .home-master-hotspots {
   position: absolute;
   inset: 0;
@@ -575,6 +862,41 @@ button {
   .home-live-overlay .live-kpi-grid {
     top: 38.55%;
     height: 7.05%;
+  }
+
+  .home-live-overlay .live-opportunity {
+    left: 2.2%;
+    top: 49.2%;
+    width: 69%;
+    height: 8.3%;
+  }
+
+  .home-live-overlay .live-growth {
+    left: 2.2%;
+    top: 63.8%;
+    width: 45.5%;
+    height: 6.4%;
+  }
+
+  .home-live-overlay .live-dialogue {
+    left: 53.2%;
+    top: 62.9%;
+    width: 43.5%;
+    height: 9%;
+  }
+
+  .home-live-overlay .live-district {
+    left: 2.1%;
+    top: 78.4%;
+    width: 45.8%;
+    height: 4.4%;
+  }
+
+  .home-live-overlay .live-schedule {
+    left: 53.2%;
+    top: 77.1%;
+    width: 43.6%;
+    height: 5.8%;
   }
 }
 
