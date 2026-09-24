@@ -1008,6 +1008,31 @@ export function createDevToolkit({
       );
     });
 
+    host.querySelectorAll("[data-dev-drag]").forEach(button => {
+      button.addEventListener(
+        "click",
+        startDragMode
+      );
+    });
+
+    host.querySelectorAll("[data-dev-snap]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () => {
+          state.snap =
+            Number(
+              button.dataset.devSnap
+            ) || 4;
+          renderPanel();
+        }
+      );
+    });
+
+    host.querySelector("[data-dev-finish-drag]")?.addEventListener(
+      "click",
+      finishDragMode
+    );
+
     host.querySelector("[data-dev-cancel-select]")?.addEventListener(
       "click",
       () => {
@@ -1093,6 +1118,154 @@ export function createDevToolkit({
   document.addEventListener(
     "click",
     handleSelection,
+    true
+  );
+
+  function beginLayoutDrag(event) {
+    if (
+      !state.dragMode ||
+      !state.selected ||
+      !document.contains(state.selected) ||
+      event.target.closest("#ui-dev-root")
+    ) {
+      return;
+    }
+
+    if (!state.selected.contains(event.target)) {
+      return;
+    }
+
+    const info = selectedInfo();
+    if (!info?.layoutKey) return;
+
+    const computed =
+      getComputedStyle(
+        state.selected
+      );
+
+    pushHistory();
+
+    const styles =
+      ensureSelectedOverride(info);
+
+    if (computed.position === "static") {
+      styles.position = "relative";
+      state.selected.style.position =
+        "relative";
+    }
+
+    const startLeft =
+      computed.left === "auto"
+        ? 0
+        : parseFloat(computed.left) || 0;
+
+    const startTop =
+      computed.top === "auto"
+        ? 0
+        : parseFloat(computed.top) || 0;
+
+    state.dragPointer = {
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      left: startLeft,
+      top: startTop,
+      id: info.id
+    };
+
+    state.selected.setPointerCapture?.(
+      event.pointerId
+    );
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function moveLayoutDrag(event) {
+    const drag = state.dragPointer;
+
+    if (
+      !state.dragMode ||
+      !drag ||
+      drag.pointerId !== event.pointerId ||
+      !state.selected
+    ) {
+      return;
+    }
+
+    const snap =
+      Math.max(
+        1,
+        Number(state.snap) || 1
+      );
+
+    const nextLeft =
+      Math.round(
+        (
+          drag.left +
+          event.clientX -
+          drag.x
+        ) / snap
+      ) * snap;
+
+    const nextTop =
+      Math.round(
+        (
+          drag.top +
+          event.clientY -
+          drag.y
+        ) / snap
+      ) * snap;
+
+    const styles =
+      state.overrides[drag.id] ||
+      (state.overrides[drag.id] = {});
+
+    styles.left = `${nextLeft}px`;
+    styles.top = `${nextTop}px`;
+
+    state.selected.style.left =
+      styles.left;
+    state.selected.style.top =
+      styles.top;
+
+    event.preventDefault();
+  }
+
+  function endLayoutDrag(event) {
+    if (
+      !state.dragPointer ||
+      state.dragPointer.pointerId !== event.pointerId
+    ) {
+      return;
+    }
+
+    state.dragPointer = null;
+    writeOverrides(state.overrides);
+    event.preventDefault();
+  }
+
+  document.addEventListener(
+    "pointerdown",
+    beginLayoutDrag,
+    true
+  );
+
+  document.addEventListener(
+    "pointermove",
+    moveLayoutDrag,
+    true
+  );
+
+  document.addEventListener(
+    "pointerup",
+    endLayoutDrag,
+    true
+  );
+
+  document.addEventListener(
+    "pointercancel",
+    endLayoutDrag,
     true
   );
 
@@ -1191,10 +1364,14 @@ export function createDevToolkit({
     close() {
       state.open = false;
       state.selecting = false;
+      state.dragMode = false;
+      state.dragPointer = null;
       renderPanel();
     },
     select: () => startSelecting("any"),
     selectLayout: startLayoutSelecting,
+    dragSelected: startDragMode,
+    finishDrag: finishDragMode,
     runAudit,
     undo,
     redo,
