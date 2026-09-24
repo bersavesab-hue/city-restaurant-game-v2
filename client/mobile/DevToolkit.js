@@ -783,9 +783,23 @@ export function createDevToolkit({
         ${stepper("上下", "top", info.values.top, 4)}
       </div>
 
+      ${
+        info.layoutKey
+          ? `
+            <div class="dev-layout-actions">
+              <button class="primary" type="button" data-dev-drag>
+                拖动当前区块
+              </button>
+              <span>吸附 ${state.snap}px</span>
+            </div>
+          `
+          : ""
+      }
+
       <div class="dev-selected-meta">
         <span>${info.action || "无动作"}</span>
         <span>${info.bound ? "事件已绑定" : "无事件"}</span>
+        ${info.layoutKey ? `<span>母版：${info.layoutKey}</span>` : ""}
       </div>
     `;
   }
@@ -834,6 +848,34 @@ export function createDevToolkit({
   }
 
   function renderPanel() {
+    if (state.dragMode) {
+      const info = selectedInfo();
+
+      host.innerHTML = `
+        <div class="ui-dev-drag-bar">
+          <div>
+            <strong>拖动排版</strong>
+            <span>${info?.layoutKey || "母版区块"}</span>
+          </div>
+          <div class="dev-snap-group">
+            ${[1,4,8].map(value => `
+              <button
+                type="button"
+                class="${state.snap === value ? "is-active" : ""}"
+                data-dev-snap="${value}"
+              >${value}px</button>
+            `).join("")}
+          </div>
+          <button class="finish" type="button" data-dev-finish-drag>
+            完成
+          </button>
+        </div>
+      `;
+
+      bindPanelEvents();
+      return;
+    }
+
     if (state.selecting) {
       host.innerHTML = `
         <div class="ui-dev-select-bar">
