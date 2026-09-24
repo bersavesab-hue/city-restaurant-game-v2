@@ -115,9 +115,14 @@ button {
   background: #102a42;
 }
 
-.home-master-artwork {
+.home-master-picture {
   position: absolute;
   inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.home-master-artwork {
   width: 100%;
   height: 100%;
   display: block;
@@ -237,6 +242,85 @@ button {
   inset: 0;
   min-height: 0;
   display: block;
+}
+
+@media (max-aspect-ratio: 1 / 2) {
+  .mobile-shell.store-master-shell {
+    width:
+      min(
+        100vw,
+        540px
+      );
+    height: 100dvh;
+    max-height: 100dvh;
+    aspect-ratio: auto;
+  }
+
+  .hotspot-settings {
+    left: 91.5%;
+    top: .8%;
+    width: 8.5%;
+    height: 4.3%;
+  }
+
+  .hotspot-opportunity-more {
+    left: 74%;
+    top: 46.8%;
+    width: 23%;
+    height: 3.2%;
+  }
+
+  .hotspot-opportunity-enter {
+    left: 73%;
+    top: 54.2%;
+    width: 24%;
+    height: 4%;
+  }
+
+  .hotspot-renovation,
+  .hotspot-staff-shortcut,
+  .hotspot-research-shortcut,
+  .hotspot-business-shortcut {
+    top: 65.8%;
+    width: 12%;
+    height: 6.2%;
+  }
+
+  .hotspot-renovation { left: 3.4%; }
+  .hotspot-staff-shortcut { left: 15.6%; }
+  .hotspot-research-shortcut { left: 27.8%; }
+  .hotspot-business-shortcut { left: 40%; }
+
+  .hotspot-dialogue-more {
+    left: 87%;
+    top: 58.3%;
+    width: 10%;
+    height: 3.2%;
+  }
+
+  .hotspot-district-more {
+    left: 43%;
+    top: 73%;
+    width: 9%;
+    height: 3.2%;
+  }
+
+  .hotspot-schedule-advance {
+    left: 87%;
+    top: 73%;
+    width: 10%;
+    height: 3.2%;
+  }
+
+  .hotspot-nav-store,
+  .hotspot-nav-business,
+  .hotspot-nav-research,
+  .hotspot-nav-staff,
+  .hotspot-nav-more {
+    top: 92%;
+    width: 20%;
+    height: 8%;
+  }
 }
 
 /* Standard bottom navigation remains for the non-store management pages. */
