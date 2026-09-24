@@ -14,6 +14,8 @@ import {
   createDevToolkit
 } from "./DevToolkit.js";
 
+import homeLayout from "./layout/home.layout.json";
+
 import {
   renderActionGrid,
   renderListCardRows,
@@ -49,6 +51,27 @@ const devToolkit = DEV_MODE
       getActivePage: () => activePage
     })
   : null;
+
+function homeLayoutStyle() {
+  const sections =
+    homeLayout.sections;
+
+  return [
+    `--home-hero-min:${sections.hero.minPx}px`,
+    `--home-hero-vh:${sections.hero.tallVh}dvh`,
+    `--home-hero-max:${sections.hero.maxPx}px`,
+    `--home-opportunity-min:${sections.opportunity.minPx}px`,
+    `--home-opportunity-vh:${sections.opportunity.tallVh}dvh`,
+    `--home-opportunity-max:${sections.opportunity.maxPx}px`,
+    `--home-upper-min:${sections.upperPanels.minPx}px`,
+    `--home-upper-vh:${sections.upperPanels.tallVh}dvh`,
+    `--home-upper-max:${sections.upperPanels.maxPx}px`,
+    `--home-lower-min:${sections.lowerPanels.minPx}px`,
+    `--home-lower-vh:${sections.lowerPanels.tallVh}dvh`,
+    `--home-lower-max:${sections.lowerPanels.maxPx}px`,
+    `--home-section-gap:${sections.gapPx}px`
+  ].join(";");
+}
 
 function money(value) {
   return (
@@ -106,7 +129,10 @@ function signalTone(value, inverse = false) {
 
 function navMarkup() {
   return `
-    <nav class="bottom-nav">
+    <nav
+      class="bottom-nav"
+      data-layout-key="bottom-nav"
+    >
       ${NAV_ITEMS.map(
         ([id, label, icon]) => `
           <button
@@ -128,6 +154,7 @@ function sceneMarkup(model) {
     <section
       class="home-hero-shell"
       data-ui-component="home-hero-scene"
+      data-layout-key="hero"
       aria-label="门店主页静态主视觉"
     >
       <img
@@ -141,6 +168,7 @@ function sceneMarkup(model) {
       <header
         class="home-hud home-hud-overlay"
         data-ui-component="home-top-hud"
+        data-layout-key="top-hud"
       >
         <div class="hud-card hud-day">
           <span class="hud-icon">☀</span>
@@ -193,6 +221,7 @@ function sceneMarkup(model) {
       <section
         class="home-metric-grid home-metric-overlay"
         data-ui-component="home-metrics"
+        data-layout-key="kpi-grid"
       >
         <article class="home-metric-card revenue">
           <header>
@@ -370,12 +399,17 @@ function renderStore() {
         ];
 
   return `
-    <div class="page-scroll home-scroll">
+    <div
+      class="page-scroll home-scroll"
+      data-home-layout-version="${homeLayout.version}"
+      style="${homeLayoutStyle()}"
+    >
       ${sceneMarkup(model)}
 
       <section
         class="home-opportunity ${model.opportunity.tone}"
         data-ui-component="home-opportunity"
+        data-layout-key="opportunity"
       >
         <header class="opportunity-band">
           <strong><span>⌖</span> 今日机会</strong>
@@ -418,8 +452,12 @@ function renderStore() {
       <div
         class="home-dual-grid"
         data-ui-component="home-growth-and-dialogue"
+        data-layout-key="upper-panels"
       >
-        <section class="home-panel growth-panel">
+        <section
+          class="home-panel growth-panel"
+          data-layout-key="growth-panel"
+        >
           <header class="home-panel-title">
             <strong><span>▣</span> 门店成长</strong>
             <small>从一家小店，做出一座城市的味道！</small>
@@ -463,7 +501,10 @@ function renderStore() {
           </div>
         </section>
 
-        <section class="home-panel dialogue-panel">
+        <section
+          class="home-panel dialogue-panel"
+          data-layout-key="dialogue-panel"
+        >
           <header class="home-panel-title">
             <strong><span>●</span> 店内动态</strong>
             <button type="button" data-nav="staff">更多 ›</button>
@@ -491,8 +532,12 @@ function renderStore() {
       <div
         class="home-dual-grid lower-grid"
         data-ui-component="home-district-and-schedule"
+        data-layout-key="lower-panels"
       >
-        <section class="home-panel district-panel">
+        <section
+          class="home-panel district-panel"
+          data-layout-key="district-panel"
+        >
           <header class="home-panel-title">
             <strong><span>⌖</span> 商圈情报</strong>
             <button type="button" data-nav="business">更多 ›</button>
@@ -513,7 +558,10 @@ function renderStore() {
           </div>
         </section>
 
-        <section class="home-panel schedule-panel">
+        <section
+          class="home-panel schedule-panel"
+          data-layout-key="schedule-panel"
+        >
           <header class="home-panel-title">
             <strong><span>▦</span> 今日日程</strong>
             <button
