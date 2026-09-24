@@ -402,6 +402,7 @@ function renderStore() {
     <div
       class="page-scroll home-scroll"
       data-home-layout-version="${homeLayout.version}"
+      data-home-skin="segmented-static-v1"
       style="${homeLayoutStyle()}"
     >
       ${sceneMarkup(model)}
