@@ -186,7 +186,7 @@ function renderStore() {
     <section
       class="home-master-page"
       data-ui-component="home-master"
-      data-home-master-version="5"
+      data-home-master-version="6"
       aria-label="门店首页静态母版"
     >
       <picture class="home-master-picture" aria-hidden="true">
@@ -259,6 +259,87 @@ function renderStore() {
             <em>${staffStatusLabel(model.operations.employees)}</em>
           </article>
         </div>
+
+        <section class="live-opportunity">
+          <strong>${model.opportunity.title}</strong>
+          <p>${model.opportunity.detail}</p>
+          <div class="live-opportunity-tags">
+            ${(model.opportunity.tags ?? []).slice(0,4).map(tag => `
+              <span>${tag}</span>
+            `).join("")}
+          </div>
+        </section>
+
+        <section class="live-growth">
+          <span>下一阶段</span>
+          <strong>
+            ${model.progress.maxLevel
+              ? model.progress.title
+              : model.progress.nextTitle}
+          </strong>
+          <b>
+            ${model.progress.maxLevel
+              ? "MAX"
+              : Math.round(model.progress.progress * 100) + "%"}
+          </b>
+          <i>
+            <u style="width:${model.progress.maxLevel ? 100 : Math.round(model.progress.progress * 100)}%"></u>
+          </i>
+        </section>
+
+        <section class="live-dialogue">
+          ${model.dialogue.slice(0,3).map(item => `
+            <article>
+              <span class="live-dialogue-avatar">
+                ${item.speaker.slice(0,1)}
+              </span>
+              <div>
+                <header>
+                  <strong>${item.speaker}</strong>
+                  <em>${item.role}</em>
+                  <time>${item.time}</time>
+                </header>
+                <p>${item.text}</p>
+              </div>
+            </article>
+          `).join("")}
+        </section>
+
+        <section class="live-district">
+          <div>
+            <strong>${model.district ? model.district.trafficIndex : "--"}</strong>
+            <span>客流</span>
+          </div>
+          <div>
+            <strong>${model.district ? model.district.mainCustomer : "--"}</strong>
+            <span>主力客群</span>
+          </div>
+          <div>
+            <strong>${model.district ? model.district.deliveryDemand : "--"}</strong>
+            <span>外卖</span>
+          </div>
+          <div>
+            <strong>${model.district ? model.district.competition : "--"}</strong>
+            <span>竞争</span>
+          </div>
+        </section>
+
+        <section class="live-schedule">
+          ${model.schedule.slice(0,4).map(item => `
+            <article class="${item.status}">
+              <i></i>
+              <time>${item.time}</time>
+              <span>${item.title}</span>
+              <strong>
+                ${item.status === "done"
+                  ? "已完成"
+                  : item.status === "active"
+                    ? "进行中"
+                    : "未开始"}
+              </strong>
+            </article>
+          `).join("")}
+        </section>
       </div>
 
       <div class="home-master-hotspots" aria-label="首页交互热区">
