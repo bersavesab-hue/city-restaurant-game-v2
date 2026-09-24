@@ -250,3 +250,29 @@ test(
     );
   }
 );
+
+
+test(
+  "tall-phone layout uses max-aspect-ratio and keeps opportunity header on one row",
+  () => {
+    assert.match(
+      css,
+      /@media \(max-aspect-ratio: 9 \/ 18\)/
+    );
+
+    assert.doesNotMatch(
+      css,
+      /@media \(min-aspect-ratio: 9 \/ 18\)/
+    );
+
+    assert.doesNotMatch(
+      css,
+      /@media \(max-width: 370px\)[\s\S]*?\.opportunity-band\s*\{[\s\S]*?grid-template-columns:\s*auto\s+1fr/
+    );
+
+    assert.match(
+      css,
+      /@media \(max-width: 370px\)[\s\S]*?grid-template-columns:\s*68px\s+minmax\(0,1fr\)\s+80px/
+    );
+  }
+);
