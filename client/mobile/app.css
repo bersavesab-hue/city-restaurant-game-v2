@@ -621,27 +621,4 @@ button {
   }
 }
 
-@media (min-width: 430px) {
-  .home-hud {
-    gap: 7px;
-    padding-left: 9px;
-    padding-right: 9px;
-  }
-
-  .home-metric-card {
-    min-height: 84px;
-    padding: 12px 9px 10px;
-  }
-
-  .quick-actions {
-    grid-template-columns:
-      repeat(4, minmax(0,1fr));
-  }
-
-  .home-panel-body {
-    padding: 10px;
-  }
-}
-
-
 
