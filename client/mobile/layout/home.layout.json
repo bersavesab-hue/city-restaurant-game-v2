@@ -1,5 +1,5 @@
 {
-  "version": "hybrid-static-v1",
+  "version": "hybrid-static-v2",
   "design": {
     "width": 360,
     "height": 640,
@@ -35,5 +35,15 @@
     "opportunity": "assets/home/opportunity-card.svg",
     "panel": "assets/home/panel-card.svg",
     "nav": "assets/home/nav-base.svg"
+  },
+  "editor": {
+    "mode": "touch-drag",
+    "snapOptions": [
+      1,
+      4,
+      8
+    ],
+    "defaultSnap": 4,
+    "stableTargetAttribute": "data-layout-key"
   }
 }
