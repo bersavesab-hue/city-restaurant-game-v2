@@ -374,6 +374,7 @@ export function createDevToolkit({
     dock: "bottom",
     tab: "edit",
     selecting: false,
+    selectionScope: "any",
     selected: null,
     report: null,
     overrides: readOverrides(),
@@ -678,10 +679,15 @@ export function createDevToolkit({
     renderPanel();
   }
 
-  function startSelecting() {
+  function startSelecting(scope = "any") {
     state.selecting = true;
+    state.selectionScope = scope;
     state.open = false;
     renderPanel();
+  }
+
+  function startLayoutSelecting() {
+    startSelecting("layout");
   }
 
   function issueMarkup() {
@@ -807,7 +813,11 @@ export function createDevToolkit({
       host.innerHTML = `
         <div class="ui-dev-select-bar">
           <strong>点选模式</strong>
-          <span>直接点要修改的卡片或按钮</span>
+          <span>${
+            state.selectionScope === "layout"
+              ? "只会选中首页母版区块"
+              : "直接点要修改的卡片或按钮"
+          }</span>
           <button type="button" data-dev-cancel-select>取消</button>
         </div>
       `;
@@ -841,7 +851,12 @@ export function createDevToolkit({
         </header>
 
         <div class="ui-dev-quickbar">
-          <button class="primary" type="button" data-dev-select>点选界面</button>
+          ${
+            getActivePage() === "store"
+              ? '<button class="primary" type="button" data-dev-layout-select>母版排版</button>'
+              : '<button class="primary" type="button" data-dev-select>点选界面</button>'
+          }
+          <button type="button" data-dev-select>自由点选</button>
           <button type="button" data-dev-audit>立即体检</button>
           <button type="button" data-dev-copy>复制配置</button>
         </div>
@@ -913,7 +928,17 @@ export function createDevToolkit({
     });
 
     host.querySelectorAll("[data-dev-select]").forEach(button => {
-      button.addEventListener("click", startSelecting);
+      button.addEventListener(
+        "click",
+        () => startSelecting("any")
+      );
+    });
+
+    host.querySelectorAll("[data-dev-layout-select]").forEach(button => {
+      button.addEventListener(
+        "click",
+        startLayoutSelecting
+      );
     });
 
     host.querySelector("[data-dev-cancel-select]")?.addEventListener(
@@ -971,13 +996,26 @@ export function createDevToolkit({
     if (!state.selecting) return;
     if (event.target.closest("#ui-dev-root")) return;
 
-    const node = normalizeSelection(
-      event.target,
-      root,
-      sheetRoot
-    );
+    const node =
+      state.selectionScope === "layout"
+        ? event.target.closest(
+            "[data-layout-key]"
+          )
+        : normalizeSelection(
+            event.target,
+            root,
+            sheetRoot
+          );
 
-    if (!node) return;
+    if (
+      !node ||
+      !(
+        root.contains(node) ||
+        sheetRoot.contains(node)
+      )
+    ) {
+      return;
+    }
 
     event.preventDefault();
     event.stopPropagation();
@@ -1088,7 +1126,8 @@ export function createDevToolkit({
       state.selecting = false;
       renderPanel();
     },
-    select: startSelecting,
+    select: () => startSelecting("any"),
+    selectLayout: startLayoutSelecting,
     runAudit,
     undo,
     redo,
