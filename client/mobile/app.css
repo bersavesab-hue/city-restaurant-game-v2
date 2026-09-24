@@ -108,6 +108,8 @@ button {
 
 .home-scroll {
   padding: 0 8px 6px;
+  display: flex;
+  flex-direction: column;
   background:
     linear-gradient(
       180deg,
@@ -1176,6 +1178,13 @@ button {
 }
 
 .lower-grid {
+  flex: 1 1 auto;
+  min-height:
+    clamp(
+      108px,
+      14dvh,
+      150px
+    );
   margin-bottom: 2px;
 }
 
@@ -1879,18 +1888,19 @@ button {
   [data-ui-component="home-growth-and-dialogue"] {
     height:
       clamp(
-        124px,
-        16dvh,
-        150px
+        142px,
+        18dvh,
+        168px
       );
   }
 
   [data-ui-component="home-district-and-schedule"] {
-    height:
+    height: auto;
+    min-height:
       clamp(
-        96px,
-        12.5dvh,
-        118px
+        108px,
+        14dvh,
+        150px
       );
   }
 
