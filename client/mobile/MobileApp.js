@@ -86,6 +86,36 @@ function trendTone(value) {
       : "neutral";
 }
 
+function satisfactionLabel(value) {
+  const number =
+    Number(value) || 0;
+
+  if (number >= 85) {
+    return "口碑很好";
+  }
+
+  if (number >= 70) {
+    return "状态稳定";
+  }
+
+  return "有待提升";
+}
+
+function staffStatusLabel(value) {
+  const number =
+    Number(value) || 0;
+
+  if (number >= 4) {
+    return "工作正常";
+  }
+
+  if (number >= 2) {
+    return "人手偏紧";
+  }
+
+  return "急需补员";
+}
+
 function signalTone(value, inverse = false) {
   const number =
     Number(value) || 0;
@@ -128,11 +158,35 @@ function navMarkup() {
 }
 
 function renderStore() {
+  const model =
+    buildHomeDashboardModel(
+      app
+    );
+
+  if (model.empty) {
+    return `
+      <section class="home-master-page">
+        <picture class="home-master-picture" aria-hidden="true">
+          <source
+            media="(max-aspect-ratio: 1/2)"
+            srcset="assets/home/home-master-20x9.webp"
+          />
+          <img
+            class="home-master-artwork"
+            src="assets/home/home-master.webp"
+            alt=""
+            decoding="async"
+          />
+        </picture>
+      </section>
+    `;
+  }
+
   return `
     <section
       class="home-master-page"
       data-ui-component="home-master"
-      data-home-master-version="3"
+      data-home-master-version="4"
       aria-label="门店首页静态母版"
     >
       <picture class="home-master-picture" aria-hidden="true">
@@ -147,6 +201,65 @@ function renderStore() {
           decoding="async"
         />
       </picture>
+
+      <div class="home-live-overlay" aria-label="首页实时经营数据">
+        <div class="live-hud live-day">
+          <strong>第${model.time.day}天</strong>
+          <span>经营日</span>
+        </div>
+
+        <div class="live-hud live-clock">
+          <strong data-bind="clock">${model.time.clock}</strong>
+          <span>营业中</span>
+        </div>
+
+        <div class="live-hud live-money">
+          <span>资金</span>
+          <strong>${money(model.money.balance)}</strong>
+        </div>
+
+        <div class="live-hud live-rating">
+          <span>星级评价</span>
+          <strong>${model.restaurant.reviewScore.toFixed(1)}分</strong>
+        </div>
+
+        <div class="live-hud live-level">
+          <strong>Lv.${model.restaurant.level}</strong>
+          <span>${model.restaurant.title}</span>
+        </div>
+
+        <div class="live-kpi-grid">
+          <article class="live-kpi">
+            <span>今日营业额</span>
+            <strong>${money(model.money.todayRevenue)}</strong>
+            <em class="${trendTone(model.money.revenueTrend)}">
+              ${model.money.revenueTrend >= 0 ? "↑" : "↓"}
+              ${signedPercent(model.money.revenueTrend)}
+            </em>
+          </article>
+
+          <article class="live-kpi">
+            <span>今日利润</span>
+            <strong>${money(model.money.todayProfit)}</strong>
+            <em class="${trendTone(model.money.profitTrend)}">
+              ${model.money.profitTrend >= 0 ? "↑" : "↓"}
+              ${signedPercent(model.money.profitTrend)}
+            </em>
+          </article>
+
+          <article class="live-kpi">
+            <span>满意度</span>
+            <strong>${Math.round(model.restaurant.satisfaction)}%</strong>
+            <em>${satisfactionLabel(model.restaurant.satisfaction)}</em>
+          </article>
+
+          <article class="live-kpi">
+            <span>在岗员工</span>
+            <strong>${model.operations.employees}</strong>
+            <em>${staffStatusLabel(model.operations.employees)}</em>
+          </article>
+        </div>
+      </div>
 
       <div class="home-master-hotspots" aria-label="首页交互热区">
         <button class="home-hotspot hotspot-settings" type="button" data-nav="more" aria-label="设置"></button>
