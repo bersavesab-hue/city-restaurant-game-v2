@@ -1,0 +1,39 @@
+{
+  "version": "hybrid-static-v1",
+  "design": {
+    "width": 360,
+    "height": 640,
+    "aspect": "9:16"
+  },
+  "sections": {
+    "hero": {
+      "minPx": 360,
+      "tallVh": 46,
+      "maxPx": 500
+    },
+    "opportunity": {
+      "minPx": 110,
+      "tallVh": 15,
+      "maxPx": 140
+    },
+    "upperPanels": {
+      "minPx": 142,
+      "tallVh": 18,
+      "maxPx": 168
+    },
+    "lowerPanels": {
+      "minPx": 108,
+      "tallVh": 14,
+      "maxPx": 150
+    },
+    "gapPx": 6
+  },
+  "skins": {
+    "hudLight": "assets/home/hud-card-light.svg",
+    "hudDark": "assets/home/hud-card-dark.svg",
+    "kpi": "assets/home/kpi-card.svg",
+    "opportunity": "assets/home/opportunity-card.svg",
+    "panel": "assets/home/panel-card.svg",
+    "nav": "assets/home/nav-base.svg"
+  }
+}
