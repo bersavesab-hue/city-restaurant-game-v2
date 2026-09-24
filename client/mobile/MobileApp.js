@@ -145,7 +145,7 @@ function sceneMarkup(model) {
         <div class="hud-card hud-day">
           <span class="hud-icon">☀</span>
           <div>
-            <strong>第 ${model.time.day} 天</strong>
+            <strong>第${model.time.day}天</strong>
             <small>经营日</small>
           </div>
         </div>
