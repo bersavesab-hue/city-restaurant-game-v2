@@ -89,6 +89,13 @@ function selectorFor(node, root) {
     return node.dataset.devId;
   }
 
+  if (node.dataset.layoutKey) {
+    const id =
+      `[data-layout-key="${node.dataset.layoutKey}"]`;
+    node.dataset.devId = id;
+    return id;
+  }
+
   if (node.dataset.uiComponent) {
     const id = `[data-ui-component="${node.dataset.uiComponent}"]`;
     node.dataset.devId = id;
@@ -163,6 +170,7 @@ function normalizeSelection(target, root, sheetRoot) {
   if (!(target instanceof Element)) return null;
 
   const selector = [
+    "[data-layout-key]",
     "[data-ui-component]",
     "button",
     ".home-metric-card",
@@ -392,7 +400,7 @@ export function createDevToolkit({
       .forEach(container => {
         container
           .querySelectorAll(
-            "button,[data-bind],[data-ui-component],article,section,header,nav,.feature-card,.list-card"
+            "button,[data-bind],[data-layout-key],[data-ui-component],article,section,header,nav,.feature-card,.list-card"
           )
           .forEach(node => {
             selectorFor(node, root);
@@ -608,8 +616,9 @@ export function createDevToolkit({
 
   function exportJson() {
     const payload = {
-      version: 2,
+      version: 3,
       page: getActivePage(),
+      layoutMode: "hybrid-static",
       overrides: state.overrides
     };
 
