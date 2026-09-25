@@ -186,7 +186,7 @@ function renderStore() {
     <section
       class="home-master-page"
       data-ui-component="home-master"
-      data-home-master-version="8"
+      data-home-master-version="9"
       aria-label="门店首页静态母版"
     >
       <picture class="home-master-picture" aria-hidden="true">
@@ -271,7 +271,6 @@ function renderStore() {
         </section>
 
         <section class="live-growth">
-          <span>下一阶段</span>
           <strong>
             ${model.progress.maxLevel
               ? model.progress.title
@@ -307,16 +306,22 @@ function renderStore() {
 
         <section class="live-district">
           <div>
-            <strong>${model.district ? model.district.trafficIndex : "--"}</strong>
+            <strong>${model.district
+              ? (model.district.trafficIndex >= 75 ? "较高 ↑" : model.district.trafficIndex >= 55 ? "中等" : "偏低")
+              : "--"}</strong>
           </div>
           <div>
             <strong>${model.district ? model.district.mainCustomer : "--"}</strong>
           </div>
           <div>
-            <strong>${model.district ? model.district.deliveryDemand : "--"}</strong>
+            <strong>${model.district
+              ? (model.district.deliveryDemand >= 75 ? "上升 ↑" : model.district.deliveryDemand >= 55 ? "中等" : "偏低")
+              : "--"}</strong>
           </div>
           <div>
-            <strong>${model.district ? model.district.competition : "--"}</strong>
+            <strong>${model.district
+              ? (model.district.competition >= 75 ? "较高" : model.district.competition >= 55 ? "中等" : "较低")
+              : "--"}</strong>
           </div>
         </section>
 
