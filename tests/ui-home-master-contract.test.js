@@ -344,3 +344,34 @@ test(
     );
   }
 );
+
+
+test(
+  "20x9 screenshot calibration keeps live panels inside their mother-card slots",
+  () => {
+    assert.match(
+      css,
+      /\.live-growth\s*\{[\s\S]*?width:\s*33\.6%/
+    );
+
+    assert.match(
+      css,
+      /\.live-dialogue\s*\{[\s\S]*?top:\s*61\.7%/
+    );
+
+    assert.match(
+      css,
+      /\.live-schedule\s*\{[\s\S]*?top:\s*75\.75%/
+    );
+
+    assert.match(
+      css,
+      /\.live-district\s*\{[\s\S]*?top:\s*79\.15%/
+    );
+
+    assert.doesNotMatch(
+      mobileApp,
+      /<span>客流<\/span>|<span>主力客群<\/span>|<span>外卖<\/span>|<span>竞争<\/span>/
+    );
+  }
+);
