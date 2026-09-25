@@ -186,7 +186,7 @@ function renderStore() {
     <section
       class="home-master-page"
       data-ui-component="home-master"
-      data-home-master-version="9"
+      data-home-master-version="10"
       aria-label="门店首页静态母版"
     >
       <picture class="home-master-picture" aria-hidden="true">
