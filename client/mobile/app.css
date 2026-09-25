@@ -460,6 +460,10 @@ button {
       rgba(255,255,255,0) 70% 100%
     );
 }
+.live-growth-label {
+  display: none;
+}
+
 .live-growth > strong {
   grid-column: 1;
   grid-row: 1;
@@ -891,11 +895,163 @@ button {
     height: 1.75%;
   }
 
+  .home-live-overlay .live-day,
+  .home-live-overlay .live-clock,
+  .home-live-overlay .live-money,
+  .home-live-overlay .live-rating,
+  .home-live-overlay .live-level,
+  .home-live-overlay .live-kpi,
+  .home-live-overlay .live-opportunity,
+  .home-live-overlay .live-growth,
+  .home-live-overlay .live-dialogue,
+  .home-live-overlay .live-district > div,
   .home-live-overlay .live-schedule {
-    left: 55.1%;
-    top: 75.55%;
+    background: transparent;
+  }
+
+  .home-live-overlay .live-kpi-grid {
+    left: 2%;
+    right: 1.9%;
+    top: 38.55%;
+    height: 7.05%;
+  }
+
+  .home-live-overlay .live-kpi {
+    padding:
+      39%
+      4%
+      3%
+      29%;
+    align-content: start;
+  }
+
+  .home-live-overlay .live-kpi span {
+    display: none;
+  }
+
+  .home-live-overlay .live-opportunity {
+    left: 2.3%;
+    top: 49.55%;
+    width: 70.4%;
+    height: 8.45%;
+    padding: 0;
+  }
+
+  .home-live-overlay .live-opportunity > strong {
+    position: absolute;
+    left: 20.5%;
+    right: 1%;
+    top: 4%;
+    font-size: clamp(8px,2.35vw,12px);
+  }
+
+  .home-live-overlay .live-opportunity > p {
+    position: absolute;
+    left: 1%;
+    right: 1%;
+    top: 28%;
+    margin: 0;
+    font-size: clamp(5.5px,1.65vw,8px);
+    line-height: 1.22;
+  }
+
+  .home-live-overlay .live-opportunity-tags {
+    position: absolute;
+    left: .5%;
+    right: .5%;
+    bottom: 2%;
+    display: grid;
+    grid-template-columns:
+      repeat(4,minmax(0,1fr));
+    gap: 1.4%;
+  }
+
+  .home-live-overlay .live-opportunity-tags span {
+    padding:
+      2px
+      3px
+      2px
+      30%;
+    background: transparent;
+    font-size: clamp(5px,1.45vw,7px);
+    text-align: left;
+  }
+
+  .home-live-overlay .live-growth {
+    left: 3.8%;
+    top: 61.55%;
+    width: 34%;
+    height: 5.8%;
+    padding: 0;
+    display: block;
+    overflow: visible;
+  }
+
+  .home-live-overlay .live-growth-label {
+    display: inline;
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #16415c;
+    font-size: clamp(6px,1.7vw,8px);
+    font-weight: 800;
+  }
+
+  .home-live-overlay .live-growth > strong {
+    position: absolute;
+    left: 23%;
+    right: 15%;
+    top: 0;
+    font-size: clamp(7px,2vw,10px);
+  }
+
+  .home-live-overlay .live-growth > b {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: clamp(7px,2vw,10px);
+  }
+
+  .home-live-overlay .live-growth > i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 5%;
+    width: auto;
+    height: 7px;
+    margin: 0;
+  }
+
+  .home-live-overlay .live-dialogue {
+    left: 55.2%;
+    top: 61.15%;
+    width: 42.8%;
+    height: 10.4%;
+    padding: .4% .8%;
+  }
+
+  .home-live-overlay .live-dialogue article {
+    min-height: 31px;
+    padding: 2px 0;
+  }
+
+  .home-live-overlay .live-district {
+    left: 4.7%;
+    top: 80.45%;
     width: 42.7%;
-    height: 7.55%;
+    height: 2.05%;
+  }
+
+  .home-live-overlay .live-district strong {
+    font-size: clamp(5px,1.45vw,7px);
+  }
+
+  .home-live-overlay .live-schedule {
+    left: 55.2%;
+    top: 75.65%;
+    width: 42.6%;
+    height: 7.2%;
+    padding: .2% .7%;
   }
 }
 
