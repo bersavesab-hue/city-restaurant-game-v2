@@ -155,16 +155,16 @@ button {
 .live-hud strong,
 .live-hud span {
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
 
 .live-hud strong {
   font-size:
     clamp(
-      7px,
-      2.35vw,
-      11px
+      6.5px,
+      2.15vw,
+      10px
     );
   font-weight: 950;
 }
@@ -386,13 +386,13 @@ button {
 .live-opportunity {
   position: absolute;
   left: 2.3%;
-  top: 49.7%;
+  top: 49.55%;
   width: 70.4%;
-  height: 8.2%;
+  height: 8.45%;
   box-sizing: border-box;
-  padding: 1.2% 1.5%;
+  padding: 1.05% 1.5%;
   overflow: hidden;
-  background: rgba(255,255,255,.995);
+  background: #fff;
 }
 .live-opportunity > strong,
 .live-opportunity > p {
@@ -442,47 +442,50 @@ button {
 .live-growth {
   position: absolute;
   left: 2.9%;
-  top: 61.7%;
-  width: 33.6%;
-  height: 6.9%;
+  top: 61.45%;
+  width: 45.2%;
+  height: 5.9%;
   box-sizing: border-box;
-  padding: 1.2% 1.5%;
+  padding: 1.1% 14% 0 1.4%;
   display: grid;
   grid-template-columns: minmax(0,1fr) auto;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto 1fr;
   column-gap: 6px;
   align-content: start;
   overflow: hidden;
-  background: rgba(255,255,255,.995);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.998) 0 70%,
+      rgba(255,255,255,0) 70% 100%
+    );
 }
-.live-growth > span {
-  grid-column: 1;
-  color: #82909a;
-  font-size: clamp(5px,1.5vw,8px);
-}
-
 .live-growth > strong {
   grid-column: 1;
+  grid-row: 1;
   color: #16415c;
-  font-size: clamp(9px,2.6vw,14px);
+  font-size: clamp(8px,2.35vw,12px);
   font-weight: 950;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 
 .live-growth > b {
-  grid-column: 2;
-  grid-row: 2;
-  align-self: end;
+  position: absolute;
+  right: 13.5%;
+  top: 13%;
   color: #245875;
-  font-size: clamp(8px,2.4vw,13px);
+  font-size: clamp(8px,2.35vw,12px);
+  font-weight: 950;
 }
 
 .live-growth > i {
-  grid-column: 1 / -1;
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
   height: 7px;
-  margin-top: 5px;
+  margin-top: 6px;
   border-radius: 999px;
   overflow: hidden;
   background: #dce5e9;
@@ -499,13 +502,13 @@ button {
 .live-dialogue {
   position: absolute;
   left: 54.2%;
-  top: 61.7%;
+  top: 61.35%;
   width: 43.8%;
-  height: 10.1%;
+  height: 10.5%;
   box-sizing: border-box;
-  padding: .5% 1%;
+  padding: .55% 1%;
   overflow: hidden;
-  background: rgba(255,255,255,.995);
+  background: #fff;
 }
 .live-dialogue article {
   display: grid;
@@ -574,9 +577,9 @@ button {
 .live-district {
   position: absolute;
   left: 4.7%;
-  top: 79.15%;
+  top: 81.05%;
   width: 42.7%;
-  height: 3.6%;
+  height: 1.75%;
   box-sizing: border-box;
   padding: 0;
   display: grid;
@@ -589,30 +592,30 @@ button {
   display: grid;
   place-items: center;
   align-content: center;
-  border-radius: 6px;
-  background: rgba(255,255,255,.96);
+  border-radius: 4px;
+  background: rgba(255,255,255,.985);
 }
 
 .live-district strong {
   max-width: 100%;
   overflow: hidden;
   color: #1e5873;
-  font-size: clamp(6px,1.8vw,9px);
+  font-size: clamp(5.5px,1.6vw,8px);
   line-height: 1;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
 
 .live-schedule {
   position: absolute;
-  left: 55.2%;
-  top: 75.75%;
-  width: 42.4%;
-  height: 7.15%;
+  left: 55.1%;
+  top: 75.55%;
+  width: 42.7%;
+  height: 7.55%;
   box-sizing: border-box;
-  padding: .45% .8%;
+  padding: .35% .8%;
   overflow: hidden;
-  background: rgba(255,255,255,.995);
+  background: #fff;
 }
 .live-schedule article {
   min-width: 0;
@@ -862,37 +865,37 @@ button {
 
   .home-live-overlay .live-opportunity {
     left: 2.3%;
-    top: 49.7%;
+    top: 49.55%;
     width: 70.4%;
-    height: 8.2%;
+    height: 8.45%;
   }
 
   .home-live-overlay .live-growth {
     left: 2.9%;
-    top: 61.7%;
-    width: 33.6%;
-    height: 6.9%;
+    top: 61.45%;
+    width: 45.2%;
+    height: 5.9%;
   }
 
   .home-live-overlay .live-dialogue {
     left: 54.2%;
-    top: 61.7%;
+    top: 61.35%;
     width: 43.8%;
-    height: 10.1%;
+    height: 10.5%;
   }
 
   .home-live-overlay .live-district {
     left: 4.7%;
-    top: 79.15%;
+    top: 81.05%;
     width: 42.7%;
-    height: 3.6%;
+    height: 1.75%;
   }
 
   .home-live-overlay .live-schedule {
-    left: 55.2%;
-    top: 75.75%;
-    width: 42.4%;
-    height: 7.15%;
+    left: 55.1%;
+    top: 75.55%;
+    width: 42.7%;
+    height: 7.55%;
   }
 }
 
