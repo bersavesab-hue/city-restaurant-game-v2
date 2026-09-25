@@ -186,7 +186,7 @@ function renderStore() {
     <section
       class="home-master-page"
       data-ui-component="home-master"
-      data-home-master-version="7"
+      data-home-master-version="8"
       aria-label="门店首页静态母版"
     >
       <picture class="home-master-picture" aria-hidden="true">
@@ -308,19 +308,15 @@ function renderStore() {
         <section class="live-district">
           <div>
             <strong>${model.district ? model.district.trafficIndex : "--"}</strong>
-            <span>客流</span>
           </div>
           <div>
             <strong>${model.district ? model.district.mainCustomer : "--"}</strong>
-            <span>主力客群</span>
           </div>
           <div>
             <strong>${model.district ? model.district.deliveryDemand : "--"}</strong>
-            <span>外卖</span>
           </div>
           <div>
             <strong>${model.district ? model.district.competition : "--"}</strong>
-            <span>竞争</span>
           </div>
         </section>
 
