@@ -351,22 +351,22 @@ test(
   () => {
     assert.match(
       css,
-      /\.live-growth\s*\{[\s\S]*?width:\s*33\.6%/
+      /\.live-growth\s*\{[\s\S]*?width:\s*45\.2%/
     );
 
     assert.match(
       css,
-      /\.live-dialogue\s*\{[\s\S]*?top:\s*61\.7%/
+      /\.live-dialogue\s*\{[\s\S]*?top:\s*61\.35%/
     );
 
     assert.match(
       css,
-      /\.live-schedule\s*\{[\s\S]*?top:\s*75\.75%/
+      /\.live-schedule\s*\{[\s\S]*?top:\s*75\.55%/
     );
 
     assert.match(
       css,
-      /\.live-district\s*\{[\s\S]*?top:\s*79\.15%/
+      /\.live-district\s*\{[\s\S]*?top:\s*81\.05%/
     );
 
     assert.doesNotMatch(
