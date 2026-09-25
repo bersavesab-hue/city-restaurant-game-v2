@@ -186,7 +186,7 @@ function renderStore() {
     <section
       class="home-master-page"
       data-ui-component="home-master"
-      data-home-master-version="10"
+      data-home-master-version="11"
       aria-label="门店首页静态母版"
     >
       <picture class="home-master-picture" aria-hidden="true">
@@ -230,7 +230,6 @@ function renderStore() {
 
         <div class="live-kpi-grid">
           <article class="live-kpi">
-            <span>今日营业额</span>
             <strong>${money(model.money.todayRevenue)}</strong>
             <em class="${trendTone(model.money.revenueTrend)}">
               ${model.money.revenueTrend >= 0 ? "↑" : "↓"}
@@ -239,7 +238,6 @@ function renderStore() {
           </article>
 
           <article class="live-kpi">
-            <span>今日利润</span>
             <strong>${money(model.money.todayProfit)}</strong>
             <em class="${trendTone(model.money.profitTrend)}">
               ${model.money.profitTrend >= 0 ? "↑" : "↓"}
@@ -248,13 +246,11 @@ function renderStore() {
           </article>
 
           <article class="live-kpi">
-            <span>满意度</span>
             <strong>${Math.round(model.restaurant.satisfaction)}%</strong>
             <em>${satisfactionLabel(model.restaurant.satisfaction)}</em>
           </article>
 
           <article class="live-kpi">
-            <span>在岗员工</span>
             <strong>${model.operations.employees}</strong>
             <em>${staffStatusLabel(model.operations.employees)}</em>
           </article>
@@ -271,6 +267,7 @@ function renderStore() {
         </section>
 
         <section class="live-growth">
+          <span class="live-growth-label">下一阶段：</span>
           <strong>
             ${model.progress.maxLevel
               ? model.progress.title
