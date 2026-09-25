@@ -375,3 +375,34 @@ test(
     );
   }
 );
+
+
+test(
+  "hard-mask baked sample content before drawing live lower dashboard data",
+  () => {
+    assert.match(
+      css,
+      /\.live-opportunity\s*\{[\s\S]*?background:\s*#fff/
+    );
+
+    assert.match(
+      css,
+      /\.live-dialogue\s*\{[\s\S]*?background:\s*#fff/
+    );
+
+    assert.match(
+      css,
+      /\.live-schedule\s*\{[\s\S]*?background:\s*#fff/
+    );
+
+    assert.match(
+      css,
+      /\.live-district\s*\{[\s\S]*?top:\s*81\.05%/
+    );
+
+    assert.doesNotMatch(
+      mobileApp,
+      /<span>下一阶段<\/span>/
+    );
+  }
+);
