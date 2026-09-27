@@ -775,3 +775,36 @@ body:has(.ui-dev-drag-bar) .dev-selected-outline {
   user-select: none;
   -webkit-user-drag: none;
 }
+
+
+.ui-dev-launcher {
+  position: fixed;
+  right:
+    max(
+      8px,
+      env(safe-area-inset-right)
+    );
+  bottom:
+    calc(
+      10px +
+      env(safe-area-inset-bottom)
+    );
+  z-index: 100003;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border:
+    1px solid
+    rgba(89,216,255,.75);
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background:
+    rgba(18,27,33,.92);
+  color: #8be4ff;
+  font-size: 11px;
+  font-weight: 950;
+  box-shadow:
+    0 6px 18px
+    rgba(0,0,0,.28);
+}
