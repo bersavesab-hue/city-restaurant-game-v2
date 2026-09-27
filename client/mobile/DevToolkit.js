@@ -1,5 +1,5 @@
-const STORAGE_KEY = "city-restaurant-ui-dev-overrides.v3";
-const PROJECT_STORAGE_KEY = "city-restaurant-ui-dev-project.v3";
+const STORAGE_KEY = "city-restaurant-ui-dev-overrides.v4";
+const PROJECT_STORAGE_KEY = "city-restaurant-ui-dev-project.v4";
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -1987,7 +1987,7 @@ export function createDevToolkit({
     const payload = {
       version: 4,
       page: getActivePage(),
-      layoutMode: "component-layout-v3-clean",
+      layoutMode: "component-layout-v4-image-fit",
       overrides:
         state.overrides,
       project:
