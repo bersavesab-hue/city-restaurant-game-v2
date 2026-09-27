@@ -111,12 +111,12 @@ test(
   () => {
     assert.match(
       toolkit,
-      /city-restaurant-ui-dev-overrides\\.v4/
+      /city-restaurant-ui-dev-overrides\.v4/
     );
 
     assert.match(
       toolkit,
-      /city-restaurant-ui-dev-project\\.v4/
+      /city-restaurant-ui-dev-project\.v4/
     );
 
     assert.doesNotMatch(
