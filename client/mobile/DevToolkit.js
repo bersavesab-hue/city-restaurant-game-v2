@@ -2033,6 +2033,294 @@ export function createDevToolkit({
     true
   );
 
+  function beginResize(event) {
+    const handle =
+      event.target.closest(
+        "[data-dev-resize]"
+      );
+
+    if (
+      !handle ||
+      !state.selected ||
+      !document.contains(
+        state.selected
+      )
+    ) {
+      return;
+    }
+
+    const info =
+      selectedInfo();
+
+    if (!info) return;
+
+    pushHistory();
+
+    const rect =
+      state.selected
+        .getBoundingClientRect();
+
+    const computed =
+      getComputedStyle(
+        state.selected
+      );
+
+    const styles =
+      ensureSelectedOverride(
+        info
+      );
+
+    if (
+      computed.position ===
+      "static"
+    ) {
+      styles.position =
+        "relative";
+
+      state.selected
+        .style
+        .position =
+        "relative";
+    }
+
+    state.resizePointer = {
+      pointerId:
+        event.pointerId,
+      corner:
+        handle.dataset.devResize,
+      x:
+        event.clientX,
+      y:
+        event.clientY,
+      width:
+        rect.width,
+      height:
+        rect.height,
+      left:
+        computed.left === "auto"
+          ? 0
+          : parseFloat(
+              computed.left
+            ) || 0,
+      top:
+        computed.top === "auto"
+          ? 0
+          : parseFloat(
+              computed.top
+            ) || 0,
+      id:
+        info.id,
+      customId:
+        info.customId
+    };
+
+    handle.setPointerCapture?.(
+      event.pointerId
+    );
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function moveResize(event) {
+    const resize =
+      state.resizePointer;
+
+    if (
+      !resize ||
+      resize.pointerId !==
+        event.pointerId ||
+      !state.selected
+    ) {
+      return;
+    }
+
+    const snap =
+      Math.max(
+        1,
+        Number(state.snap) || 1
+      );
+
+    const dx =
+      event.clientX -
+      resize.x;
+
+    const dy =
+      event.clientY -
+      resize.y;
+
+    const west =
+      resize.corner.includes(
+        "w"
+      );
+
+    const north =
+      resize.corner.includes(
+        "n"
+      );
+
+    let width =
+      resize.width +
+      (west ? -dx : dx);
+
+    let height =
+      resize.height +
+      (north ? -dy : dy);
+
+    width =
+      Math.max(
+        24,
+        Math.round(
+          width / snap
+        ) * snap
+      );
+
+    height =
+      Math.max(
+        24,
+        Math.round(
+          height / snap
+        ) * snap
+      );
+
+    let left =
+      resize.left;
+
+    let top =
+      resize.top;
+
+    if (west) {
+      left =
+        resize.left +
+        resize.width -
+        width;
+    }
+
+    if (north) {
+      top =
+        resize.top +
+        resize.height -
+        height;
+    }
+
+    left =
+      Math.round(
+        left / snap
+      ) * snap;
+
+    top =
+      Math.round(
+        top / snap
+      ) * snap;
+
+    const styles =
+      state.overrides[
+        resize.id
+      ] || (
+        state.overrides[
+          resize.id
+        ] = {}
+      );
+
+    styles.width =
+      `${width}px`;
+
+    styles.height =
+      `${height}px`;
+
+    styles.left =
+      `${left}px`;
+
+    styles.top =
+      `${top}px`;
+
+    state.selected
+      .style
+      .width =
+      styles.width;
+
+    state.selected
+      .style
+      .height =
+      styles.height;
+
+    state.selected
+      .style
+      .left =
+      styles.left;
+
+    state.selected
+      .style
+      .top =
+      styles.top;
+
+    if (resize.customId) {
+      const item =
+        customComponentById(
+          resize.customId
+        );
+
+      if (item) {
+        item.width = width;
+        item.height = height;
+        item.x = left;
+        item.y = top;
+      }
+    }
+
+    renderSelectionChrome();
+    event.preventDefault();
+  }
+
+  function endResize(event) {
+    if (
+      !state.resizePointer ||
+      state.resizePointer.pointerId !==
+        event.pointerId
+    ) {
+      return;
+    }
+
+    if (
+      state.resizePointer.customId
+    ) {
+      persistProject();
+    }
+
+    writeOverrides(
+      state.overrides
+    );
+
+    state.resizePointer = null;
+    renderSelectionChrome();
+    renderPanel();
+    event.preventDefault();
+  }
+
+  chrome.addEventListener(
+    "pointerdown",
+    beginResize,
+    true
+  );
+
+  document.addEventListener(
+    "pointermove",
+    moveResize,
+    true
+  );
+
+  document.addEventListener(
+    "pointerup",
+    endResize,
+    true
+  );
+
+  document.addEventListener(
+    "pointercancel",
+    endResize,
+    true
+  );
+
   function beginLayoutDrag(event) {
     if (
       !state.dragMode ||
