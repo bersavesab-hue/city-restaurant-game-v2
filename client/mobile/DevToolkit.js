@@ -1,5 +1,5 @@
-const STORAGE_KEY = "city-restaurant-ui-dev-overrides.v4";
-const PROJECT_STORAGE_KEY = "city-restaurant-ui-dev-project.v4";
+const STORAGE_KEY = "city-restaurant-ui-dev-overrides.v5";
+const PROJECT_STORAGE_KEY = "city-restaurant-ui-dev-project.v5";
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -2327,7 +2327,7 @@ export function createDevToolkit({
     const payload = {
       version: 4,
       page: getActivePage(),
-      layoutMode: "component-layout-v4-image-fit",
+      layoutMode: "component-layout-v5-free-size-align",
       overrides:
         state.overrides,
       project:
@@ -2572,6 +2572,36 @@ export function createDevToolkit({
                 type="button"
                 data-dev-fill-canvas
               >一键铺满全屏背景</button>
+            </section>
+          `
+          : ""
+      }
+
+      ${
+        info.customId
+          ? `
+            <section class="dev-align-settings">
+              <strong>对齐画布</strong>
+              <div class="dev-align-actions">
+                <button type="button" data-dev-align="left">左对齐</button>
+                <button type="button" data-dev-align="center-x">水平居中</button>
+                <button type="button" data-dev-align="right">右对齐</button>
+                <button type="button" data-dev-align="top">顶部</button>
+                <button type="button" data-dev-align="center-y">垂直居中</button>
+                <button type="button" data-dev-align="bottom">底部</button>
+              </div>
+
+              <strong>尺寸快捷</strong>
+              <div class="dev-size-actions">
+                <button type="button" data-dev-size="width">宽度铺满</button>
+                <button type="button" data-dev-size="height">高度铺满</button>
+                <button type="button" data-dev-size="canvas">整个画布</button>
+                ${
+                  info.imageSettings
+                    ? '<button type="button" data-dev-natural-ratio>恢复原比例</button>'
+                    : ""
+                }
+              </div>
             </section>
           `
           : ""
@@ -3009,6 +3039,31 @@ export function createDevToolkit({
           )
       );
     });
+
+    host.querySelectorAll("[data-dev-align]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          alignSelected(
+            button.dataset.devAlign
+          )
+      );
+    });
+
+    host.querySelectorAll("[data-dev-size]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          sizeSelected(
+            button.dataset.devSize
+          )
+      );
+    });
+
+    host.querySelector("[data-dev-natural-ratio]")?.addEventListener(
+      "click",
+      restoreNaturalRatio
+    );
 
     host.querySelectorAll("[data-dev-fit]").forEach(button => {
       button.addEventListener(
