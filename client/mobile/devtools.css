@@ -808,3 +808,85 @@ body:has(.ui-dev-drag-bar) .dev-selected-outline {
     0 6px 18px
     rgba(0,0,0,.28);
 }
+
+
+.dev-image-settings {
+  margin-top: 8px;
+  padding: 9px;
+  border: 1px solid #343b44;
+  border-radius: 11px;
+  display: grid;
+  gap: 8px;
+  background: #1d2329;
+}
+
+.dev-image-settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dev-image-settings-head > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.dev-image-settings-head strong {
+  color: #f4f6f7;
+  font-size: 11px;
+}
+
+.dev-image-settings-head small {
+  color: #8f9aa3;
+  font-size: 8px;
+}
+
+.dev-image-settings-head > button {
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid #414a54;
+  border-radius: 9px;
+  background: #2a3038;
+  color: #c8d0d6;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.dev-image-settings-head > button.is-active {
+  border-color: #24bde9;
+  background: #183844;
+  color: #8be6ff;
+}
+
+.dev-fit-actions {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0,1fr));
+  gap: 6px;
+}
+
+.dev-fit-actions button,
+.dev-fill-canvas {
+  min-height: 38px;
+  border: 1px solid #3b424b;
+  border-radius: 9px;
+  background: #292f36;
+  color: #f1f4f5;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.dev-fit-actions button.is-active {
+  border-color: #c7962f;
+  background: #4a3818;
+  color: #ffd774;
+}
+
+.dev-fill-canvas {
+  width: 100%;
+  border-color: #367082;
+  background: #213d47;
+  color: #a7e8ff;
+}
