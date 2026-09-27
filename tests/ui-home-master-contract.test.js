@@ -199,7 +199,7 @@ test(
 
     assert.match(
       toolkit,
-      /layoutMode:\s*"component-layout-v1"/
+      /layoutMode:\s*"component-layout-v2"/
     );
 
     assert.match(
@@ -230,6 +230,64 @@ test(
     assert.match(
       androidActivity,
       /SYSTEM_UI_FLAG_HIDE_NAVIGATION/
+    );
+  }
+);
+
+
+test(
+  "mobile component editor v2 supports CRUD resize images and layers",
+  () => {
+    for (
+      const marker
+      of [
+        "function deleteSelected",
+        "function duplicateSelected",
+        "function setLayer",
+        "function chooseImage",
+        "function handleImageFile",
+        "function beginResize",
+        "function moveResize",
+        "data-dev-upload",
+        "data-dev-replace-image",
+        "data-dev-layer",
+        "data-dev-resize"
+      ]
+    ) {
+      assert.match(
+        toolkit,
+        new RegExp(marker)
+      );
+    }
+
+    assert.match(
+      toolkit,
+      /PROJECT_STORAGE_KEY/
+    );
+
+    assert.match(
+      toolkit,
+      /component-layout-v2/
+    );
+
+    assert.match(
+      toolkit,
+      /project:\s*state\.project/
+    );
+
+    assert.match(
+      androidActivity,
+      /onShowFileChooser/
+    );
+
+    assert.match(
+      androidActivity,
+      /REQUEST_FILE_CHOOSER/
+    );
+
+    assert.match(
+      androidActivity,
+      /FileChooserParams\.parseResult/
     );
   }
 );
