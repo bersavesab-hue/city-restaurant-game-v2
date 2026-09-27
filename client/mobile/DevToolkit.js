@@ -78,6 +78,18 @@ function writeProject(value) {
   }
 }
 
+function isBackgroundAssetName(name) {
+  const value =
+    String(name || "")
+      .toLowerCase();
+
+  return (
+    /^00[_-]/.test(value) ||
+    value.includes("background") ||
+    value.includes("背景")
+  );
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -539,6 +551,8 @@ export function createDevToolkit({
         "relative";
     }
 
+    let projectChanged = false;
+
     for (
       const item
       of state.project.components.filter(
@@ -547,6 +561,33 @@ export function createDevToolkit({
           getActivePage()
       )
     ) {
+      if (
+        item.type === "image" &&
+        isBackgroundAssetName(
+          item.name
+        ) &&
+        !item.backgroundInitialized
+      ) {
+        const rect =
+          parent.getBoundingClientRect();
+
+        item.x = 0;
+        item.y = 0;
+        item.width =
+          Math.round(
+            rect.width
+          );
+        item.height =
+          Math.round(
+            rect.height
+          );
+        item.objectFit = "cover";
+        item.lockAspect = false;
+        item.zIndex = 0;
+        item.backgroundInitialized = true;
+        projectChanged = true;
+      }
+
       const wrapper =
         document.createElement("div");
 
@@ -608,6 +649,10 @@ export function createDevToolkit({
       }
 
       parent.append(wrapper);
+    }
+
+    if (projectChanged) {
+      persistProject();
     }
 
     for (
@@ -1873,6 +1918,11 @@ export function createDevToolkit({
         Math.round(height)
       );
 
+    const background =
+      isBackgroundAssetName(
+        file.name
+      );
+
     const item = {
       id: nextCustomId(),
       page:
@@ -1882,37 +1932,60 @@ export function createDevToolkit({
       name:
         file.name || "image",
       x:
-        Math.round(
-          (
-            parentRect.width -
-            width
-          ) / 2
-        ),
+        background
+          ? 0
+          : Math.round(
+              (
+                parentRect.width -
+                width
+              ) / 2
+            ),
       y:
-        Math.max(
-          0,
-          Math.round(
-            (
-              parentRect.height -
-              Math.min(
-                height,
-                parentRect.height
+        background
+          ? 0
+          : Math.max(
+              0,
+              Math.round(
+                (
+                  parentRect.height -
+                  Math.min(
+                    height,
+                    parentRect.height
+                  )
+                ) / 2
               )
-            ) / 2
-          )
-        ),
-      width,
-      height,
+            ),
+      width:
+        background
+          ? Math.round(
+              parentRect.width
+            )
+          : width,
+      height:
+        background
+          ? Math.round(
+              parentRect.height
+            )
+          : height,
       naturalWidth:
         dimensions.width,
       naturalHeight:
         dimensions.height,
       aspectRatio,
-      lockAspect: true,
-      zIndex: 40,
+      lockAspect:
+        !background,
+      zIndex:
+        background
+          ? 0
+          : 40,
       opacity: 1,
-      objectFit: "contain",
-      objectPosition: "center"
+      objectFit:
+        background
+          ? "cover"
+          : "contain",
+      objectPosition: "center",
+      backgroundInitialized:
+        background
     };
 
     state.project.components.push(
@@ -2278,7 +2351,7 @@ export function createDevToolkit({
                 class="dev-fill-canvas"
                 type="button"
                 data-dev-fill-canvas
-              >铺满整个画布（背景图）</button>
+              >一键铺满全屏背景</button>
             </section>
           `
           : ""
