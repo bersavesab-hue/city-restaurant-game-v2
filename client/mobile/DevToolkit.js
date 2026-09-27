@@ -2132,7 +2132,7 @@ export function createDevToolkit({
     if (!info) {
       return `
         <div class="dev-empty">
-          点“上传排版”，再点要替换的原组件；选中后编辑区会显示“删除原组件”。
+          首页现在是空白画布。点“＋ 上传组件”导入图片；上传后点“上传排版”选择它，再拖动或缩放。
         </div>
       `;
     }
@@ -2157,7 +2157,7 @@ export function createDevToolkit({
       </div>
 
       <p class="dev-resize-help">
-        选中框四角可以直接用手指拉伸缩放。原版组件点“删除原组件”会从当前布局隐藏并保存，之后可用撤销或“重置当前”恢复。
+        选中框四角可以直接用手指缩放。图片默认锁定原始比例；关闭“比例锁定”后才会自由改变宽高。
       </p>
 
       <div class="dev-layout-actions">
@@ -2171,9 +2171,11 @@ export function createDevToolkit({
             : ""
         }
         <button type="button" data-dev-duplicate>复制</button>
-        <button class="danger" type="button" data-dev-delete>
-          ${info.customId ? "删除上传组件" : "删除原组件"}
-        </button>
+        ${
+          info.customId
+            ? '<button class="danger" type="button" data-dev-delete>删除上传组件</button>'
+            : ""
+        }
         <span>吸附 ${state.snap}px</span>
       </div>
 
