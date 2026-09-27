@@ -600,8 +600,11 @@ export function createDevToolkit({
     ) {
       if (
         item.type === "image" &&
-        isBackgroundAssetName(
-          item.name
+        (
+          item.role === "background" ||
+          isBackgroundAssetName(
+            item.name
+          )
         )
       ) {
         const rect =
@@ -2343,18 +2346,49 @@ export function createDevToolkit({
       );
 
     const background =
+      state.uploadMode ===
+        "background" ||
       isBackgroundAssetName(
         file.name
       );
+
+    if (background) {
+      state.project.components =
+        state.project.components.filter(
+          entry =>
+            !(
+              entry.page ===
+                getActivePage() &&
+              entry.type ===
+                "image" &&
+              (
+                entry.role ===
+                  "background" ||
+                isBackgroundAssetName(
+                  entry.name
+                )
+              )
+            )
+        );
+    }
 
     const item = {
       id: nextCustomId(),
       page:
         getActivePage(),
       type: "image",
+      role:
+        background
+          ? "background"
+          : "component",
       src,
       name:
-        file.name || "image",
+        background
+          ? "00_home_background"
+          : (
+              file.name ||
+              "image"
+            ),
       x:
         background
           ? 0
@@ -2670,7 +2704,7 @@ export function createDevToolkit({
     if (!info) {
       return `
         <div class="dev-empty">
-          首页现在是空白画布。点“＋ 上传组件”导入图片；上传后点“上传排版”选择它，再拖动或缩放。
+          第一步先放主页背景。点“上传主页背景”选择图片，系统会自动置底、铺满并按屏幕比例裁剪；其他素材再用“＋ 上传组件”。
         </div>
       `;
     }
@@ -2811,6 +2845,7 @@ export function createDevToolkit({
       </div>
 
       <div class="dev-asset-actions">
+        <button class="primary" type="button" data-dev-upload-background>上传主页背景</button>
         <button type="button" data-dev-upload>＋ 上传图片组件</button>
         ${
           info.isImage
@@ -3039,6 +3074,7 @@ export function createDevToolkit({
               : '<button class="primary" type="button" data-dev-select>点选界面</button>'
           }
           <button type="button" data-dev-select>自由点选</button>
+          <button class="primary" type="button" data-dev-upload-background>上传主页背景</button>
           <button type="button" data-dev-upload>＋ 上传组件</button>
           <button type="button" data-dev-audit>立即体检</button>
           <button type="button" data-dev-copy>复制配置</button>
@@ -3246,6 +3282,13 @@ export function createDevToolkit({
       button.addEventListener(
         "click",
         () => chooseImage("add")
+      );
+    });
+
+    host.querySelectorAll("[data-dev-upload-background]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () => chooseImage("background")
       );
     });
 
@@ -4051,6 +4094,8 @@ export function createDevToolkit({
       () => clone(state.project),
     addImage:
       () => chooseImage("add"),
+    addBackground:
+      () => chooseImage("background"),
     app
   };
 
