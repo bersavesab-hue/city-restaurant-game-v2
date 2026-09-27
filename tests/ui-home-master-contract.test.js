@@ -38,6 +38,15 @@ const toolkit =
     "utf8"
   );
 
+const devCss =
+  fs.readFileSync(
+    new URL(
+      "../client/mobile/devtools.css",
+      import.meta.url
+    ),
+    "utf8"
+  );
+
 const androidActivity =
   fs.readFileSync(
     new URL(
@@ -47,196 +56,103 @@ const androidActivity =
     "utf8"
   );
 
-const heroUrl =
-  new URL(
-    "../client/mobile/assets/home/restaurant-hero.jpg",
-    import.meta.url
-  );
-
 test(
-  "store homepage is component based instead of a baked full-screen master",
+  "store starts from a truly empty upload-first canvas",
   () => {
     assert.match(
       mobileApp,
-      /renderHomePage/
+      /return renderHomePage\(\)/
     );
 
     assert.match(
-      mobileApp,
-      /store-component-shell/
+      homePage,
+      /class="home-editor-canvas"/
+    );
+
+    assert.match(
+      homePage,
+      /data-layout-key="home-page"/
+    );
+
+    assert.match(
+      homePage,
+      /blank-canvas-v1/
+    );
+
+    assert.doesNotMatch(
+      homePage,
+      /home-hud|home-kpi|home-opportunity|home-growth|home-dialogue|home-district|home-schedule|home-component-nav|restaurant-hero/
     );
 
     assert.doesNotMatch(
       mobileApp,
-      /home-master-page|store-master-shell|home-live-overlay|hotspot-/
-    );
-
-    assert.doesNotMatch(
-      homePage,
-      /home-master\.webp|home-master-20x9\.webp/
-    );
-
-    assert.match(
-      homePage,
-      /assets\/home\/restaurant-hero\.jpg/
-    );
-
-    assert.ok(
-      fs.statSync(heroUrl).size > 12000,
-      "restaurant hero should be a real standalone JPEG"
+      /home-master|home-live-overlay|hotspot-/
     );
   }
 );
 
 test(
-  "homepage exposes independently editable UI components",
-  () => {
-    for (
-      const key
-      of [
-        "home-page",
-        "home-scene",
-        "home-hud",
-        "home-kpis",
-        "home-opportunity",
-        "home-upper-grid",
-        "home-growth",
-        "home-dialogue",
-        "home-lower-grid",
-        "home-district",
-        "home-schedule",
-        "home-bottom-nav"
-      ]
-    ) {
-      assert.match(
-        homePage,
-        new RegExp(
-          `data-layout-key="${key}"`
-        )
-      );
-    }
-
-    assert.match(
-      homePage,
-      /data-home-layout-version="component-v1"/
-    );
-  }
-);
-
-test(
-  "dynamic restaurant data is rendered directly inside components",
-  () => {
-    for (
-      const marker
-      of [
-        "model.time.day",
-        "model.time.clock",
-        "model.money.balance",
-        "model.money.todayRevenue",
-        "model.money.todayProfit",
-        "model.restaurant.satisfaction",
-        "model.operations.employees",
-        "model.opportunity.title",
-        "model.progress.progress",
-        "model.dialogue.slice",
-        "model.district",
-        "model.schedule.slice"
-      ]
-    ) {
-      assert.match(
-        homePage,
-        new RegExp(
-          marker
-            .replaceAll(".", "\\.")
-        )
-      );
-    }
-
-    assert.doesNotMatch(
-      homePage,
-      /position:\s*absolute[^\n]*top:\s*\d+%/
-    );
-  }
-);
-
-test(
-  "component layout uses normal grid flow for the dashboard",
+  "old built-in homepage styling is removed",
   () => {
     assert.match(
       css,
-      /\.home-components-page\s*\{[\s\S]*?display:\s*grid/
-    );
-
-    assert.match(
-      css,
-      /\.home-component-grid\s*\{[\s\S]*?grid-template-columns/
-    );
-
-    assert.match(
-      css,
-      /\.home-component-nav\s*\{/
+      /\.home-editor-canvas\s*\{/
     );
 
     assert.doesNotMatch(
       css,
-      /\.home-master-page\s*\{|\.home-live-overlay\s*\{|\.home-hotspot\s*\{/
+      /\.home-component-hud\s*\{|\.home-component-kpis\s*\{|\.home-opportunity-card\s*\{|\.home-growth-card\s*\{|\.home-dialogue-card\s*\{|\.home-district-card\s*\{|\.home-schedule-card\s*\{|\.home-component-nav\s*\{/
     );
   }
 );
 
 test(
-  "in-game editor targets components instead of a static mother image",
+  "editor starts from fresh v3 storage instead of restoring old layout",
   () => {
     assert.match(
       toolkit,
-      /组件排版/
+      /city-restaurant-ui-dev-overrides\.v3/
     );
 
     assert.match(
       toolkit,
-      /只会选中首页组件/
+      /city-restaurant-ui-dev-project\.v3/
+    );
+
+    assert.doesNotMatch(
+      toolkit,
+      /LEGACY_STORAGE_KEY/
     );
 
     assert.match(
       toolkit,
-      /layoutMode:\s*"component-layout-v2"/
-    );
-
-    assert.match(
-      toolkit,
-      /\[data-layout-key\]/
-    );
-
-    assert.match(
-      toolkit,
-      /startDragMode/
+      /component-layout-v3-clean/
     );
   }
 );
 
 test(
-  "Android remains immersive for the component homepage",
+  "blank canvas always exposes the mobile UI editor launcher",
   () => {
     assert.match(
-      androidActivity,
-      /SYSTEM_UI_FLAG_IMMERSIVE_STICKY/
+      toolkit,
+      /data-dev-open/
     );
 
     assert.match(
-      androidActivity,
-      /SYSTEM_UI_FLAG_FULLSCREEN/
+      toolkit,
+      /上传排版/
     );
 
     assert.match(
-      androidActivity,
-      /SYSTEM_UI_FLAG_HIDE_NAVIGATION/
+      devCss,
+      /\.ui-dev-launcher\s*\{/
     );
   }
 );
 
-
 test(
-  "mobile component editor v2 supports CRUD resize images and layers",
+  "upload-first editor supports component CRUD touch resize and layers",
   () => {
     for (
       const marker
@@ -251,7 +167,8 @@ test(
         "data-dev-upload",
         "data-dev-replace-image",
         "data-dev-layer",
-        "data-dev-resize"
+        "data-dev-resize",
+        "data-dev-custom"
       ]
     ) {
       assert.match(
@@ -262,19 +179,19 @@ test(
 
     assert.match(
       toolkit,
-      /PROJECT_STORAGE_KEY/
+      /删除原组件/
     );
 
     assert.match(
       toolkit,
-      /component-layout-v2/
+      /删除上传组件/
     );
+  }
+);
 
-    assert.match(
-      toolkit,
-      /project:\s*state\.project/
-    );
-
+test(
+  "Android WebView can pick images from the phone",
+  () => {
     assert.match(
       androidActivity,
       /onShowFileChooser/
@@ -288,6 +205,31 @@ test(
     assert.match(
       androidActivity,
       /FileChooserParams[\s\S]*?\.parseResult/
+    );
+
+    assert.match(
+      androidActivity,
+      /setAllowContentAccess\(true\)/
+    );
+  }
+);
+
+test(
+  "Android remains immersive",
+  () => {
+    assert.match(
+      androidActivity,
+      /SYSTEM_UI_FLAG_IMMERSIVE_STICKY/
+    );
+
+    assert.match(
+      androidActivity,
+      /SYSTEM_UI_FLAG_FULLSCREEN/
+    );
+
+    assert.match(
+      androidActivity,
+      /SYSTEM_UI_FLAG_HIDE_NAVIGATION/
     );
   }
 );
