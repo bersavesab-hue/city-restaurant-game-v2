@@ -4,7 +4,7 @@ function renderHomePage() {
       class="home-editor-canvas"
       data-ui-component="home-page"
       data-layout-key="home-page"
-      data-home-layout-version="blank-canvas-v1"
+      data-home-layout-version="blank-canvas-v2"
       aria-label="首页自定义组件画布"
     ></section>
   `;
