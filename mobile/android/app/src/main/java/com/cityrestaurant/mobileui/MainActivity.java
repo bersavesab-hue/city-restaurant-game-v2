@@ -1,14 +1,21 @@
 package com.cityrestaurant.mobileui;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public final class MainActivity extends Activity {
+    private static final int REQUEST_FILE_CHOOSER = 1001;
+
     private WebView webView;
+    private ValueCallback<Uri[]> filePathCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +40,41 @@ public final class MainActivity extends Activity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setAllowFileAccess(true);
+        settings.setAllowContentAccess(true);
 
         webView.setWebViewClient(
             new WebViewClient()
+        );
+
+        webView.setWebChromeClient(
+            new WebChromeClient() {
+                @Override
+                public boolean onShowFileChooser(
+                    WebView view,
+                    ValueCallback<Uri[]> callback,
+                    FileChooserParams params
+                ) {
+                    if (filePathCallback != null) {
+                        filePathCallback.onReceiveValue(null);
+                    }
+
+                    filePathCallback = callback;
+
+                    Intent intent =
+                        params.createIntent();
+
+                    try {
+                        startActivityForResult(
+                            intent,
+                            REQUEST_FILE_CHOOSER
+                        );
+                        return true;
+                    } catch (Exception error) {
+                        filePathCallback = null;
+                        return false;
+                    }
+                }
+            }
         );
 
         webView.setBackgroundColor(
@@ -46,6 +85,40 @@ public final class MainActivity extends Activity {
 
         webView.loadUrl(
             "file:///android_asset/index.html"
+        );
+    }
+
+    @Override
+    protected void onActivityResult(
+        int requestCode,
+        int resultCode,
+        Intent data
+    ) {
+        if (
+            requestCode == REQUEST_FILE_CHOOSER &&
+            filePathCallback != null
+        ) {
+            Uri[] results =
+                WebChromeClient
+                    .FileChooserParams
+                    .parseResult(
+                        resultCode,
+                        data
+                    );
+
+            filePathCallback
+                .onReceiveValue(
+                    results
+                );
+
+            filePathCallback = null;
+            return;
+        }
+
+        super.onActivityResult(
+            requestCode,
+            resultCode,
+            data
         );
     }
 
@@ -69,6 +142,11 @@ public final class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (filePathCallback != null) {
+            filePathCallback.onReceiveValue(null);
+            filePathCallback = null;
+        }
+
         if (webView != null) {
             webView.destroy();
             webView = null;
