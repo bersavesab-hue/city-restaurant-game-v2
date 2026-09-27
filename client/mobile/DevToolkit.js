@@ -606,6 +606,14 @@ export function createDevToolkit({
         node instanceof
         HTMLImageElement
       ) {
+        if (
+          !node.dataset
+            .devOriginalSrc
+        ) {
+          node.dataset.devOriginalSrc =
+            node.getAttribute("src") || "";
+        }
+
         node.src = src;
       }
     }
@@ -1130,21 +1138,88 @@ export function createDevToolkit({
   }
 
   function resetSelected() {
-    const info = selectedInfo();
-    if (!info || !state.overrides[info.id]) return;
+    const info =
+      selectedInfo();
+
+    if (!info) return;
+
+    const hasStyles =
+      Boolean(
+        state.overrides[
+          info.id
+        ]
+      );
+
+    const hasAsset =
+      Boolean(
+        state.project
+          .assetOverrides[
+            info.id
+          ]
+      );
+
+    if (
+      !hasStyles &&
+      !hasAsset
+    ) {
+      return;
+    }
 
     pushHistory();
 
-    const styles = state.overrides[info.id];
+    if (hasStyles) {
+      const styles =
+        state.overrides[
+          info.id
+        ];
 
-    for (const key of Object.keys(styles)) {
-      state.selected.style.removeProperty(
-        key.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`)
-      );
+      for (
+        const key
+        of Object.keys(styles)
+      ) {
+        state.selected
+          .style
+          .removeProperty(
+            key.replace(
+              /[A-Z]/g,
+              match =>
+                `-${match.toLowerCase()}`
+            )
+          );
+      }
+
+      delete state.overrides[
+        info.id
+      ];
     }
 
-    delete state.overrides[info.id];
-    writeOverrides(state.overrides);
+    if (
+      hasAsset &&
+      state.selected instanceof
+        HTMLImageElement
+    ) {
+      if (
+        state.selected.dataset
+          .devOriginalSrc
+      ) {
+        state.selected.src =
+          state.selected.dataset
+            .devOriginalSrc;
+      }
+
+      delete state.project
+        .assetOverrides[
+          info.id
+        ];
+
+      persistProject();
+    }
+
+    writeOverrides(
+      state.overrides
+    );
+
+    renderSelectionChrome();
     renderPanel();
   }
 
@@ -1408,6 +1483,14 @@ export function createDevToolkit({
         state.selected instanceof
         HTMLImageElement
       ) {
+        if (
+          !state.selected.dataset
+            .devOriginalSrc
+        ) {
+          state.selected.dataset.devOriginalSrc =
+            state.selected.getAttribute("src") || "";
+        }
+
         state.project
           .assetOverrides[
             info.id
@@ -1520,6 +1603,31 @@ export function createDevToolkit({
     removeOverrideStyles(
       state.overrides
     );
+
+    for (
+      const id
+      of Object.keys(
+        state.project
+          .assetOverrides
+      )
+    ) {
+      const node =
+        candidates().find(
+          item =>
+            item.dataset.devId === id
+        );
+
+      if (
+        node instanceof
+          HTMLImageElement &&
+        node.dataset
+          .devOriginalSrc
+      ) {
+        node.src =
+          node.dataset
+            .devOriginalSrc;
+      }
+    }
 
     state.overrides = {};
     state.project = {
