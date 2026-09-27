@@ -107,16 +107,16 @@ test(
 );
 
 test(
-  "editor starts from fresh v3 storage instead of restoring old layout",
+  "editor starts from fresh v4 storage instead of restoring old layout",
   () => {
     assert.match(
       toolkit,
-      /city-restaurant-ui-dev-overrides\.v3/
+      /city-restaurant-ui-dev-overrides\\.v4/
     );
 
     assert.match(
       toolkit,
-      /city-restaurant-ui-dev-project\.v3/
+      /city-restaurant-ui-dev-project\\.v4/
     );
 
     assert.doesNotMatch(
@@ -126,7 +126,7 @@ test(
 
     assert.match(
       toolkit,
-      /component-layout-v3-clean/
+      /component-layout-v4-image-fit/
     );
   }
 );
@@ -179,11 +179,6 @@ test(
 
     assert.match(
       toolkit,
-      /删除原组件/
-    );
-
-    assert.match(
-      toolkit,
       /删除上传组件/
     );
   }
@@ -230,6 +225,52 @@ test(
     assert.match(
       androidActivity,
       /SYSTEM_UI_FLAG_HIDE_NAVIGATION/
+    );
+  }
+);
+
+
+test(
+  "uploaded images preserve their natural aspect ratio and expose fit modes",
+  () => {
+    for (
+      const marker
+      of [
+        "function measureImage",
+        "naturalWidth",
+        "naturalHeight",
+        "aspectRatio",
+        "lockAspect",
+        "objectFit",
+        "function setImageFit",
+        "function toggleAspectLock",
+        "function fillCanvasWithSelectedImage",
+        'data-dev-fit="contain"',
+        'data-dev-fit="cover"',
+        'data-dev-fit="fill"',
+        "data-dev-aspect-lock",
+        "data-dev-fill-canvas"
+      ]
+    ) {
+      assert.match(
+        toolkit,
+        new RegExp(marker)
+      );
+    }
+
+    assert.match(
+      toolkit,
+      /parentRect\.width\s*\*\s*\.92/
+    );
+
+    assert.match(
+      devCss,
+      /\.dev-image-settings\s*\{/
+    );
+
+    assert.match(
+      devCss,
+      /\.dev-fit-actions\s*\{/
     );
   }
 );
