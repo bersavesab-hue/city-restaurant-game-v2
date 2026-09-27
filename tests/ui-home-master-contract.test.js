@@ -58,7 +58,7 @@ test(
 
     assert.match(
       homePage,
-      /blank-canvas-v8/
+      /background-master-v1/
     );
 
     assert.match(
