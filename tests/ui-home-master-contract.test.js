@@ -371,3 +371,44 @@ test(
     );
   }
 );
+
+
+test(
+  "image display modes do not mutate component geometry or force linkage",
+  () => {
+    assert.equal(
+      (toolkit.match(/function alignSelected\(/g) || []).length,
+      1
+    );
+
+    assert.equal(
+      (toolkit.match(/function setImageFit\(/g) || []).length,
+      1
+    );
+
+    assert.match(
+      toolkit,
+      /function repairSelectedImageFrame/
+    );
+
+    assert.match(
+      toolkit,
+      /function fitImageNaturalWidth/
+    );
+
+    assert.match(
+      toolkit,
+      /data-dev-repair-image/
+    );
+
+    assert.match(
+      toolkit,
+      /data-dev-natural-width/
+    );
+
+    assert.match(
+      toolkit,
+      /Display mode changes only how pixels are drawn inside the frame/
+    );
+  }
+);
