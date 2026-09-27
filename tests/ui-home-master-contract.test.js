@@ -274,3 +274,24 @@ test(
     );
   }
 );
+
+
+test(
+  "editor keeps its scroll position after controls rerender the panel",
+  () => {
+    assert.match(
+      toolkit,
+      /panelScroll/
+    );
+
+    assert.match(
+      toolkit,
+      /body\.scrollTop\s*=\s*state\.panelScroll/
+    );
+
+    assert.match(
+      toolkit,
+      /state\.panelScroll\[\s*state\.tab\s*\]\s*=\s*body\.scrollTop/
+    );
+  }
+);
