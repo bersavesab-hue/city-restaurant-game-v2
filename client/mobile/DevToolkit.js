@@ -1598,6 +1598,227 @@ export function createDevToolkit({
     renderPanel();
   }
 
+  function syncSelectedGeometry(item) {
+    if (
+      !item ||
+      !state.selected
+    ) {
+      return;
+    }
+
+    const info =
+      selectedInfo();
+
+    if (!info) return;
+
+    const styles =
+      ensureSelectedOverride(
+        info
+      );
+
+    styles.position = "absolute";
+    styles.left =
+      `${Math.round(item.x)}px`;
+    styles.top =
+      `${Math.round(item.y)}px`;
+    styles.width =
+      `${Math.round(item.width)}px`;
+    styles.height =
+      `${Math.round(item.height)}px`;
+
+    state.selected.style.position =
+      "absolute";
+    state.selected.style.left =
+      styles.left;
+    state.selected.style.top =
+      styles.top;
+    state.selected.style.width =
+      styles.width;
+    state.selected.style.height =
+      styles.height;
+
+    writeOverrides(
+      state.overrides
+    );
+    persistProject();
+    renderSelectionChrome();
+  }
+
+  function alignSelected(mode) {
+    const info =
+      selectedInfo();
+
+    if (!info?.customId) {
+      showToast(
+        "请先选中上传组件"
+      );
+      return;
+    }
+
+    const item =
+      customComponentById(
+        info.customId
+      );
+
+    if (!item) return;
+
+    const parent =
+      projectPageRoot();
+
+    const rect =
+      parent.getBoundingClientRect();
+
+    pushHistory();
+
+    if (mode === "left") {
+      item.x = 0;
+    } else if (
+      mode === "center-x"
+    ) {
+      item.x =
+        Math.round(
+          (
+            rect.width -
+            item.width
+          ) / 2
+        );
+    } else if (
+      mode === "right"
+    ) {
+      item.x =
+        Math.round(
+          rect.width -
+          item.width
+        );
+    } else if (
+      mode === "top"
+    ) {
+      item.y = 0;
+    } else if (
+      mode === "center-y"
+    ) {
+      item.y =
+        Math.round(
+          (
+            rect.height -
+            item.height
+          ) / 2
+        );
+    } else if (
+      mode === "bottom"
+    ) {
+      item.y =
+        Math.round(
+          rect.height -
+          item.height
+        );
+    } else {
+      return;
+    }
+
+    syncSelectedGeometry(
+      item
+    );
+    renderPanel();
+  }
+
+  function sizeSelected(mode) {
+    const info =
+      selectedInfo();
+
+    if (!info?.customId) {
+      showToast(
+        "请先选中上传组件"
+      );
+      return;
+    }
+
+    const item =
+      customComponentById(
+        info.customId
+      );
+
+    if (!item) return;
+
+    const parent =
+      projectPageRoot();
+
+    const rect =
+      parent.getBoundingClientRect();
+
+    pushHistory();
+
+    // Size commands are explicit: never force width/height linkage.
+    item.lockAspect = false;
+
+    if (mode === "width") {
+      item.x = 0;
+      item.width =
+        Math.round(
+          rect.width
+        );
+    } else if (
+      mode === "height"
+    ) {
+      item.y = 0;
+      item.height =
+        Math.round(
+          rect.height
+        );
+    } else if (
+      mode === "canvas"
+    ) {
+      item.x = 0;
+      item.y = 0;
+      item.width =
+        Math.round(
+          rect.width
+        );
+      item.height =
+        Math.round(
+          rect.height
+        );
+    } else {
+      return;
+    }
+
+    syncSelectedGeometry(
+      item
+    );
+    renderPanel();
+  }
+
+  function restoreNaturalRatio() {
+    const item =
+      selectedImageItem();
+
+    if (
+      !item ||
+      !item.aspectRatio
+    ) {
+      return;
+    }
+
+    pushHistory();
+
+    // Keep the current width and recompute only height once.
+    item.height =
+      Math.max(
+        24,
+        Math.round(
+          item.width /
+          item.aspectRatio
+        )
+      );
+
+    item.lockAspect = false;
+
+    syncSelectedGeometry(
+      item
+    );
+    renderPanel();
+  }
+
   function selectedImageItem() {
     const info =
       selectedInfo();
@@ -1972,8 +2193,7 @@ export function createDevToolkit({
       naturalHeight:
         dimensions.height,
       aspectRatio,
-      lockAspect:
-        !background,
+      lockAspect: false,
       zIndex:
         background
           ? 0
@@ -2277,7 +2497,7 @@ export function createDevToolkit({
       </div>
 
       <p class="dev-resize-help">
-        选中框四角可以直接用手指缩放。图片默认锁定原始比例；关闭“比例锁定”后才会自由改变宽高。
+        图片上传时先按原始比例显示，但宽度和高度默认独立调整。需要保持比例时再打开“宽高联动”。
       </p>
 
       <div class="dev-layout-actions">
@@ -2325,7 +2545,7 @@ export function createDevToolkit({
                   class="${info.imageSettings.lockAspect ? "is-active" : ""}"
                   data-dev-aspect-lock
                 >
-                  ${info.imageSettings.lockAspect ? "🔒 比例锁定" : "🔓 自由缩放"}
+                  ${info.imageSettings.lockAspect ? "宽高联动：开" : "宽高联动：关"}
                 </button>
               </div>
 
