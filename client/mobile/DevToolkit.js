@@ -1910,6 +1910,7 @@ export function createDevToolkit({
               : '<button class="primary" type="button" data-dev-select>点选界面</button>'
           }
           <button type="button" data-dev-select>自由点选</button>
+          <button type="button" data-dev-upload>＋ 上传组件</button>
           <button type="button" data-dev-audit>立即体检</button>
           <button type="button" data-dev-copy>复制配置</button>
         </div>
@@ -2060,10 +2061,12 @@ export function createDevToolkit({
       duplicateSelected
     );
 
-    host.querySelector("[data-dev-upload]")?.addEventListener(
-      "click",
-      () => chooseImage("add")
-    );
+    host.querySelectorAll("[data-dev-upload]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () => chooseImage("add")
+      );
+    });
 
     host.querySelector("[data-dev-replace-image]")?.addEventListener(
       "click",
