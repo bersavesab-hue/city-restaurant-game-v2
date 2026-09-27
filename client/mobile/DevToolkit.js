@@ -2325,7 +2325,7 @@ export function createDevToolkit({
 
   function exportJson() {
     const payload = {
-      version: 4,
+      version: 5,
       page: getActivePage(),
       layoutMode: "component-layout-v5-free-size-align",
       overrides:
