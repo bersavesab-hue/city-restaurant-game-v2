@@ -79,3 +79,16 @@ test(
     );
   }
 );
+
+test(
+  "DEV editor exposes direct X Y W H Z numeric controls for uploaded components",
+  () => {
+    for (const property of ["x", "y", "width", "height", "zIndex"]) {
+      assert.match(toolkit, new RegExp(`data-dev-exact="${property}"`));
+    }
+
+    assert.match(toolkit, /function setExactValue\(property, rawValue\)/);
+    assert.match(toolkit, /逻辑坐标，不受手机分辨率影响/);
+    assert.match(toolkit, /图层 Z=/);
+  }
+);

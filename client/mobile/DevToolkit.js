@@ -1248,6 +1248,66 @@ export function createDevToolkit({
     return state.overrides[info.id];
   }
 
+  function setExactValue(property, rawValue) {
+    const info = selectedInfo();
+
+    if (!info?.customId) {
+      showToast("请先选中上传组件");
+      return;
+    }
+
+    const item =
+      customComponentById(info.customId);
+
+    if (!item) return;
+
+    const number = Number(rawValue);
+
+    if (!Number.isFinite(number)) {
+      renderPanel();
+      return;
+    }
+
+    pushHistory();
+
+    const value = Math.round(number);
+
+    if (property === "x") {
+      item.x = clamp(value, -4000, 4000);
+    } else if (property === "y") {
+      item.y = clamp(value, -4000, 4000);
+    } else if (property === "width") {
+      item.width = clamp(value, 24, 4000);
+    } else if (property === "height") {
+      item.height = clamp(value, 24, 4000);
+    } else if (property === "zIndex") {
+      item.zIndex = clamp(value, -1000, 9999);
+    } else {
+      return;
+    }
+
+    const styles = ensureSelectedOverride(info);
+
+    styles.position = "absolute";
+    styles.left = `${Math.round(item.x)}px`;
+    styles.top = `${Math.round(item.y)}px`;
+    styles.width = `${Math.round(item.width)}px`;
+    styles.height = `${Math.round(item.height)}px`;
+    styles.zIndex = String(Math.round(item.zIndex ?? 20));
+
+    state.selected.style.position = "absolute";
+    state.selected.style.left = styles.left;
+    state.selected.style.top = styles.top;
+    state.selected.style.width = styles.width;
+    state.selected.style.height = styles.height;
+    state.selected.style.zIndex = styles.zIndex;
+
+    writeOverrides(state.overrides);
+    persistProject();
+    renderSelectionChrome();
+    renderPanel();
+  }
+
   function adjust(property, delta) {
     const info = selectedInfo();
     if (!info) return;
@@ -2852,6 +2912,27 @@ export function createDevToolkit({
           : ""
       }
 
+      ${
+        info.customId
+          ? `
+            <section class="dev-precise-settings">
+              <div class="dev-precise-head">
+                <strong>精确坐标</strong>
+                <small>逻辑坐标，不受手机分辨率影响</small>
+              </div>
+
+              <div class="dev-precise-grid">
+                <label><span>X</span><input type="number" inputmode="numeric" value="${info.values.left}" data-dev-exact="x"></label>
+                <label><span>Y</span><input type="number" inputmode="numeric" value="${info.values.top}" data-dev-exact="y"></label>
+                <label><span>W</span><input type="number" inputmode="numeric" min="24" value="${info.values.width}" data-dev-exact="width"></label>
+                <label><span>H</span><input type="number" inputmode="numeric" min="24" value="${info.values.height}" data-dev-exact="height"></label>
+                <label><span>Z</span><input type="number" inputmode="numeric" value="${info.values.zIndex}" data-dev-exact="zIndex"></label>
+              </div>
+            </section>
+          `
+          : ""
+      }
+
       <div class="dev-editor-grid">
         ${
           info.imageSettings
@@ -2916,7 +2997,7 @@ export function createDevToolkit({
       }
 
       <div class="dev-layer-actions">
-        <span>图层</span>
+        <span>图层 Z=${info.values.zIndex}</span>
         <button type="button" data-dev-layer="back">置底</button>
         <button type="button" data-dev-layer="down">下一层</button>
         <button type="button" data-dev-layer="up">上一层</button>
@@ -3312,6 +3393,23 @@ export function createDevToolkit({
       });
     });
 
+
+    host.querySelectorAll("[data-dev-exact]").forEach(input => {
+      const apply = () =>
+        setExactValue(
+          input.dataset.devExact,
+          input.value
+        );
+
+      input.addEventListener("change", apply);
+
+      input.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          apply();
+        }
+      });
+    });
     host.querySelector("[data-dev-reset-selected]")?.addEventListener(
       "click",
       resetSelected

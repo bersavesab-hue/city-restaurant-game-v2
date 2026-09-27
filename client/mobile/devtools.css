@@ -231,6 +231,71 @@
   font-weight: 850;
 }
 
+.dev-precise-settings {
+  margin-bottom: 9px;
+  padding: 9px;
+  border: 1px solid #405365;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #202b35, #19222b);
+}
+
+.dev-precise-head {
+  margin-bottom: 7px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dev-precise-head strong {
+  color: #fff;
+  font-size: 12px;
+}
+
+.dev-precise-head small {
+  color: #83a9bd;
+  font-size: 8px;
+}
+
+.dev-precise-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.dev-precise-grid label {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.dev-precise-grid span {
+  color: #e7bf69;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.dev-precise-grid input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 0 4px;
+  border: 1px solid #46505c;
+  border-radius: 8px;
+  outline: 0;
+  background: #11171d;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.dev-precise-grid input:focus {
+  border-color: #d4a53d;
+  box-shadow: 0 0 0 2px rgba(212,165,61,.18);
+}
+
 .dev-editor-grid {
   display: grid;
   gap: 7px;
