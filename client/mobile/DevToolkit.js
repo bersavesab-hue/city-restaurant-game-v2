@@ -1482,7 +1482,6 @@ export function createDevToolkit({
     const number = Number(rawValue);
 
     if (!Number.isFinite(number)) {
-      renderPanel();
       return;
     }
 
