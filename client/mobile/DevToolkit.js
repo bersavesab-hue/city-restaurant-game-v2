@@ -1854,17 +1854,32 @@ export function createDevToolkit({
 
     pushHistory();
     item.objectFit = mode;
-    persistProject();
 
-    const image =
-      state.selected
-        ?.querySelector("img");
-
-    if (image) {
-      image.style.objectFit = mode;
+    if (
+      mode === "contain" &&
+      item.aspectRatio
+    ) {
+      item.lockAspect = true;
+      item.height =
+        Math.max(
+          24,
+          Math.round(
+            item.width /
+            item.aspectRatio
+          )
+        );
     }
 
-    renderPanel();
+    persistProject();
+    renderProjectComponents();
+    assignIds();
+
+    const node =
+      root.querySelector(
+        `[data-dev-custom="${item.id}"]`
+      );
+
+    openEditorFor(node);
   }
 
   function toggleAspectLock() {
@@ -1956,6 +1971,230 @@ export function createDevToolkit({
 
     openEditorFor(node);
     showToast("已铺满画布");
+  }
+
+  function resetImageFrameToAspect() {
+    const item =
+      selectedImageItem();
+
+    if (!item) return;
+
+    const ratio =
+      Number(
+        item.aspectRatio ||
+        (
+          item.naturalWidth &&
+          item.naturalHeight
+            ? item.naturalWidth /
+              item.naturalHeight
+            : 1
+        )
+      ) || 1;
+
+    pushHistory();
+
+    item.lockAspect = true;
+    item.objectFit = "contain";
+    item.height =
+      Math.max(
+        24,
+        Math.round(
+          item.width / ratio
+        )
+      );
+
+    persistProject();
+    renderProjectComponents();
+    assignIds();
+
+    const node =
+      root.querySelector(
+        `[data-dev-custom="${item.id}"]`
+      );
+
+    openEditorFor(node);
+    showToast("已恢复原图比例");
+  }
+
+  function alignSelected(mode) {
+    const item =
+      selectedImageItem();
+
+    if (!item) return;
+
+    const parent =
+      projectPageRoot();
+
+    const rect =
+      parent.getBoundingClientRect();
+
+    pushHistory();
+
+    if (mode === "left") {
+      item.x = 0;
+    } else if (
+      mode === "center-x"
+    ) {
+      item.x =
+        Math.round(
+          (
+            rect.width -
+            item.width
+          ) / 2
+        );
+    } else if (
+      mode === "right"
+    ) {
+      item.x =
+        Math.round(
+          rect.width -
+          item.width
+        );
+    } else if (
+      mode === "top"
+    ) {
+      item.y = 0;
+    } else if (
+      mode === "center-y"
+    ) {
+      item.y =
+        Math.round(
+          (
+            rect.height -
+            item.height
+          ) / 2
+        );
+    } else if (
+      mode === "bottom"
+    ) {
+      item.y =
+        Math.round(
+          rect.height -
+          item.height
+        );
+    } else if (
+      mode === "center"
+    ) {
+      item.x =
+        Math.round(
+          (
+            rect.width -
+            item.width
+          ) / 2
+        );
+      item.y =
+        Math.round(
+          (
+            rect.height -
+            item.height
+          ) / 2
+        );
+    }
+
+    item.x =
+      Math.max(
+        -item.width + 24,
+        Math.min(
+          rect.width - 24,
+          item.x
+        )
+      );
+
+    item.y =
+      Math.max(
+        -item.height + 24,
+        Math.min(
+          rect.height - 24,
+          item.y
+        )
+      );
+
+    persistProject();
+    renderProjectComponents();
+    assignIds();
+
+    const node =
+      root.querySelector(
+        `[data-dev-custom="${item.id}"]`
+      );
+
+    openEditorFor(node);
+  }
+
+  function fitSelectedImageToCanvas(axis) {
+    const item =
+      selectedImageItem();
+
+    if (!item) return;
+
+    const parent =
+      projectPageRoot();
+
+    const rect =
+      parent.getBoundingClientRect();
+
+    const ratio =
+      Number(
+        item.aspectRatio || 1
+      ) || 1;
+
+    pushHistory();
+
+    item.lockAspect = true;
+    item.objectFit = "contain";
+
+    if (axis === "width") {
+      item.width =
+        Math.round(rect.width);
+      item.height =
+        Math.max(
+          24,
+          Math.round(
+            item.width /
+            ratio
+          )
+        );
+      item.x = 0;
+      item.y =
+        Math.round(
+          (
+            rect.height -
+            item.height
+          ) / 2
+        );
+    } else if (
+      axis === "height"
+    ) {
+      item.height =
+        Math.round(rect.height);
+      item.width =
+        Math.max(
+          24,
+          Math.round(
+            item.height *
+            ratio
+          )
+        );
+      item.y = 0;
+      item.x =
+        Math.round(
+          (
+            rect.width -
+            item.width
+          ) / 2
+        );
+    }
+
+    persistProject();
+    renderProjectComponents();
+    assignIds();
+
+    const node =
+      root.querySelector(
+        `[data-dev-custom="${item.id}"]`
+      );
+
+    openEditorFor(node);
   }
 
   function chooseImage(mode) {
