@@ -2136,6 +2136,29 @@ export function createDevToolkit({
 
     pushHistory();
 
+    state.project.components =
+      state.project.components.filter(
+        entry =>
+          entry.id === item.id ||
+          !(
+            entry.page ===
+              getActivePage() &&
+            entry.type ===
+              "image" &&
+            (
+              entry.role ===
+                "background" ||
+              isBackgroundAssetName(
+                entry.name
+              )
+            )
+          )
+      );
+
+    item.role =
+      "background";
+    item.name =
+      "00_home_background";
     item.x = 0;
     item.y = 0;
     item.width =
@@ -2143,12 +2166,13 @@ export function createDevToolkit({
     item.height =
       Math.round(rect.height);
     item.objectFit = "cover";
+    item.objectPosition =
+      item.objectPosition ||
+      "center";
     item.lockAspect = false;
-    item.zIndex =
-      Math.min(
-        item.zIndex || 1,
-        1
-      );
+    item.zIndex = 0;
+    item.backgroundInitialized =
+      true;
 
     persistProject();
     renderProjectComponents();
@@ -2160,7 +2184,9 @@ export function createDevToolkit({
       );
 
     openEditorFor(node);
-    showToast("已铺满画布");
+    showToast(
+      "已设为全屏背景，会随屏幕自动适配"
+    );
   }
 
   function chooseImage(mode) {
@@ -2861,7 +2887,7 @@ export function createDevToolkit({
               class="dev-fill-canvas"
               type="button"
               data-dev-fill-canvas
-            >全屏背景：铺满并裁剪</button>
+            >设为全屏背景（自动适配）</button>
           `
           : ""
       }

@@ -93,3 +93,39 @@ test(
     );
   }
 );
+
+
+test(
+  "converting an uploaded image to background makes it responsive and unique",
+  () => {
+    assert.match(
+      toolkit,
+      /item\.role\s*=\s*"background"/
+    );
+
+    assert.match(
+      toolkit,
+      /item\.name\s*=\s*"00_home_background"/
+    );
+
+    assert.match(
+      toolkit,
+      /item\.objectFit\s*=\s*"cover"/
+    );
+
+    assert.match(
+      toolkit,
+      /item\.zIndex\s*=\s*0/
+    );
+
+    assert.match(
+      toolkit,
+      /设为全屏背景（自动适配）/
+    );
+
+    assert.match(
+      toolkit,
+      /已设为全屏背景，会随屏幕自动适配/
+    );
+  }
+);
