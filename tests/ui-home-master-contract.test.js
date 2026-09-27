@@ -291,7 +291,7 @@ test(
 
     assert.match(
       toolkit,
-      /state\.panelScroll\[\s*state\.tab\s*\]\s*=\s*body\.scrollTop/
+      /state\.panelScroll\[\s*state\.tab\s*\]\s*=\s*(?:body|panelBody)\.scrollTop/
     );
   }
 );
