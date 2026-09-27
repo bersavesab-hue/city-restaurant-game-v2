@@ -598,15 +598,38 @@ export function createDevToolkit({
           getActivePage()
       )
     ) {
+      const legacyFullCanvasBackground =
+        item.type === "image" &&
+        item.role !== "background" &&
+        !isBackgroundAssetName(
+          item.name
+        ) &&
+        Number(item.x || 0) === 0 &&
+        Number(item.y || 0) === 0 &&
+        Number(item.zIndex ?? 40) <= 1 &&
+        item.objectFit === "cover";
+
       if (
         item.type === "image" &&
         (
           item.role === "background" ||
           isBackgroundAssetName(
             item.name
-          )
+          ) ||
+          legacyFullCanvasBackground
         )
       ) {
+        if (
+          legacyFullCanvasBackground
+        ) {
+          item.role =
+            "background";
+          item.name =
+            "00_home_background";
+          item.backgroundInitialized =
+            true;
+          projectChanged = true;
+        }
         const rect =
           logicalRect(
             parent

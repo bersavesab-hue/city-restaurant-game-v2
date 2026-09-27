@@ -129,3 +129,34 @@ test(
     );
   }
 );
+
+
+test(
+  "legacy full-canvas images migrate automatically into responsive backgrounds",
+  () => {
+    assert.match(
+      toolkit,
+      /legacyFullCanvasBackground/
+    );
+
+    assert.match(
+      toolkit,
+      /Number\(item\.x\s*\|\|\s*0\)\s*===\s*0/
+    );
+
+    assert.match(
+      toolkit,
+      /Number\(item\.zIndex\s*\?\?\s*40\)\s*<=\s*1/
+    );
+
+    assert.match(
+      toolkit,
+      /item\.objectFit\s*===\s*"cover"/
+    );
+
+    assert.match(
+      toolkit,
+      /item\.role\s*=\s*"background"/
+    );
+  }
+);
