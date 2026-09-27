@@ -2353,7 +2353,58 @@ export function createDevToolkit({
     `;
   }
 
+  function capturePanelScroll() {
+    const body =
+      host.querySelector(
+        ".ui-dev-body"
+      );
+
+    if (!body) {
+      return;
+    }
+
+    const tab =
+      body.dataset.devBodyTab ||
+      state.tab;
+
+    state.panelScroll[tab] =
+      body.scrollTop;
+  }
+
+  function restorePanelScroll() {
+    const body =
+      host.querySelector(
+        ".ui-dev-body"
+      );
+
+    if (!body) {
+      return;
+    }
+
+    const tab =
+      body.dataset.devBodyTab ||
+      state.tab;
+
+    const top =
+      Number(
+        state.panelScroll[tab] || 0
+      );
+
+    body.scrollTop = top;
+
+    requestAnimationFrame(
+      () => {
+        if (
+          document.contains(body)
+        ) {
+          body.scrollTop = top;
+        }
+      }
+    );
+  }
+
   function renderPanel() {
+    capturePanelScroll();
     renderSelectionChrome();
 
     if (state.dragMode) {
@@ -2452,7 +2503,10 @@ export function createDevToolkit({
           <button class="${state.tab === "config" ? "is-active" : ""}" data-dev-tab="config">配置</button>
         </nav>
 
-        <div class="ui-dev-body">
+        <div
+          class="ui-dev-body"
+          data-dev-body-tab="${state.tab}"
+        >
           ${state.tab === "edit" ? editorMarkup() : ""}
 
           ${state.tab === "audit" ? `
