@@ -1609,8 +1609,14 @@ export function createDevToolkit({
   function startDragMode() {
     const info = selectedInfo();
 
-    if (!info || !info.layoutKey) {
-      showToast("请先选择母版区块");
+    if (
+      !info ||
+      (
+        !info.layoutKey &&
+        !info.customId
+      )
+    ) {
+      showToast("请先选择组件");
       return;
     }
 
@@ -1671,7 +1677,7 @@ export function createDevToolkit({
     if (!info) {
       return `
         <div class="dev-empty">
-          点“点选界面”，然后直接点游戏里的卡片、按钮或区域。选中后工具会自动回来。
+          点“组件排版”或“自由点选”，再点游戏里的卡片、图片、按钮或区域。
         </div>
       `;
     }
@@ -1680,7 +1686,7 @@ export function createDevToolkit({
       <div class="dev-selected-card">
         <div>
           <small>当前选中</small>
-          <strong>${info.label}</strong>
+          <strong>${escapeHtml(info.label)}</strong>
         </div>
         <span>${info.rect.width}×${info.rect.height}</span>
       </div>
@@ -1688,34 +1694,60 @@ export function createDevToolkit({
       <div class="dev-editor-grid">
         ${stepper("字号", "fontSize", info.values.fontSize, 1)}
         ${stepper("内边距", "padding", info.values.padding, 2)}
-        ${stepper("宽度", "minWidth", info.values.minWidth, 4)}
-        ${stepper("高度", "minHeight", info.values.minHeight, 4)}
+        ${stepper("宽度", "width", info.values.width, 4)}
+        ${stepper("高度", "height", info.values.height, 4)}
         ${stepper("圆角", "borderRadius", info.values.borderRadius, 2)}
         ${stepper("左右", "left", info.values.left, 4)}
         ${stepper("上下", "top", info.values.top, 4)}
       </div>
 
-      ${
-        info.layoutKey
-          ? `
-            <div class="dev-layout-actions">
+      <p class="dev-resize-help">
+        选中框四角可以直接用手指拉伸缩放。
+      </p>
+
+      <div class="dev-layout-actions">
+        ${
+          info.layoutKey || info.customId
+            ? `
               <button class="primary" type="button" data-dev-drag>
-                拖动当前区块
+                拖动当前组件
               </button>
-              <span>吸附 ${state.snap}px</span>
-            </div>
-          `
-          : ""
-      }
+            `
+            : ""
+        }
+        <button type="button" data-dev-duplicate>复制</button>
+        <button class="danger" type="button" data-dev-delete>
+          ${info.customId ? "删除" : "隐藏"}
+        </button>
+        <span>吸附 ${state.snap}px</span>
+      </div>
+
+      <div class="dev-asset-actions">
+        <button type="button" data-dev-upload>＋ 上传图片组件</button>
+        ${
+          info.isImage
+            ? '<button type="button" data-dev-replace-image>替换图片</button>'
+            : ""
+        }
+      </div>
+
+      <div class="dev-layer-actions">
+        <span>图层</span>
+        <button type="button" data-dev-layer="back">置底</button>
+        <button type="button" data-dev-layer="down">下一层</button>
+        <button type="button" data-dev-layer="up">上一层</button>
+        <button type="button" data-dev-layer="front">置顶</button>
+      </div>
 
       <div class="dev-selected-meta">
         <span>${info.action || "无动作"}</span>
         <span>${info.bound ? "事件已绑定" : "无事件"}</span>
         ${info.layoutKey ? `<span>组件：${info.layoutKey}</span>` : ""}
+        ${info.customId ? `<span>自定义：${info.customId}</span>` : ""}
+        <span>层级：${info.values.zIndex}</span>
       </div>
     `;
   }
-
   function auditSummaryMarkup() {
     const report = state.report;
 
@@ -1760,6 +1792,8 @@ export function createDevToolkit({
   }
 
   function renderPanel() {
+    renderSelectionChrome();
+
     if (state.dragMode) {
       const info = selectedInfo();
 
@@ -1767,7 +1801,7 @@ export function createDevToolkit({
         <div class="ui-dev-drag-bar">
           <div>
             <strong>拖动排版</strong>
-            <span>${info?.layoutKey || "母版区块"}</span>
+            <span>${info?.layoutKey || info?.customId || "组件"}</span>
           </div>
           <div class="dev-snap-group">
             ${[1,4,8].map(value => `
