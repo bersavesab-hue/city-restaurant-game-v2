@@ -14,6 +14,10 @@ import {
   createDevToolkit
 } from "./DevToolkit.js";
 
+import {
+  renderHomePage
+} from "./HomePage.js";
+
 
 import {
   renderActionGrid,
@@ -158,211 +162,11 @@ function navMarkup() {
 }
 
 function renderStore() {
-  const model =
+  return renderHomePage(
     buildHomeDashboardModel(
       app
-    );
-
-  if (model.empty) {
-    return `
-      <section class="home-master-page">
-        <picture class="home-master-picture" aria-hidden="true">
-          <source
-            media="(max-aspect-ratio: 1/2)"
-            srcset="assets/home/home-master-20x9.webp"
-          />
-          <img
-            class="home-master-artwork"
-            src="assets/home/home-master.webp"
-            alt=""
-            decoding="async"
-          />
-        </picture>
-      </section>
-    `;
-  }
-
-  return `
-    <section
-      class="home-master-page"
-      data-ui-component="home-master"
-      data-home-master-version="11"
-      aria-label="门店首页静态母版"
-    >
-      <picture class="home-master-picture" aria-hidden="true">
-        <source
-          media="(max-aspect-ratio: 1/2)"
-          srcset="assets/home/home-master-20x9.webp"
-        />
-        <img
-          class="home-master-artwork"
-          src="assets/home/home-master.webp"
-          alt=""
-          decoding="async"
-        />
-      </picture>
-
-      <div class="home-live-overlay" aria-label="首页实时经营数据">
-        <div class="live-hud live-day">
-          <strong>第${model.time.day}天</strong>
-          <span>经营日</span>
-        </div>
-
-        <div class="live-hud live-clock">
-          <strong data-bind="clock">${model.time.clock}</strong>
-          <span>营业中</span>
-        </div>
-
-        <div class="live-hud live-money">
-          <span>资金</span>
-          <strong>${money(model.money.balance)}</strong>
-        </div>
-
-        <div class="live-hud live-rating">
-          <span>星级评价</span>
-          <strong>${model.restaurant.reviewScore.toFixed(1)}分</strong>
-        </div>
-
-        <div class="live-hud live-level">
-          <strong>Lv.${model.restaurant.level}</strong>
-          <span>${model.restaurant.title}</span>
-        </div>
-
-        <div class="live-kpi-grid">
-          <article class="live-kpi">
-            <strong>${money(model.money.todayRevenue)}</strong>
-            <em class="${trendTone(model.money.revenueTrend)}">
-              ${model.money.revenueTrend >= 0 ? "↑" : "↓"}
-              ${signedPercent(model.money.revenueTrend)}
-            </em>
-          </article>
-
-          <article class="live-kpi">
-            <strong>${money(model.money.todayProfit)}</strong>
-            <em class="${trendTone(model.money.profitTrend)}">
-              ${model.money.profitTrend >= 0 ? "↑" : "↓"}
-              ${signedPercent(model.money.profitTrend)}
-            </em>
-          </article>
-
-          <article class="live-kpi">
-            <strong>${Math.round(model.restaurant.satisfaction)}%</strong>
-            <em>${satisfactionLabel(model.restaurant.satisfaction)}</em>
-          </article>
-
-          <article class="live-kpi">
-            <strong>${model.operations.employees}</strong>
-            <em>${staffStatusLabel(model.operations.employees)}</em>
-          </article>
-        </div>
-
-        <section class="live-opportunity">
-          <strong>${model.opportunity.title}</strong>
-          <p>${model.opportunity.detail}</p>
-          <div class="live-opportunity-tags">
-            ${(model.opportunity.tags ?? []).slice(0,4).map(tag => `
-              <span>${tag}</span>
-            `).join("")}
-          </div>
-        </section>
-
-        <section class="live-growth">
-          <span class="live-growth-label">下一阶段：</span>
-          <strong>
-            ${model.progress.maxLevel
-              ? model.progress.title
-              : model.progress.nextTitle}
-          </strong>
-          <b>
-            ${model.progress.maxLevel
-              ? "MAX"
-              : Math.round(model.progress.progress * 100) + "%"}
-          </b>
-          <i>
-            <u style="width:${model.progress.maxLevel ? 100 : Math.round(model.progress.progress * 100)}%"></u>
-          </i>
-        </section>
-
-        <section class="live-dialogue">
-          ${model.dialogue.slice(0,3).map(item => `
-            <article>
-              <span class="live-dialogue-avatar">
-                ${item.speaker.slice(0,1)}
-              </span>
-              <div>
-                <header>
-                  <strong>${item.speaker}</strong>
-                  <em>${item.role}</em>
-                  <time>${item.time}</time>
-                </header>
-                <p>${item.text}</p>
-              </div>
-            </article>
-          `).join("")}
-        </section>
-
-        <section class="live-district">
-          <div>
-            <strong>${model.district
-              ? (model.district.trafficIndex >= 75 ? "较高 ↑" : model.district.trafficIndex >= 55 ? "中等" : "偏低")
-              : "--"}</strong>
-          </div>
-          <div>
-            <strong>${model.district ? model.district.mainCustomer : "--"}</strong>
-          </div>
-          <div>
-            <strong>${model.district
-              ? (model.district.deliveryDemand >= 75 ? "上升 ↑" : model.district.deliveryDemand >= 55 ? "中等" : "偏低")
-              : "--"}</strong>
-          </div>
-          <div>
-            <strong>${model.district
-              ? (model.district.competition >= 75 ? "较高" : model.district.competition >= 55 ? "中等" : "较低")
-              : "--"}</strong>
-          </div>
-        </section>
-
-        <section class="live-schedule">
-          ${model.schedule.slice(0,4).map(item => `
-            <article class="${item.status}">
-              <i></i>
-              <time>${item.time}</time>
-              <span>${item.title}</span>
-              <strong>
-                ${item.status === "done"
-                  ? "已完成"
-                  : item.status === "active"
-                    ? "进行中"
-                    : "未开始"}
-              </strong>
-            </article>
-          `).join("")}
-        </section>
-      </div>
-
-      <div class="home-master-hotspots" aria-label="首页交互热区">
-        <button class="home-hotspot hotspot-settings" type="button" data-nav="more" aria-label="设置"></button>
-
-        <button class="home-hotspot hotspot-opportunity-more" type="button" data-nav="business" aria-label="查看完整商圈情报"></button>
-        <button class="home-hotspot hotspot-opportunity-enter" type="button" data-nav="business" aria-label="去经营"></button>
-
-        <button class="home-hotspot hotspot-renovation" type="button" data-open-sheet="renovation" aria-label="装修"></button>
-        <button class="home-hotspot hotspot-staff-shortcut" type="button" data-nav="staff" aria-label="员工"></button>
-        <button class="home-hotspot hotspot-research-shortcut" type="button" data-nav="research" aria-label="研发"></button>
-        <button class="home-hotspot hotspot-business-shortcut" type="button" data-nav="business" aria-label="经营"></button>
-
-        <button class="home-hotspot hotspot-dialogue-more" type="button" data-nav="staff" aria-label="店内动态更多"></button>
-        <button class="home-hotspot hotspot-district-more" type="button" data-nav="business" aria-label="商圈情报更多"></button>
-        <button class="home-hotspot hotspot-schedule-advance" type="button" data-advance="30" aria-label="推进日程"></button>
-
-        <button class="home-hotspot hotspot-nav-store" type="button" data-nav="store" aria-label="门店"></button>
-        <button class="home-hotspot hotspot-nav-business" type="button" data-nav="business" aria-label="经营"></button>
-        <button class="home-hotspot hotspot-nav-research" type="button" data-nav="research" aria-label="研发"></button>
-        <button class="home-hotspot hotspot-nav-staff" type="button" data-nav="staff" aria-label="员工"></button>
-        <button class="home-hotspot hotspot-nav-more" type="button" data-nav="more" aria-label="更多"></button>
-      </div>
-    </section>
-  `;
+    )
+  );
 }
 
 function renderBusiness() {
@@ -561,7 +365,7 @@ function pageMarkup() {
 
 function render() {
   root.innerHTML = `
-    <div class="mobile-shell ${activePage === "store" ? "store-master-shell" : ""}">
+    <div class="mobile-shell ${activePage === "store" ? "store-component-shell" : ""}">
       <section class="page-host">
         ${pageMarkup()}
       </section>
