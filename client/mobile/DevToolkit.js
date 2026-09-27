@@ -2050,6 +2050,36 @@ export function createDevToolkit({
       resetSelected
     );
 
+    host.querySelector("[data-dev-delete]")?.addEventListener(
+      "click",
+      deleteSelected
+    );
+
+    host.querySelector("[data-dev-duplicate]")?.addEventListener(
+      "click",
+      duplicateSelected
+    );
+
+    host.querySelector("[data-dev-upload]")?.addEventListener(
+      "click",
+      () => chooseImage("add")
+    );
+
+    host.querySelector("[data-dev-replace-image]")?.addEventListener(
+      "click",
+      () => chooseImage("replace")
+    );
+
+    host.querySelectorAll("[data-dev-layer]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          setLayer(
+            button.dataset.devLayer
+          )
+      );
+    });
+
     host.querySelector("[data-dev-clear]")?.addEventListener(
       "click",
       clearAll
@@ -2077,7 +2107,7 @@ export function createDevToolkit({
     const node =
       state.selectionScope === "layout"
         ? event.target.closest(
-            "[data-layout-key]"
+            "[data-layout-key],[data-dev-custom]"
           )
         : normalizeSelection(
             event.target,
@@ -2410,7 +2440,15 @@ export function createDevToolkit({
     }
 
     const info = selectedInfo();
-    if (!info?.layoutKey) return;
+    if (
+      !info ||
+      (
+        !info.layoutKey &&
+        !info.customId
+      )
+    ) {
+      return;
+    }
 
     const computed =
       getComputedStyle(
@@ -2444,7 +2482,9 @@ export function createDevToolkit({
       y: event.clientY,
       left: startLeft,
       top: startTop,
-      id: info.id
+      id: info.id,
+      customId:
+        info.customId
     };
 
     state.selected.setPointerCapture?.(
@@ -2503,6 +2543,18 @@ export function createDevToolkit({
     state.selected.style.top =
       styles.top;
 
+    if (drag.customId) {
+      const item =
+        customComponentById(
+          drag.customId
+        );
+
+      if (item) {
+        item.x = nextLeft;
+        item.y = nextTop;
+      }
+    }
+
     event.preventDefault();
   }
 
@@ -2514,8 +2566,16 @@ export function createDevToolkit({
       return;
     }
 
+    if (
+      state.dragPointer.customId
+    ) {
+      persistProject();
+    }
+
     state.dragPointer = null;
-    writeOverrides(state.overrides);
+    writeOverrides(
+      state.overrides
+    );
     event.preventDefault();
   }
 
@@ -2616,7 +2676,10 @@ export function createDevToolkit({
 
   function afterRender() {
     assignIds();
+    renderProjectComponents();
+    assignIds();
     applyOverrides();
+    renderSelectionChrome();
 
     if (state.report) {
       state.report = auditUi({
@@ -2640,6 +2703,10 @@ export function createDevToolkit({
       state.selecting = false;
       state.dragMode = false;
       state.dragPointer = null;
+      state.resizePointer = null;
+      chrome.classList.remove(
+        "is-visible"
+      );
       renderPanel();
     },
     select: () => startSelecting("any"),
@@ -2652,6 +2719,10 @@ export function createDevToolkit({
     getReport: () => state.report,
     exportLayout: () => clone(state.overrides),
     clearLayout: clearAll,
+    exportProject:
+      () => clone(state.project),
+    addImage:
+      () => chooseImage("add"),
     app
   };
 
