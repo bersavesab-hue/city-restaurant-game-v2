@@ -2572,6 +2572,26 @@ export function createDevToolkit({
       );
     });
 
+    host.querySelectorAll("[data-dev-fit]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          setImageFit(
+            button.dataset.devFit
+          )
+      );
+    });
+
+    host.querySelector("[data-dev-aspect-lock]")?.addEventListener(
+      "click",
+      toggleAspectLock
+    );
+
+    host.querySelector("[data-dev-fill-canvas]")?.addEventListener(
+      "click",
+      fillCanvasWithSelectedImage
+    );
+
     host.querySelector("[data-dev-clear]")?.addEventListener(
       "click",
       clearAll
