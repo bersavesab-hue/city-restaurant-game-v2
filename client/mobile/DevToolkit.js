@@ -910,20 +910,35 @@ export function createDevToolkit({
       action: actionLabel(state.selected),
       bound: Boolean(state.selected.dataset.devBound),
       layoutKey: state.selected.dataset.layoutKey || "",
+      customId: state.selected.dataset.devCustom || "",
+      isImage:
+        state.selected instanceof HTMLImageElement ||
+        Boolean(
+          state.selected.dataset.devCustom &&
+          customComponentById(
+            state.selected.dataset.devCustom
+          )?.type === "image"
+        ),
       values: {
         fontSize: Math.round(parseFloat(style.fontSize) || 0),
         padding: Math.round(parseFloat(style.paddingTop) || 0),
-        minWidth: Math.round(parseFloat(style.minWidth) || state.selected.getBoundingClientRect().width),
-        minHeight: Math.round(parseFloat(style.minHeight) || state.selected.getBoundingClientRect().height),
+        width: Math.round(state.selected.getBoundingClientRect().width),
+        height: Math.round(state.selected.getBoundingClientRect().height),
         borderRadius: Math.round(parseFloat(style.borderRadius) || 0),
         left: style.left === "auto" ? 0 : Math.round(parseFloat(style.left) || 0),
-        top: style.top === "auto" ? 0 : Math.round(parseFloat(style.top) || 0)
+        top: style.top === "auto" ? 0 : Math.round(parseFloat(style.top) || 0),
+        opacity: Math.round((parseFloat(style.opacity) || 1) * 100),
+        zIndex: Number.isFinite(parseInt(style.zIndex, 10))
+          ? parseInt(style.zIndex, 10)
+          : 0
       }
     };
   }
 
   function pushHistory() {
-    state.undoStack.push(clone(state.overrides));
+    state.undoStack.push(
+      snapshotState()
+    );
 
     if (state.undoStack.length > 40) {
       state.undoStack.shift();
@@ -953,26 +968,55 @@ export function createDevToolkit({
   }
 
   function restoreSnapshot(snapshot) {
-    removeOverrideStyles(state.overrides);
+    removeOverrideStyles(
+      state.overrides
+    );
 
-    state.overrides = clone(snapshot);
-    writeOverrides(state.overrides);
+    state.overrides =
+      clone(
+        snapshot.overrides || {}
+      );
+
+    state.project =
+      clone(
+        snapshot.project || {
+          components: [],
+          assetOverrides: {}
+        }
+      );
+
+    writeOverrides(
+      state.overrides
+    );
+
+    persistProject();
+    renderProjectComponents();
+    assignIds();
     applyOverrides();
+    renderSelectionChrome();
     renderPanel();
   }
 
   function undo() {
     if (!state.undoStack.length) return;
 
-    state.redoStack.push(clone(state.overrides));
-    restoreSnapshot(state.undoStack.pop());
+    state.redoStack.push(
+      snapshotState()
+    );
+    restoreSnapshot(
+      state.undoStack.pop()
+    );
   }
 
   function redo() {
     if (!state.redoStack.length) return;
 
-    state.undoStack.push(clone(state.overrides));
-    restoreSnapshot(state.redoStack.pop());
+    state.undoStack.push(
+      snapshotState()
+    );
+    restoreSnapshot(
+      state.redoStack.pop()
+    );
   }
 
   function ensureSelectedOverride(info) {
@@ -996,16 +1040,16 @@ export function createDevToolkit({
 
     if (property === "padding") {
       current = parseFloat(computed.paddingTop) || 0;
-    } else if (property === "minWidth") {
+    } else if (property === "width") {
       current =
-        parseFloat(computed.minWidth) ||
-        state.selected.getBoundingClientRect().width ||
-        0;
-    } else if (property === "minHeight") {
+        state.selected
+          .getBoundingClientRect()
+          .width || 0;
+    } else if (property === "height") {
       current =
-        parseFloat(computed.minHeight) ||
-        state.selected.getBoundingClientRect().height ||
-        0;
+        state.selected
+          .getBoundingClientRect()
+          .height || 0;
     } else if (property === "left" || property === "top") {
       current = computed[property] === "auto"
         ? 0
@@ -1022,9 +1066,9 @@ export function createDevToolkit({
     const min =
       property === "fontSize"
         ? 8
-        : property === "minWidth"
+        : property === "width"
           ? 24
-          : property === "minHeight"
+          : property === "height"
             ? 24
           : property === "left" || property === "top"
             ? -200
@@ -1033,10 +1077,55 @@ export function createDevToolkit({
     const next = Math.max(min, current + delta);
     const value = `${Math.round(next)}px`;
 
+    const customId =
+      state.selected.dataset.devCustom;
+
+    if (
+      customId &&
+      (
+        property === "width" ||
+        property === "height" ||
+        property === "left" ||
+        property === "top"
+      )
+    ) {
+      const item =
+        customComponentById(
+          customId
+        );
+
+      if (item) {
+        if (property === "width") {
+          item.width =
+            Math.round(next);
+        } else if (
+          property === "height"
+        ) {
+          item.height =
+            Math.round(next);
+        } else if (
+          property === "left"
+        ) {
+          item.x =
+            Math.round(next);
+        } else if (
+          property === "top"
+        ) {
+          item.y =
+            Math.round(next);
+        }
+
+        persistProject();
+      }
+    }
+
     styles[property] = value;
     state.selected.style[property] = value;
 
-    writeOverrides(state.overrides);
+    writeOverrides(
+      state.overrides
+    );
+    renderSelectionChrome();
     renderPanel();
   }
 
