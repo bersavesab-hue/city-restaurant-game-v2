@@ -39,7 +39,7 @@ const toolkit =
   );
 
 test(
-  "mobile runtime starts with only a blank design canvas",
+  "mobile runtime starts with responsive background and fixed static chrome",
   () => {
     assert.match(
       mobileApp,
@@ -66,15 +66,25 @@ test(
       /data-coordinate-space="logical"/
     );
 
+    assert.match(
+      homePage,
+      /home-top-chrome/
+    );
+
+    assert.match(
+      homePage,
+      /home-bottom-chrome/
+    );
+
     assert.doesNotMatch(
       homePage,
-      /button|nav|header|article/
+      /<button|data-bind=|data-nav=/
     );
   }
 );
 
 test(
-  "runtime CSS contains only screen foundation and blank canvas styles",
+  "runtime CSS contains screen foundation and fixed homepage chrome",
   () => {
     for (
       const marker
@@ -86,7 +96,10 @@ test(
         ".screen-stage",
         ".home-editor-canvas",
         ".ui-anchor-top",
-        ".ui-anchor-bottom"
+        ".ui-anchor-bottom",
+        ".home-top-chrome",
+        ".home-bottom-chrome",
+        ".home-content-reserve"
       ]
     ) {
       assert.ok(
@@ -97,7 +110,7 @@ test(
 
     assert.doesNotMatch(
       css,
-      /bottom-nav|segment-tabs|list-card|research-grid|staff-list|section-header|bottom-sheet/
+      /segment-tabs|list-card|research-grid|staff-list|section-header|bottom-sheet/
     );
   }
 );
