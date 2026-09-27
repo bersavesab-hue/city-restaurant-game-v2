@@ -578,6 +578,8 @@ export function createDevToolkit({
         image.style.display = "block";
         image.style.objectFit =
           item.objectFit || "contain";
+        image.style.objectPosition =
+          item.objectPosition || "center";
 
         wrapper.append(image);
       } else if (
@@ -878,6 +880,27 @@ export function createDevToolkit({
     );
   }
 
+  function measureImage(src) {
+    return new Promise(
+      (resolve, reject) => {
+        const image =
+          new Image();
+
+        image.onload = () => {
+          resolve({
+            width:
+              image.naturalWidth || 1,
+            height:
+              image.naturalHeight || 1
+          });
+        };
+
+        image.onerror = reject;
+        image.src = src;
+      }
+    );
+  }
+
   function assignIds() {
     [root, sheetRoot]
       .filter(Boolean)
@@ -911,6 +934,12 @@ export function createDevToolkit({
     }
 
     const style = getComputedStyle(state.selected);
+    const custom =
+      state.selected.dataset.devCustom
+        ? customComponentById(
+            state.selected.dataset.devCustom
+          )
+        : null;
 
     return {
       id: selectorFor(state.selected, root),
@@ -923,11 +952,38 @@ export function createDevToolkit({
       isImage:
         state.selected instanceof HTMLImageElement ||
         Boolean(
-          state.selected.dataset.devCustom &&
-          customComponentById(
-            state.selected.dataset.devCustom
-          )?.type === "image"
+          custom?.type === "image"
         ),
+      imageSettings:
+        custom?.type === "image"
+          ? {
+              objectFit:
+                custom.objectFit || "contain",
+              lockAspect:
+                custom.lockAspect !== false,
+              aspectRatio:
+                Number(
+                  custom.aspectRatio ||
+                  (
+                    custom.naturalWidth &&
+                    custom.naturalHeight
+                      ? custom.naturalWidth /
+                        custom.naturalHeight
+                      : custom.width /
+                        custom.height
+                  ) ||
+                  1
+                ),
+              naturalWidth:
+                Number(
+                  custom.naturalWidth || 0
+                ),
+              naturalHeight:
+                Number(
+                  custom.naturalHeight || 0
+                )
+            }
+          : null,
       values: {
         fontSize: Math.round(parseFloat(style.fontSize) || 0),
         padding: Math.round(parseFloat(style.paddingTop) || 0),
@@ -1425,6 +1481,145 @@ export function createDevToolkit({
     renderPanel();
   }
 
+  function selectedImageItem() {
+    const info =
+      selectedInfo();
+
+    if (
+      !info?.customId
+    ) {
+      return null;
+    }
+
+    const item =
+      customComponentById(
+        info.customId
+      );
+
+    return item?.type === "image"
+      ? item
+      : null;
+  }
+
+  function setImageFit(mode) {
+    const item =
+      selectedImageItem();
+
+    if (!item) return;
+
+    if (
+      !["contain", "cover", "fill"]
+        .includes(mode)
+    ) {
+      return;
+    }
+
+    pushHistory();
+    item.objectFit = mode;
+    persistProject();
+
+    const image =
+      state.selected
+        ?.querySelector("img");
+
+    if (image) {
+      image.style.objectFit = mode;
+    }
+
+    renderPanel();
+  }
+
+  function toggleAspectLock() {
+    const item =
+      selectedImageItem();
+
+    if (!item) return;
+
+    pushHistory();
+
+    item.lockAspect =
+      item.lockAspect === false;
+
+    if (
+      item.lockAspect &&
+      item.aspectRatio
+    ) {
+      item.height =
+        Math.max(
+          24,
+          Math.round(
+            item.width /
+            item.aspectRatio
+          )
+        );
+
+      state.selected.style.height =
+        `${item.height}px`;
+
+      const info =
+        selectedInfo();
+
+      if (info) {
+        const styles =
+          ensureSelectedOverride(
+            info
+          );
+
+        styles.height =
+          `${item.height}px`;
+
+        writeOverrides(
+          state.overrides
+        );
+      }
+    }
+
+    persistProject();
+    renderSelectionChrome();
+    renderPanel();
+  }
+
+  function fillCanvasWithSelectedImage() {
+    const item =
+      selectedImageItem();
+
+    if (!item) return;
+
+    const parent =
+      projectPageRoot();
+
+    const rect =
+      parent.getBoundingClientRect();
+
+    pushHistory();
+
+    item.x = 0;
+    item.y = 0;
+    item.width =
+      Math.round(rect.width);
+    item.height =
+      Math.round(rect.height);
+    item.objectFit = "cover";
+    item.lockAspect = false;
+    item.zIndex =
+      Math.min(
+        item.zIndex || 1,
+        1
+      );
+
+    persistProject();
+    renderProjectComponents();
+    assignIds();
+
+    const node =
+      root.querySelector(
+        `[data-dev-custom="${item.id}"]`
+      );
+
+    openEditorFor(node);
+    showToast("已铺满画布");
+  }
+
   function chooseImage(mode) {
     state.uploadMode = mode;
     fileInput.value = "";
@@ -1468,7 +1663,32 @@ export function createDevToolkit({
           item &&
           item.type === "image"
         ) {
+          const dimensions =
+            await measureImage(src);
+
           item.src = src;
+          item.naturalWidth =
+            dimensions.width;
+          item.naturalHeight =
+            dimensions.height;
+          item.aspectRatio =
+            dimensions.width /
+            dimensions.height;
+
+          if (
+            item.lockAspect !== false &&
+            item.width
+          ) {
+            item.height =
+              Math.max(
+                24,
+                Math.round(
+                  item.width /
+                  item.aspectRatio
+                )
+              );
+          }
+
           persistProject();
           renderProjectComponents();
           assignIds();
@@ -1514,15 +1734,40 @@ export function createDevToolkit({
       parent
         .getBoundingClientRect();
 
+    const dimensions =
+      await measureImage(src);
+
+    const aspectRatio =
+      Math.max(
+        .05,
+        dimensions.width /
+        dimensions.height
+      );
+
     const width =
       Math.min(
-        180,
         Math.max(
           96,
           Math.round(
             parentRect.width *
-            .34
+            .92
           )
+        ),
+        Math.max(
+          96,
+          Math.round(
+            parentRect.width -
+            16
+          )
+        )
+      );
+
+    const height =
+      Math.max(
+        24,
+        Math.round(
+          width /
+          aspectRatio
         )
       );
 
@@ -1542,15 +1787,30 @@ export function createDevToolkit({
           ) / 2
         ),
       y:
-        Math.round(
-          parentRect.height *
-          .34
+        Math.max(
+          0,
+          Math.round(
+            (
+              parentRect.height -
+              Math.min(
+                height,
+                parentRect.height
+              )
+            ) / 2
+          )
         ),
       width,
-      height: width,
+      height,
+      naturalWidth:
+        dimensions.width,
+      naturalHeight:
+        dimensions.height,
+      aspectRatio,
+      lockAspect: true,
       zIndex: 40,
       opacity: 1,
-      objectFit: "contain"
+      objectFit: "contain",
+      objectPosition: "center"
     };
 
     state.project.components.push(
