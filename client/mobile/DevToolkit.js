@@ -226,6 +226,7 @@ function normalizeSelection(target, root, sheetRoot) {
   if (!(target instanceof Element)) return null;
 
   const selector = [
+    "img",
     "[data-layout-key]",
     "[data-ui-component]",
     "button",
@@ -475,13 +476,406 @@ export function createDevToolkit({
     ];
   }
 
+  function projectPageRoot() {
+    return (
+      root.querySelector(
+        '[data-layout-key="home-page"]'
+      ) ||
+      root.querySelector(".page-host") ||
+      root
+    );
+  }
+
+  function customComponentById(id) {
+    return state.project.components.find(
+      item => item.id === id
+    ) || null;
+  }
+
+  function persistProject() {
+    writeProject(state.project);
+  }
+
+  function renderProjectComponents() {
+    root
+      .querySelectorAll(
+        '[data-dev-created="true"]'
+      )
+      .forEach(node => node.remove());
+
+    const parent =
+      projectPageRoot();
+
+    if (
+      !parent ||
+      getActivePage() !== "store"
+    ) {
+      return;
+    }
+
+    if (
+      getComputedStyle(parent).position ===
+      "static"
+    ) {
+      parent.style.position =
+        "relative";
+    }
+
+    for (
+      const item
+      of state.project.components.filter(
+        entry =>
+          entry.page ===
+          getActivePage()
+      )
+    ) {
+      const wrapper =
+        document.createElement("div");
+
+      wrapper.className =
+        "dev-custom-component";
+
+      wrapper.dataset.devCreated =
+        "true";
+
+      wrapper.dataset.devCustom =
+        item.id;
+
+      wrapper.dataset.devId =
+        `custom:${item.id}`;
+
+      wrapper.style.position =
+        "absolute";
+
+      wrapper.style.left =
+        `${item.x}px`;
+
+      wrapper.style.top =
+        `${item.y}px`;
+
+      wrapper.style.width =
+        `${item.width}px`;
+
+      wrapper.style.height =
+        `${item.height}px`;
+
+      wrapper.style.zIndex =
+        String(item.zIndex ?? 20);
+
+      wrapper.style.opacity =
+        String(item.opacity ?? 1);
+
+      if (item.type === "image") {
+        const image =
+          document.createElement("img");
+
+        image.src = item.src;
+        image.alt = "";
+        image.draggable = false;
+        image.style.width = "100%";
+        image.style.height = "100%";
+        image.style.display = "block";
+        image.style.objectFit =
+          item.objectFit || "contain";
+
+        wrapper.append(image);
+      } else if (
+        item.type === "html" &&
+        item.html
+      ) {
+        wrapper.innerHTML =
+          item.html;
+      }
+
+      parent.append(wrapper);
+    }
+
+    for (
+      const [id, src]
+      of Object.entries(
+        state.project.assetOverrides
+      )
+    ) {
+      const node =
+        candidates().find(
+          item =>
+            item.dataset.devId === id
+        );
+
+      if (
+        node instanceof
+        HTMLImageElement
+      ) {
+        node.src = src;
+      }
+    }
+  }
+
+  function snapshotState() {
+    return {
+      overrides:
+        clone(state.overrides),
+      project:
+        clone(state.project)
+    };
+  }
+
+  function relativeRect(node) {
+    const parent =
+      projectPageRoot();
+
+    const parentRect =
+      parent.getBoundingClientRect();
+
+    const rect =
+      node.getBoundingClientRect();
+
+    return {
+      x:
+        Math.round(
+          rect.left -
+          parentRect.left
+        ),
+      y:
+        Math.round(
+          rect.top -
+          parentRect.top
+        ),
+      width:
+        Math.max(
+          24,
+          Math.round(rect.width)
+        ),
+      height:
+        Math.max(
+          24,
+          Math.round(rect.height)
+        )
+    };
+  }
+
+  function nextCustomId() {
+    return (
+      "ui-" +
+      Date.now().toString(36) +
+      "-" +
+      Math.random()
+        .toString(36)
+        .slice(2, 7)
+    );
+  }
+
+  function stripInteractiveAttributes(node) {
+    if (!(node instanceof Element)) {
+      return;
+    }
+
+    for (
+      const attribute
+      of [
+        "id",
+        "data-nav",
+        "data-open-sheet",
+        "data-advance",
+        "data-layout-key",
+        "data-ui-component",
+        "data-dev-id",
+        "data-dev-bound"
+      ]
+    ) {
+      node.removeAttribute(
+        attribute
+      );
+    }
+
+    node
+      .querySelectorAll("*")
+      .forEach(child => {
+        stripInteractiveAttributes(
+          child
+        );
+      });
+  }
+
+  function sanitizeCloneHtml(node) {
+    const cloned =
+      node.cloneNode(true);
+
+    stripInteractiveAttributes(
+      cloned
+    );
+
+    cloned
+      .classList
+      .remove(
+        "dev-selected-outline"
+      );
+
+    cloned.style.width = "100%";
+    cloned.style.height = "100%";
+    cloned.style.margin = "0";
+    cloned.style.pointerEvents = "none";
+
+    return cloned.outerHTML;
+  }
+
+  function renderSelectionChrome() {
+    const frame =
+      chrome.querySelector(
+        ".ui-dev-resize-frame"
+      );
+
+    if (
+      !frame ||
+      !state.open ||
+      !state.selected ||
+      !document.contains(
+        state.selected
+      ) ||
+      state.selecting ||
+      state.dragMode
+    ) {
+      chrome.classList.remove(
+        "is-visible"
+      );
+      return;
+    }
+
+    const rect =
+      state.selected
+        .getBoundingClientRect();
+
+    frame.style.left =
+      `${Math.round(rect.left)}px`;
+
+    frame.style.top =
+      `${Math.round(rect.top)}px`;
+
+    frame.style.width =
+      `${Math.round(rect.width)}px`;
+
+    frame.style.height =
+      `${Math.round(rect.height)}px`;
+
+    chrome.classList.add(
+      "is-visible"
+    );
+  }
+
+  function fileToDataUrl(file) {
+    return new Promise(
+      (resolve, reject) => {
+        const reader =
+          new FileReader();
+
+        reader.onload = () =>
+          resolve(
+            String(
+              reader.result || ""
+            )
+          );
+
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      }
+    );
+  }
+
+  async function optimizeImage(file) {
+    const raw =
+      await fileToDataUrl(
+        file
+      );
+
+    if (
+      file.type ===
+      "image/svg+xml"
+    ) {
+      return raw;
+    }
+
+    return new Promise(
+      resolve => {
+        const image =
+          new Image();
+
+        image.onload = () => {
+          const maxSide = 1600;
+          const scale =
+            Math.min(
+              1,
+              maxSide /
+              Math.max(
+                image.naturalWidth,
+                image.naturalHeight
+              )
+            );
+
+          const width =
+            Math.max(
+              1,
+              Math.round(
+                image.naturalWidth *
+                scale
+              )
+            );
+
+          const height =
+            Math.max(
+              1,
+              Math.round(
+                image.naturalHeight *
+                scale
+              )
+            );
+
+          const canvas =
+            document.createElement(
+              "canvas"
+            );
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const context =
+            canvas.getContext("2d");
+
+          if (!context) {
+            resolve(raw);
+            return;
+          }
+
+          context.drawImage(
+            image,
+            0,
+            0,
+            width,
+            height
+          );
+
+          resolve(
+            canvas.toDataURL(
+              "image/webp",
+              .9
+            )
+          );
+        };
+
+        image.onerror = () =>
+          resolve(raw);
+
+        image.src = raw;
+      }
+    );
+  }
+
   function assignIds() {
     [root, sheetRoot]
       .filter(Boolean)
       .forEach(container => {
         container
           .querySelectorAll(
-            "button,[data-bind],[data-layout-key],[data-ui-component],article,section,header,nav,.feature-card,.list-card"
+            "img,button,[data-bind],[data-layout-key],[data-ui-component],article,section,header,nav,.feature-card,.list-card,[data-dev-custom]"
           )
           .forEach(node => {
             selectorFor(node, root);
