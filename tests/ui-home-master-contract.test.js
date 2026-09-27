@@ -295,3 +295,34 @@ test(
     );
   }
 );
+
+
+test(
+  "editor preserves its scroll position when controls rerender the panel",
+  () => {
+    assert.match(
+      toolkit,
+      /panelScroll:\s*\{[\s\S]*?edit:\s*0[\s\S]*?audit:\s*0[\s\S]*?config:\s*0/
+    );
+
+    assert.match(
+      toolkit,
+      /function capturePanelScroll/
+    );
+
+    assert.match(
+      toolkit,
+      /function restorePanelScroll/
+    );
+
+    assert.match(
+      toolkit,
+      /data-dev-body-tab/
+    );
+
+    assert.match(
+      toolkit,
+      /panelBody\?\.addEventListener\([\s\S]*?"scroll"/
+    );
+  }
+);
