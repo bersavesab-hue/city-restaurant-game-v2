@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { renderHomePage } from "../client/mobile/HomePage.js";
 
 const mobileApp =
   fs.readFileSync(
@@ -58,11 +57,11 @@ const androidActivity =
   );
 
 test(
-  "store renders static artwork around live dashboard fields",
+  "store starts from a truly empty upload-first canvas",
   () => {
     assert.match(
       mobileApp,
-      /renderHomePage\(\s*buildHomeDashboardModel\(app\)/
+      /return renderHomePage\(\)/
     );
 
     assert.match(
@@ -77,24 +76,18 @@ test(
 
     assert.match(
       homePage,
-      /layered-v1/
+      /blank-canvas-v\d+/
     );
 
-    const view = renderHomePage({
-      restaurant: {status:"open",level:3,reviewScore:4.2,satisfaction:71},
-      time: {day:42,clock:"13:25"},
-      money: {balance:12345,todayRevenue:678,todayProfit:90},
-      operations: {employees:2},
-      progress: {title:"成长中",nextTitle:"新阶段",progress:.37},
-      district: {name:"测试商圈",trafficIndex:76,mainCustomer:"学生",deliveryDemand:44,competition:59},
-      opportunity: {title:"新的机会",detail:"测试建议",action:"前往员工",tags:["客流变化"]},
-      dialogue: [{speaker:"小张",role:"后厨",text:"正在备菜",time:"13:20"}],
-      schedule: [{time:"15:00",title:"库存复盘",status:"upcoming"}]
-    });
-    for (const value of ["第42天","13:25","¥ 12,345","¥ 678","4.2分","37%","新的机会","前往员工","小张","库存复盘"]) {
-      assert.ok(view.includes(value), value);
-    }
-    assert.doesNotMatch(view, /86,240|6,820|第28天|12:15/);
+    assert.doesNotMatch(
+      homePage,
+      /home-hud|home-kpi|home-opportunity|home-growth|home-dialogue|home-district|home-schedule|home-component-nav|restaurant-hero/
+    );
+
+    assert.doesNotMatch(
+      mobileApp,
+      /home-master|home-live-overlay|hotspot-/
+    );
   }
 );
 
@@ -139,7 +132,7 @@ test(
 );
 
 test(
-  "layered home retains the mobile UI editor launcher",
+  "blank canvas always exposes the mobile UI editor launcher",
   () => {
     assert.match(
       toolkit,
