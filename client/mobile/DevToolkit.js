@@ -450,6 +450,11 @@ export function createDevToolkit({
     dragPointer: null,
     resizePointer: null,
     snap: 4,
+    panelScroll: {
+      edit: 0,
+      audit: 0,
+      config: 0
+    },
     project: readProject(),
     uploadMode: "add",
     report: null,
@@ -2468,6 +2473,18 @@ export function createDevToolkit({
     `;
 
     bindPanelEvents();
+
+    const body =
+      host.querySelector(
+        ".ui-dev-body"
+      );
+
+    if (body) {
+      body.scrollTop =
+        state.panelScroll[
+          state.tab
+        ] || 0;
+    }
   }
 
   function findByDevId(id) {
@@ -2479,6 +2496,24 @@ export function createDevToolkit({
   }
 
   function bindPanelEvents() {
+    const body =
+      host.querySelector(
+        ".ui-dev-body"
+      );
+
+    body?.addEventListener(
+      "scroll",
+      () => {
+        state.panelScroll[
+          state.tab
+        ] =
+          body.scrollTop;
+      },
+      {
+        passive: true
+      }
+    );
+
     host.querySelector("[data-dev-open]")?.addEventListener(
       "click",
       togglePanel
@@ -2507,7 +2542,21 @@ export function createDevToolkit({
 
     host.querySelectorAll("[data-dev-tab]").forEach(button => {
       button.addEventListener("click", () => {
-        state.tab = button.dataset.devTab;
+        const currentBody =
+          host.querySelector(
+            ".ui-dev-body"
+          );
+
+        if (currentBody) {
+          state.panelScroll[
+            state.tab
+          ] =
+            currentBody.scrollTop;
+        }
+
+        state.tab =
+          button.dataset.devTab;
+
         renderPanel();
       });
     });
