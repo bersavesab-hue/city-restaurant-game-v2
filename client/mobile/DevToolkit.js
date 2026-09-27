@@ -1712,6 +1712,23 @@ export function createDevToolkit({
           rect.height -
           item.height
         );
+    } else if (
+      mode === "center"
+    ) {
+      item.x =
+        Math.round(
+          (
+            rect.width -
+            item.width
+          ) / 2
+        );
+      item.y =
+        Math.round(
+          (
+            rect.height -
+            item.height
+          ) / 2
+        );
     } else {
       return;
     }
@@ -1893,6 +1910,7 @@ export function createDevToolkit({
       item.lockAspect &&
       item.aspectRatio
     ) {
+      item.objectFit = "contain";
       item.height =
         Math.max(
           24,
@@ -1901,31 +1919,20 @@ export function createDevToolkit({
             item.aspectRatio
           )
         );
-
-      state.selected.style.height =
-        `${item.height}px`;
-
-      const info =
-        selectedInfo();
-
-      if (info) {
-        const styles =
-          ensureSelectedOverride(
-            info
-          );
-
-        styles.height =
-          `${item.height}px`;
-
-        writeOverrides(
-          state.overrides
-        );
-      }
+    } else {
+      item.objectFit = "fill";
     }
 
     persistProject();
-    renderSelectionChrome();
-    renderPanel();
+    renderProjectComponents();
+    assignIds();
+
+    const node =
+      root.querySelector(
+        `[data-dev-custom="${item.id}"]`
+      );
+
+    openEditorFor(node);
   }
 
   function fillCanvasWithSelectedImage() {
@@ -2478,7 +2485,8 @@ export function createDevToolkit({
   }
 
   function editorMarkup() {
-    const info = selectedInfo();
+    const info =
+      selectedInfo();
 
     if (!info) {
       return `
@@ -2487,6 +2495,9 @@ export function createDevToolkit({
         </div>
       `;
     }
+
+    const isCustom =
+      Boolean(info.customId);
 
     return `
       <div class="dev-selected-card">
@@ -2497,18 +2508,118 @@ export function createDevToolkit({
         <span>${info.rect.width}×${info.rect.height}</span>
       </div>
 
+      ${
+        isCustom
+          ? `
+            <section class="dev-quick-geometry">
+              <strong>快速对齐</strong>
+              <div class="dev-align-actions">
+                <button type="button" data-dev-align="left">左</button>
+                <button type="button" data-dev-align="center-x">水平居中</button>
+                <button type="button" data-dev-align="right">右</button>
+                <button type="button" data-dev-align="top">顶</button>
+                <button type="button" data-dev-align="center-y">垂直居中</button>
+                <button type="button" data-dev-align="bottom">底</button>
+              </div>
+
+              <strong>尺寸快捷</strong>
+              <div class="dev-size-actions">
+                <button type="button" data-dev-size="width">宽度铺满</button>
+                <button type="button" data-dev-size="height">高度铺满</button>
+                <button type="button" data-dev-size="canvas">整个画布</button>
+                ${
+                  info.imageSettings
+                    ? '<button type="button" data-dev-natural-ratio>恢复原比例</button>'
+                    : ""
+                }
+              </div>
+            </section>
+          `
+          : ""
+      }
+
+      ${
+        info.imageSettings
+          ? `
+            <section class="dev-image-settings is-prominent">
+              <div class="dev-image-settings-head">
+                <div>
+                  <strong>图片尺寸模式</strong>
+                  <small>
+                    原图
+                    ${info.imageSettings.naturalWidth || "--"}
+                    ×
+                    ${info.imageSettings.naturalHeight || "--"}
+                  </small>
+                </div>
+
+                <button
+                  type="button"
+                  class="${info.imageSettings.lockAspect ? "is-active" : ""}"
+                  data-dev-aspect-lock
+                >
+                  ${info.imageSettings.lockAspect ? "等比缩放" : "自由宽高"}
+                </button>
+              </div>
+
+              <div class="dev-fit-actions">
+                <button
+                  type="button"
+                  class="${info.imageSettings.objectFit === "contain" ? "is-active" : ""}"
+                  data-dev-fit="contain"
+                >原比例适应</button>
+                <button
+                  type="button"
+                  class="${info.imageSettings.objectFit === "cover" ? "is-active" : ""}"
+                  data-dev-fit="cover"
+                >裁剪铺满</button>
+                <button
+                  type="button"
+                  class="${info.imageSettings.objectFit === "fill" ? "is-active" : ""}"
+                  data-dev-fit="fill"
+                >自由拉伸</button>
+              </div>
+
+              <button
+                class="dev-fill-canvas"
+                type="button"
+                data-dev-fill-canvas
+              >一键铺满整个画布</button>
+            </section>
+          `
+          : ""
+      }
+
       <div class="dev-editor-grid">
-        ${stepper("字号", "fontSize", info.values.fontSize, 1)}
-        ${stepper("内边距", "padding", info.values.padding, 2)}
+        ${
+          info.imageSettings
+            ? ""
+            : stepper(
+                "字号",
+                "fontSize",
+                info.values.fontSize,
+                1
+              )
+        }
+        ${
+          info.imageSettings
+            ? ""
+            : stepper(
+                "内边距",
+                "padding",
+                info.values.padding,
+                2
+              )
+        }
         ${stepper("宽度", "width", info.values.width, 4)}
         ${stepper("高度", "height", info.values.height, 4)}
-        ${stepper("圆角", "borderRadius", info.values.borderRadius, 2)}
         ${stepper("左右", "left", info.values.left, 4)}
         ${stepper("上下", "top", info.values.top, 4)}
+        ${stepper("圆角", "borderRadius", info.values.borderRadius, 2)}
       </div>
 
       <p class="dev-resize-help">
-        图片上传时先按原始比例显示，但宽度和高度默认独立调整。需要保持比例时再打开“宽高联动”。
+        图片如果不想让宽高联动，切到“自由宽高”；此时图片会直接填满外框，不再出现上下空白。
       </p>
 
       <div class="dev-layout-actions">
@@ -2539,85 +2650,6 @@ export function createDevToolkit({
         }
       </div>
 
-      ${
-        info.imageSettings
-          ? `
-            <section class="dev-image-settings">
-              <div class="dev-image-settings-head">
-                <div>
-                  <strong>图片显示</strong>
-                  <small>
-                    原图 ${info.imageSettings.naturalWidth || "--"}×${info.imageSettings.naturalHeight || "--"}
-                  </small>
-                </div>
-
-                <button
-                  type="button"
-                  class="${info.imageSettings.lockAspect ? "is-active" : ""}"
-                  data-dev-aspect-lock
-                >
-                  ${info.imageSettings.lockAspect ? "宽高联动：开" : "宽高联动：关"}
-                </button>
-              </div>
-
-              <div class="dev-fit-actions">
-                <button
-                  type="button"
-                  class="${info.imageSettings.objectFit === "contain" ? "is-active" : ""}"
-                  data-dev-fit="contain"
-                >适应</button>
-                <button
-                  type="button"
-                  class="${info.imageSettings.objectFit === "cover" ? "is-active" : ""}"
-                  data-dev-fit="cover"
-                >铺满/裁剪</button>
-                <button
-                  type="button"
-                  class="${info.imageSettings.objectFit === "fill" ? "is-active" : ""}"
-                  data-dev-fit="fill"
-                >拉伸</button>
-              </div>
-
-              <button
-                class="dev-fill-canvas"
-                type="button"
-                data-dev-fill-canvas
-              >一键铺满全屏背景</button>
-            </section>
-          `
-          : ""
-      }
-
-      ${
-        info.customId
-          ? `
-            <section class="dev-align-settings">
-              <strong>对齐画布</strong>
-              <div class="dev-align-actions">
-                <button type="button" data-dev-align="left">左对齐</button>
-                <button type="button" data-dev-align="center-x">水平居中</button>
-                <button type="button" data-dev-align="right">右对齐</button>
-                <button type="button" data-dev-align="top">顶部</button>
-                <button type="button" data-dev-align="center-y">垂直居中</button>
-                <button type="button" data-dev-align="bottom">底部</button>
-              </div>
-
-              <strong>尺寸快捷</strong>
-              <div class="dev-size-actions">
-                <button type="button" data-dev-size="width">宽度铺满</button>
-                <button type="button" data-dev-size="height">高度铺满</button>
-                <button type="button" data-dev-size="canvas">整个画布</button>
-                ${
-                  info.imageSettings
-                    ? '<button type="button" data-dev-natural-ratio>恢复原比例</button>'
-                    : ""
-                }
-              </div>
-            </section>
-          `
-          : ""
-      }
-
       <div class="dev-layer-actions">
         <span>图层</span>
         <button type="button" data-dev-layer="back">置底</button>
@@ -2635,6 +2667,7 @@ export function createDevToolkit({
       </div>
     `;
   }
+
   function auditSummaryMarkup() {
     const report = state.report;
 
