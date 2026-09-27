@@ -60,6 +60,22 @@ function render() {
 window.addEventListener(
   "ui-screen-resize",
   () => {
+    const active =
+      document.activeElement;
+
+    const editingDevField =
+      active instanceof
+        HTMLInputElement &&
+      Boolean(
+        active.closest(
+          "#ui-dev-root"
+        )
+      );
+
+    if (editingDevField) {
+      return;
+    }
+
     devToolkit.afterRender();
   }
 );

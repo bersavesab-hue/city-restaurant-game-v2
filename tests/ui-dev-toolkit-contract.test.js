@@ -92,3 +92,19 @@ test(
     assert.match(toolkit, /图层 Z=/);
   }
 );
+
+
+test(
+  "precise XYWHZ inputs stay mounted while the mobile keyboard is open",
+  () => {
+    assert.doesNotMatch(
+      toolkit,
+      /setExactValue\(property, rawValue\)[\s\S]*?renderSelectionChrome\(\);\s*renderPanel\(\);/
+    );
+
+    assert.match(
+      toolkit,
+      /\[data-dev-exact\][\s\S]*?pointerdown[\s\S]*?stopPropagation/
+    );
+  }
+);

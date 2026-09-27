@@ -1305,7 +1305,6 @@ export function createDevToolkit({
     writeOverrides(state.overrides);
     persistProject();
     renderSelectionChrome();
-    renderPanel();
   }
 
   function adjust(property, delta) {
@@ -3401,14 +3400,35 @@ export function createDevToolkit({
           input.value
         );
 
-      input.addEventListener("change", apply);
-
-      input.addEventListener("keydown", event => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          apply();
+      input.addEventListener(
+        "pointerdown",
+        event => {
+          event.stopPropagation();
         }
-      });
+      );
+
+      input.addEventListener(
+        "click",
+        event => {
+          event.stopPropagation();
+        }
+      );
+
+      input.addEventListener(
+        "change",
+        apply
+      );
+
+      input.addEventListener(
+        "keydown",
+        event => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            apply();
+            input.blur();
+          }
+        }
+      );
     });
     host.querySelector("[data-dev-reset-selected]")?.addEventListener(
       "click",
