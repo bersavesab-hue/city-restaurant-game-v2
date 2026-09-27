@@ -1163,11 +1163,41 @@ export function createDevToolkit({
         if (property === "width") {
           item.width =
             Math.round(next);
+
+          if (
+            item.type === "image" &&
+            item.lockAspect !== false &&
+            item.aspectRatio
+          ) {
+            item.height =
+              Math.max(
+                24,
+                Math.round(
+                  item.width /
+                  item.aspectRatio
+                )
+              );
+          }
         } else if (
           property === "height"
         ) {
           item.height =
             Math.round(next);
+
+          if (
+            item.type === "image" &&
+            item.lockAspect !== false &&
+            item.aspectRatio
+          ) {
+            item.width =
+              Math.max(
+                24,
+                Math.round(
+                  item.height *
+                  item.aspectRatio
+                )
+              );
+          }
         } else if (
           property === "left"
         ) {
@@ -1181,11 +1211,36 @@ export function createDevToolkit({
         }
 
         persistProject();
+
+        if (
+          property === "width" ||
+          property === "height"
+        ) {
+          state.selected.style.width =
+            `${item.width}px`;
+          state.selected.style.height =
+            `${item.height}px`;
+
+          styles.width =
+            `${item.width}px`;
+          styles.height =
+            `${item.height}px`;
+        }
       }
     }
 
-    styles[property] = value;
-    state.selected.style[property] = value;
+    if (
+      !(
+        customId &&
+        (
+          property === "width" ||
+          property === "height"
+        )
+      )
+    ) {
+      styles[property] = value;
+      state.selected.style[property] = value;
+    }
 
     writeOverrides(
       state.overrides
@@ -2601,7 +2656,13 @@ export function createDevToolkit({
       id:
         info.id,
       customId:
-        info.customId
+        info.customId,
+      aspectRatio:
+        info.imageSettings?.aspectRatio || null,
+      lockAspect:
+        Boolean(
+          info.imageSettings?.lockAspect
+        )
     };
 
     handle.setPointerCapture?.(
@@ -2657,6 +2718,46 @@ export function createDevToolkit({
       resize.height +
       (north ? -dy : dy);
 
+    if (
+      resize.lockAspect &&
+      resize.aspectRatio
+    ) {
+      const widthChange =
+        Math.abs(
+          width -
+          resize.width
+        );
+
+      const heightChange =
+        Math.abs(
+          height -
+          resize.height
+        );
+
+      if (
+        widthChange >=
+        heightChange
+      ) {
+        width =
+          Math.max(
+            24,
+            width
+          );
+        height =
+          width /
+          resize.aspectRatio;
+      } else {
+        height =
+          Math.max(
+            24,
+            height
+          );
+        width =
+          height *
+          resize.aspectRatio;
+      }
+    }
+
     width =
       Math.max(
         24,
@@ -2672,6 +2773,20 @@ export function createDevToolkit({
           height / snap
         ) * snap
       );
+
+    if (
+      resize.lockAspect &&
+      resize.aspectRatio
+    ) {
+      height =
+        Math.max(
+          24,
+          Math.round(
+            width /
+            resize.aspectRatio
+          )
+        );
+    }
 
     let left =
       resize.left;
