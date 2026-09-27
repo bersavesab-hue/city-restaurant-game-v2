@@ -499,6 +499,7 @@ export function createDevToolkit({
     dragPointer: null,
     resizePointer: null,
     snap: 4,
+    guides: true,
     panelScroll: {
       edit: 0,
       audit: 0,
@@ -521,6 +522,15 @@ export function createDevToolkit({
   const chrome = document.createElement("div");
   chrome.id = "ui-dev-chrome";
   chrome.innerHTML = `
+    <div class="ui-dev-guides" data-dev-guides aria-hidden="true">
+      <div class="ui-dev-guide-screen" data-dev-guide-screen></div>
+      <div class="ui-dev-guide-reference" data-dev-guide-reference></div>
+      <div class="ui-dev-guide-line is-center-v" data-dev-guide-center-v></div>
+      <div class="ui-dev-guide-line is-center-h" data-dev-guide-center-h></div>
+      <div class="ui-dev-guide-line is-safe-top" data-dev-guide-safe-top></div>
+      <div class="ui-dev-guide-line is-safe-bottom" data-dev-guide-safe-bottom></div>
+    </div>
+
     <div class="ui-dev-resize-frame">
       <button type="button" data-dev-resize="nw" aria-label="左上缩放"></button>
       <button type="button" data-dev-resize="ne" aria-label="右上缩放"></button>
@@ -703,6 +713,26 @@ export function createDevToolkit({
       wrapper.style.opacity =
         String(item.opacity ?? 1);
 
+      wrapper.dataset.devLocked =
+        item.locked === true
+          ? "true"
+          : "false";
+
+      wrapper.dataset.devHidden =
+        item.hidden === true
+          ? "true"
+          : "false";
+
+      wrapper.style.display =
+        item.hidden === true
+          ? "none"
+          : "block";
+
+      wrapper.style.pointerEvents =
+        item.locked === true
+          ? "none"
+          : "auto";
+
       if (item.type === "image") {
         const image =
           document.createElement("img");
@@ -884,11 +914,150 @@ export function createDevToolkit({
     return cloned.outerHTML;
   }
 
+  function renderGuides() {
+    const guides =
+      chrome.querySelector(
+        "[data-dev-guides]"
+      );
+
+    const parent =
+      projectPageRoot();
+
+    if (
+      !guides ||
+      !parent ||
+      !state.open ||
+      !state.guides
+    ) {
+      chrome.classList.remove(
+        "guides-visible"
+      );
+      return;
+    }
+
+    const rect =
+      parent.getBoundingClientRect();
+
+    const scale =
+      uiScale();
+
+    const metrics =
+      window.__CITY_SCREEN__?.getMetrics?.() || {};
+
+    const referenceLeft =
+      Number(metrics.referenceLeft || 0);
+
+    const referenceTop =
+      Number(metrics.referenceTop || 0);
+
+    const safeTop =
+      Number(metrics.safeTop || 0);
+
+    const safeBottom =
+      Number(metrics.safeBottom || 0);
+
+    const screen =
+      guides.querySelector(
+        "[data-dev-guide-screen]"
+      );
+
+    const reference =
+      guides.querySelector(
+        "[data-dev-guide-reference]"
+      );
+
+    const centerV =
+      guides.querySelector(
+        "[data-dev-guide-center-v]"
+      );
+
+    const centerH =
+      guides.querySelector(
+        "[data-dev-guide-center-h]"
+      );
+
+    const topLine =
+      guides.querySelector(
+        "[data-dev-guide-safe-top]"
+      );
+
+    const bottomLine =
+      guides.querySelector(
+        "[data-dev-guide-safe-bottom]"
+      );
+
+    if (screen) {
+      screen.style.left =
+        `${Math.round(rect.left)}px`;
+      screen.style.top =
+        `${Math.round(rect.top)}px`;
+      screen.style.width =
+        `${Math.round(rect.width)}px`;
+      screen.style.height =
+        `${Math.round(rect.height)}px`;
+    }
+
+    if (reference) {
+      reference.style.left =
+        `${Math.round(rect.left + referenceLeft * scale)}px`;
+      reference.style.top =
+        `${Math.round(rect.top + referenceTop * scale)}px`;
+      reference.style.width =
+        `${Math.round(540 * scale)}px`;
+      reference.style.height =
+        `${Math.round(960 * scale)}px`;
+    }
+
+    if (centerV) {
+      centerV.style.left =
+        `${Math.round(rect.left + rect.width / 2)}px`;
+      centerV.style.top =
+        `${Math.round(rect.top)}px`;
+      centerV.style.height =
+        `${Math.round(rect.height)}px`;
+    }
+
+    if (centerH) {
+      centerH.style.left =
+        `${Math.round(rect.left)}px`;
+      centerH.style.top =
+        `${Math.round(rect.top + rect.height / 2)}px`;
+      centerH.style.width =
+        `${Math.round(rect.width)}px`;
+    }
+
+    if (topLine) {
+      topLine.style.left =
+        `${Math.round(rect.left)}px`;
+      topLine.style.top =
+        `${Math.round(rect.top + safeTop * scale)}px`;
+      topLine.style.width =
+        `${Math.round(rect.width)}px`;
+    }
+
+    if (bottomLine) {
+      bottomLine.style.left =
+        `${Math.round(rect.left)}px`;
+      bottomLine.style.top =
+        `${Math.round(rect.bottom - safeBottom * scale)}px`;
+      bottomLine.style.width =
+        `${Math.round(rect.width)}px`;
+    }
+
+    chrome.classList.add(
+      "guides-visible"
+    );
+  }
+
   function renderSelectionChrome() {
+    renderGuides();
     const frame =
       chrome.querySelector(
         ".ui-dev-resize-frame"
       );
+
+    const info =
+      selectedInfo();
 
     if (
       !frame ||
@@ -898,7 +1067,9 @@ export function createDevToolkit({
         state.selected
       ) ||
       state.selecting ||
-      state.dragMode
+      state.dragMode ||
+      info?.locked ||
+      info?.hidden
     ) {
       chrome.classList.remove(
         "is-visible"
@@ -1100,11 +1271,25 @@ export function createDevToolkit({
       label:
         custom?.name ||
         elementLabel(state.selected),
-      rect: rectOf(state.selected),
+      rect:
+        custom
+          ? {
+              x: Math.round(Number(custom.x || 0)),
+              y: Math.round(Number(custom.y || 0)),
+              width: Math.round(Number(custom.width || 0)),
+              height: Math.round(Number(custom.height || 0))
+            }
+          : rectOf(state.selected),
       action: actionLabel(state.selected),
       bound: Boolean(state.selected.dataset.devBound),
       layoutKey: state.selected.dataset.layoutKey || "",
       customId: state.selected.dataset.devCustom || "",
+      locked:
+        custom?.locked === true,
+      hidden:
+        custom?.hidden === true,
+      role:
+        custom?.role || "",
       isImage:
         state.selected instanceof HTMLImageElement ||
         Boolean(
@@ -1143,15 +1328,40 @@ export function createDevToolkit({
       values: {
         fontSize: Math.round(parseFloat(style.fontSize) || 0),
         padding: Math.round(parseFloat(style.paddingTop) || 0),
-        width: Math.round(state.selected.getBoundingClientRect().width / uiScale()),
-        height: Math.round(state.selected.getBoundingClientRect().height / uiScale()),
+        width:
+          custom
+            ? Math.round(Number(custom.width || 0))
+            : Math.round(state.selected.getBoundingClientRect().width / uiScale()),
+        height:
+          custom
+            ? Math.round(Number(custom.height || 0))
+            : Math.round(state.selected.getBoundingClientRect().height / uiScale()),
         borderRadius: Math.round(parseFloat(style.borderRadius) || 0),
-        left: style.left === "auto" ? 0 : Math.round(parseFloat(style.left) || 0),
-        top: style.top === "auto" ? 0 : Math.round(parseFloat(style.top) || 0),
+        left:
+          custom
+            ? Math.round(Number(custom.x || 0))
+            : (
+                style.left === "auto"
+                  ? 0
+                  : Math.round(parseFloat(style.left) || 0)
+              ),
+        top:
+          custom
+            ? Math.round(Number(custom.y || 0))
+            : (
+                style.top === "auto"
+                  ? 0
+                  : Math.round(parseFloat(style.top) || 0)
+              ),
         opacity: Math.round((parseFloat(style.opacity) || 1) * 100),
-        zIndex: Number.isFinite(parseInt(style.zIndex, 10))
-          ? parseInt(style.zIndex, 10)
-          : 0
+        zIndex:
+          custom
+            ? Math.round(Number(custom.zIndex ?? 20))
+            : (
+                Number.isFinite(parseInt(style.zIndex, 10))
+                  ? parseInt(style.zIndex, 10)
+                  : 0
+              )
       }
     };
   }
@@ -1261,6 +1471,14 @@ export function createDevToolkit({
 
     if (!item) return;
 
+    if (
+      item.locked === true &&
+      ["x", "y", "width", "height"].includes(property)
+    ) {
+      showToast("组件已锁定");
+      return;
+    }
+
     const number = Number(rawValue);
 
     if (!Number.isFinite(number)) {
@@ -1310,6 +1528,14 @@ export function createDevToolkit({
   function adjust(property, delta) {
     const info = selectedInfo();
     if (!info) return;
+
+    if (
+      info.locked &&
+      ["width", "height", "left", "top"].includes(property)
+    ) {
+      showToast("组件已锁定");
+      return;
+    }
 
     pushHistory();
 
@@ -1631,6 +1857,11 @@ export function createDevToolkit({
 
     if (!info) return;
 
+    if (info.locked) {
+      showToast("组件已锁定");
+      return;
+    }
+
     pushHistory();
 
     const rect =
@@ -1815,6 +2046,11 @@ export function createDevToolkit({
     const info =
       selectedInfo();
 
+    if (info?.locked) {
+      showToast("组件已锁定");
+      return;
+    }
+
     if (!info?.customId) {
       showToast(
         "请先选中上传组件"
@@ -1911,6 +2147,11 @@ export function createDevToolkit({
   function sizeSelected(mode) {
     const info =
       selectedInfo();
+
+    if (info?.locked) {
+      showToast("组件已锁定");
+      return;
+    }
 
     if (!info?.customId) {
       showToast(
@@ -2714,6 +2955,192 @@ export function createDevToolkit({
     }, 1300);
   }
 
+  function activeProjectLayers() {
+    return state.project.components
+      .filter(
+        item =>
+          item.page ===
+          getActivePage()
+      )
+      .slice()
+      .sort(
+        (a, b) =>
+          Number(b.zIndex ?? 20) -
+          Number(a.zIndex ?? 20)
+      );
+  }
+
+  function selectedCustomId() {
+    return state.selected?.dataset?.devCustom || "";
+  }
+
+  function selectProjectLayer(id) {
+    const node =
+      root.querySelector(
+        `[data-dev-custom="${id}"]`
+      );
+
+    if (!node) return;
+
+    openEditorFor(node);
+  }
+
+  function refreshProjectSelection(id) {
+    renderProjectComponents();
+    assignIds();
+
+    const node =
+      root.querySelector(
+        `[data-dev-custom="${id}"]`
+      );
+
+    state.selected = node || null;
+
+    if (state.selected) {
+      state.selected.classList.add(
+        "dev-selected-outline"
+      );
+    }
+
+    renderSelectionChrome();
+    renderPanel();
+  }
+
+  function renameSelected(rawName) {
+    const info =
+      selectedInfo();
+
+    if (!info?.customId) return;
+
+    const item =
+      customComponentById(
+        info.customId
+      );
+
+    if (!item) return;
+
+    const name =
+      String(rawName || "")
+        .trim()
+        .slice(0, 64);
+
+    if (!name || name === item.name) {
+      return;
+    }
+
+    pushHistory();
+    item.name = name;
+    persistProject();
+    renderPanel();
+  }
+
+  function toggleComponentLock(id) {
+    const item =
+      customComponentById(id);
+
+    if (!item) return;
+
+    pushHistory();
+    item.locked =
+      item.locked !== true;
+    persistProject();
+    refreshProjectSelection(id);
+
+    showToast(
+      item.locked
+        ? "组件已锁定"
+        : "组件已解锁"
+    );
+  }
+
+  function toggleComponentVisibility(id) {
+    const item =
+      customComponentById(id);
+
+    if (!item) return;
+
+    pushHistory();
+    item.hidden =
+      item.hidden !== true;
+    persistProject();
+    refreshProjectSelection(id);
+
+    showToast(
+      item.hidden
+        ? "组件已隐藏，可从图层列表恢复"
+        : "组件已显示"
+    );
+  }
+
+  function toggleGuides() {
+    state.guides =
+      !state.guides;
+    renderSelectionChrome();
+    renderPanel();
+  }
+
+  function layerListMarkup() {
+    const layers =
+      activeProjectLayers();
+
+    if (!layers.length) {
+      return `
+        <section class="dev-layer-panel">
+          <div class="dev-layer-panel-head">
+            <strong>图层</strong>
+            <button type="button" data-dev-guides>
+              参考线：${state.guides ? "开" : "关"}
+            </button>
+          </div>
+          <div class="dev-layer-empty">还没有上传组件</div>
+        </section>
+      `;
+    }
+
+    const selectedId =
+      selectedCustomId();
+
+    return `
+      <section class="dev-layer-panel">
+        <div class="dev-layer-panel-head">
+          <strong>图层 · ${layers.length}</strong>
+          <button type="button" data-dev-guides>
+            参考线：${state.guides ? "开" : "关"}
+          </button>
+        </div>
+
+        <div class="dev-layer-list">
+          ${layers.map(item => `
+            <div class="dev-layer-row ${selectedId === item.id ? "is-selected" : ""} ${item.hidden ? "is-hidden" : ""}">
+              <button
+                class="dev-layer-select"
+                type="button"
+                data-dev-layer-select="${item.id}"
+              >
+                <span>Z${Number(item.zIndex ?? 20)}</span>
+                <strong>${escapeHtml(item.name || item.id)}</strong>
+              </button>
+
+              <button
+                class="dev-layer-mini ${item.hidden ? "is-active" : ""}"
+                type="button"
+                data-dev-layer-visible="${item.id}"
+                aria-label="${item.hidden ? "显示" : "隐藏"}"
+              >${item.hidden ? "显" : "隐"}</button>
+
+              <button
+                class="dev-layer-mini ${item.locked ? "is-active" : ""}"
+                type="button"
+                data-dev-layer-lock="${item.id}"
+                aria-label="${item.locked ? "解锁" : "锁定"}"
+              >${item.locked ? "锁" : "开"}</button>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
   function openEditorFor(node) {
     if (!node) return;
 
@@ -2752,6 +3179,11 @@ export function createDevToolkit({
       )
     ) {
       showToast("请先选择组件");
+      return;
+    }
+
+    if (info.locked) {
+      showToast("组件已锁定");
       return;
     }
 
@@ -2808,9 +3240,12 @@ export function createDevToolkit({
 
   function editorMarkup() {
     const info = selectedInfo();
+    const layers =
+      layerListMarkup();
 
     if (!info) {
       return `
+        ${layers}
         <div class="dev-empty">
           第一步先放主页背景。点“上传主页背景”选择图片，系统会自动置底、铺满并按屏幕比例裁剪；其他素材再用“＋ 上传组件”。
         </div>
@@ -2818,6 +3253,8 @@ export function createDevToolkit({
     }
 
     return `
+      ${layers}
+
       <div class="dev-selected-card">
         <div>
           <small>当前选中</small>
@@ -2825,6 +3262,38 @@ export function createDevToolkit({
         </div>
         <span>${info.rect.width}×${info.rect.height}</span>
       </div>
+
+      ${
+        info.customId
+          ? `
+            <section class="dev-component-settings">
+              <label class="dev-name-field">
+                <span>组件名称</span>
+                <input
+                  type="text"
+                  maxlength="64"
+                  value="${escapeHtml(info.label)}"
+                  data-dev-name-input
+                >
+              </label>
+
+              <div class="dev-component-actions">
+                <button
+                  type="button"
+                  class="${info.locked ? "is-active" : ""}"
+                  data-dev-toggle-lock="${info.customId}"
+                >${info.locked ? "已锁定" : "锁定"}</button>
+
+                <button
+                  type="button"
+                  class="${info.hidden ? "is-active" : ""}"
+                  data-dev-toggle-visible="${info.customId}"
+                >${info.hidden ? "已隐藏" : "隐藏"}</button>
+              </div>
+            </section>
+          `
+          : ""
+      }
 
       ${
         info.imageSettings
@@ -2921,10 +3390,10 @@ export function createDevToolkit({
               </div>
 
               <div class="dev-precise-grid">
-                <label><span>X</span><input type="number" inputmode="numeric" value="${info.values.left}" data-dev-exact="x"></label>
-                <label><span>Y</span><input type="number" inputmode="numeric" value="${info.values.top}" data-dev-exact="y"></label>
-                <label><span>W</span><input type="number" inputmode="numeric" min="24" value="${info.values.width}" data-dev-exact="width"></label>
-                <label><span>H</span><input type="number" inputmode="numeric" min="24" value="${info.values.height}" data-dev-exact="height"></label>
+                <label><span>X</span><input type="number" inputmode="numeric" value="${info.values.left}" data-dev-exact="x" ${info.locked ? "disabled" : ""}></label>
+                <label><span>Y</span><input type="number" inputmode="numeric" value="${info.values.top}" data-dev-exact="y" ${info.locked ? "disabled" : ""}></label>
+                <label><span>W</span><input type="number" inputmode="numeric" min="24" value="${info.values.width}" data-dev-exact="width" ${info.locked ? "disabled" : ""}></label>
+                <label><span>H</span><input type="number" inputmode="numeric" min="24" value="${info.values.height}" data-dev-exact="height" ${info.locked ? "disabled" : ""}></label>
                 <label><span>Z</span><input type="number" inputmode="numeric" value="${info.values.zIndex}" data-dev-exact="zIndex"></label>
               </div>
             </section>
@@ -2958,8 +3427,8 @@ export function createDevToolkit({
         ${
           info.layoutKey || info.customId
             ? `
-              <button class="primary" type="button" data-dev-drag>
-                拖动当前组件
+              <button class="primary" type="button" data-dev-drag ${info.locked ? "disabled" : ""}>
+                ${info.locked ? "组件已锁定" : "拖动当前组件"}
               </button>
             `
             : ""
@@ -3205,6 +3674,7 @@ export function createDevToolkit({
           <button type="button" data-dev-select>自由点选</button>
           <button class="primary" type="button" data-dev-upload-background>上传主页背景</button>
           <button type="button" data-dev-upload>＋ 上传组件</button>
+          <button type="button" data-dev-guides>参考线：${state.guides ? "开" : "关"}</button>
           <button type="button" data-dev-audit>立即体检</button>
           <button type="button" data-dev-copy>复制配置</button>
         </div>
@@ -3383,6 +3853,72 @@ export function createDevToolkit({
       button.addEventListener("click", exportJson);
     });
 
+
+    host.querySelectorAll("[data-dev-layer-select]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          selectProjectLayer(
+            button.dataset.devLayerSelect
+          )
+      );
+    });
+
+    host.querySelectorAll("[data-dev-layer-visible]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          toggleComponentVisibility(
+            button.dataset.devLayerVisible
+          )
+      );
+    });
+
+    host.querySelectorAll("[data-dev-layer-lock]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          toggleComponentLock(
+            button.dataset.devLayerLock
+          )
+      );
+    });
+
+    host.querySelectorAll("[data-dev-toggle-lock]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          toggleComponentLock(
+            button.dataset.devToggleLock
+          )
+      );
+    });
+
+    host.querySelectorAll("[data-dev-toggle-visible]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          toggleComponentVisibility(
+            button.dataset.devToggleVisible
+          )
+      );
+    });
+
+    host.querySelectorAll("[data-dev-guides]").forEach(button => {
+      button.addEventListener(
+        "click",
+        toggleGuides
+      );
+    });
+
+    host.querySelector("[data-dev-name-input]")?.addEventListener(
+      "change",
+      event => {
+        renameSelected(
+          event.target.value
+        );
+      }
+    );
     host.querySelectorAll("[data-dev-adjust]").forEach(button => {
       button.addEventListener("click", () => {
         const [property, rawDelta] =
@@ -3979,7 +4515,8 @@ export function createDevToolkit({
       (
         !info.layoutKey &&
         !info.customId
-      )
+      ) ||
+      info.locked
     ) {
       return;
     }

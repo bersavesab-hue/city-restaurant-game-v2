@@ -97,14 +97,67 @@ test(
 test(
   "precise XYWHZ inputs stay mounted while the mobile keyboard is open",
   () => {
+    const exactFunction =
+      toolkit.match(
+        /function setExactValue\(property, rawValue\) \{[\s\S]*?\n  \}\n\n  function adjust/
+      )?.[0] || "";
+
+    assert.ok(
+      exactFunction
+    );
+
     assert.doesNotMatch(
-      toolkit,
-      /setExactValue\(property, rawValue\)[\s\S]*?renderSelectionChrome\(\);\s*renderPanel\(\);/
+      exactFunction,
+      /renderPanel\(\)/
     );
 
     assert.match(
       toolkit,
       /\[data-dev-exact\][\s\S]*?pointerdown[\s\S]*?stopPropagation/
+    );
+  }
+);
+
+
+test(
+  "DEV editor has layer list rename lock hide and guide controls",
+  () => {
+    for (
+      const marker
+      of [
+        "data-dev-layer-select",
+        "data-dev-layer-visible",
+        "data-dev-layer-lock",
+        "data-dev-name-input",
+        "data-dev-toggle-lock",
+        "data-dev-toggle-visible",
+        "data-dev-guides"
+      ]
+    ) {
+      assert.ok(
+        toolkit.includes(marker),
+        marker
+      );
+    }
+
+    assert.match(
+      toolkit,
+      /function layerListMarkup\(\)/
+    );
+
+    assert.match(
+      toolkit,
+      /function toggleComponentLock\(id\)/
+    );
+
+    assert.match(
+      toolkit,
+      /function toggleComponentVisibility\(id\)/
+    );
+
+    assert.match(
+      toolkit,
+      /function renderGuides\(\)/
     );
   }
 );
