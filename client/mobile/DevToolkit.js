@@ -2188,6 +2188,55 @@ export function createDevToolkit({
         }
       </div>
 
+      ${
+        info.imageSettings
+          ? `
+            <section class="dev-image-settings">
+              <div class="dev-image-settings-head">
+                <div>
+                  <strong>图片显示</strong>
+                  <small>
+                    原图 ${info.imageSettings.naturalWidth || "--"}×${info.imageSettings.naturalHeight || "--"}
+                  </small>
+                </div>
+
+                <button
+                  type="button"
+                  class="${info.imageSettings.lockAspect ? "is-active" : ""}"
+                  data-dev-aspect-lock
+                >
+                  ${info.imageSettings.lockAspect ? "🔒 比例锁定" : "🔓 自由缩放"}
+                </button>
+              </div>
+
+              <div class="dev-fit-actions">
+                <button
+                  type="button"
+                  class="${info.imageSettings.objectFit === "contain" ? "is-active" : ""}"
+                  data-dev-fit="contain"
+                >适应</button>
+                <button
+                  type="button"
+                  class="${info.imageSettings.objectFit === "cover" ? "is-active" : ""}"
+                  data-dev-fit="cover"
+                >铺满/裁剪</button>
+                <button
+                  type="button"
+                  class="${info.imageSettings.objectFit === "fill" ? "is-active" : ""}"
+                  data-dev-fit="fill"
+                >拉伸</button>
+              </div>
+
+              <button
+                class="dev-fill-canvas"
+                type="button"
+                data-dev-fill-canvas
+              >铺满整个画布（背景图）</button>
+            </section>
+          `
+          : ""
+      }
+
       <div class="dev-layer-actions">
         <span>图层</span>
         <button type="button" data-dev-layer="back">置底</button>
