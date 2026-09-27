@@ -162,11 +162,7 @@ function navMarkup() {
 }
 
 function renderStore() {
-  return renderHomePage(
-    buildHomeDashboardModel(
-      app
-    )
-  );
+  return renderHomePage();
 }
 
 function renderBusiness() {
