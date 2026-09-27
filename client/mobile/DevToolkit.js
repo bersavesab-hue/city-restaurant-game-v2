@@ -225,6 +225,18 @@ function selectorFor(node, root) {
 function normalizeSelection(target, root, sheetRoot) {
   if (!(target instanceof Element)) return null;
 
+  const custom =
+    target.closest(
+      "[data-dev-custom]"
+    );
+
+  if (
+    custom &&
+    root.contains(custom)
+  ) {
+    return custom;
+  }
+
   const selector = [
     "img",
     "[data-dev-custom]",
@@ -1799,31 +1811,61 @@ export function createDevToolkit({
         dimensions.height
       );
 
-    const width =
+    const maxWidth =
+      Math.max(
+        96,
+        Math.round(
+          parentRect.width -
+          16
+        )
+      );
+
+    const maxHeight =
+      Math.max(
+        48,
+        Math.round(
+          parentRect.height *
+          .82
+        )
+      );
+
+    let width =
       Math.min(
+        maxWidth,
         Math.max(
           96,
           Math.round(
             parentRect.width *
             .92
           )
-        ),
-        Math.max(
-          96,
-          Math.round(
-            parentRect.width -
-            16
-          )
         )
       );
 
-    const height =
+    let height =
+      width /
+      aspectRatio;
+
+    if (
+      height >
+      maxHeight
+    ) {
+      height =
+        maxHeight;
+      width =
+        height *
+        aspectRatio;
+    }
+
+    width =
       Math.max(
         24,
-        Math.round(
-          width /
-          aspectRatio
-        )
+        Math.round(width)
+      );
+
+    height =
+      Math.max(
+        24,
+        Math.round(height)
       );
 
     const item = {
