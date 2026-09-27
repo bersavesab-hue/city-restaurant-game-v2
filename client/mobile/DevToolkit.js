@@ -1277,8 +1277,8 @@ export function createDevToolkit({
 
     showToast(
       info.customId
-        ? "组件已删除"
-        : "组件已隐藏，可撤销"
+        ? "上传组件已删除"
+        : "原组件已从当前布局删除，可撤销"
     );
 
     renderPanel();
@@ -1816,7 +1816,7 @@ export function createDevToolkit({
     if (!info) {
       return `
         <div class="dev-empty">
-          点“组件排版”或“自由点选”，再点游戏里的卡片、图片、按钮或区域。
+          点“组件排版”，再点要替换的原组件；选中后编辑区会显示“删除原组件”。
         </div>
       `;
     }
@@ -1841,7 +1841,7 @@ export function createDevToolkit({
       </div>
 
       <p class="dev-resize-help">
-        选中框四角可以直接用手指拉伸缩放。
+        选中框四角可以直接用手指拉伸缩放。原版组件点“删除原组件”会从当前布局隐藏并保存，之后可用撤销或“重置当前”恢复。
       </p>
 
       <div class="dev-layout-actions">
@@ -1856,7 +1856,7 @@ export function createDevToolkit({
         }
         <button type="button" data-dev-duplicate>复制</button>
         <button class="danger" type="button" data-dev-delete>
-          ${info.customId ? "删除" : "隐藏"}
+          ${info.customId ? "删除上传组件" : "删除原组件"}
         </button>
         <span>吸附 ${state.snap}px</span>
       </div>
