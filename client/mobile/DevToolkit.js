@@ -1241,6 +1241,10 @@ export function createDevToolkit({
                   item.aspectRatio
                 )
               );
+          } else if (
+            item.type === "image"
+          ) {
+            item.objectFit = "fill";
           }
         } else if (
           property === "height"
@@ -1261,6 +1265,10 @@ export function createDevToolkit({
                   item.aspectRatio
                 )
               );
+          } else if (
+            item.type === "image"
+          ) {
+            item.objectFit = "fill";
           }
         } else if (
           property === "left"
@@ -1769,6 +1777,15 @@ export function createDevToolkit({
 
     // Size commands are explicit: never force width/height linkage.
     item.lockAspect = false;
+
+    if (
+      item.type === "image"
+    ) {
+      item.objectFit =
+        mode === "canvas"
+          ? "cover"
+          : "fill";
+    }
 
     if (mode === "width") {
       item.x = 0;
@@ -2484,11 +2501,6 @@ export function createDevToolkit({
     state.selecting = false;
     state.open = true;
     state.tab = "edit";
-
-    state.selected.scrollIntoView({
-      block: "center",
-      behavior: "smooth"
-    });
 
     renderPanel();
   }
@@ -3573,6 +3585,22 @@ export function createDevToolkit({
         item.height = height;
         item.x = left;
         item.y = top;
+
+        if (
+          item.type === "image" &&
+          item.lockAspect === false
+        ) {
+          item.objectFit = "fill";
+
+          const image =
+            state.selected
+              .querySelector("img");
+
+          if (image) {
+            image.style.objectFit =
+              "fill";
+          }
+        }
       }
     }
 
