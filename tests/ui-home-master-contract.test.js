@@ -107,16 +107,16 @@ test(
 );
 
 test(
-  "editor starts from fresh v4 storage instead of restoring old layout",
+  "editor starts from fresh v5 storage instead of restoring old layout",
   () => {
     assert.match(
       toolkit,
-      /city-restaurant-ui-dev-overrides\.v4/
+      /city-restaurant-ui-dev-overrides\.v5/
     );
 
     assert.match(
       toolkit,
-      /city-restaurant-ui-dev-project\.v4/
+      /city-restaurant-ui-dev-project\.v5/
     );
 
     assert.doesNotMatch(
@@ -126,7 +126,7 @@ test(
 
     assert.match(
       toolkit,
-      /component-layout-v4-image-fit/
+      /component-layout-v5-free-size-align/
     );
   }
 );
@@ -323,6 +323,51 @@ test(
     assert.match(
       toolkit,
       /panelBody\?\.addEventListener\([\s\S]*?"scroll"/
+    );
+  }
+);
+
+
+test(
+  "editor supports independent width height and canvas alignment",
+  () => {
+    assert.match(
+      toolkit,
+      /lockAspect:\s*false/
+    );
+
+    for (
+      const marker
+      of [
+        "function alignSelected",
+        "function sizeSelected",
+        "function restoreNaturalRatio",
+        'data-dev-align="left"',
+        'data-dev-align="center-x"',
+        'data-dev-align="right"',
+        'data-dev-align="top"',
+        'data-dev-align="center-y"',
+        'data-dev-align="bottom"',
+        'data-dev-size="width"',
+        'data-dev-size="height"',
+        'data-dev-size="canvas"',
+        "data-dev-natural-ratio"
+      ]
+    ) {
+      assert.match(
+        toolkit,
+        new RegExp(marker)
+      );
+    }
+
+    assert.match(
+      devCss,
+      /\.dev-align-settings\s*\{/
+    );
+
+    assert.match(
+      devCss,
+      /\.dev-align-actions\s*,/
     );
   }
 );
