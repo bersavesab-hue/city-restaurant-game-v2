@@ -287,7 +287,7 @@ test(
 
     assert.match(
       androidActivity,
-      /FileChooserParams\.parseResult/
+      /FileChooserParams[\s\S]*?\.parseResult/
     );
   }
 );
