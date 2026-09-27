@@ -1501,14 +1501,42 @@ export function createDevToolkit({
   );
 
   function clearAll() {
-    if (!Object.keys(state.overrides).length) return;
+    if (
+      !Object.keys(
+        state.overrides
+      ).length &&
+      !state.project
+        .components.length &&
+      !Object.keys(
+        state.project
+          .assetOverrides
+      ).length
+    ) {
+      return;
+    }
 
     pushHistory();
 
-    removeOverrideStyles(state.overrides);
+    removeOverrideStyles(
+      state.overrides
+    );
 
     state.overrides = {};
-    writeOverrides(state.overrides);
+    state.project = {
+      components: [],
+      assetOverrides: {}
+    };
+
+    writeOverrides(
+      state.overrides
+    );
+    persistProject();
+
+    state.selected = null;
+    renderProjectComponents();
+    chrome.classList.remove(
+      "is-visible"
+    );
     renderPanel();
   }
 
@@ -1533,10 +1561,13 @@ export function createDevToolkit({
 
   function exportJson() {
     const payload = {
-      version: 3,
+      version: 4,
       page: getActivePage(),
-      layoutMode: "component-layout-v1",
-      overrides: state.overrides
+      layoutMode: "component-layout-v2",
+      overrides:
+        state.overrides,
+      project:
+        state.project
     };
 
     const json = JSON.stringify(payload, null, 2);
@@ -1763,7 +1794,16 @@ export function createDevToolkit({
 
   function configMarkup() {
     const report = state.report;
-    const changes = Object.keys(state.overrides).length;
+    const changes =
+      Object.keys(
+        state.overrides
+      ).length +
+      state.project
+        .components.length +
+      Object.keys(
+        state.project
+          .assetOverrides
+      ).length;
 
     return `
       <div class="dev-config-summary">
@@ -1781,7 +1821,7 @@ export function createDevToolkit({
         </article>
         <article>
           <span>组件</span>
-          <strong>${report?.components?.length ?? "--"}</strong>
+          <strong>${(report?.components?.length ?? 0) + state.project.components.length}</strong>
         </article>
       </div>
 
