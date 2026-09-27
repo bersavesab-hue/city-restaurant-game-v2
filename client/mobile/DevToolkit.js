@@ -1,6 +1,5 @@
-const STORAGE_KEY = "city-restaurant-ui-dev-overrides.v2";
-const LEGACY_STORAGE_KEY = "city-restaurant-ui-dev-overrides.v1";
-const PROJECT_STORAGE_KEY = "city-restaurant-ui-dev-project.v2";
+const STORAGE_KEY = "city-restaurant-ui-dev-overrides.v3";
+const PROJECT_STORAGE_KEY = "city-restaurant-ui-dev-project.v3";
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -8,14 +7,15 @@ function clone(value) {
 
 function readOverrides() {
   try {
-    const current = localStorage.getItem(STORAGE_KEY);
-    if (current) return JSON.parse(current);
+    const current =
+      localStorage.getItem(
+        STORAGE_KEY
+      );
 
-    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-    if (legacy) {
-      const parsed = JSON.parse(legacy);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-      return parsed;
+    if (current) {
+      return JSON.parse(
+        current
+      );
     }
   } catch {
     // Dev storage must never break the game.
@@ -227,6 +227,7 @@ function normalizeSelection(target, root, sheetRoot) {
 
   const selector = [
     "img",
+    "[data-dev-custom]",
     "[data-layout-key]",
     "[data-ui-component]",
     "button",
@@ -1234,7 +1235,7 @@ export function createDevToolkit({
       "home-page"
     ) {
       showToast(
-        "首页根组件不能删除"
+        "空白画布不能删除"
       );
       return;
     }
@@ -1671,7 +1672,7 @@ export function createDevToolkit({
     const payload = {
       version: 4,
       page: getActivePage(),
-      layoutMode: "component-layout-v2",
+      layoutMode: "component-layout-v3-clean",
       overrides:
         state.overrides,
       project:
@@ -1816,7 +1817,7 @@ export function createDevToolkit({
     if (!info) {
       return `
         <div class="dev-empty">
-          点“组件排版”，再点要替换的原组件；选中后编辑区会显示“删除原组件”。
+          点“上传排版”，再点要替换的原组件；选中后编辑区会显示“删除原组件”。
         </div>
       `;
     }
@@ -1976,8 +1977,8 @@ export function createDevToolkit({
           <strong>点选模式</strong>
           <span>${
             state.selectionScope === "layout"
-              ? "只会选中首页组件"
-              : "直接点要修改的卡片或按钮"
+              ? "只会选中已上传组件"
+              : "直接点要修改的图片、卡片或按钮"
           }</span>
           <button type="button" data-dev-cancel-select>取消</button>
         </div>
@@ -1988,7 +1989,16 @@ export function createDevToolkit({
     }
 
     if (!state.open) {
-      host.innerHTML = "";
+      host.innerHTML = `
+        <button
+          class="ui-dev-launcher"
+          type="button"
+          data-dev-open
+          aria-label="打开 UI 编辑器"
+        >UI</button>
+      `;
+
+      bindPanelEvents();
       return;
     }
 
@@ -2014,7 +2024,7 @@ export function createDevToolkit({
         <div class="ui-dev-quickbar">
           ${
             getActivePage() === "store"
-              ? '<button class="primary" type="button" data-dev-layout-select>组件排版</button>'
+              ? '<button class="primary" type="button" data-dev-layout-select>上传排版</button>'
               : '<button class="primary" type="button" data-dev-select>点选界面</button>'
           }
           <button type="button" data-dev-select>自由点选</button>
@@ -2061,6 +2071,11 @@ export function createDevToolkit({
   }
 
   function bindPanelEvents() {
+    host.querySelector("[data-dev-open]")?.addEventListener(
+      "click",
+      togglePanel
+    );
+
     host.querySelector("[data-dev-close]")?.addEventListener("click", () => {
       state.open = false;
       renderPanel();
