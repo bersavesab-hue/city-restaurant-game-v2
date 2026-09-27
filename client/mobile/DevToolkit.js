@@ -1,5 +1,6 @@
 const STORAGE_KEY = "city-restaurant-ui-dev-overrides.v2";
 const LEGACY_STORAGE_KEY = "city-restaurant-ui-dev-overrides.v1";
+const PROJECT_STORAGE_KEY = "city-restaurant-ui-dev-project.v2";
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -29,6 +30,61 @@ function writeOverrides(value) {
   } catch {
     // Dev storage must never break the game.
   }
+}
+
+function readProject() {
+  try {
+    const raw =
+      localStorage.getItem(
+        PROJECT_STORAGE_KEY
+      );
+
+    if (raw) {
+      const parsed =
+        JSON.parse(raw);
+
+      return {
+        components:
+          Array.isArray(
+            parsed.components
+          )
+            ? parsed.components
+            : [],
+        assetOverrides:
+          parsed.assetOverrides &&
+          typeof parsed.assetOverrides === "object"
+            ? parsed.assetOverrides
+            : {}
+      };
+    }
+  } catch {
+    // Dev storage must never break the game.
+  }
+
+  return {
+    components: [],
+    assetOverrides: {}
+  };
+}
+
+function writeProject(value) {
+  try {
+    localStorage.setItem(
+      PROJECT_STORAGE_KEY,
+      JSON.stringify(value)
+    );
+  } catch {
+    // Dev storage must never break the game.
+  }
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function clamp(value, min, max) {
@@ -378,7 +434,10 @@ export function createDevToolkit({
     selected: null,
     dragMode: false,
     dragPointer: null,
+    resizePointer: null,
     snap: 4,
+    project: readProject(),
+    uploadMode: "add",
     report: null,
     overrides: readOverrides(),
     undoStack: [],
@@ -390,6 +449,24 @@ export function createDevToolkit({
   const host = document.createElement("div");
   host.id = "ui-dev-root";
   document.body.append(host);
+
+  const chrome = document.createElement("div");
+  chrome.id = "ui-dev-chrome";
+  chrome.innerHTML = `
+    <div class="ui-dev-resize-frame">
+      <button type="button" data-dev-resize="nw" aria-label="左上缩放"></button>
+      <button type="button" data-dev-resize="ne" aria-label="右上缩放"></button>
+      <button type="button" data-dev-resize="sw" aria-label="左下缩放"></button>
+      <button type="button" data-dev-resize="se" aria-label="右下缩放"></button>
+    </div>
+  `;
+  document.body.append(chrome);
+
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/png,image/jpeg,image/webp,image/svg+xml";
+  fileInput.style.display = "none";
+  document.body.append(fileInput);
 
   function candidates() {
     return [
