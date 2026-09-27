@@ -1,5 +1,5 @@
-const STORAGE_KEY = "city-restaurant-ui-dev-overrides.v5";
-const PROJECT_STORAGE_KEY = "city-restaurant-ui-dev-project.v5";
+const STORAGE_KEY = "city-restaurant-ui-dev-overrides.v6";
+const PROJECT_STORAGE_KEY = "city-restaurant-ui-dev-project.v6";
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -101,6 +101,43 @@ function escapeHtml(value) {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function uiScale() {
+  const value =
+    Number.parseFloat(
+      getComputedStyle(
+        document.documentElement
+      ).getPropertyValue(
+        "--screen-scale"
+      )
+    );
+
+  return (
+    Number.isFinite(value) &&
+    value > 0
+  )
+    ? value
+    : 1;
+}
+
+function logicalRect(node) {
+  const rect =
+    node.getBoundingClientRect();
+
+  const scale =
+    uiScale();
+
+  return {
+    x: rect.x / scale,
+    y: rect.y / scale,
+    left: rect.left / scale,
+    right: rect.right / scale,
+    top: rect.top / scale,
+    bottom: rect.bottom / scale,
+    width: rect.width / scale,
+    height: rect.height / scale
+  };
 }
 
 function rectOf(node) {
@@ -565,27 +602,43 @@ export function createDevToolkit({
         item.type === "image" &&
         isBackgroundAssetName(
           item.name
-        ) &&
-        !item.backgroundInitialized
+        )
       ) {
         const rect =
-          parent.getBoundingClientRect();
+          logicalRect(
+            parent
+          );
 
-        item.x = 0;
-        item.y = 0;
-        item.width =
+        const nextWidth =
           Math.round(
             rect.width
           );
-        item.height =
+
+        const nextHeight =
           Math.round(
             rect.height
           );
-        item.objectFit = "cover";
-        item.lockAspect = false;
-        item.zIndex = 0;
-        item.backgroundInitialized = true;
-        projectChanged = true;
+
+        if (
+          item.x !== 0 ||
+          item.y !== 0 ||
+          item.width !== nextWidth ||
+          item.height !== nextHeight ||
+          item.objectFit !== "cover" ||
+          item.lockAspect !== false ||
+          item.zIndex !== 0 ||
+          !item.backgroundInitialized
+        ) {
+          item.x = 0;
+          item.y = 0;
+          item.width = nextWidth;
+          item.height = nextHeight;
+          item.objectFit = "cover";
+          item.lockAspect = false;
+          item.zIndex = 0;
+          item.backgroundInitialized = true;
+          projectChanged = true;
+        }
       }
 
       const wrapper =
@@ -703,26 +756,39 @@ export function createDevToolkit({
     const rect =
       node.getBoundingClientRect();
 
+    const scale =
+      uiScale();
+
     return {
       x:
         Math.round(
-          rect.left -
-          parentRect.left
+          (
+            rect.left -
+            parentRect.left
+          ) / scale
         ),
       y:
         Math.round(
-          rect.top -
-          parentRect.top
+          (
+            rect.top -
+            parentRect.top
+          ) / scale
         ),
       width:
         Math.max(
           24,
-          Math.round(rect.width)
+          Math.round(
+            rect.width /
+            scale
+          )
         ),
       height:
         Math.max(
           24,
-          Math.round(rect.height)
+          Math.round(
+            rect.height /
+            scale
+          )
         )
     };
   }
@@ -1051,8 +1117,8 @@ export function createDevToolkit({
       values: {
         fontSize: Math.round(parseFloat(style.fontSize) || 0),
         padding: Math.round(parseFloat(style.paddingTop) || 0),
-        width: Math.round(state.selected.getBoundingClientRect().width),
-        height: Math.round(state.selected.getBoundingClientRect().height),
+        width: Math.round(state.selected.getBoundingClientRect().width / uiScale()),
+        height: Math.round(state.selected.getBoundingClientRect().height / uiScale()),
         borderRadius: Math.round(parseFloat(style.borderRadius) || 0),
         left: style.left === "auto" ? 0 : Math.round(parseFloat(style.left) || 0),
         top: style.top === "auto" ? 0 : Math.round(parseFloat(style.top) || 0),
@@ -1171,14 +1237,20 @@ export function createDevToolkit({
       current = parseFloat(computed.paddingTop) || 0;
     } else if (property === "width") {
       current =
-        state.selected
-          .getBoundingClientRect()
-          .width || 0;
+        (
+          state.selected
+            .getBoundingClientRect()
+            .width /
+          uiScale()
+        ) || 0;
     } else if (property === "height") {
       current =
-        state.selected
-          .getBoundingClientRect()
-          .height || 0;
+        (
+          state.selected
+            .getBoundingClientRect()
+            .height /
+          uiScale()
+        ) || 0;
     } else if (property === "left" || property === "top") {
       current = computed[property] === "auto"
         ? 0
@@ -1676,7 +1748,9 @@ export function createDevToolkit({
       projectPageRoot();
 
     const rect =
-      parent.getBoundingClientRect();
+      logicalRect(
+        parent
+      );
 
     pushHistory();
 
@@ -1771,7 +1845,9 @@ export function createDevToolkit({
       projectPageRoot();
 
     const rect =
-      parent.getBoundingClientRect();
+      logicalRect(
+        parent
+      );
 
     pushHistory();
 
@@ -1870,7 +1946,9 @@ export function createDevToolkit({
       projectPageRoot();
 
     const rect =
-      parent.getBoundingClientRect();
+      logicalRect(
+        parent
+      );
 
     pushHistory();
 
@@ -1914,7 +1992,9 @@ export function createDevToolkit({
       projectPageRoot();
 
     const rect =
-      parent.getBoundingClientRect();
+      logicalRect(
+        parent
+      );
 
     pushHistory();
 
@@ -2047,7 +2127,9 @@ export function createDevToolkit({
       projectPageRoot();
 
     const rect =
-      parent.getBoundingClientRect();
+      logicalRect(
+        parent
+      );
 
     pushHistory();
 
@@ -2189,8 +2271,9 @@ export function createDevToolkit({
       projectPageRoot();
 
     const parentRect =
-      parent
-        .getBoundingClientRect();
+      logicalRect(
+        parent
+      );
 
     const dimensions =
       await measureImage(src);
@@ -2447,7 +2530,7 @@ export function createDevToolkit({
     const payload = {
       version: 5,
       page: getActivePage(),
-      layoutMode: "component-layout-v5-free-size-align",
+      layoutMode: "component-layout-v6-responsive-logical-space",
       overrides:
         state.overrides,
       project:
@@ -3353,9 +3436,11 @@ export function createDevToolkit({
       y:
         event.clientY,
       width:
-        rect.width,
+        rect.width /
+        uiScale(),
       height:
-        rect.height,
+        rect.height /
+        uiScale(),
       left:
         computed.left === "auto"
           ? 0
@@ -3407,13 +3492,20 @@ export function createDevToolkit({
         Number(state.snap) || 1
       );
 
+    const scale =
+      uiScale();
+
     const dx =
-      event.clientX -
-      resize.x;
+      (
+        event.clientX -
+        resize.x
+      ) / scale;
 
     const dy =
-      event.clientY -
-      resize.y;
+      (
+        event.clientY -
+        resize.y
+      ) / scale;
 
     const west =
       resize.corner.includes(
@@ -3749,8 +3841,10 @@ export function createDevToolkit({
       Math.round(
         (
           drag.left +
-          event.clientX -
-          drag.x
+          (
+            event.clientX -
+            drag.x
+          ) / uiScale()
         ) / snap
       ) * snap;
 
@@ -3758,8 +3852,10 @@ export function createDevToolkit({
       Math.round(
         (
           drag.top +
-          event.clientY -
-          drag.y
+          (
+            event.clientY -
+            drag.y
+          ) / uiScale()
         ) / snap
       ) * snap;
 

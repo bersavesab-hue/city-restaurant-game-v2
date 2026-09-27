@@ -4,8 +4,9 @@ function renderHomePage() {
       class="home-editor-canvas"
       data-ui-component="home-page"
       data-layout-key="home-page"
-      data-home-layout-version="blank-canvas-v7"
-      aria-label="首页自定义组件画布"
+      data-home-layout-version="blank-canvas-v8"
+      data-coordinate-space="logical"
+      aria-label="全屏自适应 UI 空白画布"
     ></section>
   `;
 }
