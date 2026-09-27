@@ -1005,7 +1005,9 @@ export function createDevToolkit({
 
     return {
       id: selectorFor(state.selected, root),
-      label: elementLabel(state.selected),
+      label:
+        custom?.name ||
+        elementLabel(state.selected),
       rect: rectOf(state.selected),
       action: actionLabel(state.selected),
       bound: Boolean(state.selected.dataset.devBound),
@@ -1836,6 +1838,89 @@ export function createDevToolkit({
     renderPanel();
   }
 
+  function repairSelectedImageFrame() {
+    const item =
+      selectedImageItem();
+
+    if (
+      !item ||
+      !item.aspectRatio
+    ) {
+      return;
+    }
+
+    const parent =
+      projectPageRoot();
+
+    const rect =
+      parent.getBoundingClientRect();
+
+    pushHistory();
+
+    item.height =
+      Math.max(
+        24,
+        Math.round(
+          item.width /
+          item.aspectRatio
+        )
+      );
+
+    item.x =
+      Math.round(
+        (
+          rect.width -
+          item.width
+        ) / 2
+      );
+
+    item.objectFit = "contain";
+    item.lockAspect = false;
+
+    syncSelectedGeometry(item);
+    renderPanel();
+    showToast("已修复外框并水平居中");
+  }
+
+  function fitImageNaturalWidth() {
+    const item =
+      selectedImageItem();
+
+    if (
+      !item ||
+      !item.aspectRatio
+    ) {
+      return;
+    }
+
+    const parent =
+      projectPageRoot();
+
+    const rect =
+      parent.getBoundingClientRect();
+
+    pushHistory();
+
+    item.x = 0;
+    item.width =
+      Math.round(rect.width);
+    item.height =
+      Math.max(
+        24,
+        Math.round(
+          item.width /
+          item.aspectRatio
+        )
+      );
+
+    item.objectFit = "contain";
+    item.lockAspect = false;
+
+    syncSelectedGeometry(item);
+    renderPanel();
+    showToast("已按原比例铺满宽度");
+  }
+
   function selectedImageItem() {
     const info =
       selectedInfo();
@@ -2485,8 +2570,7 @@ export function createDevToolkit({
   }
 
   function editorMarkup() {
-    const info =
-      selectedInfo();
+    const info = selectedInfo();
 
     if (!info) {
       return `
@@ -2495,9 +2579,6 @@ export function createDevToolkit({
         </div>
       `;
     }
-
-    const isCustom =
-      Boolean(info.customId);
 
     return `
       <div class="dev-selected-card">
@@ -2509,9 +2590,64 @@ export function createDevToolkit({
       </div>
 
       ${
-        isCustom
+        info.imageSettings
           ? `
-            <section class="dev-quick-geometry">
+            <section class="dev-image-settings dev-image-settings-priority">
+              <div class="dev-image-settings-head">
+                <div>
+                  <strong>图片尺寸</strong>
+                  <small>
+                    原图 ${info.imageSettings.naturalWidth || "--"}×${info.imageSettings.naturalHeight || "--"}
+                  </small>
+                </div>
+
+                <button
+                  type="button"
+                  class="${info.imageSettings.lockAspect ? "is-active" : ""}"
+                  data-dev-aspect-lock
+                >
+                  ${info.imageSettings.lockAspect ? "宽高联动：开" : "宽高联动：关"}
+                </button>
+              </div>
+
+              <div class="dev-image-repair-actions">
+                <button
+                  class="primary"
+                  type="button"
+                  data-dev-repair-image
+                >修复外框</button>
+                <button
+                  type="button"
+                  data-dev-natural-width
+                >原比例铺满宽度</button>
+              </div>
+
+              <div class="dev-fit-actions">
+                <button
+                  type="button"
+                  class="${info.imageSettings.objectFit === "contain" ? "is-active" : ""}"
+                  data-dev-fit="contain"
+                >完整显示</button>
+                <button
+                  type="button"
+                  class="${info.imageSettings.objectFit === "cover" ? "is-active" : ""}"
+                  data-dev-fit="cover"
+                >铺满裁剪</button>
+                <button
+                  type="button"
+                  class="${info.imageSettings.objectFit === "fill" ? "is-active" : ""}"
+                  data-dev-fit="fill"
+                >拉伸填满</button>
+              </div>
+            </section>
+          `
+          : ""
+      }
+
+      ${
+        info.customId
+          ? `
+            <section class="dev-align-settings dev-align-settings-priority">
               <strong>快速对齐</strong>
               <div class="dev-align-actions">
                 <button type="button" data-dev-align="left">左</button>
@@ -2524,67 +2660,15 @@ export function createDevToolkit({
 
               <strong>尺寸快捷</strong>
               <div class="dev-size-actions">
-                <button type="button" data-dev-size="width">宽度铺满</button>
-                <button type="button" data-dev-size="height">高度铺满</button>
-                <button type="button" data-dev-size="canvas">整个画布</button>
+                <button type="button" data-dev-size="width">只铺满宽度</button>
+                <button type="button" data-dev-size="height">只铺满高度</button>
+                <button type="button" data-dev-size="canvas">铺满画布</button>
                 ${
                   info.imageSettings
-                    ? '<button type="button" data-dev-natural-ratio>恢复原比例</button>'
+                    ? '<button type="button" data-dev-natural-ratio>外框恢复原比例</button>'
                     : ""
                 }
               </div>
-            </section>
-          `
-          : ""
-      }
-
-      ${
-        info.imageSettings
-          ? `
-            <section class="dev-image-settings is-prominent">
-              <div class="dev-image-settings-head">
-                <div>
-                  <strong>图片尺寸模式</strong>
-                  <small>
-                    原图
-                    ${info.imageSettings.naturalWidth || "--"}
-                    ×
-                    ${info.imageSettings.naturalHeight || "--"}
-                  </small>
-                </div>
-
-                <button
-                  type="button"
-                  class="${info.imageSettings.lockAspect ? "is-active" : ""}"
-                  data-dev-aspect-lock
-                >
-                  ${info.imageSettings.lockAspect ? "等比缩放" : "自由宽高"}
-                </button>
-              </div>
-
-              <div class="dev-fit-actions">
-                <button
-                  type="button"
-                  class="${info.imageSettings.objectFit === "contain" ? "is-active" : ""}"
-                  data-dev-fit="contain"
-                >原比例适应</button>
-                <button
-                  type="button"
-                  class="${info.imageSettings.objectFit === "cover" ? "is-active" : ""}"
-                  data-dev-fit="cover"
-                >裁剪铺满</button>
-                <button
-                  type="button"
-                  class="${info.imageSettings.objectFit === "fill" ? "is-active" : ""}"
-                  data-dev-fit="fill"
-                >自由拉伸</button>
-              </div>
-
-              <button
-                class="dev-fill-canvas"
-                type="button"
-                data-dev-fill-canvas
-              >一键铺满整个画布</button>
             </section>
           `
           : ""
@@ -2594,22 +2678,12 @@ export function createDevToolkit({
         ${
           info.imageSettings
             ? ""
-            : stepper(
-                "字号",
-                "fontSize",
-                info.values.fontSize,
-                1
-              )
+            : stepper("字号", "fontSize", info.values.fontSize, 1)
         }
         ${
           info.imageSettings
             ? ""
-            : stepper(
-                "内边距",
-                "padding",
-                info.values.padding,
-                2
-              )
+            : stepper("内边距", "padding", info.values.padding, 2)
         }
         ${stepper("宽度", "width", info.values.width, 4)}
         ${stepper("高度", "height", info.values.height, 4)}
@@ -2619,7 +2693,7 @@ export function createDevToolkit({
       </div>
 
       <p class="dev-resize-help">
-        图片如果不想让宽高联动，切到“自由宽高”；此时图片会直接填满外框，不再出现上下空白。
+        宽高联动关闭时，宽度和高度完全独立。图片里的“完整显示/裁剪/拉伸”只改变图片在外框内的显示方式，不会再自动修改宽高。
       </p>
 
       <div class="dev-layout-actions">
@@ -2650,6 +2724,18 @@ export function createDevToolkit({
         }
       </div>
 
+      ${
+        info.imageSettings
+          ? `
+            <button
+              class="dev-fill-canvas"
+              type="button"
+              data-dev-fill-canvas
+            >全屏背景：铺满并裁剪</button>
+          `
+          : ""
+      }
+
       <div class="dev-layer-actions">
         <span>图层</span>
         <button type="button" data-dev-layer="back">置底</button>
@@ -2661,7 +2747,6 @@ export function createDevToolkit({
       <div class="dev-selected-meta">
         <span>${info.action || "无动作"}</span>
         <span>${info.bound ? "事件已绑定" : "无事件"}</span>
-        ${info.layoutKey ? `<span>组件：${info.layoutKey}</span>` : ""}
         ${info.customId ? `<span>自定义：${info.customId}</span>` : ""}
         <span>层级：${info.values.zIndex}</span>
       </div>
@@ -3107,6 +3192,16 @@ export function createDevToolkit({
     host.querySelector("[data-dev-natural-ratio]")?.addEventListener(
       "click",
       restoreNaturalRatio
+    );
+
+    host.querySelector("[data-dev-repair-image]")?.addEventListener(
+      "click",
+      repairSelectedImageFrame
+    );
+
+    host.querySelector("[data-dev-natural-width]")?.addEventListener(
+      "click",
+      fitImageNaturalWidth
     );
 
     host.querySelectorAll("[data-dev-fit]").forEach(button => {
