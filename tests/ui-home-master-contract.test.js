@@ -11,10 +11,28 @@ const mobileApp =
     "utf8"
   );
 
+const homePage =
+  fs.readFileSync(
+    new URL(
+      "../client/mobile/HomePage.js",
+      import.meta.url
+    ),
+    "utf8"
+  );
+
 const css =
   fs.readFileSync(
     new URL(
       "../client/mobile/app.css",
+      import.meta.url
+    ),
+    "utf8"
+  );
+
+const toolkit =
+  fs.readFileSync(
+    new URL(
+      "../client/mobile/DevToolkit.js",
       import.meta.url
     ),
     "utf8"
@@ -29,131 +47,175 @@ const androidActivity =
     "utf8"
   );
 
-const buildScript =
-  fs.readFileSync(
-    new URL(
-      "../scripts/build-mobile-ui.mjs",
-      import.meta.url
-    ),
-    "utf8"
-  );
-
-const masterUrl =
+const heroUrl =
   new URL(
-    "../client/mobile/assets/home/home-master.webp",
+    "../client/mobile/assets/home/restaurant-hero.jpg",
     import.meta.url
   );
 
 test(
-  "store homepage uses exactly one approved static master image",
+  "store homepage is component based instead of a baked full-screen master",
   () => {
     assert.match(
       mobileApp,
-      /class="home-master-page"/
+      /renderHomePage/
     );
 
     assert.match(
       mobileApp,
-      /assets\/home\/home-master\.webp/
+      /store-component-shell/
     );
 
     assert.doesNotMatch(
       mobileApp,
-      /homeLayout|sceneMarkup|home-hero-scene|home-top-hud|home-metrics|home-opportunity|home-growth-and-dialogue|home-district-and-schedule/
+      /home-master-page|store-master-shell|home-live-overlay|hotspot-/
     );
 
     assert.doesNotMatch(
-      mobileApp,
-      /restaurant-hero\.jpg|hud-card-light\.svg|hud-card-dark\.svg|kpi-card\.svg|opportunity-card\.svg|panel-card\.svg|nav-base\.svg/
+      homePage,
+      /home-master\.webp|home-master-20x9\.webp/
+    );
+
+    assert.match(
+      homePage,
+      /assets\/home\/restaurant-hero\.jpg/
+    );
+
+    assert.ok(
+      fs.statSync(heroUrl).size > 12000,
+      "restaurant hero should be a real standalone JPEG"
     );
   }
 );
 
 test(
-  "master keeps interaction through invisible hotspots only",
+  "homepage exposes independently editable UI components",
   () => {
     for (
-      const marker
+      const key
       of [
-        "hotspot-settings",
-        "hotspot-opportunity-more",
-        "hotspot-opportunity-enter",
-        "hotspot-renovation",
-        "hotspot-staff-shortcut",
-        "hotspot-research-shortcut",
-        "hotspot-business-shortcut",
-        "hotspot-nav-store",
-        "hotspot-nav-business",
-        "hotspot-nav-research",
-        "hotspot-nav-staff",
-        "hotspot-nav-more"
+        "home-page",
+        "home-scene",
+        "home-hud",
+        "home-kpis",
+        "home-opportunity",
+        "home-upper-grid",
+        "home-growth",
+        "home-dialogue",
+        "home-lower-grid",
+        "home-district",
+        "home-schedule",
+        "home-bottom-nav"
       ]
     ) {
       assert.match(
-        mobileApp,
-        new RegExp(marker)
+        homePage,
+        new RegExp(
+          `data-layout-key="${key}"`
+        )
       );
     }
 
     assert.match(
-      css,
-      /\.home-hotspot\s*\{[\s\S]*?opacity:\s*0/
+      homePage,
+      /data-home-layout-version="component-v1"/
     );
   }
 );
 
 test(
-  "store master is rendered on a strict 9 by 16 canvas",
+  "dynamic restaurant data is rendered directly inside components",
   () => {
-    assert.match(
-      css,
-      /\.mobile-shell\.store-master-shell\s*\{[\s\S]*?aspect-ratio:\s*9\s*\/\s*16/
-    );
-
-    assert.match(
-      css,
-      /\.home-master-artwork\s*\{[\s\S]*?width:\s*100%[\s\S]*?height:\s*100%/
-    );
-
-    assert.doesNotMatch(
-      css,
-      /\.home-hero-shell|\.home-hud\s*\{|\.home-metric-grid|\.home-opportunity\s*\{|\.home-dual-grid|\.home-panel\s*\{/
-    );
-  }
-);
-
-test(
-  "approved master asset is packaged directly without reconstruction chunks",
-  () => {
-    assert.ok(
-      fs.statSync(masterUrl).size > 100000,
-      "approved master should be the full 720x1280 WebP"
-    );
-
-    assert.match(
-      buildScript,
-      /client\/mobile\/assets/
-    );
-
-    assert.doesNotMatch(
-      buildScript,
-      /assets-src\/home-master|assets-src\/home\/master|heroBase64|part-\d+\.b64/
-    );
-
-    assert.equal(
-      fs.existsSync(
-        new URL(
-          "../client/mobile/layout/home.layout.json",
-          import.meta.url
+    for (
+      const marker
+      of [
+        "model.time.day",
+        "model.time.clock",
+        "model.money.balance",
+        "model.money.todayRevenue",
+        "model.money.todayProfit",
+        "model.restaurant.satisfaction",
+        "model.operations.employees",
+        "model.opportunity.title",
+        "model.progress.progress",
+        "model.dialogue.slice",
+        "model.district",
+        "model.schedule.slice"
+      ]
+    ) {
+      assert.match(
+        homePage,
+        new RegExp(
+          marker
+            .replaceAll(".", "\\.")
         )
-      ),
-      false
+      );
+    }
+
+    assert.doesNotMatch(
+      homePage,
+      /position:\s*absolute[^\n]*top:\s*\d+%/
     );
   }
 );
 
 test(
-  "Android stays immersive while showing the 9 by 16 master",
+  "component layout uses normal grid flow for the dashboard",
+  () => {
+    assert.match(
+      css,
+      /\.home-components-page\s*\{[\s\S]*?display:\s*grid/
+    );
+
+    assert.match(
+      css,
+      /\.home-component-grid\s*\{[\s\S]*?grid-template-columns/
+    );
+
+    assert.match(
+      css,
+      /\.home-component-nav\s*\{/
+    );
+
+    assert.doesNotMatch(
+      css,
+      /\.home-master-page\s*\{|\.home-live-overlay\s*\{|\.home-hotspot\s*\{/
+    );
+  }
+);
+
+test(
+  "in-game editor targets components instead of a static mother image",
+  () => {
+    assert.match(
+      toolkit,
+      /组件排版/
+    );
+
+    assert.match(
+      toolkit,
+      /只会选中首页组件/
+    );
+
+    assert.match(
+      toolkit,
+      /layoutMode:\s*"component-layout-v1"/
+    );
+
+    assert.match(
+      toolkit,
+      /\[data-layout-key\]/
+    );
+
+    assert.match(
+      toolkit,
+      /startDragMode/
+    );
+  }
+);
+
+test(
+  "Android remains immersive for the component homepage",
   () => {
     assert.match(
       androidActivity,
@@ -168,241 +230,6 @@ test(
     assert.match(
       androidActivity,
       /SYSTEM_UI_FLAG_HIDE_NAVIGATION/
-    );
-  }
-);
-
-
-test(
-  "20x9 long-screen master fills tall phones without changing the 9x16 fallback",
-  () => {
-    const longMaster =
-      new URL(
-        "../client/mobile/assets/home/home-master-20x9.webp",
-        import.meta.url
-      );
-
-    assert.ok(
-      fs.statSync(longMaster).size > 150000,
-      "20x9 master should be the full long-screen WebP"
-    );
-
-    assert.match(
-      mobileApp,
-      /max-aspect-ratio:\s*1\/2/
-    );
-
-    assert.match(
-      mobileApp,
-      /home-master-20x9\.webp/
-    );
-
-    assert.match(
-      mobileApp,
-      /home-master\.webp/
-    );
-
-    assert.match(
-      css,
-      /@media \(max-aspect-ratio: 1 \/ 2\)/
-    );
-
-    assert.match(
-      css,
-      /@media \(max-aspect-ratio: 1 \/ 2\)[\s\S]*?height:\s*100dvh/
-    );
-
-    assert.match(
-      css,
-      /@media \(max-aspect-ratio: 1 \/ 2\)[\s\S]*?\.hotspot-nav-store/
-    );
-  }
-);
-
-
-test(
-  "live HUD and KPI overlay replaces master sample values without rebuilding the master",
-  () => {
-    for (
-      const marker
-      of [
-        "home-live-overlay",
-        "live-day",
-        "live-clock",
-        "live-money",
-        "live-rating",
-        "live-level",
-        "live-kpi-grid"
-      ]
-    ) {
-      assert.match(
-        mobileApp,
-        new RegExp(marker)
-      );
-    }
-
-    assert.match(
-      mobileApp,
-      /data-bind="clock"/
-    );
-
-    assert.match(
-      mobileApp,
-      /model\.money\.balance/
-    );
-
-    assert.match(
-      mobileApp,
-      /model\.money\.todayRevenue/
-    );
-
-    assert.match(
-      mobileApp,
-      /model\.money\.todayProfit/
-    );
-
-    assert.match(
-      mobileApp,
-      /model\.restaurant\.satisfaction/
-    );
-
-    assert.match(
-      mobileApp,
-      /model\.operations\.employees/
-    );
-
-    assert.match(
-      css,
-      /\.home-live-overlay\s*\{[\s\S]*?pointer-events:\s*none/
-    );
-
-    assert.match(
-      css,
-      /\.live-kpi-grid\s*\{/
-    );
-  }
-);
-
-
-test(
-  "second live homepage batch uses real model data and neutral live dialogue avatars",
-  () => {
-    for (
-      const marker
-      of [
-        "live-opportunity",
-        "live-growth",
-        "live-dialogue",
-        "live-district",
-        "live-schedule"
-      ]
-    ) {
-      assert.match(
-        mobileApp,
-        new RegExp(marker)
-      );
-    }
-
-    assert.match(
-      mobileApp,
-      /model\.opportunity\.title/
-    );
-
-    assert.match(
-      mobileApp,
-      /model\.progress\.progress/
-    );
-
-    assert.match(
-      mobileApp,
-      /model\.dialogue\.slice\(0,3\)/
-    );
-
-    assert.match(
-      mobileApp,
-      /item\.speaker\.slice\(0,1\)/
-    );
-
-    assert.match(
-      mobileApp,
-      /model\.district\.trafficIndex/
-    );
-
-    assert.match(
-      mobileApp,
-      /model\.schedule\.slice\(0,4\)/
-    );
-
-    assert.match(
-      css,
-      /\.live-dialogue-avatar\s*\{/
-    );
-
-    assert.doesNotMatch(
-      mobileApp,
-      /avatar.*\.(png|jpg|jpeg|webp)/i
-    );
-  }
-);
-
-
-test(
-  "20x9 screenshot calibration keeps live panels inside their mother-card slots",
-  () => {
-    assert.match(
-      css,
-      /\.live-growth\s*\{[\s\S]*?width:\s*45\.2%/
-    );
-
-    assert.match(
-      css,
-      /\.live-dialogue\s*\{[\s\S]*?top:\s*61\.35%/
-    );
-
-    assert.match(
-      css,
-      /\.live-schedule\s*\{[\s\S]*?top:\s*75\.55%/
-    );
-
-    assert.match(
-      css,
-      /\.live-district\s*\{[\s\S]*?top:\s*81\.05%/
-    );
-
-    assert.doesNotMatch(
-      mobileApp,
-      /<span>客流<\/span>|<span>主力客群<\/span>|<span>外卖<\/span>|<span>竞争<\/span>/
-    );
-  }
-);
-
-
-test(
-  "hard-mask baked sample content before drawing live lower dashboard data",
-  () => {
-    assert.match(
-      css,
-      /\.live-opportunity\s*\{[\s\S]*?background:\s*#fff/
-    );
-
-    assert.match(
-      css,
-      /\.live-dialogue\s*\{[\s\S]*?background:\s*#fff/
-    );
-
-    assert.match(
-      css,
-      /\.live-schedule\s*\{[\s\S]*?background:\s*#fff/
-    );
-
-    assert.match(
-      css,
-      /\.live-district\s*\{[\s\S]*?top:\s*81\.05%/
-    );
-
-    assert.doesNotMatch(
-      mobileApp,
-      /<span>下一阶段<\/span>/
     );
   }
 );
