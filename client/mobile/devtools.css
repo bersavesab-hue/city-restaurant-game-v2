@@ -279,32 +279,93 @@
   margin-top: 9px;
   display: grid;
   grid-template-columns:
-    minmax(0,1fr)
-    auto;
+    repeat(3, minmax(0,1fr));
   gap: 7px;
   align-items: center;
 }
 
 .dev-layout-actions button {
   min-height: 42px;
-  border: 1px solid #9c6f1a;
+  border: 1px solid #3d424c;
   border-radius: 10px;
+  background: #292d35;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.dev-layout-actions button.primary {
+  border-color: #9c6f1a;
   background:
     linear-gradient(
       180deg,
       #8f6415,
       #6e4a0d
     );
-  color: #fff;
-  font-size: 11px;
-  font-weight: 850;
+}
+
+.dev-layout-actions button.danger {
+  border-color: #6b3538;
+  background: #392124;
+  color: #f2b6bb;
 }
 
 .dev-layout-actions span {
+  grid-column: 1 / -1;
+  justify-self: start;
   padding: 6px 8px;
   border-radius: 999px;
   background: #252932;
   color: #d7b96b;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.dev-resize-help {
+  margin: 8px 0 0;
+  color: #8ea6b4;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.dev-asset-actions,
+.dev-layer-actions {
+  margin-top: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.dev-asset-actions {
+  grid-template-columns:
+    repeat(2, minmax(0,1fr));
+}
+
+.dev-layer-actions {
+  grid-template-columns:
+    auto
+    repeat(4, minmax(0,1fr));
+  align-items: center;
+}
+
+.dev-asset-actions button,
+.dev-layer-actions button {
+  min-height: 38px;
+  border: 1px solid #3a4049;
+  border-radius: 9px;
+  background: #262b33;
+  color: #f3f5f6;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.dev-asset-actions button:first-child {
+  border-color: #356a7c;
+  background: #203b47;
+  color: #a8e7ff;
+}
+
+.dev-layer-actions > span {
+  color: #8f96a0;
   font-size: 9px;
   font-weight: 800;
 }
@@ -633,4 +694,84 @@ body:has(.ui-dev-drag-bar) .dev-selected-outline {
     grid-template-columns:
       repeat(2, minmax(0,1fr));
   }
+}
+
+
+#ui-dev-chrome {
+  position: fixed;
+  inset: 0;
+  z-index: 100001;
+  pointer-events: none;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+#ui-dev-chrome:not(.is-visible) {
+  display: none;
+}
+
+.ui-dev-resize-frame {
+  position: fixed;
+  box-sizing: border-box;
+  border: 2px solid #59d8ff;
+  border-radius: 4px;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 1px
+    rgba(6,32,43,.38);
+}
+
+.ui-dev-resize-frame > button {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: #25bce9;
+  box-shadow:
+    0 2px 8px
+    rgba(0,0,0,.32);
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.ui-dev-resize-frame > button[data-dev-resize="nw"] {
+  left: -12px;
+  top: -12px;
+  cursor: nwse-resize;
+}
+
+.ui-dev-resize-frame > button[data-dev-resize="ne"] {
+  right: -12px;
+  top: -12px;
+  cursor: nesw-resize;
+}
+
+.ui-dev-resize-frame > button[data-dev-resize="sw"] {
+  left: -12px;
+  bottom: -12px;
+  cursor: nesw-resize;
+}
+
+.ui-dev-resize-frame > button[data-dev-resize="se"] {
+  right: -12px;
+  bottom: -12px;
+  cursor: nwse-resize;
+}
+
+.dev-custom-component {
+  box-sizing: border-box;
+  overflow: visible;
+  touch-action: none;
+}
+
+.dev-custom-component > img {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
