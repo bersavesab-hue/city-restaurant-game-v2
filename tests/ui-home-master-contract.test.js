@@ -412,3 +412,24 @@ test(
     );
   }
 );
+
+
+test(
+  "free-size image edits fill the frame and editor actions do not scroll the page",
+  () => {
+    assert.match(
+      toolkit,
+      /item\.lockAspect\s*===\s*false[\s\S]*?item\.objectFit\s*=\s*"fill"/
+    );
+
+    assert.match(
+      toolkit,
+      /mode\s*===\s*"canvas"[\s\S]*?\?\s*"cover"[\s\S]*?:\s*"fill"/
+    );
+
+    assert.doesNotMatch(
+      toolkit,
+      /state\.selected\.scrollIntoView/
+    );
+  }
+);
