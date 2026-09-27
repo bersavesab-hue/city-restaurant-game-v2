@@ -76,7 +76,7 @@ test(
 
     assert.match(
       homePage,
-      /blank-canvas-v1/
+      /blank-canvas-v2/
     );
 
     assert.doesNotMatch(
