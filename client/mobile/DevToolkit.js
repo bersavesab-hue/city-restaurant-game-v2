@@ -623,7 +623,7 @@ export function createDevToolkit({
     const payload = {
       version: 3,
       page: getActivePage(),
-      layoutMode: "hybrid-static",
+      layoutMode: "component-layout-v1",
       overrides: state.overrides
     };
 
@@ -799,7 +799,7 @@ export function createDevToolkit({
       <div class="dev-selected-meta">
         <span>${info.action || "无动作"}</span>
         <span>${info.bound ? "事件已绑定" : "无事件"}</span>
-        ${info.layoutKey ? `<span>母版：${info.layoutKey}</span>` : ""}
+        ${info.layoutKey ? `<span>组件：${info.layoutKey}</span>` : ""}
       </div>
     `;
   }
@@ -882,7 +882,7 @@ export function createDevToolkit({
           <strong>点选模式</strong>
           <span>${
             state.selectionScope === "layout"
-              ? "只会选中首页母版区块"
+              ? "只会选中首页组件"
               : "直接点要修改的卡片或按钮"
           }</span>
           <button type="button" data-dev-cancel-select>取消</button>
@@ -920,7 +920,7 @@ export function createDevToolkit({
         <div class="ui-dev-quickbar">
           ${
             getActivePage() === "store"
-              ? '<button class="primary" type="button" data-dev-layout-select>母版排版</button>'
+              ? '<button class="primary" type="button" data-dev-layout-select>组件排版</button>'
               : '<button class="primary" type="button" data-dev-select>点选界面</button>'
           }
           <button type="button" data-dev-select>自由点选</button>
