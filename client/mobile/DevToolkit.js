@@ -2623,18 +2623,18 @@ export function createDevToolkit({
   }
 
   function bindPanelEvents() {
-    const body =
+    const panelBody =
       host.querySelector(
         ".ui-dev-body"
       );
 
-    body?.addEventListener(
+    panelBody?.addEventListener(
       "scroll",
       () => {
         state.panelScroll[
           state.tab
         ] =
-          body.scrollTop;
+          panelBody.scrollTop;
       },
       {
         passive: true
