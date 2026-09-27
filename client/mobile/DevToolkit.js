@@ -1148,6 +1148,358 @@ export function createDevToolkit({
     renderPanel();
   }
 
+  function deleteSelected() {
+    const info =
+      selectedInfo();
+
+    if (!info) return;
+
+    if (
+      info.layoutKey ===
+      "home-page"
+    ) {
+      showToast(
+        "首页根组件不能删除"
+      );
+      return;
+    }
+
+    pushHistory();
+
+    if (info.customId) {
+      state.project.components =
+        state.project.components
+          .filter(
+            item =>
+              item.id !==
+              info.customId
+          );
+
+      persistProject();
+
+      state.selected.remove();
+      state.selected = null;
+      renderProjectComponents();
+      assignIds();
+    } else {
+      const styles =
+        ensureSelectedOverride(
+          info
+        );
+
+      styles.display = "none";
+      state.selected.style.display =
+        "none";
+      writeOverrides(
+        state.overrides
+      );
+      state.selected = null;
+    }
+
+    chrome.classList.remove(
+      "is-visible"
+    );
+
+    showToast(
+      info.customId
+        ? "组件已删除"
+        : "组件已隐藏，可撤销"
+    );
+
+    renderPanel();
+  }
+
+  function duplicateSelected() {
+    const info =
+      selectedInfo();
+
+    if (!info) return;
+
+    pushHistory();
+
+    const rect =
+      relativeRect(
+        state.selected
+      );
+
+    const source =
+      info.customId
+        ? customComponentById(
+            info.customId
+          )
+        : null;
+
+    const item =
+      source
+        ? {
+            ...clone(source),
+            id: nextCustomId(),
+            x:
+              Number(source.x || 0) +
+              12,
+            y:
+              Number(source.y || 0) +
+              12,
+            zIndex:
+              Number(
+                source.zIndex || 20
+              ) + 1
+          }
+        : {
+            id: nextCustomId(),
+            page:
+              getActivePage(),
+            type: "html",
+            html:
+              sanitizeCloneHtml(
+                state.selected
+              ),
+            x: rect.x + 12,
+            y: rect.y + 12,
+            width: rect.width,
+            height: rect.height,
+            zIndex: 30,
+            opacity: 1
+          };
+
+    state.project.components.push(
+      item
+    );
+
+    persistProject();
+    renderProjectComponents();
+    assignIds();
+
+    const node =
+      root.querySelector(
+        `[data-dev-custom="${item.id}"]`
+      );
+
+    openEditorFor(node);
+
+    showToast("已复制组件");
+  }
+
+  function setLayer(mode) {
+    const info =
+      selectedInfo();
+
+    if (!info) return;
+
+    pushHistory();
+
+    const custom =
+      info.customId
+        ? customComponentById(
+            info.customId
+          )
+        : null;
+
+    const current =
+      Number(
+        getComputedStyle(
+          state.selected
+        ).zIndex
+      ) || 0;
+
+    const next =
+      mode === "front"
+        ? 999
+        : mode === "back"
+          ? 1
+          : mode === "up"
+            ? current + 1
+            : Math.max(
+                0,
+                current - 1
+              );
+
+    if (custom) {
+      custom.zIndex = next;
+      persistProject();
+    }
+
+    const styles =
+      ensureSelectedOverride(
+        info
+      );
+
+    if (
+      getComputedStyle(
+        state.selected
+      ).position === "static"
+    ) {
+      styles.position =
+        "relative";
+      state.selected.style.position =
+        "relative";
+    }
+
+    styles.zIndex =
+      String(next);
+
+    state.selected.style.zIndex =
+      String(next);
+
+    writeOverrides(
+      state.overrides
+    );
+
+    renderSelectionChrome();
+    renderPanel();
+  }
+
+  function chooseImage(mode) {
+    state.uploadMode = mode;
+    fileInput.value = "";
+    fileInput.click();
+  }
+
+  async function handleImageFile(file) {
+    if (!file) return;
+
+    const src =
+      await optimizeImage(
+        file
+      );
+
+    pushHistory();
+
+    if (
+      state.uploadMode ===
+      "replace"
+    ) {
+      const info =
+        selectedInfo();
+
+      if (
+        !info ||
+        !info.isImage
+      ) {
+        showToast(
+          "请先选中图片"
+        );
+        return;
+      }
+
+      if (info.customId) {
+        const item =
+          customComponentById(
+            info.customId
+          );
+
+        if (
+          item &&
+          item.type === "image"
+        ) {
+          item.src = src;
+          persistProject();
+          renderProjectComponents();
+          assignIds();
+
+          const node =
+            root.querySelector(
+              `[data-dev-custom="${item.id}"]`
+            );
+
+          openEditorFor(node);
+        }
+      } else if (
+        state.selected instanceof
+        HTMLImageElement
+      ) {
+        state.project
+          .assetOverrides[
+            info.id
+          ] = src;
+
+        persistProject();
+        state.selected.src = src;
+        renderSelectionChrome();
+        renderPanel();
+      }
+
+      showToast("图片已替换");
+      return;
+    }
+
+    const parent =
+      projectPageRoot();
+
+    const parentRect =
+      parent
+        .getBoundingClientRect();
+
+    const width =
+      Math.min(
+        180,
+        Math.max(
+          96,
+          Math.round(
+            parentRect.width *
+            .34
+          )
+        )
+      );
+
+    const item = {
+      id: nextCustomId(),
+      page:
+        getActivePage(),
+      type: "image",
+      src,
+      name:
+        file.name || "image",
+      x:
+        Math.round(
+          (
+            parentRect.width -
+            width
+          ) / 2
+        ),
+      y:
+        Math.round(
+          parentRect.height *
+          .34
+        ),
+      width,
+      height: width,
+      zIndex: 40,
+      opacity: 1,
+      objectFit: "contain"
+    };
+
+    state.project.components.push(
+      item
+    );
+
+    persistProject();
+    renderProjectComponents();
+    assignIds();
+
+    const node =
+      root.querySelector(
+        `[data-dev-custom="${item.id}"]`
+      );
+
+    openEditorFor(node);
+    showToast("图片组件已添加");
+  }
+
+  fileInput.addEventListener(
+    "change",
+    () => {
+      handleImageFile(
+        fileInput.files?.[0]
+      ).catch(
+        () =>
+          showToast(
+            "图片导入失败"
+          )
+      );
+    }
+  );
+
   function clearAll() {
     if (!Object.keys(state.overrides).length) return;
 
