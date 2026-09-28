@@ -15,49 +15,49 @@ const UI_TYPE_OPTIONS = [
 const TOP_HUD_LAYOUT = {
   top_date: {
     x: 8,
-    y: 8,
+    y: 6,
     width: 104,
-    height: 47,
+    height: 64,
     zIndex: 100,
     anchor: "top-left"
   },
   top_time: {
     x: 115,
-    y: 8,
+    y: 6,
     width: 91,
-    height: 47,
+    height: 64,
     zIndex: 100,
     anchor: "top-left"
   },
   top_money: {
     x: 207,
-    y: 8,
+    y: 6,
     width: 122,
-    height: 47,
+    height: 64,
     zIndex: 100,
     anchor: "top-left"
   },
   top_rating: {
     x: 331,
-    y: 8,
+    y: 6,
     width: 74,
-    height: 47,
+    height: 64,
     zIndex: 100,
     anchor: "top-left"
   },
   top_level: {
     x: 407,
-    y: 8,
+    y: 6,
     width: 98,
-    height: 47,
+    height: 64,
     zIndex: 100,
     anchor: "top-left"
   },
   top_settings: {
     x: 5,
-    y: 8,
+    y: 6,
     width: 30,
-    height: 47,
+    height: 64,
     zIndex: 110,
     anchor: "top-right"
   }
