@@ -11,6 +11,7 @@ import {
 } from "./MobileGameController.js";
 
 import {
+  PRIMARY_NAV,
   renderHomePage
 } from "./HomePage.js";
 
@@ -28,7 +29,13 @@ const root =
 const sheetRoot =
   document.querySelector("#sheet-root");
 
-const activePage =
+const allowedPages =
+  PRIMARY_NAV.map(
+    item =>
+      item.id
+  );
+
+let activePage =
   "store";
 
 const runtimeSession =
@@ -80,9 +87,7 @@ const devToolkit =
     app,
     root,
     sheetRoot,
-    allowedPages: [
-      activePage
-    ],
+    allowedPages,
     getActivePage:
       () => activePage
   });
@@ -101,7 +106,8 @@ function render() {
     >
       <section class="page-host">
         ${renderHomePage(
-          viewModel
+          viewModel,
+          activePage
         )}
       </section>
 
@@ -142,6 +148,29 @@ function shouldSkipRefresh() {
 root.addEventListener(
   "click",
   event => {
+    const nav =
+      event.target.closest(
+        "[data-nav]"
+      );
+
+    if (nav) {
+      const nextPage =
+        nav.dataset.nav;
+
+      if (
+        allowedPages.includes(
+          nextPage
+        )
+      ) {
+        activePage =
+          nextPage;
+
+        render();
+      }
+
+      return;
+    }
+
     const button =
       event.target.closest(
         "[data-game-action]"
