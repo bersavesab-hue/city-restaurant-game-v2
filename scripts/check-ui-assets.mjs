@@ -204,6 +204,31 @@ for (
     }
   }
 
+  if (
+    metadata &&
+    asset.expected
+  ) {
+    if (
+      metadata.width !==
+        asset.expected.width ||
+      metadata.height !==
+        asset.expected.height
+    ) {
+      fail(
+        `${asset.id} dimensions changed: expected ${asset.expected.width}x${asset.expected.height}, got ${metadata.width}x${metadata.height}`
+      );
+    }
+
+    if (
+      metadata.hasAlpha !==
+      asset.expected.hasAlpha
+    ) {
+      fail(
+        `${asset.id} alpha metadata changed: expected ${asset.expected.hasAlpha}, got ${metadata.hasAlpha}`
+      );
+    }
+  }
+
   console.log(
     [
       asset.id,
