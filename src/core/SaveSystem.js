@@ -87,6 +87,78 @@ function prepareStateForMigration(
   return state;
 }
 
+function parseSaveRecord(
+  raw,
+  slot
+) {
+  let record;
+
+  try {
+    record =
+      JSON.parse(
+        raw
+      );
+  } catch {
+    throw new Error(
+      `Save slot "${slot}" contains invalid JSON`
+    );
+  }
+
+  if (
+    Number.isInteger(
+      record?.formatVersion
+    ) &&
+    record.formatVersion >
+      CURRENT_SAVE_FORMAT_VERSION
+  ) {
+    const error =
+      new Error(
+        `Save slot "${slot}" uses future format version ${record.formatVersion}`
+      );
+
+    error.code =
+      "SAVE_FUTURE_FORMAT";
+
+    throw error;
+  }
+
+  if (
+    !record ||
+    !SUPPORTED_SAVE_FORMAT_VERSIONS
+      .includes(
+        record.formatVersion
+      ) ||
+    !record.state ||
+    typeof record.state !==
+      "object" ||
+    Array.isArray(
+      record.state
+    )
+  ) {
+    throw new Error(
+      `Save slot "${slot}" has an invalid format`
+    );
+  }
+
+  return record;
+}
+
+function canBackupRaw(
+  raw,
+  slot
+) {
+  try {
+    parseSaveRecord(
+      raw,
+      slot
+    );
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 class SaveSystem {
   constructor({
     storage =
@@ -102,14 +174,20 @@ class SaveSystem {
     return `${this.prefix}:${slot}`;
   }
 
-  save(slot = "auto") {
+  getBackupKey(
+    slot = "auto"
+  ) {
+    return `${this.getKey(slot)}:backup`;
+  }
+
+  createRecord() {
     const state =
       migrationSystem
         .migrateState(
           gameState.snapshot()
         );
 
-    const record = {
+    return {
       formatVersion:
         CURRENT_SAVE_FORMAT_VERSION,
       savedAt: Date.now(),
@@ -117,10 +195,64 @@ class SaveSystem {
       registry:
         dataRegistry.snapshot()
     };
+  }
+
+  save(slot = "auto") {
+    const record =
+      this.createRecord();
+
+    const serialized =
+      JSON.stringify(
+        record
+      );
+
+    const key =
+      this.getKey(slot);
+
+    const backupKey =
+      this.getBackupKey(
+        slot
+      );
+
+    const previousRaw =
+      this.storage.getItem(
+        key
+      );
+
+    let backupCreated =
+      false;
+
+    if (
+      previousRaw !== null &&
+      canBackupRaw(
+        previousRaw,
+        slot
+      )
+    ) {
+      try {
+        this.storage.setItem(
+          backupKey,
+          previousRaw
+        );
+
+        backupCreated =
+          true;
+      } catch (error) {
+        eventBus.emit(
+          "save:backupFailed",
+          {
+            slot,
+            message:
+              error?.message ??
+              "Unknown backup write error"
+          }
+        );
+      }
+    }
 
     this.storage.setItem(
-      this.getKey(slot),
-      JSON.stringify(record)
+      key,
+      serialized
     );
 
     eventBus.emit(
@@ -132,8 +264,9 @@ class SaveSystem {
         formatVersion:
           record.formatVersion,
         schemaVersion:
-          state.meta
-            ?.schemaVersion
+          record.state.meta
+            ?.schemaVersion,
+        backupCreated
       }
     );
 
@@ -142,44 +275,13 @@ class SaveSystem {
     );
   }
 
-  load(slot = "auto") {
-    const raw =
-      this.storage.getItem(
-        this.getKey(slot)
-      );
-
-    if (raw === null) {
-      return null;
+  applyRecord(
+    record,
+    {
+      slot,
+      source
     }
-
-    let record;
-
-    try {
-      record = JSON.parse(raw);
-    } catch {
-      throw new Error(
-        `Save slot "${slot}" contains invalid JSON`
-      );
-    }
-
-    if (
-      !record ||
-      !SUPPORTED_SAVE_FORMAT_VERSIONS
-        .includes(
-          record.formatVersion
-        ) ||
-      !record.state ||
-      typeof record.state !==
-        "object" ||
-      Array.isArray(
-        record.state
-      )
-    ) {
-      throw new Error(
-        `Save slot "${slot}" has an invalid format`
-      );
-    }
-
+  ) {
     const stateForMigration =
       prepareStateForMigration(
         record
@@ -239,6 +341,7 @@ class SaveSystem {
       "save:loaded",
       {
         slot,
+        source,
         savedAt:
           record.savedAt,
         formatVersion:
@@ -253,24 +356,185 @@ class SaveSystem {
       state:
         gameState.snapshot(),
       registry:
-        dataRegistry.snapshot()
+        dataRegistry.snapshot(),
+      source
     };
+  }
+
+  loadRaw(
+    raw,
+    {
+      slot,
+      source
+    }
+  ) {
+    const record =
+      parseSaveRecord(
+        raw,
+        slot
+      );
+
+    return this.applyRecord(
+      record,
+      {
+        slot,
+        source
+      }
+    );
+  }
+
+  shouldTryBackup(
+    error
+  ) {
+    if (
+      error?.code ===
+        "SAVE_FUTURE_FORMAT"
+    ) {
+      return false;
+    }
+
+    if (
+      typeof error?.message ===
+        "string" &&
+      error.message.includes(
+        "Cannot downgrade state"
+      )
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  load(slot = "auto") {
+    const key =
+      this.getKey(
+        slot
+      );
+
+    const raw =
+      this.storage.getItem(
+        key
+      );
+
+    if (raw === null) {
+      return null;
+    }
+
+    try {
+      return this.loadRaw(
+        raw,
+        {
+          slot,
+          source:
+            "primary"
+        }
+      );
+    } catch (primaryError) {
+      if (
+        !this.shouldTryBackup(
+          primaryError
+        )
+      ) {
+        throw primaryError;
+      }
+
+      const backupRaw =
+        this.storage.getItem(
+          this.getBackupKey(
+            slot
+          )
+        );
+
+      if (backupRaw === null) {
+        throw primaryError;
+      }
+
+      try {
+        const loaded =
+          this.loadRaw(
+            backupRaw,
+            {
+              slot,
+              source:
+                "backup"
+            }
+          );
+
+        try {
+          this.storage.setItem(
+            key,
+            backupRaw
+          );
+        } catch {
+          // Recovery remains valid in memory even if the primary key cannot be healed.
+        }
+
+        eventBus.emit(
+          "save:recovered",
+          {
+            slot,
+            primaryError:
+              primaryError
+                ?.message ??
+              "Unknown primary save error"
+          }
+        );
+
+        return loaded;
+      } catch (backupError) {
+        const error =
+          new Error(
+            `Save slot "${slot}" failed primary and backup recovery: ${primaryError.message}; backup: ${backupError.message}`
+          );
+
+        error.cause =
+          primaryError;
+
+        throw error;
+      }
+    }
   }
 
   has(slot = "auto") {
     return (
       this.storage.getItem(
-        this.getKey(slot)
+        this.getKey(
+          slot
+        )
+      ) !== null
+    );
+  }
+
+  hasBackup(
+    slot = "auto"
+  ) {
+    return (
+      this.storage.getItem(
+        this.getBackupKey(
+          slot
+        )
       ) !== null
     );
   }
 
   remove(slot = "auto") {
     const existed =
-      this.has(slot);
+      this.has(slot) ||
+      this.hasBackup(
+        slot
+      );
 
     this.storage.removeItem(
-      this.getKey(slot)
+      this.getKey(
+        slot
+      )
+    );
+
+    this.storage.removeItem(
+      this.getBackupKey(
+        slot
+      )
     );
 
     if (existed) {
@@ -289,5 +553,6 @@ export const saveSystem =
 
 export {
   SaveSystem,
-  MemoryStorage
+  MemoryStorage,
+  parseSaveRecord
 };
