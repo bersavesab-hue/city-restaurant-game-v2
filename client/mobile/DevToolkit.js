@@ -162,6 +162,11 @@ function readProject() {
           parsed.assetOverrides &&
           typeof parsed.assetOverrides === "object"
             ? parsed.assetOverrides
+            : {},
+        uiPresets:
+          parsed.uiPresets &&
+          typeof parsed.uiPresets === "object"
+            ? parsed.uiPresets
             : {}
       };
     }
@@ -171,7 +176,8 @@ function readProject() {
 
   return {
     components: [],
-    assetOverrides: {}
+    assetOverrides: {},
+    uiPresets: {}
   };
 }
 
@@ -982,12 +988,15 @@ export function createDevToolkit({
         false;
 
       if (applyGeometry) {
+        const hudPreset =
+          topHudPresetSettings();
+
         item.x = preset.x;
-        item.y = preset.y;
+        item.y = hudPreset.top;
         item.width =
           preset.width;
         item.height =
-          preset.height;
+          hudPreset.height;
       } else if (
         preserveAbsolute &&
         previous
@@ -3656,7 +3665,8 @@ export function createDevToolkit({
     state.overrides = {};
     state.project = {
       components: [],
-      assetOverrides: {}
+      assetOverrides: {},
+      uiPresets: {}
     };
 
     writeOverrides(
@@ -3738,6 +3748,105 @@ export function createDevToolkit({
   }
 
 
+
+  function topHudPresetSettings() {
+    const saved =
+      state.project.uiPresets?.topHud ||
+      {};
+
+    return {
+      height: clamp(
+        Math.round(
+          Number(saved.height ?? 64)
+        ),
+        40,
+        88
+      ),
+      top: clamp(
+        Math.round(
+          Number(saved.top ?? 6)
+        ),
+        0,
+        40
+      )
+    };
+  }
+
+  function ensureProjectPresets() {
+    if (
+      !state.project.uiPresets ||
+      typeof state.project.uiPresets !== "object"
+    ) {
+      state.project.uiPresets = {};
+    }
+
+    if (
+      !state.project.uiPresets.topHud ||
+      typeof state.project.uiPresets.topHud !== "object"
+    ) {
+      state.project.uiPresets.topHud = {};
+    }
+
+    return state.project.uiPresets.topHud;
+  }
+
+  function setTopHudPresetValue(
+    property,
+    rawValue
+  ) {
+    const number =
+      Number(rawValue);
+
+    if (!Number.isFinite(number)) {
+      return;
+    }
+
+    pushHistory();
+
+    const preset =
+      ensureProjectPresets();
+
+    if (property === "height") {
+      preset.height =
+        clamp(
+          Math.round(number),
+          40,
+          88
+        );
+    } else if (property === "top") {
+      preset.top =
+        clamp(
+          Math.round(number),
+          0,
+          40
+        );
+    } else {
+      return;
+    }
+
+    persistProject();
+    autoLayoutTopHud(false);
+  }
+
+  function applyTopHudSizePreset(
+    height
+  ) {
+    pushHistory();
+
+    const preset =
+      ensureProjectPresets();
+
+    preset.height =
+      clamp(
+        Math.round(height),
+        40,
+        88
+      );
+
+    persistProject();
+    autoLayoutTopHud(false);
+  }
+
   function inspectTopHud() {
     const items =
       state.project.components.filter(
@@ -3812,7 +3921,9 @@ export function createDevToolkit({
     };
   }
 
-  function autoLayoutTopHud() {
+  function autoLayoutTopHud(
+    recordHistory = true
+  ) {
     const inspection =
       inspectTopHud();
 
@@ -3845,7 +3956,9 @@ export function createDevToolkit({
       return;
     }
 
-    pushHistory();
+    if (recordHistory) {
+      pushHistory();
+    }
 
     for (
       const [uiType, item]
@@ -4219,6 +4332,40 @@ export function createDevToolkit({
       ${layers}
 
       <section class="dev-preset-actions">
+        <div class="dev-hud-size-toolbar">
+          <div class="dev-hud-size-fields">
+            <label>
+              <span>高度 H</span>
+              <input
+                type="number"
+                inputmode="numeric"
+                min="40"
+                max="88"
+                value="${topHudPresetSettings().height}"
+                data-dev-hud-preset="height"
+              >
+            </label>
+            <label>
+              <span>顶部 Y</span>
+              <input
+                type="number"
+                inputmode="numeric"
+                min="0"
+                max="40"
+                value="${topHudPresetSettings().top}"
+                data-dev-hud-preset="top"
+              >
+            </label>
+          </div>
+
+          <div class="dev-hud-size-presets">
+            <button type="button" data-dev-hud-size="48">紧凑</button>
+            <button type="button" data-dev-hud-size="56">标准</button>
+            <button type="button" data-dev-hud-size="64">大</button>
+            <button type="button" data-dev-hud-size="72">加大</button>
+          </div>
+        </div>
+
         <button
           class="primary"
           type="button"
@@ -5100,10 +5247,35 @@ export function createDevToolkit({
     });
 
 
-    host.querySelector("[data-dev-auto-top-hud]")?.addEventListener(
-      "click",
-      autoLayoutTopHud
-    );
+    host.querySelectorAll("[data-dev-auto-top-hud]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () => autoLayoutTopHud(true)
+      );
+    });
+
+    host.querySelectorAll("[data-dev-hud-preset]").forEach(input => {
+      input.addEventListener(
+        "change",
+        () =>
+          setTopHudPresetValue(
+            input.dataset.devHudPreset,
+            input.value
+          )
+      );
+    });
+
+    host.querySelectorAll("[data-dev-hud-size]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          applyTopHudSizePreset(
+            Number(
+              button.dataset.devHudSize
+            )
+          )
+      );
+    });
 
     host.querySelectorAll("[data-dev-position-parent]").forEach(button => {
       button.addEventListener(

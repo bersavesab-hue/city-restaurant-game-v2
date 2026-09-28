@@ -303,6 +303,62 @@
   line-height: 1.45;
 }
 
+
+.dev-hud-size-toolbar {
+  margin-bottom: 9px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #34434c;
+}
+
+.dev-hud-size-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.dev-hud-size-fields label {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+
+.dev-hud-size-fields span {
+  color: #a7bac3;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.dev-hud-size-fields input {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 7px;
+  border: 1px solid #465763;
+  border-radius: 8px;
+  background: #1c2830;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.dev-hud-size-presets {
+  margin-top: 7px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.dev-hud-size-presets button {
+  min-height: 34px;
+  border: 1px solid #4a5660;
+  border-radius: 7px;
+  background: #27323a;
+  color: #dfe7ea;
+  font-size: 8px;
+  font-weight: 850;
+}
+
 .dev-preset-actions {
   margin: 8px 0;
   padding: 9px;
