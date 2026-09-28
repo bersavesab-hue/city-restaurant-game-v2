@@ -230,3 +230,342 @@ button {
   pointer-events: none;
   user-select: none;
 }
+
+/* T04-UI playable bridge: real game state, intentionally not final art. */
+.playtest-dashboard {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top:
+    max(
+      var(--safe-top),
+      12px
+    );
+  bottom:
+    max(
+      var(--safe-bottom),
+      18px
+    );
+  z-index: 120;
+  display: grid;
+  grid-template-rows:
+    auto
+    auto
+    auto
+    minmax(0, 1.25fr)
+    minmax(0, .92fr)
+    auto
+    auto;
+  gap: 9px;
+  overflow: hidden;
+  color: #f6f2e9;
+  pointer-events: auto;
+}
+
+.playtest-top-card,
+.playtest-card,
+.playtest-kpi-grid article,
+.playtest-feedback {
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(20,29,35,.88);
+  box-shadow: 0 8px 20px rgba(0,0,0,.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.playtest-top-card {
+  min-height: 82px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 18px;
+}
+
+.playtest-top-card small,
+.playtest-card small {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(235,241,244,.62);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.playtest-top-card h1 {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.08;
+}
+
+.playtest-top-card p,
+.playtest-hint {
+  margin: 6px 0 0;
+  color: rgba(238,244,246,.72);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.playtest-money {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.playtest-money strong {
+  display: block;
+  color: #ffe2a2;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.playtest-kpi-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+  gap: 7px;
+}
+
+.playtest-kpi-grid article {
+  min-width: 0;
+  min-height: 62px;
+  padding: 9px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 14px;
+}
+
+.playtest-kpi-grid span {
+  overflow: hidden;
+  color: rgba(236,242,245,.65);
+  font-size: 9px;
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.playtest-kpi-grid strong {
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.playtest-card {
+  min-height: 0;
+  padding: 11px 12px;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.playtest-section-head {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+}
+
+.playtest-section-head > div {
+  min-width: 0;
+}
+
+.playtest-section-head strong {
+  display: block;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.playtest-section-head > span {
+  color: rgba(239,244,247,.7);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.playtest-dashboard button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 11px;
+  color: #f7f1e6;
+  background: rgba(255,255,255,.08);
+  font-size: 11px;
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.playtest-dashboard button:active {
+  transform: translateY(1px);
+}
+
+.playtest-dashboard button.is-active {
+  border-color: rgba(255,209,119,.65);
+  color: #ffe2a2;
+  background: rgba(188,126,38,.22);
+}
+
+.playtest-dashboard button:disabled {
+  opacity: .38;
+  cursor: default;
+}
+
+.playtest-speed-row,
+.playtest-action-row {
+  margin-top: 10px;
+  display: grid;
+  gap: 7px;
+}
+
+.playtest-speed-row {
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, .72fr)
+    )
+    minmax(
+      0,
+      1.45fr
+    );
+}
+
+.playtest-action-row {
+  grid-template-columns:
+    1fr
+    1fr;
+}
+
+.playtest-stock-list {
+  margin-top: 9px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 6px;
+  overflow: hidden;
+}
+
+.playtest-stock-row {
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.055);
+}
+
+.playtest-stock-row span,
+.playtest-stock-row strong {
+  overflow: hidden;
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.playtest-stock-row span {
+  color: rgba(240,244,246,.72);
+}
+
+.playtest-stock-row strong {
+  color: #fff0c7;
+}
+
+.playtest-empty {
+  grid-column: 1 / -1;
+  padding: 12px;
+  border-radius: 10px;
+  color: rgba(240,244,246,.55);
+  background: rgba(255,255,255,.045);
+  font-size: 11px;
+  text-align: center;
+}
+
+.playtest-progress {
+  margin-top: 10px;
+}
+
+.playtest-progress > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: rgba(240,244,246,.72);
+  font-size: 10px;
+}
+
+.playtest-progress-track {
+  height: 7px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+}
+
+.playtest-progress-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: rgba(255,209,119,.82);
+}
+
+.playtest-settlement {
+  min-height: 96px;
+}
+
+.playtest-feedback {
+  min-height: 30px;
+  padding: 8px 11px;
+  overflow: hidden;
+  border-radius: 12px;
+  color: rgba(240,246,248,.8);
+  font-size: 10px;
+  line-height: 1.35;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-height: 760px) {
+  .playtest-dashboard {
+    gap: 6px;
+  }
+
+  .playtest-top-card {
+    min-height: 68px;
+    padding: 9px 11px;
+  }
+
+  .playtest-top-card h1 {
+    font-size: 18px;
+  }
+
+  .playtest-card {
+    padding: 8px 10px;
+  }
+
+  .playtest-kpi-grid article {
+    min-height: 52px;
+  }
+
+  .playtest-hint {
+    margin-top: 4px;
+  }
+
+  .playtest-speed-row,
+  .playtest-action-row,
+  .playtest-stock-list,
+  .playtest-progress {
+    margin-top: 6px;
+  }
+}
