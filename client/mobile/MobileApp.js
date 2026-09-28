@@ -7,6 +7,10 @@ import {
 } from "./DevToolkit.js";
 
 import {
+  createMobileGameController
+} from "./MobileGameController.js";
+
+import {
   renderHomePage
 } from "./HomePage.js";
 
@@ -41,6 +45,28 @@ window.__CITY_RUNTIME_SESSION__ =
 window.__CITY_RUNTIME_STATUS__ =
   runtimeStatus;
 
+const gameController =
+  createMobileGameController(
+    app
+  );
+
+const starterState =
+  gameController
+    .ensureStarterState();
+
+if (
+  starterState.created &&
+  !runtimeSession
+    .isSaveBlocked()
+) {
+  runtimeSession.saveNow(
+    "starter-created"
+  );
+}
+
+window.__CITY_GAME_CONTROLLER__ =
+  gameController;
+
 const buildLabel =
   `v${__APP_VERSION__} · ${__BUILD_GIT_SHA__}`;
 
@@ -62,6 +88,10 @@ const devToolkit =
   });
 
 function render() {
+  const viewModel =
+    gameController
+      .getViewModel();
+
   root.innerHTML = `
     <div
       class="screen-stage"
@@ -70,7 +100,9 @@ function render() {
       data-design-height="960"
     >
       <section class="page-host">
-        ${renderHomePage()}
+        ${renderHomePage(
+          viewModel
+        )}
       </section>
 
       <div
@@ -85,6 +117,61 @@ function render() {
 
   devToolkit.afterRender();
 }
+
+function shouldSkipRefresh() {
+  const active =
+    document.activeElement;
+
+  if (
+    active instanceof
+      HTMLInputElement &&
+    active.closest(
+      "#ui-dev-root"
+    )
+  ) {
+    return true;
+  }
+
+  return Boolean(
+    document.querySelector(
+      ".ui-dev-sheet"
+    )
+  );
+}
+
+root.addEventListener(
+  "click",
+  event => {
+    const button =
+      event.target.closest(
+        "[data-game-action]"
+      );
+
+    if (
+      !button ||
+      button.disabled
+    ) {
+      return;
+    }
+
+    const action =
+      button.dataset
+        .gameAction;
+
+    const value =
+      button.dataset
+        .gameValue ??
+      null;
+
+    gameController
+      .performAction(
+        action,
+        value
+      );
+
+    render();
+  }
+);
 
 window.addEventListener(
   "ui-screen-resize",
@@ -107,6 +194,17 @@ window.addEventListener(
 
     devToolkit.afterRender();
   }
+);
+
+setInterval(
+  () => {
+    if (
+      !shouldSkipRefresh()
+    ) {
+      render();
+    }
+  },
+  3000
 );
 
 render();
