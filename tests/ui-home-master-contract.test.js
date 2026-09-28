@@ -410,14 +410,37 @@ test(
       );
     }
 
+    const primaryBlocks =
+      [
+        ...css.matchAll(
+          /\.home-primary-content\s*\{([\s\S]*?)\}/g
+        )
+      ].map(
+        match =>
+          match[1]
+      );
+
+    const positionedPrimary =
+      primaryBlocks.find(
+        block =>
+          /top:/.test(
+            block
+          )
+      ) ??
+      "";
+
+    assert.ok(
+      positionedPrimary
+    );
+
     assert.match(
-      css,
-      /\.home-primary-content\s*\{\s*top:[\s\S]*?overflow:\s*hidden/
+      positionedPrimary,
+      /overflow:\s*hidden/
     );
 
     assert.doesNotMatch(
-      css,
-      /\.home-primary-content\s*\{\s*top:[\s\S]*?overflow-y:\s*(auto|scroll)/
+      positionedPrimary,
+      /overflow-y:\s*(auto|scroll)/
     );
 
     assert.match(
