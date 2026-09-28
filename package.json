@@ -36,7 +36,10 @@
     "test:phase3:performance": "node scripts/phase3-performance-gate.mjs",
     "test:save-compat": "node scripts/save-compatibility-gate.mjs",
     "test:ui": "node --test tests/ui-screen-adapter.test.js tests/ui-home-master-contract.test.js tests/ui-background-layer.test.js tests/ui-dev-toolkit-contract.test.js tests/ui-mobile-keyboard.test.js tests/ui-layer-panel.test.js tests/ui-guides.test.js tests/ui-anchor-layout.test.js tests/ui-z-layer.test.js tests/ui-top-hud-preset.test.js tests/ui-component-types.test.js tests/ui-hud-local-preset.test.js",
-    "build:mobile-ui": "node scripts/build-mobile-ui.mjs"
+    "build:mobile-ui": "node scripts/build-mobile-ui.mjs",
+    "check:version": "node scripts/check-version-sync.mjs",
+    "test:core:smoke": "node --test tests/foundation-v2-smoke.test.js tests/procurement-flow.test.js tests/operating-day-e2e.test.js",
+    "test:ci": "npm run check:version && npm run test:core:smoke && npm run test:save-compat && npm run test:ui && npm run build:mobile-ui"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
