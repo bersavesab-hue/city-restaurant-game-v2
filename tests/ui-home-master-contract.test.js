@@ -410,35 +410,19 @@ test(
       );
     }
 
-    const primaryBlock =
-      css.match(
-        /\.home-primary-content\s*\{([\s\S]*?)\}/
-      )?.[1] ??
-      "";
-
-    const listBlock =
-      css.match(
-        /\.formal-scroll-list\s*\{([\s\S]*?)\}/
-      )?.[1] ??
-      "";
-
-    assert.ok(
-      primaryBlock
-    );
-
     assert.match(
-      primaryBlock,
-      /overflow:\s*hidden/
+      css,
+      /\.home-primary-content\s*\{\s*top:[\s\S]*?overflow:\s*hidden/
     );
 
     assert.doesNotMatch(
-      primaryBlock,
-      /overflow-y:\s*(auto|scroll)/
+      css,
+      /\.home-primary-content\s*\{\s*top:[\s\S]*?overflow-y:\s*(auto|scroll)/
     );
 
     assert.match(
-      listBlock,
-      /overflow-y:\s*auto/
+      css,
+      /\.formal-scroll-list\s*\{[\s\S]*?overflow-y:\s*auto/
     );
   }
 );
