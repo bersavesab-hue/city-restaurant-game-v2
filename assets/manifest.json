@@ -1,15 +1,196 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "project": "city-restaurant-game-v2",
   "logicalReference": {
     "width": 540,
     "height": 960,
-    "note": "Logical UI coordinate reference only; source artwork may use higher pixel dimensions."
+    "note": "Logical UI coordinate reference only; source artwork may use higher pixel dimensions. 9:19.5 and 9:20 extend logical height without stretching the 540x960 reference frame."
   },
-  "assets": [],
+  "sourcePolicy": {
+    "approvedRuntimeRoot": "client/mobile/assets",
+    "recoveredReferenceRoot": "client/mobile/assets/home/recovered",
+    "recoveredFromCommit": "33400d19c27c7617c110eb82c748468a69a015b4"
+  },
+  "slots": [
+    {
+      "id": "home.background",
+      "role": "background",
+      "status": "missing",
+      "runtimePath": null,
+      "fallback": "css",
+      "dynamicDataAllowed": false,
+      "note": "Needs a clean full-screen or cover-safe master; recovered scene-clean is only an old scene crop."
+    },
+    {
+      "id": "home.topChrome",
+      "role": "fixed_ui",
+      "status": "missing",
+      "runtimePath": null,
+      "fallback": "css",
+      "dynamicDataAllowed": false,
+      "note": "Static frame only. Date, time, money, rating and level remain live text."
+    },
+    {
+      "id": "home.bottomNav",
+      "role": "fixed_ui",
+      "status": "missing",
+      "runtimePath": null,
+      "fallback": "css",
+      "dynamicDataAllowed": false,
+      "note": "Needs five-route neutral/selected artwork strategy. Recovered nav-home only represents the old store-selected state."
+    },
+    {
+      "id": "home.quick.staff",
+      "role": "icon",
+      "status": "missing",
+      "runtimePath": null,
+      "fallback": "css_glyph",
+      "dynamicDataAllowed": false
+    },
+    {
+      "id": "home.quick.dish",
+      "role": "icon",
+      "status": "missing",
+      "runtimePath": null,
+      "fallback": "css_glyph",
+      "dynamicDataAllowed": false
+    },
+    {
+      "id": "home.quick.activity",
+      "role": "icon",
+      "status": "missing",
+      "runtimePath": null,
+      "fallback": "css_glyph",
+      "dynamicDataAllowed": false
+    },
+    {
+      "id": "home.quick.storage",
+      "role": "icon",
+      "status": "missing",
+      "runtimePath": null,
+      "fallback": "css_glyph",
+      "dynamicDataAllowed": false
+    },
+    {
+      "id": "home.districtDecoration",
+      "role": "decoration",
+      "status": "candidate",
+      "runtimePath": "client/mobile/assets/home/recovered/city-skyline.png",
+      "fallback": "none",
+      "dynamicDataAllowed": false
+    }
+  ],
+  "assets": [
+    {
+      "id": "recovered.avatarChef",
+      "path": "client/mobile/assets/home/recovered/avatar-chef.png",
+      "status": "reference",
+      "role": "avatar_reference",
+      "dynamicDataBaked": false,
+      "note": "Historical role avatar; do not assign to every generated chef identity."
+    },
+    {
+      "id": "recovered.avatarServer",
+      "path": "client/mobile/assets/home/recovered/avatar-server.png",
+      "status": "reference",
+      "role": "avatar_reference",
+      "dynamicDataBaked": false,
+      "note": "Historical role avatar; do not assign to every generated server identity."
+    },
+    {
+      "id": "recovered.citySkyline",
+      "path": "client/mobile/assets/home/recovered/city-skyline.png",
+      "status": "candidate",
+      "role": "decoration",
+      "dynamicDataBaked": false,
+      "note": "Potential static district decoration after visual review."
+    },
+    {
+      "id": "recovered.feedHeader",
+      "path": "client/mobile/assets/home/recovered/feed-header.png",
+      "status": "reference",
+      "role": "legacy_header",
+      "dynamicDataBaked": false,
+      "note": "Old flattened homepage section header; current formal home has no equivalent section."
+    },
+    {
+      "id": "recovered.growthBusiness",
+      "path": "client/mobile/assets/home/recovered/growth-business.png",
+      "status": "reference",
+      "role": "legacy_action",
+      "dynamicDataBaked": false
+    },
+    {
+      "id": "recovered.growthHeader",
+      "path": "client/mobile/assets/home/recovered/growth-header.png",
+      "status": "reference",
+      "role": "legacy_header",
+      "dynamicDataBaked": false
+    },
+    {
+      "id": "recovered.growthRenovation",
+      "path": "client/mobile/assets/home/recovered/growth-renovation.png",
+      "status": "reference",
+      "role": "legacy_action",
+      "dynamicDataBaked": false
+    },
+    {
+      "id": "recovered.growthResearch",
+      "path": "client/mobile/assets/home/recovered/growth-research.png",
+      "status": "reference",
+      "role": "legacy_action",
+      "dynamicDataBaked": false
+    },
+    {
+      "id": "recovered.growthStaff",
+      "path": "client/mobile/assets/home/recovered/growth-staff.png",
+      "status": "reference",
+      "role": "legacy_action",
+      "dynamicDataBaked": false
+    },
+    {
+      "id": "recovered.marketHeader",
+      "path": "client/mobile/assets/home/recovered/market-header.png",
+      "status": "reference",
+      "role": "legacy_header",
+      "dynamicDataBaked": false
+    },
+    {
+      "id": "recovered.navHome",
+      "path": "client/mobile/assets/home/recovered/nav-home.png",
+      "status": "repair",
+      "role": "legacy_nav",
+      "dynamicDataBaked": false,
+      "note": "Only old home-selected navigation state; cannot be the final five-route dynamic nav by itself."
+    },
+    {
+      "id": "recovered.opportunityHeader",
+      "path": "client/mobile/assets/home/recovered/opportunity-header.png",
+      "status": "reference",
+      "role": "legacy_header",
+      "dynamicDataBaked": false
+    },
+    {
+      "id": "recovered.sceneClean",
+      "path": "client/mobile/assets/home/recovered/scene-clean.png",
+      "status": "repair",
+      "role": "scene_crop",
+      "dynamicDataBaked": false,
+      "note": "Clean old restaurant scene crop; not a full-screen 9:16 master."
+    },
+    {
+      "id": "recovered.scheduleHeader",
+      "path": "client/mobile/assets/home/recovered/schedule-header.png",
+      "status": "reference",
+      "role": "legacy_header",
+      "dynamicDataBaked": false
+    }
+  ],
   "rules": {
     "dynamicDataMayBeBakedIntoArtwork": false,
     "preserveOriginalMaster": true,
-    "exactResizeAndCropUseDeterministicScripts": true
+    "exactResizeAndCropUseDeterministicScripts": true,
+    "runtimeMustNotReadRecoveredReferenceAssetsUnlessManifestSlotPointsToThem": true,
+    "doNotUseWholeFlattenedUiScreensAsRuntimeArtwork": true
   }
 }
