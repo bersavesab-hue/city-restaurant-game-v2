@@ -1,6 +1,114 @@
 const STORAGE_KEY = "city-restaurant-ui-dev-overrides.v6";
 const PROJECT_STORAGE_KEY = "city-restaurant-ui-dev-project.v6";
 
+const UI_TYPE_OPTIONS = [
+  ["generic", "普通素材"],
+  ["top_date", "日期卡"],
+  ["top_time", "时间卡"],
+  ["top_money", "资金卡"],
+  ["top_rating", "星级卡"],
+  ["top_level", "等级卡"],
+  ["top_settings", "设置按钮"],
+  ["background", "背景图"]
+];
+
+const TOP_HUD_LAYOUT = {
+  top_date: {
+    x: 8,
+    y: 8,
+    width: 104,
+    height: 47,
+    zIndex: 100,
+    anchor: "top-left"
+  },
+  top_time: {
+    x: 115,
+    y: 8,
+    width: 91,
+    height: 47,
+    zIndex: 100,
+    anchor: "top-left"
+  },
+  top_money: {
+    x: 207,
+    y: 8,
+    width: 122,
+    height: 47,
+    zIndex: 100,
+    anchor: "top-left"
+  },
+  top_rating: {
+    x: 331,
+    y: 8,
+    width: 74,
+    height: 47,
+    zIndex: 100,
+    anchor: "top-left"
+  },
+  top_level: {
+    x: 407,
+    y: 8,
+    width: 98,
+    height: 47,
+    zIndex: 100,
+    anchor: "top-left"
+  },
+  top_settings: {
+    x: 5,
+    y: 8,
+    width: 30,
+    height: 47,
+    zIndex: 110,
+    anchor: "top-right"
+  }
+};
+
+const UI_TYPE_PATTERNS = {
+  top_date: /日期|阳光日期牌|date/i,
+  top_time: /时钟|时间|clock|time/i,
+  top_money: /货币|资金|money|cash/i,
+  top_rating: /星徽|星级|评分|rating|star/i,
+  top_level: /皇冠|等级|level/i,
+  top_settings: /齿轮|设置|setting|gear/i
+};
+
+function uiTypeLabel(value) {
+  return (
+    UI_TYPE_OPTIONS.find(
+      item => item[0] === value
+    )?.[1] ||
+    "普通素材"
+  );
+}
+
+function inferUiTypeFromName(
+  name,
+  role = ""
+) {
+  if (
+    role === "background" ||
+    isBackgroundAssetName(name)
+  ) {
+    return "background";
+  }
+
+  const value =
+    String(name || "");
+
+  for (
+    const [type, pattern]
+    of Object.entries(
+      UI_TYPE_PATTERNS
+    )
+  ) {
+    if (pattern.test(value)) {
+      return type;
+    }
+  }
+
+  return "generic";
+}
+
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
@@ -507,6 +615,8 @@ export function createDevToolkit({
     },
     project: readProject(),
     uploadMode: "add",
+    pendingUpload: null,
+    hudStatus: "",
     report: null,
     overrides: readOverrides(),
     undoStack: [],
@@ -797,6 +907,175 @@ export function createDevToolkit({
     ) || null;
   }
 
+  function applyUiTypePreset(
+    item,
+    uiType,
+    {
+      applyGeometry = false,
+      preserveAbsolute = false
+    } = {}
+  ) {
+    if (!item) return;
+
+    const valid =
+      UI_TYPE_OPTIONS.some(
+        option =>
+          option[0] === uiType
+      )
+        ? uiType
+        : "generic";
+
+    const previous =
+      preserveAbsolute
+        ? resolveItemPlacement(item)
+        : null;
+
+    item.uiType = valid;
+
+    if (valid === "background") {
+      const rect =
+        logicalRect(
+          projectPageRoot()
+        );
+
+      item.role = "background";
+      item.name =
+        "00_home_background";
+      item.positionParent =
+        "canvas";
+      item.anchor =
+        "top-left";
+      item.x = 0;
+      item.y = 0;
+      item.width =
+        Math.round(rect.width);
+      item.height =
+        Math.round(rect.height);
+      item.zIndex = 0;
+      item.lockAspect = false;
+      item.objectFit = "cover";
+      item.backgroundInitialized =
+        true;
+      return;
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(
+        TOP_HUD_LAYOUT,
+        valid
+      )
+    ) {
+      const preset =
+        TOP_HUD_LAYOUT[valid];
+
+      item.role = "hud";
+      item.name = valid;
+      item.positionParent =
+        "safe";
+      item.anchor =
+        preset.anchor;
+      item.zIndex =
+        preset.zIndex;
+      item.lockAspect = false;
+      item.objectFit = "fill";
+      item.backgroundInitialized =
+        false;
+
+      if (applyGeometry) {
+        item.x = preset.x;
+        item.y = preset.y;
+        item.width =
+          preset.width;
+        item.height =
+          preset.height;
+      } else if (
+        preserveAbsolute &&
+        previous
+      ) {
+        setItemAbsolutePosition(
+          item,
+          previous.left,
+          previous.top
+        );
+      }
+
+      return;
+    }
+
+    item.role = "component";
+    item.positionParent =
+      item.positionParent ||
+      "canvas";
+    item.anchor =
+      item.anchor ||
+      "top-left";
+    item.backgroundInitialized =
+      false;
+
+    if (
+      preserveAbsolute &&
+      previous
+    ) {
+      setItemAbsolutePosition(
+        item,
+        previous.left,
+        previous.top
+      );
+    }
+  }
+
+  function setSelectedUiType(uiType) {
+    const info =
+      selectedInfo();
+
+    if (!info?.customId) return;
+
+    const item =
+      customComponentById(
+        info.customId
+      );
+
+    if (!item) return;
+
+    pushHistory();
+
+    if (uiType === "background") {
+      state.project.components =
+        state.project.components.filter(
+          entry =>
+            entry.id === item.id ||
+            !(
+              entry.page ===
+                getActivePage() &&
+              (
+                entry.role ===
+                  "background" ||
+                entry.uiType ===
+                  "background"
+              )
+            )
+        );
+    }
+
+    applyUiTypePreset(
+      item,
+      uiType,
+      {
+        preserveAbsolute:
+          uiType !== "background"
+      }
+    );
+
+    persistProject();
+    refreshProjectSelection(
+      item.id
+    );
+
+    showToast(
+      `组件类型：${uiTypeLabel(item.uiType)}`
+    );
+  }
+
   function persistProject() {
     writeProject(state.project);
   }
@@ -848,6 +1127,15 @@ export function createDevToolkit({
         projectChanged = true;
       }
 
+      if (!item.uiType) {
+        item.uiType =
+          inferUiTypeFromName(
+            item.name,
+            item.role
+          );
+        projectChanged = true;
+      }
+
       const legacyFullCanvasBackground =
         item.type === "image" &&
         item.role !== "background" &&
@@ -873,6 +1161,8 @@ export function createDevToolkit({
           legacyFullCanvasBackground
         ) {
           item.role =
+            "background";
+          item.uiType =
             "background";
           item.name =
             "00_home_background";
@@ -907,6 +1197,8 @@ export function createDevToolkit({
         ) {
           item.x = 0;
           item.y = 0;
+          item.uiType =
+            "background";
           item.positionParent =
             "canvas";
           item.anchor =
@@ -1537,6 +1829,12 @@ export function createDevToolkit({
         custom?.hidden === true,
       role:
         custom?.role || "",
+      uiType:
+        custom?.uiType ||
+        inferUiTypeFromName(
+          custom?.name,
+          custom?.role
+        ),
       positionParent:
         custom?.positionParent ||
         "canvas",
@@ -2835,6 +3133,8 @@ export function createDevToolkit({
 
     item.role =
       "background";
+    item.uiType =
+      "background";
     item.name =
       "00_home_background";
     item.positionParent =
@@ -2877,7 +3177,79 @@ export function createDevToolkit({
     fileInput.click();
   }
 
-  async function handleImageFile(file) {
+  function pendingUploadMarkup() {
+    const pending =
+      state.pendingUpload;
+
+    if (!pending) {
+      return "";
+    }
+
+    return `
+      <section class="dev-upload-type-picker">
+        <div class="dev-upload-type-head">
+          <div>
+            <strong>选择组件类型</strong>
+            <small>${escapeHtml(pending.name || "图片")}</small>
+          </div>
+          <button
+            type="button"
+            data-dev-cancel-upload-type
+            aria-label="取消"
+          >×</button>
+        </div>
+
+        <div class="dev-upload-type-grid">
+          ${UI_TYPE_OPTIONS
+            .filter(
+              option =>
+                option[0] !==
+                "background"
+            )
+            .map(
+              ([value, label]) => `
+                <button
+                  type="button"
+                  data-dev-upload-type="${value}"
+                >
+                  <strong>${label}</strong>
+                  <small>${value}</small>
+                </button>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  async function confirmPendingUpload(
+    uiType
+  ) {
+    const pending =
+      state.pendingUpload;
+
+    if (!pending?.file) {
+      return;
+    }
+
+    state.pendingUpload = null;
+
+    await handleImageFile(
+      pending.file,
+      uiType
+    );
+  }
+
+  function cancelPendingUpload() {
+    state.pendingUpload = null;
+    renderPanel();
+  }
+
+  async function handleImageFile(
+    file,
+    forcedUiType = ""
+  ) {
     if (!file) return;
 
     const src =
@@ -3053,12 +3425,20 @@ export function createDevToolkit({
         Math.round(height)
       );
 
-    const background =
-      state.uploadMode ===
-        "background" ||
-      isBackgroundAssetName(
-        file.name
+    const requestedUiType =
+      forcedUiType ||
+      (
+        state.uploadMode ===
+          "background"
+          ? "background"
+          : inferUiTypeFromName(
+              file.name
+            )
       );
+
+    const background =
+      requestedUiType ===
+        "background";
 
     if (background) {
       state.project.components =
@@ -3085,6 +3465,8 @@ export function createDevToolkit({
       page:
         getActivePage(),
       type: "image",
+      uiType:
+        requestedUiType,
       positionParent:
         "canvas",
       anchor:
@@ -3157,6 +3539,18 @@ export function createDevToolkit({
         background
     };
 
+    applyUiTypePreset(
+      item,
+      requestedUiType,
+      {
+        applyGeometry:
+          Object.prototype.hasOwnProperty.call(
+            TOP_HUD_LAYOUT,
+            requestedUiType
+          )
+      }
+    );
+
     state.project.components.push(
       item
     );
@@ -3177,8 +3571,33 @@ export function createDevToolkit({
   fileInput.addEventListener(
     "change",
     () => {
+      const file =
+        fileInput.files?.[0];
+
+      if (!file) return;
+
+      if (
+        state.uploadMode ===
+        "add"
+      ) {
+        state.pendingUpload = {
+          file,
+          name:
+            file.name ||
+            "图片"
+        };
+        state.open = true;
+        state.tab = "edit";
+        renderPanel();
+        return;
+      }
+
       handleImageFile(
-        fileInput.files?.[0]
+        file,
+        state.uploadMode ===
+          "background"
+          ? "background"
+          : ""
       ).catch(
         () =>
           showToast(
@@ -3274,9 +3693,9 @@ export function createDevToolkit({
 
   function exportJson() {
     const payload = {
-      version: 5,
+      version: 6,
       page: getActivePage(),
-      layoutMode: "component-layout-v6-responsive-logical-space",
+      layoutMode: "component-layout-v7-typed-responsive-space",
       overrides:
         state.overrides,
       project:
@@ -3319,126 +3738,145 @@ export function createDevToolkit({
   }
 
 
-  function autoLayoutTopHud() {
+  function inspectTopHud() {
     const items =
       state.project.components.filter(
         item =>
-          item.page === getActivePage() &&
+          item.page ===
+            getActivePage() &&
           item.type === "image" &&
-          item.role !== "background"
+          item.role !== "background" &&
+          item.uiType !== "background"
       );
 
-    const rules = [
-      {
-        key: "date",
-        test: /日期|阳光日期牌|date/i,
-        x: 8,
-        y: 8,
-        width: 104,
-        height: 47,
-        zIndex: 100,
-        anchor: "top-left"
-      },
-      {
-        key: "time",
-        test: /时钟|时间|clock|time/i,
-        x: 115,
-        y: 8,
-        width: 91,
-        height: 47,
-        zIndex: 100,
-        anchor: "top-left"
-      },
-      {
-        key: "money",
-        test: /货币|资金|money|cash/i,
-        x: 207,
-        y: 8,
-        width: 122,
-        height: 47,
-        zIndex: 100,
-        anchor: "top-left"
-      },
-      {
-        key: "rating",
-        test: /星徽|星级|评分|rating|star/i,
-        x: 331,
-        y: 8,
-        width: 74,
-        height: 47,
-        zIndex: 100,
-        anchor: "top-left"
-      },
-      {
-        key: "level",
-        test: /皇冠|等级|level/i,
-        x: 407,
-        y: 8,
-        width: 98,
-        height: 47,
-        zIndex: 100,
-        anchor: "top-left"
-      },
-      {
-        key: "settings",
-        test: /齿轮|设置|setting|gear/i,
-        x: 5,
-        y: 8,
-        width: 30,
-        height: 47,
-        zIndex: 110,
-        anchor: "top-right"
-      }
-    ];
-
-    const found = [];
+    const mapping = {};
+    const missing = [];
+    const duplicates = [];
     const used = new Set();
 
-    for (const rule of rules) {
-      const item =
-        items.find(
-          candidate =>
-            !used.has(candidate.id) &&
-            rule.test.test(
-              String(candidate.name || "")
-            )
+    for (
+      const uiType
+      of Object.keys(
+        TOP_HUD_LAYOUT
+      )
+    ) {
+      const typed =
+        items.filter(
+          item =>
+            item.uiType ===
+            uiType
         );
 
-      if (!item) continue;
+      if (typed.length > 1) {
+        duplicates.push(
+          `${uiTypeLabel(uiType)}×${typed.length}`
+        );
+      }
 
-      used.add(item.id);
-      found.push(rule.key);
+      let item =
+        typed[0] || null;
 
-      item.positionParent = "safe";
-      item.anchor = rule.anchor;
-      item.x = rule.x;
-      item.y = rule.y;
-      item.width = rule.width;
-      item.height = rule.height;
-      item.zIndex = rule.zIndex;
-      item.lockAspect = false;
-      item.objectFit = "fill";
-      item.hidden = false;
+      if (!item) {
+        const pattern =
+          UI_TYPE_PATTERNS[
+            uiType
+          ];
+
+        item =
+          items.find(
+            candidate =>
+              !used.has(candidate.id) &&
+              pattern.test(
+                String(
+                  candidate.name ||
+                  ""
+                )
+              )
+          ) || null;
+      }
+
+      if (item) {
+        mapping[uiType] = item;
+        used.add(item.id);
+      } else {
+        missing.push(
+          uiTypeLabel(uiType)
+        );
+      }
     }
 
-    if (!found.length) {
+    return {
+      mapping,
+      missing,
+      duplicates
+    };
+  }
+
+  function autoLayoutTopHud() {
+    const inspection =
+      inspectTopHud();
+
+    if (
+      inspection.duplicates.length
+    ) {
+      state.hudStatus =
+        `不能排版；重复：${inspection.duplicates.join("、")}`;
+
+      renderPanel();
       showToast(
-        "没识别到顶部素材，请保留日期/时间/资金/星级/等级/设置关键词"
+        "顶部 HUD 有重复类型"
+      );
+      return;
+    }
+
+    const entries =
+      Object.entries(
+        inspection.mapping
+      );
+
+    if (!entries.length) {
+      state.hudStatus =
+        "没有识别到顶部 HUD。请先给组件选择类型。";
+
+      renderPanel();
+      showToast(
+        "请先设置组件类型"
       );
       return;
     }
 
     pushHistory();
+
+    for (
+      const [uiType, item]
+      of entries
+    ) {
+      applyUiTypePreset(
+        item,
+        uiType,
+        {
+          applyGeometry: true
+        }
+      );
+
+      item.hidden = false;
+    }
+
     persistProject();
     renderProjectComponents();
     assignIds();
 
     state.selected = null;
     renderSelectionChrome();
-    renderPanel();
 
+    state.hudStatus =
+      inspection.missing.length
+        ? `已排版 ${entries.length}/6；缺：${inspection.missing.join("、")}`
+        : "顶部 HUD 6/6 已完成排版";
+
+    renderPanel();
     showToast(
-      `顶部 HUD 已排版 ${found.length}/6`
+      state.hudStatus
     );
   }
 
@@ -3638,7 +4076,7 @@ export function createDevToolkit({
                 type="button"
                 data-dev-layer-select="${item.id}"
               >
-                <span>Z${Number(item.zIndex ?? 20)}</span>
+                <span>Z${Number(item.zIndex ?? 20)} · ${escapeHtml(uiTypeLabel(item.uiType || inferUiTypeFromName(item.name, item.role)))}</span>
                 <strong>${escapeHtml(item.name || item.id)}</strong>
               </button>
 
@@ -3763,9 +4201,12 @@ export function createDevToolkit({
     const info = selectedInfo();
     const layers =
       layerListMarkup();
+    const pendingUpload =
+      pendingUploadMarkup();
 
     if (!info) {
       return `
+        ${pendingUpload}
         ${layers}
         <div class="dev-empty">
           第一步先放主页背景。点“上传主页背景”选择图片，系统会自动置底、铺满并按屏幕比例裁剪；其他素材再用“＋ 上传组件”。
@@ -3774,8 +4215,8 @@ export function createDevToolkit({
     }
 
     return `
+      ${pendingUpload}
       ${layers}
-
 
       <section class="dev-preset-actions">
         <button
@@ -3786,8 +4227,12 @@ export function createDevToolkit({
           顶部 HUD 一键排版
         </button>
         <small>
-          自动识别日期 / 时间 / 资金 / 星级 / 等级 / 设置，并按 540 逻辑宽度缩放排列
+          优先按组件类型排版；旧素材才回退到名称识别。尺寸按 540 逻辑宽度自动套用。
         </small>
+        ${state.hudStatus
+          ? `<p class="dev-hud-status">${escapeHtml(state.hudStatus)}</p>`
+          : ""
+        }
       </section>
 
       <div class="dev-selected-card">
@@ -3810,6 +4255,20 @@ export function createDevToolkit({
                   value="${escapeHtml(info.label)}"
                   data-dev-name-input
                 >
+              </label>
+
+              <label class="dev-type-field">
+                <span>组件类型</span>
+                <select data-dev-ui-type>
+                  ${UI_TYPE_OPTIONS.map(
+                    ([value, label]) => `
+                      <option
+                        value="${value}"
+                        ${info.uiType === value ? "selected" : ""}
+                      >${label}</option>
+                    `
+                  ).join("")}
+                </select>
               </label>
 
               <div class="dev-component-actions">
@@ -4518,6 +4977,36 @@ export function createDevToolkit({
           event.target.value
         );
       }
+    );
+
+    host.querySelector("[data-dev-ui-type]")?.addEventListener(
+      "change",
+      event => {
+        setSelectedUiType(
+          event.target.value
+        );
+      }
+    );
+
+    host.querySelectorAll("[data-dev-upload-type]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () => {
+          confirmPendingUpload(
+            button.dataset.devUploadType
+          ).catch(
+            () =>
+              showToast(
+                "图片导入失败"
+              )
+          );
+        }
+      );
+    });
+
+    host.querySelector("[data-dev-cancel-upload-type]")?.addEventListener(
+      "click",
+      cancelPendingUpload
     );
     host.querySelectorAll("[data-dev-adjust]").forEach(button => {
       button.addEventListener("click", () => {

@@ -188,6 +188,121 @@
 }
 
 
+
+.dev-upload-type-picker {
+  margin: 8px 0 10px;
+  padding: 10px;
+  border: 1px solid #4b6270;
+  border-radius: 12px;
+  background: #14212a;
+}
+
+.dev-upload-type-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dev-upload-type-head > div {
+  min-width: 0;
+}
+
+.dev-upload-type-head strong,
+.dev-upload-type-head small {
+  display: block;
+}
+
+.dev-upload-type-head strong {
+  color: #f5f7f8;
+  font-size: 12px;
+}
+
+.dev-upload-type-head small {
+  margin-top: 3px;
+  overflow: hidden;
+  color: #91a8b4;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dev-upload-type-head > button {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #2a333c;
+  color: #fff;
+  font-size: 17px;
+}
+
+.dev-upload-type-grid {
+  margin-top: 9px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.dev-upload-type-grid button {
+  min-height: 48px;
+  padding: 7px;
+  border: 1px solid #3b4b55;
+  border-radius: 9px;
+  background: #222d35;
+  color: #edf2f4;
+  text-align: left;
+}
+
+.dev-upload-type-grid button strong,
+.dev-upload-type-grid button small {
+  display: block;
+}
+
+.dev-upload-type-grid button strong {
+  font-size: 10px;
+}
+
+.dev-upload-type-grid button small {
+  margin-top: 3px;
+  color: #8298a4;
+  font-size: 7px;
+}
+
+.dev-type-field {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dev-type-field span {
+  color: #a9bbc4;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.dev-type-field select {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 9px;
+  border: 1px solid #41515c;
+  border-radius: 8px;
+  background: #202a32;
+  color: #f1f4f5;
+  font-size: 10px;
+}
+
+.dev-hud-status {
+  margin: 7px 0 0;
+  padding: 7px 8px;
+  border-radius: 7px;
+  background: #24313a;
+  color: #d8e4e9;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
 .dev-preset-actions {
   margin: 8px 0;
   padding: 9px;
