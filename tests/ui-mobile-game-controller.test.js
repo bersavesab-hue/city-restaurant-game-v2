@@ -134,6 +134,10 @@ test(
       controller
         .ensureStarterState();
 
+    app.core
+      .timeSystem
+      .resume();
+
     let result =
       controller
         .performAction(
