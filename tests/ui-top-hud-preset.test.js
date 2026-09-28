@@ -16,7 +16,7 @@ test(
   () => {
     assert.match(
       toolkit,
-      /function autoLayoutTopHud\(\)/
+      /function autoLayoutTopHud\(/
     );
 
     for (
