@@ -159,7 +159,8 @@ function renderHomePage(
       class="home-editor-canvas"
       data-ui-component="home-page"
       data-layout-key="home-page"
-      data-home-layout-version="playable-bridge-v1"
+      data-home-layout-version="background-master-v1"
+      data-playable-bridge-version="playable-bridge-v1"
       data-coordinate-space="logical"
       aria-label="餐饮经营可玩测试主页"
     >
