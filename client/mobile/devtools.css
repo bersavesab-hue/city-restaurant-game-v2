@@ -187,6 +187,33 @@
   color: #a8d8b8;
 }
 
+
+.dev-preset-actions {
+  margin: 8px 0;
+  padding: 9px;
+  border: 1px solid #3b4650;
+  border-radius: 11px;
+  background: #172129;
+}
+
+.dev-preset-actions button {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 9px;
+  background: #9a6800;
+  color: #fff5d5;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.dev-preset-actions small {
+  display: block;
+  margin-top: 6px;
+  color: #8ea5b0;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
 .dev-selected-card {
   min-height: 58px;
   margin-bottom: 9px;

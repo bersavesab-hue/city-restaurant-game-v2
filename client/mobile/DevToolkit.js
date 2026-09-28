@@ -3318,6 +3318,130 @@ export function createDevToolkit({
     }, 1300);
   }
 
+
+  function autoLayoutTopHud() {
+    const items =
+      state.project.components.filter(
+        item =>
+          item.page === getActivePage() &&
+          item.type === "image" &&
+          item.role !== "background"
+      );
+
+    const rules = [
+      {
+        key: "date",
+        test: /日期|阳光日期牌|date/i,
+        x: 8,
+        y: 8,
+        width: 104,
+        height: 47,
+        zIndex: 100,
+        anchor: "top-left"
+      },
+      {
+        key: "time",
+        test: /时钟|时间|clock|time/i,
+        x: 115,
+        y: 8,
+        width: 91,
+        height: 47,
+        zIndex: 100,
+        anchor: "top-left"
+      },
+      {
+        key: "money",
+        test: /货币|资金|money|cash/i,
+        x: 207,
+        y: 8,
+        width: 122,
+        height: 47,
+        zIndex: 100,
+        anchor: "top-left"
+      },
+      {
+        key: "rating",
+        test: /星徽|星级|评分|rating|star/i,
+        x: 331,
+        y: 8,
+        width: 74,
+        height: 47,
+        zIndex: 100,
+        anchor: "top-left"
+      },
+      {
+        key: "level",
+        test: /皇冠|等级|level/i,
+        x: 407,
+        y: 8,
+        width: 98,
+        height: 47,
+        zIndex: 100,
+        anchor: "top-left"
+      },
+      {
+        key: "settings",
+        test: /齿轮|设置|setting|gear/i,
+        x: 5,
+        y: 8,
+        width: 30,
+        height: 47,
+        zIndex: 110,
+        anchor: "top-right"
+      }
+    ];
+
+    const found = [];
+    const used = new Set();
+
+    for (const rule of rules) {
+      const item =
+        items.find(
+          candidate =>
+            !used.has(candidate.id) &&
+            rule.test.test(
+              String(candidate.name || "")
+            )
+        );
+
+      if (!item) continue;
+
+      used.add(item.id);
+      found.push(rule.key);
+
+      item.positionParent = "safe";
+      item.anchor = rule.anchor;
+      item.x = rule.x;
+      item.y = rule.y;
+      item.width = rule.width;
+      item.height = rule.height;
+      item.zIndex = rule.zIndex;
+      item.lockAspect = false;
+      item.objectFit = "fill";
+      item.hidden = false;
+    }
+
+    if (!found.length) {
+      showToast(
+        "没识别到顶部素材，请保留日期/时间/资金/星级/等级/设置关键词"
+      );
+      return;
+    }
+
+    pushHistory();
+    persistProject();
+    renderProjectComponents();
+    assignIds();
+
+    state.selected = null;
+    renderSelectionChrome();
+    renderPanel();
+
+    showToast(
+      `顶部 HUD 已排版 ${found.length}/6`
+    );
+  }
+
   function activeProjectLayers() {
     const pageItems =
       state.project.components
@@ -3651,6 +3775,20 @@ export function createDevToolkit({
 
     return `
       ${layers}
+
+
+      <section class="dev-preset-actions">
+        <button
+          class="primary"
+          type="button"
+          data-dev-auto-top-hud
+        >
+          顶部 HUD 一键排版
+        </button>
+        <small>
+          自动识别日期 / 时间 / 资金 / 星级 / 等级 / 设置，并按 540 逻辑宽度缩放排列
+        </small>
+      </section>
 
       <div class="dev-selected-card">
         <div>
@@ -4471,6 +4609,12 @@ export function createDevToolkit({
           )
       );
     });
+
+
+    host.querySelector("[data-dev-auto-top-hud]")?.addEventListener(
+      "click",
+      autoLayoutTopHud
+    );
 
     host.querySelectorAll("[data-dev-position-parent]").forEach(button => {
       button.addEventListener(
