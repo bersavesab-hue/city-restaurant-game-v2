@@ -4,13 +4,13 @@ export const RELEASE_INFO =
       "城市餐饮创业",
 
     packageName:
-      "com.cityrestaurant.v2playtest",
+      "com.cityrestaurant.mobileui",
 
     versionName:
-      "0.9.4",
+      "0.16.2",
 
     versionCode:
-      904,
+      1602,
 
     channel:
       "playtest",
@@ -19,13 +19,13 @@ export const RELEASE_INFO =
       "debug",
 
     minSdk:
-      23,
+      24,
 
     compileSdk:
-      36,
+      35,
 
     targetSdk:
-      36
+      35
   });
 
 
