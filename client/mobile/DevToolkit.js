@@ -3319,18 +3319,52 @@ export function createDevToolkit({
   }
 
   function activeProjectLayers() {
+    const pageItems =
+      state.project.components
+        .filter(
+          item =>
+            item.page ===
+            getActivePage()
+        );
+
+    const order =
+      new Map(
+        pageItems.map(
+          (item, index) =>
+            [item.id, index]
+        )
+      );
+
+    return pageItems
+      .slice()
+      .sort(
+        (a, b) => {
+          const zDiff =
+            Number(b.zIndex ?? 20) -
+            Number(a.zIndex ?? 20);
+
+          if (zDiff !== 0) {
+            return zDiff;
+          }
+
+          return (
+            Number(order.get(b.id) || 0) -
+            Number(order.get(a.id) || 0)
+          );
+        }
+      );
+  }
+
+  function sameZCount(zIndex) {
     return state.project.components
       .filter(
         item =>
           item.page ===
-          getActivePage()
+            getActivePage() &&
+          Number(item.zIndex ?? 20) ===
+            Number(zIndex)
       )
-      .slice()
-      .sort(
-        (a, b) =>
-          Number(b.zIndex ?? 20) -
-          Number(a.zIndex ?? 20)
-      );
+      .length;
   }
 
   function selectedCustomId() {
@@ -3466,7 +3500,7 @@ export function createDevToolkit({
     return `
       <section class="dev-layer-panel">
         <div class="dev-layer-panel-head">
-          <strong>图层 · ${layers.length}</strong>
+          <strong>图层 · ${layers.length} · 上方=画面前层</strong>
           <button type="button" data-dev-guides>
             参考线：${state.guides ? "开" : "关"}
           </button>
@@ -3816,6 +3850,14 @@ export function createDevToolkit({
                 <label><span>H</span><input type="number" inputmode="numeric" min="24" value="${info.values.height}" data-dev-exact="height" ${info.locked ? "disabled" : ""}></label>
                 <label><span>Z</span><input type="number" inputmode="numeric" value="${info.values.zIndex}" data-dev-exact="zIndex"></label>
               </div>
+
+              <p class="dev-z-help ${sameZCount(info.values.zIndex) > 1 ? "has-conflict" : ""}">
+                Z 只控制前后覆盖，不会改变大小或位置。
+                ${sameZCount(info.values.zIndex) > 1
+                  ? `当前有 ${sameZCount(info.values.zIndex)} 个组件同为 Z=${info.values.zIndex}；同层时图层列表越靠上，画面越靠前。`
+                  : `当前 Z=${info.values.zIndex} 无同层冲突。`
+                }
+              </p>
             </section>
           `
           : ""

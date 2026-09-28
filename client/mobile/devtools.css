@@ -543,6 +543,23 @@
   box-shadow: 0 0 0 2px rgba(212,165,61,.18);
 }
 
+
+.dev-z-help {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #1b2830;
+  color: #8ea5b0;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.dev-z-help.has-conflict {
+  border: 1px solid #8c6b2a;
+  background: #332a17;
+  color: #ffd671;
+}
+
 .dev-editor-grid {
   display: grid;
   gap: 7px;
