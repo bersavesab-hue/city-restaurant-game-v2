@@ -1,22 +1,17 @@
 name: Mobile UI Playtest
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "src/**"
-      - "client/**"
-      - "mobile/**"
-      - "tests/ui-*.test.js"
-      - "scripts/build-mobile-ui.mjs"
-      - "package.json"
-      - "package-lock.json"
-      - ".github/workflows/mobile-ui-playtest.yml"
   workflow_dispatch:
+  push:
+    tags:
+      - "playtest-*"
 
 permissions:
   contents: read
+
+concurrency:
+  group: mobile-playtest-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -35,11 +30,8 @@ jobs:
       - name: Install JavaScript dependencies
         run: npm ci
 
-      - name: Test UI foundation
-        run: npm run test:ui
-
-      - name: Build mobile UI
-        run: npm run build:mobile-ui
+      - name: Run focused CI gate
+        run: npm run test:ci
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -66,16 +58,27 @@ jobs:
       - name: Build debug APK
         run: gradle -p mobile/android :app:assembleDebug --stacktrace
 
+      - name: Generate release metadata
+        env:
+          PLAYTEST_SIGNING_MODE: android-debug
+          PLAYTEST_SIGNING_STABLE: "false"
+        run: |
+          node scripts/generate-release-metadata.mjs \
+            mobile/android/app/build/outputs/apk/debug/app-debug.apk \
+            release-metadata.json
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: restaurant-mobile-ui-apk
-          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          name: restaurant-playtest-${{ github.sha }}
+          path: |
+            mobile/android/app/build/outputs/apk/debug/app-debug.apk
+            release-metadata.json
           if-no-files-found: error
 
       - name: Upload browser UI
         uses: actions/upload-artifact@v4
         with:
-          name: restaurant-mobile-ui-web
+          name: restaurant-mobile-ui-web-${{ github.sha }}
           path: dist/mobile-ui
           if-no-files-found: error
