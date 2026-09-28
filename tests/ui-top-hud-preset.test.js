@@ -28,7 +28,7 @@ test(
         "width: 74",
         "width: 98",
         "width: 30",
-        "height: 47"
+        "height: 64"
       ]
     ) {
       assert.ok(
