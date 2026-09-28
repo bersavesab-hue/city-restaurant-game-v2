@@ -87,7 +87,12 @@
       "status": "reference",
       "role": "avatar_reference",
       "dynamicDataBaked": false,
-      "note": "Historical role avatar; do not assign to every generated chef identity."
+      "note": "Historical role avatar; do not assign to every generated chef identity.",
+      "expected": {
+        "width": 70,
+        "height": 73,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.avatarServer",
@@ -95,7 +100,12 @@
       "status": "reference",
       "role": "avatar_reference",
       "dynamicDataBaked": false,
-      "note": "Historical role avatar; do not assign to every generated server identity."
+      "note": "Historical role avatar; do not assign to every generated server identity.",
+      "expected": {
+        "width": 70,
+        "height": 75,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.citySkyline",
@@ -103,7 +113,12 @@
       "status": "candidate",
       "role": "decoration",
       "dynamicDataBaked": false,
-      "note": "Potential static district decoration after visual review."
+      "note": "Potential static district decoration after visual review.",
+      "expected": {
+        "width": 204,
+        "height": 28,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.feedHeader",
@@ -111,49 +126,84 @@
       "status": "reference",
       "role": "legacy_header",
       "dynamicDataBaked": false,
-      "note": "Old flattened homepage section header; current formal home has no equivalent section."
+      "note": "Old flattened homepage section header; current formal home has no equivalent section.",
+      "expected": {
+        "width": 382,
+        "height": 49,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.growthBusiness",
       "path": "client/mobile/assets/home/recovered/growth-business.png",
       "status": "reference",
       "role": "legacy_action",
-      "dynamicDataBaked": false
+      "dynamicDataBaked": false,
+      "expected": {
+        "width": 115,
+        "height": 94,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.growthHeader",
       "path": "client/mobile/assets/home/recovered/growth-header.png",
       "status": "reference",
       "role": "legacy_header",
-      "dynamicDataBaked": false
+      "dynamicDataBaked": false,
+      "expected": {
+        "width": 444,
+        "height": 49,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.growthRenovation",
       "path": "client/mobile/assets/home/recovered/growth-renovation.png",
       "status": "reference",
       "role": "legacy_action",
-      "dynamicDataBaked": false
+      "dynamicDataBaked": false,
+      "expected": {
+        "width": 93,
+        "height": 94,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.growthResearch",
       "path": "client/mobile/assets/home/recovered/growth-research.png",
       "status": "reference",
       "role": "legacy_action",
-      "dynamicDataBaked": false
+      "dynamicDataBaked": false,
+      "expected": {
+        "width": 99,
+        "height": 94,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.growthStaff",
       "path": "client/mobile/assets/home/recovered/growth-staff.png",
       "status": "reference",
       "role": "legacy_action",
-      "dynamicDataBaked": false
+      "dynamicDataBaked": false,
+      "expected": {
+        "width": 94,
+        "height": 94,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.marketHeader",
       "path": "client/mobile/assets/home/recovered/market-header.png",
       "status": "reference",
       "role": "legacy_header",
-      "dynamicDataBaked": false
+      "dynamicDataBaked": false,
+      "expected": {
+        "width": 444,
+        "height": 48,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.navHome",
@@ -161,14 +211,24 @@
       "status": "repair",
       "role": "legacy_nav",
       "dynamicDataBaked": false,
-      "note": "Only old home-selected navigation state; cannot be the final five-route dynamic nav by itself."
+      "note": "Only old home-selected navigation state; cannot be the final five-route dynamic nav by itself.",
+      "expected": {
+        "width": 864,
+        "height": 130,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.opportunityHeader",
       "path": "client/mobile/assets/home/recovered/opportunity-header.png",
       "status": "reference",
       "role": "legacy_header",
-      "dynamicDataBaked": false
+      "dynamicDataBaked": false,
+      "expected": {
+        "width": 832,
+        "height": 55,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.sceneClean",
@@ -176,14 +236,24 @@
       "status": "repair",
       "role": "scene_crop",
       "dynamicDataBaked": false,
-      "note": "Clean old restaurant scene crop; not a full-screen 9:16 master."
+      "note": "Clean old restaurant scene crop; not a full-screen 9:16 master.",
+      "expected": {
+        "width": 864,
+        "height": 582,
+        "hasAlpha": false
+      }
     },
     {
       "id": "recovered.scheduleHeader",
       "path": "client/mobile/assets/home/recovered/schedule-header.png",
       "status": "reference",
       "role": "legacy_header",
-      "dynamicDataBaked": false
+      "dynamicDataBaked": false,
+      "expected": {
+        "width": 381,
+        "height": 48,
+        "hasAlpha": false
+      }
     }
   ],
   "rules": {
