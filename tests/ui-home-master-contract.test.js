@@ -38,27 +38,28 @@ const toolkit =
     "utf8"
   );
 
+
 test(
-  "mobile runtime starts with only a blank design canvas",
+  "mobile runtime renders the real playable bridge instead of a blank canvas",
   () => {
     assert.match(
       mobileApp,
-      /installScreenAdapter/
+      /createMobileGameController/
     );
 
     assert.match(
       mobileApp,
-      /renderHomePage/
+      /ensureStarterState/
     );
 
-    assert.doesNotMatch(
+    assert.match(
       mobileApp,
-      /renderBusiness|renderResearch|renderStaff|renderMore|bottom-nav|NAV_ITEMS/
+      /data-game-action/
     );
 
     assert.match(
       homePage,
-      /background-master-v1/
+      /playable-bridge-v1/
     );
 
     assert.match(
@@ -66,15 +67,53 @@ test(
       /data-coordinate-space="logical"/
     );
 
+    for (
+      const action
+      of [
+        "toggle-time",
+        "speed",
+        "toggle-restaurant",
+        "purchase",
+        "advance-hour",
+        "save"
+      ]
+    ) {
+      assert.ok(
+        homePage.includes(
+          `data-game-action="${action}"`
+        ),
+        action
+      );
+    }
+
+    for (
+      const label
+      of [
+        "可用资金",
+        "今日营业额",
+        "采购与库存",
+        "营业菜单",
+        "最近日结"
+      ]
+    ) {
+      assert.ok(
+        homePage.includes(
+          label
+        ),
+        label
+      );
+    }
+
     assert.doesNotMatch(
       homePage,
-      /button|nav|header|article/
+      /¥ 86,240|第28天|12:15|★ 4\.7/
     );
   }
 );
 
+
 test(
-  "runtime CSS contains only screen foundation and blank canvas styles",
+  "playable bridge stays inside one non-scrolling logical screen",
   () => {
     for (
       const marker
@@ -85,25 +124,34 @@ test(
         "--safe-top",
         ".screen-stage",
         ".home-editor-canvas",
-        ".ui-anchor-top",
-        ".ui-anchor-bottom"
+        ".playtest-dashboard",
+        ".playtest-kpi-grid",
+        ".playtest-stock-list"
       ]
     ) {
       assert.ok(
-        css.includes(marker),
+        css.includes(
+          marker
+        ),
         marker
       );
     }
 
+    assert.match(
+      css,
+      /\.playtest-dashboard\s*\{[\s\S]*?overflow:\s*hidden/
+    );
+
     assert.doesNotMatch(
       css,
-      /bottom-nav|segment-tabs|list-card|research-grid|staff-list|section-header|bottom-sheet/
+      /\.playtest-dashboard\s*\{[\s\S]*?overflow-y:\s*(auto|scroll)/
     );
   }
 );
 
+
 test(
-  "editor uses fresh responsive storage and logical coordinate scaling",
+  "editor keeps responsive logical coordinate support",
   () => {
     assert.match(
       toolkit,
@@ -128,11 +176,6 @@ test(
     assert.match(
       toolkit,
       /function logicalRect\(node\)/
-    );
-
-    assert.match(
-      toolkit,
-      /uiScale\(\)/
     );
   }
 );
