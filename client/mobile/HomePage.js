@@ -176,6 +176,7 @@ function renderTopChrome(
       class="home-top-chrome"
       data-ui-component="home-top-chrome"
       data-layout-key="home-top-chrome"
+      data-asset-slot="home.topChrome"
       aria-label="主页顶部状态栏"
     >
       <div class="home-status-strip">
@@ -290,6 +291,7 @@ function renderBottomNav(
     <nav
       class="home-bottom-chrome"
       data-ui-component="home-bottom-chrome"
+      data-asset-slot="home.bottomNav"
       aria-label="主页一级导航"
     >
       <div class="home-bottom-nav">
@@ -530,6 +532,7 @@ function renderStorePage(
         <button
           type="button"
           data-nav="staff"
+          data-asset-slot="home.quick.staff"
         >
           <span>◉</span>
           <strong>员工</strong>
@@ -539,6 +542,7 @@ function renderStorePage(
         <button
           type="button"
           data-nav="research"
+          data-asset-slot="home.quick.dish"
         >
           <span>♨</span>
           <strong>菜品</strong>
@@ -548,6 +552,7 @@ function renderStorePage(
         <button
           type="button"
           data-nav="business"
+          data-asset-slot="home.quick.activity"
         >
           <span>◎</span>
           <strong>活动</strong>
@@ -557,6 +562,7 @@ function renderStorePage(
         <button
           type="button"
           data-nav="business"
+          data-asset-slot="home.quick.storage"
         >
           <span>▦</span>
           <strong>仓储</strong>
@@ -1047,6 +1053,7 @@ function renderHomePage(
         data-ui-component="home-background-layer"
         data-layout-key="home-background-layer"
         data-background-slot="home"
+        data-asset-slot="home.background"
         aria-hidden="true"
       ></div>
 
