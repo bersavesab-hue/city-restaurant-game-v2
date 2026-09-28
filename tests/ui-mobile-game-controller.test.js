@@ -223,13 +223,13 @@ test(
     );
 
     assert.ok(
-      app.systems
-        .orderSystem
-        .listByRestaurant(
-          restaurant.id
+      app.core
+        .gameState
+        .getSection(
+          "simulation"
         )
-        .length >
-      0
+        .processedHours >=
+      1
     );
   }
 );
