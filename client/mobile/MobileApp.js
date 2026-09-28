@@ -14,6 +14,10 @@ import {
   installScreenAdapter
 } from "./ScreenAdapter.js";
 
+import {
+  createBrowserRuntimeSession
+} from "../../src/runtime/BrowserRuntimeSession.js";
+
 const root =
   document.querySelector("#app");
 
@@ -22,6 +26,20 @@ const sheetRoot =
 
 const activePage =
   "store";
+
+const runtimeSession =
+  createBrowserRuntimeSession(
+    app
+  );
+
+const runtimeStatus =
+  runtimeSession.start();
+
+window.__CITY_RUNTIME_SESSION__ =
+  runtimeSession;
+
+window.__CITY_RUNTIME_STATUS__ =
+  runtimeStatus;
 
 const buildLabel =
   `v${__APP_VERSION__} · ${__BUILD_GIT_SHA__}`;
