@@ -67,7 +67,9 @@ function createMobileGameController(
     menuSystem,
     orderSystem,
     operatingScheduleSystem,
-    propertySystem
+    propertySystem,
+    districtSystem,
+    dishResearchSystem
   } =
     app.systems;
 
@@ -595,6 +597,32 @@ function createMobileGameController(
         restaurant.id
       );
 
+    const property =
+      restaurant.locationId
+        ? propertySystem.get(
+            restaurant.locationId
+          )
+        : null;
+
+    const district =
+      property?.districtId
+        ? districtSystem.get(
+            property.districtId
+          )
+        : null;
+
+    const research =
+      dishResearchSystem
+        .getResearchSummary(
+          restaurant.id
+        );
+
+    const schedule =
+      operatingScheduleSystem
+        .get(
+          restaurant.id
+        );
+
     return {
       restaurant,
       finance,
@@ -603,6 +631,10 @@ function createMobileGameController(
       menu,
       latestSettlement,
       procurement,
+      property,
+      district,
+      research,
+      schedule,
 
       employees:
         employeeSystem
