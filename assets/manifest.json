@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "project": "city-restaurant-game-v2",
+  "logicalReference": {
+    "width": 540,
+    "height": 960,
+    "note": "Logical UI coordinate reference only; source artwork may use higher pixel dimensions."
+  },
+  "assets": [],
+  "rules": {
+    "dynamicDataMayBeBakedIntoArtwork": false,
+    "preserveOriginalMaster": true,
+    "exactResizeAndCropUseDeterministicScripts": true
+  }
+}
