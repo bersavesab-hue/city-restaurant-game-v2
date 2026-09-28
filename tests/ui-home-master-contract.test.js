@@ -117,7 +117,7 @@ test(
 
     assert.match(
       toolkit,
-      /component-layout-v6-responsive-logical-space/
+      /component-layout-v7-typed-responsive-space/
     );
 
     assert.match(

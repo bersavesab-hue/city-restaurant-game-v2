@@ -43,12 +43,12 @@ test(
   () => {
     assert.match(
       toolkit,
-      /item\.positionParent = "safe"/
+      /item\.positionParent =\s*"safe"/
     );
 
     assert.match(
       toolkit,
-      /item\.objectFit = "fill"/
+      /item\.objectFit =\s*"fill"/
     );
 
     assert.match(
