@@ -23,6 +23,9 @@ const sheetRoot =
 const activePage =
   "store";
 
+const buildLabel =
+  `v${__APP_VERSION__} · ${__BUILD_GIT_SHA__}`;
+
 installScreenAdapter({
   baseWidth: 540,
   baseHeight: 960
@@ -51,6 +54,14 @@ function render() {
       <section class="page-host">
         ${renderHomePage()}
       </section>
+
+      <div
+        class="playtest-build-stamp"
+        data-playtest-build-stamp
+        aria-label="测试包版本"
+      >
+        ${buildLabel}
+      </div>
     </div>
   `;
 
