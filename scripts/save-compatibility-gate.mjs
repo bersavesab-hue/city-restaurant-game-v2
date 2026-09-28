@@ -4,7 +4,8 @@ import {
 
 const tests = [
   "tests/save-roundtrip.test.js",
-  "tests/save-migration-compatibility.test.js"
+  "tests/save-migration-compatibility.test.js",
+  "tests/save-recovery.test.js"
 ];
 
 console.log(
