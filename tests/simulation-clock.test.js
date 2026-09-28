@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 
 import {
   GAME_MINUTES_PER_REAL_SECOND,
-  MAX_CATCH_UP_MS,
   createSimulationClock
 } from "../src/runtime/SimulationClock.js";
 
@@ -205,9 +204,7 @@ test(
 
     assert.equal(
       fixture.clock.pulse(),
-      MAX_CATCH_UP_MS /
-        1000 *
-        GAME_MINUTES_PER_REAL_SECOND
+      GAME_MINUTES_PER_REAL_SECOND
     );
 
     assert.deepEqual(
