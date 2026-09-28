@@ -408,6 +408,76 @@
   cursor: not-allowed;
 }
 
+.dev-anchor-settings {
+  margin-top: 8px;
+  padding: 9px;
+  border: 1px solid #344754;
+  border-radius: 11px;
+  background: #19242c;
+}
+
+.dev-anchor-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dev-anchor-head strong {
+  color: #f3f5f6;
+  font-size: 11px;
+}
+
+.dev-anchor-head small {
+  color: #86a7b8;
+  font-size: 8px;
+}
+
+.dev-parent-actions {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 6px;
+}
+
+.dev-parent-actions button,
+.dev-anchor-grid button {
+  min-height: 36px;
+  border: 1px solid #3b4650;
+  border-radius: 8px;
+  background: #252d35;
+  color: #e7edf0;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.dev-parent-actions button.is-active,
+.dev-anchor-grid button.is-active {
+  border-color: #d0a13c;
+  background: #493817;
+  color: #ffd671;
+}
+
+.dev-anchor-grid {
+  width: 132px;
+  margin: 8px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 40px);
+  gap: 6px;
+}
+
+.dev-anchor-grid button {
+  min-height: 40px;
+  font-size: 14px;
+}
+
+.dev-anchor-help {
+  margin: 8px 0 0;
+  color: #8ea5b0;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
 .dev-precise-settings {
   margin-bottom: 9px;
   padding: 9px;

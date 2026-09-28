@@ -563,6 +563,234 @@ export function createDevToolkit({
     );
   }
 
+  function positioningParentRect(parentKey = "canvas") {
+    const page =
+      projectPageRoot();
+
+    const pageRect =
+      logicalRect(page);
+
+    const metrics =
+      window.__CITY_SCREEN__?.getMetrics?.() || {};
+
+    if (parentKey === "safe") {
+      const left =
+        Number(metrics.safeLeft || 0);
+      const top =
+        Number(metrics.safeTop || 0);
+      const right =
+        Number(metrics.safeRight || 0);
+      const bottom =
+        Number(metrics.safeBottom || 0);
+
+      return {
+        x: left,
+        y: top,
+        width: Math.max(
+          0,
+          pageRect.width - left - right
+        ),
+        height: Math.max(
+          0,
+          pageRect.height - top - bottom
+        )
+      };
+    }
+
+    if (parentKey === "reference") {
+      return {
+        x: Number(metrics.referenceLeft || 0),
+        y: Number(metrics.referenceTop || 0),
+        width: 540,
+        height: 960
+      };
+    }
+
+    return {
+      x: 0,
+      y: 0,
+      width: pageRect.width,
+      height: pageRect.height
+    };
+  }
+
+  function normalizePlacement(item) {
+    if (!item) return;
+
+    if (!item.positionParent) {
+      item.positionParent =
+        "canvas";
+    }
+
+    if (!item.anchor) {
+      item.anchor =
+        "top-left";
+    }
+  }
+
+  function resolveItemPlacement(item) {
+    normalizePlacement(item);
+
+    const frame =
+      positioningParentRect(
+        item.positionParent
+      );
+
+    const width =
+      Number(item.width || 0);
+    const height =
+      Number(item.height || 0);
+    const x =
+      Number(item.x || 0);
+    const y =
+      Number(item.y || 0);
+
+    let left = frame.x + x;
+    let top = frame.y + y;
+
+    if (
+      item.anchor.includes("center")
+    ) {
+      const parts =
+        item.anchor.split("-");
+
+      if (
+        item.anchor === "center" ||
+        parts[1] === "center"
+      ) {
+        left =
+          frame.x +
+          (frame.width - width) / 2 +
+          x;
+      }
+    }
+
+    if (item.anchor.endsWith("right")) {
+      left =
+        frame.x +
+        frame.width -
+        width -
+        x;
+    }
+
+    if (
+      item.anchor === "center" ||
+      item.anchor.startsWith("center-")
+    ) {
+      top =
+        frame.y +
+        (frame.height - height) / 2 +
+        y;
+    }
+
+    if (item.anchor.startsWith("bottom-")) {
+      top =
+        frame.y +
+        frame.height -
+        height -
+        y;
+    }
+
+    return {
+      left: Math.round(left),
+      top: Math.round(top),
+      width: Math.round(width),
+      height: Math.round(height),
+      frame
+    };
+  }
+
+  function offsetsForAbsolutePosition(
+    item,
+    left,
+    top
+  ) {
+    normalizePlacement(item);
+
+    const frame =
+      positioningParentRect(
+        item.positionParent
+      );
+
+    const width =
+      Number(item.width || 0);
+    const height =
+      Number(item.height || 0);
+
+    let x =
+      left - frame.x;
+    let y =
+      top - frame.y;
+
+    if (
+      item.anchor === "top-center" ||
+      item.anchor === "bottom-center"
+    ) {
+      x =
+        left -
+        (
+          frame.x +
+          (frame.width - width) / 2
+        );
+    } else if (
+      item.anchor.endsWith("right")
+    ) {
+      x =
+        frame.x +
+        frame.width -
+        width -
+        left;
+    } else if (item.anchor === "center") {
+      x =
+        left -
+        (
+          frame.x +
+          (frame.width - width) / 2
+        );
+    }
+
+    if (
+      item.anchor.startsWith("center-") ||
+      item.anchor === "center"
+    ) {
+      y =
+        top -
+        (
+          frame.y +
+          (frame.height - height) / 2
+        );
+    } else if (
+      item.anchor.startsWith("bottom-")
+    ) {
+      y =
+        frame.y +
+        frame.height -
+        height -
+        top;
+    }
+
+    return {
+      x: Math.round(x),
+      y: Math.round(y)
+    };
+  }
+
+  function setItemAbsolutePosition(
+    item,
+    left,
+    top
+  ) {
+    const offsets =
+      offsetsForAbsolutePosition(
+        item,
+        left,
+        top
+      );
+
+    item.x = offsets.x;
+    item.y = offsets.y;
+  }
+
   function customComponentById(id) {
     return state.project.components.find(
       item => item.id === id
@@ -608,6 +836,18 @@ export function createDevToolkit({
           getActivePage()
       )
     ) {
+      if (!item.positionParent) {
+        item.positionParent =
+          "canvas";
+        projectChanged = true;
+      }
+
+      if (!item.anchor) {
+        item.anchor =
+          "top-left";
+        projectChanged = true;
+      }
+
       const legacyFullCanvasBackground =
         item.type === "image" &&
         item.role !== "background" &&
@@ -667,6 +907,10 @@ export function createDevToolkit({
         ) {
           item.x = 0;
           item.y = 0;
+          item.positionParent =
+            "canvas";
+          item.anchor =
+            "top-left";
           item.width = nextWidth;
           item.height = nextHeight;
           item.objectFit = "cover";
@@ -695,17 +939,20 @@ export function createDevToolkit({
       wrapper.style.position =
         "absolute";
 
+      const placement =
+        resolveItemPlacement(item);
+
       wrapper.style.left =
-        `${item.x}px`;
+        `${placement.left}px`;
 
       wrapper.style.top =
-        `${item.y}px`;
+        `${placement.top}px`;
 
       wrapper.style.width =
-        `${item.width}px`;
+        `${placement.width}px`;
 
       wrapper.style.height =
-        `${item.height}px`;
+        `${placement.height}px`;
 
       wrapper.style.zIndex =
         String(item.zIndex ?? 20);
@@ -1290,6 +1537,12 @@ export function createDevToolkit({
         custom?.hidden === true,
       role:
         custom?.role || "",
+      positionParent:
+        custom?.positionParent ||
+        "canvas",
+      anchor:
+        custom?.anchor ||
+        "top-left",
       isImage:
         state.selected instanceof HTMLImageElement ||
         Boolean(
@@ -1503,25 +1756,9 @@ export function createDevToolkit({
       return;
     }
 
-    const styles = ensureSelectedOverride(info);
-
-    styles.position = "absolute";
-    styles.left = `${Math.round(item.x)}px`;
-    styles.top = `${Math.round(item.y)}px`;
-    styles.width = `${Math.round(item.width)}px`;
-    styles.height = `${Math.round(item.height)}px`;
-    styles.zIndex = String(Math.round(item.zIndex ?? 20));
-
-    state.selected.style.position = "absolute";
-    state.selected.style.left = styles.left;
-    state.selected.style.top = styles.top;
-    state.selected.style.width = styles.width;
-    state.selected.style.height = styles.height;
-    state.selected.style.zIndex = styles.zIndex;
-
-    writeOverrides(state.overrides);
-    persistProject();
-    renderSelectionChrome();
+    syncSelectedGeometry(
+      item
+    );
   }
 
   function adjust(property, delta) {
@@ -2013,15 +2250,24 @@ export function createDevToolkit({
         info
       );
 
+    const placement =
+      resolveItemPlacement(item);
+
     styles.position = "absolute";
     styles.left =
-      `${Math.round(item.x)}px`;
+      `${placement.left}px`;
     styles.top =
-      `${Math.round(item.y)}px`;
+      `${placement.top}px`;
     styles.width =
-      `${Math.round(item.width)}px`;
+      `${placement.width}px`;
     styles.height =
-      `${Math.round(item.height)}px`;
+      `${placement.height}px`;
+    styles.zIndex =
+      String(
+        Math.round(
+          item.zIndex ?? 20
+        )
+      );
 
     state.selected.style.position =
       "absolute";
@@ -2033,12 +2279,100 @@ export function createDevToolkit({
       styles.width;
     state.selected.style.height =
       styles.height;
+    state.selected.style.zIndex =
+      styles.zIndex;
 
     writeOverrides(
       state.overrides
     );
     persistProject();
     renderSelectionChrome();
+  }
+
+  function setPlacementParent(parentKey) {
+    const info =
+      selectedInfo();
+
+    if (!info?.customId) return;
+
+    const item =
+      customComponentById(
+        info.customId
+      );
+
+    if (!item || item.role === "background") {
+      return;
+    }
+
+    const allowed =
+      ["canvas", "safe", "reference"];
+
+    if (!allowed.includes(parentKey)) {
+      return;
+    }
+
+    const current =
+      resolveItemPlacement(item);
+
+    pushHistory();
+    item.positionParent =
+      parentKey;
+
+    setItemAbsolutePosition(
+      item,
+      current.left,
+      current.top
+    );
+
+    syncSelectedGeometry(item);
+    renderPanel();
+  }
+
+  function setAnchor(anchor) {
+    const info =
+      selectedInfo();
+
+    if (!info?.customId) return;
+
+    const item =
+      customComponentById(
+        info.customId
+      );
+
+    if (!item || item.role === "background") {
+      return;
+    }
+
+    const allowed = [
+      "top-left",
+      "top-center",
+      "top-right",
+      "center-left",
+      "center",
+      "center-right",
+      "bottom-left",
+      "bottom-center",
+      "bottom-right"
+    ];
+
+    if (!allowed.includes(anchor)) {
+      return;
+    }
+
+    const current =
+      resolveItemPlacement(item);
+
+    pushHistory();
+    item.anchor = anchor;
+
+    setItemAbsolutePosition(
+      item,
+      current.left,
+      current.top
+    );
+
+    syncSelectedGeometry(item);
+    renderPanel();
   }
 
   function alignSelected(mode) {
@@ -2064,78 +2398,86 @@ export function createDevToolkit({
 
     if (!item) return;
 
-    const parent =
-      projectPageRoot();
-
     const rect =
-      logicalRect(
-        parent
+      positioningParentRect(
+        item.positionParent
       );
+
+    const current =
+      resolveItemPlacement(item);
+
+    let left =
+      current.left;
+
+    let top =
+      current.top;
 
     pushHistory();
 
     if (mode === "left") {
-      item.x = 0;
+      left =
+        rect.x;
     } else if (
       mode === "center-x"
     ) {
-      item.x =
-        Math.round(
-          (
-            rect.width -
-            item.width
-          ) / 2
-        );
+      left =
+        rect.x +
+        (
+          rect.width -
+          item.width
+        ) / 2;
     } else if (
       mode === "right"
     ) {
-      item.x =
-        Math.round(
-          rect.width -
-          item.width
-        );
+      left =
+        rect.x +
+        rect.width -
+        item.width;
     } else if (
       mode === "top"
     ) {
-      item.y = 0;
+      top =
+        rect.y;
     } else if (
       mode === "center-y"
     ) {
-      item.y =
-        Math.round(
-          (
-            rect.height -
-            item.height
-          ) / 2
-        );
+      top =
+        rect.y +
+        (
+          rect.height -
+          item.height
+        ) / 2;
     } else if (
       mode === "bottom"
     ) {
-      item.y =
-        Math.round(
-          rect.height -
-          item.height
-        );
+      top =
+        rect.y +
+        rect.height -
+        item.height;
     } else if (
       mode === "center"
     ) {
-      item.x =
-        Math.round(
-          (
-            rect.width -
-            item.width
-          ) / 2
-        );
-      item.y =
-        Math.round(
-          (
-            rect.height -
-            item.height
-          ) / 2
-        );
+      left =
+        rect.x +
+        (
+          rect.width -
+          item.width
+        ) / 2;
+      top =
+        rect.y +
+        (
+          rect.height -
+          item.height
+        ) / 2;
     } else {
       return;
     }
+
+    setItemAbsolutePosition(
+      item,
+      left,
+      top
+    );
 
     syncSelectedGeometry(
       item
@@ -2166,13 +2508,13 @@ export function createDevToolkit({
 
     if (!item) return;
 
-    const parent =
-      projectPageRoot();
-
     const rect =
-      logicalRect(
-        parent
+      positioningParentRect(
+        item.positionParent
       );
+
+    const current =
+      resolveItemPlacement(item);
 
     pushHistory();
 
@@ -2189,24 +2531,32 @@ export function createDevToolkit({
     }
 
     if (mode === "width") {
-      item.x = 0;
       item.width =
         Math.round(
           rect.width
         );
+
+      setItemAbsolutePosition(
+        item,
+        rect.x,
+        current.top
+      );
     } else if (
       mode === "height"
     ) {
-      item.y = 0;
       item.height =
         Math.round(
           rect.height
         );
+
+      setItemAbsolutePosition(
+        item,
+        current.left,
+        rect.y
+      );
     } else if (
       mode === "canvas"
     ) {
-      item.x = 0;
-      item.y = 0;
       item.width =
         Math.round(
           rect.width
@@ -2215,6 +2565,12 @@ export function createDevToolkit({
         Math.round(
           rect.height
         );
+
+      setItemAbsolutePosition(
+        item,
+        rect.x,
+        rect.y
+      );
     } else {
       return;
     }
@@ -2481,6 +2837,10 @@ export function createDevToolkit({
       "background";
     item.name =
       "00_home_background";
+    item.positionParent =
+      "canvas";
+    item.anchor =
+      "top-left";
     item.x = 0;
     item.y = 0;
     item.width =
@@ -2725,6 +3085,10 @@ export function createDevToolkit({
       page:
         getActivePage(),
       type: "image",
+      positionParent:
+        "canvas",
+      anchor:
+        "top-left",
       role:
         background
           ? "background"
@@ -3367,13 +3731,70 @@ export function createDevToolkit({
               <div class="dev-size-actions">
                 <button type="button" data-dev-size="width">只铺满宽度</button>
                 <button type="button" data-dev-size="height">只铺满高度</button>
-                <button type="button" data-dev-size="canvas">铺满画布</button>
+                <button type="button" data-dev-size="canvas">铺满定位区</button>
                 ${
                   info.imageSettings
                     ? '<button type="button" data-dev-natural-ratio>外框恢复原比例</button>'
                     : ""
                 }
               </div>
+            </section>
+          `
+          : ""
+      }
+
+      ${
+        info.customId &&
+        info.role !== "background"
+          ? `
+            <section class="dev-anchor-settings">
+              <div class="dev-anchor-head">
+                <strong>定位与锚点</strong>
+                <small>X/Y 为相对当前锚点的偏移</small>
+              </div>
+
+              <div class="dev-parent-actions">
+                <button
+                  type="button"
+                  class="${info.positionParent === "canvas" ? "is-active" : ""}"
+                  data-dev-position-parent="canvas"
+                >实际画布</button>
+                <button
+                  type="button"
+                  class="${info.positionParent === "safe" ? "is-active" : ""}"
+                  data-dev-position-parent="safe"
+                >安全区</button>
+                <button
+                  type="button"
+                  class="${info.positionParent === "reference" ? "is-active" : ""}"
+                  data-dev-position-parent="reference"
+                >540×960框</button>
+              </div>
+
+              <div class="dev-anchor-grid">
+                ${[
+                  ["top-left","↖"],
+                  ["top-center","↑"],
+                  ["top-right","↗"],
+                  ["center-left","←"],
+                  ["center","●"],
+                  ["center-right","→"],
+                  ["bottom-left","↙"],
+                  ["bottom-center","↓"],
+                  ["bottom-right","↘"]
+                ].map(([key,label]) => `
+                  <button
+                    type="button"
+                    class="${info.anchor === key ? "is-active" : ""}"
+                    data-dev-anchor="${key}"
+                    aria-label="${key}"
+                  >${label}</button>
+                `).join("")}
+              </div>
+
+              <p class="dev-anchor-help">
+                顶部 HUD：建议“安全区 + 左上/上中/右上”；底部导航：建议“安全区 + 左下/下中/右下”。
+              </p>
             </section>
           `
           : ""
@@ -4009,6 +4430,26 @@ export function createDevToolkit({
       );
     });
 
+    host.querySelectorAll("[data-dev-position-parent]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          setPlacementParent(
+            button.dataset.devPositionParent
+          )
+      );
+    });
+
+    host.querySelectorAll("[data-dev-anchor]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () =>
+          setAnchor(
+            button.dataset.devAnchor
+          )
+      );
+    });
+
     host.querySelectorAll("[data-dev-align]").forEach(button => {
       button.addEventListener(
         "click",
@@ -4420,8 +4861,12 @@ export function createDevToolkit({
       if (item) {
         item.width = width;
         item.height = height;
-        item.x = left;
-        item.y = top;
+
+        setItemAbsolutePosition(
+          item,
+          left,
+          top
+        );
 
         if (
           item.type === "image" &&
@@ -4624,8 +5069,11 @@ export function createDevToolkit({
         );
 
       if (item) {
-        item.x = nextLeft;
-        item.y = nextTop;
+        setItemAbsolutePosition(
+          item,
+          nextLeft,
+          nextTop
+        );
       }
     }
 
