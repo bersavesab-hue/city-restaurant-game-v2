@@ -8,7 +8,7 @@ import {
   BALANCE_INITIAL_CAPITAL
 } from "./helpers/launch-balance-scenario.js";
 
-const STRATEGIES =
+const PRICING_STRATEGIES =
   Object.freeze([
     {
       id:
@@ -16,9 +16,7 @@ const STRATEGIES =
       label:
         "性价比",
       price:
-        19,
-      marketingActionId:
-        null
+        19
     },
     {
       id:
@@ -26,9 +24,7 @@ const STRATEGIES =
       label:
         "稳健",
       price:
-        22,
-      marketingActionId:
-        null
+        22
     },
     {
       id:
@@ -36,47 +32,32 @@ const STRATEGIES =
       label:
         "提价控客流",
       price:
-        26,
-      marketingActionId:
-        null
-    },
-    {
-      id:
-        "promotion",
-      label:
-        "营销拉客",
-      price:
-        24,
-      marketingActionId:
-        "local_ads"
+        26
     }
   ]);
 
 test(
-  "T11 四种真实经营策略运行30天均可持续且不爆钱",
+  "T11 满产能门店三种定价策略30天均可持续且存在真实取舍",
   () => {
     const results = [];
 
     for (
       const strategy
-      of STRATEGIES
+      of PRICING_STRATEGIES
     ) {
       const scenario =
         setupLaunchBalanceScenario({
           seed:
             `t11-${strategy.id}`,
           price:
-            strategy.price
+            strategy.price,
+          trafficIndex:
+            100
         });
 
       advanceStrategyDays(
         scenario.restaurant.id,
-        30,
-        {
-          marketingActionId:
-            strategy
-              .marketingActionId
-        }
+        30
       );
 
       const checkpoint =
@@ -129,70 +110,6 @@ test(
       );
     }
 
-    console.log(
-      "[t11-strategy-matrix]",
-      JSON.stringify(
-        results.map(
-          item => ({
-            id:
-              item.id,
-            price:
-              item.price,
-            balance:
-              item.balance,
-            profit:
-              item.profit,
-            margin:
-              Number(
-                (
-                  item.margin *
-                  100
-                ).toFixed(
-                  1
-                )
-              ),
-            orders:
-              item.orders,
-            averageSpend:
-              Number(
-                item.averageSpend
-                  .toFixed(
-                    1
-                  )
-              ),
-            salaryRatio:
-              Number(
-                (
-                  item.salaryRatio *
-                  100
-                ).toFixed(
-                  1
-                )
-              ),
-            ingredientRatio:
-              Number(
-                (
-                  item.ingredientRatio *
-                  100
-                ).toFixed(
-                  1
-                )
-              ),
-            marketing:
-              item.marketing,
-            marketingRuns:
-              item.marketingRuns,
-            level:
-              item.level,
-            reviewScore:
-              item.reviewScore,
-            repeatRate:
-              item.repeatRate
-          })
-        )
-      )
-    );
-
     const byId =
       Object.fromEntries(
         results.map(
@@ -207,35 +124,7 @@ test(
       byId.value.orders >=
         byId.balanced.orders *
           0.95,
-      "低价策略在满产能门店不应显著损失客流"
-    );
-
-    assert.ok(
-      byId.balanced.orders >
-      byId.premium.orders,
-      "提价策略应以更少客流换取更高客单价"
-    );
-
-    assert.ok(
-      byId.premium
-        .averageSpend >
-      byId.value
-        .averageSpend,
-      "提价策略应形成更高客单价"
-    );
-
-    assert.ok(
-      byId.promotion
-        .marketingRuns >
-      0,
-      "营销策略必须实际产生营销投入"
-    );
-
-    assert.ok(
-      byId.promotion
-        .marketing >
-      0,
-      "营销策略必须形成真实营销支出"
+      "满产能时低价不应凭空突破服务上限"
     );
 
     assert.ok(
@@ -245,9 +134,157 @@ test(
     );
 
     assert.ok(
+      byId.premium
+        .averageSpend >
+      byId.balanced
+        .averageSpend,
+      "提价策略应形成更高客单价"
+    );
+
+    assert.ok(
       byId.premium.orders <
       byId.balanced.orders,
-      "提价后客流应真实下降"
+      "提价策略应以更少客流换更高客单价"
+    );
+
+    console.log(
+      "[t11-pricing-matrix]",
+      JSON.stringify(
+        results.map(
+          item => ({
+            id:
+              item.id,
+            balance:
+              item.balance,
+            profit:
+              item.profit,
+            margin:
+              Number(
+                (
+                  item.margin *
+                  100
+                ).toFixed(1)
+              ),
+            orders:
+              item.orders,
+            averageSpend:
+              Number(
+                item.averageSpend
+                  .toFixed(1)
+              ),
+            level:
+              item.level
+          })
+        )
+      )
+    );
+  }
+);
+
+test(
+  "T11 有余量门店营销必须用成本换来新增订单而不是无脑投放",
+  () => {
+    const baseline =
+      setupLaunchBalanceScenario({
+        seed:
+          "t11-low-traffic-base",
+        price:
+          22,
+        trafficIndex:
+          58
+      });
+
+    advanceStrategyDays(
+      baseline.restaurant.id,
+      30
+    );
+
+    const base =
+      getStrategyCheckpoint(
+        baseline.restaurant.id,
+        30
+      );
+
+    const promoted =
+      setupLaunchBalanceScenario({
+        seed:
+          "t11-low-traffic-promo",
+        price:
+          22,
+        trafficIndex:
+          58
+      });
+
+    advanceStrategyDays(
+      promoted.restaurant.id,
+      30,
+      {
+        marketingActionId:
+          "local_ads"
+      }
+    );
+
+    const promo =
+      getStrategyCheckpoint(
+        promoted.restaurant.id,
+        30
+      );
+
+    assert.ok(
+      promo.marketingRuns >
+      0,
+      "营销场景必须实际启动活动"
+    );
+
+    assert.ok(
+      promo.marketing >
+      0,
+      "营销场景必须形成真实支出"
+    );
+
+    assert.ok(
+      promo.orders >
+      base.orders,
+      `有余量门店营销后订单没有增长：${base.orders} -> ${promo.orders}`
+    );
+
+    assert.ok(
+      promo.balance >
+      0,
+      "营销策略不应导致30天内破产"
+    );
+
+    assert.ok(
+      promo.balance <
+      BALANCE_INITIAL_CAPITAL *
+        1.5,
+      "营销策略资金膨胀异常"
+    );
+
+    console.log(
+      "[t11-marketing-headroom]",
+      JSON.stringify({
+        base: {
+          orders:
+            base.orders,
+          profit:
+            base.profit,
+          balance:
+            base.balance
+        },
+        promo: {
+          orders:
+            promo.orders,
+          profit:
+            promo.profit,
+          balance:
+            promo.balance,
+          marketing:
+            promo.marketing,
+          marketingRuns:
+            promo.marketingRuns
+        }
+      })
     );
   }
 );
