@@ -1693,3 +1693,491 @@ button {
     max-height: 90px;
   }
 }
+
+/* T09-2 menu, recipe and dish research workflow. */
+.primary-page-dishes {
+  display: grid;
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr)
+    auto;
+}
+
+.dish-page-title {
+  min-height: 66px;
+}
+
+.dish-title-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dish-title-stats > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: rgba(231,239,243,.58);
+  font-size: 8px;
+  text-align: right;
+}
+
+.dish-title-stats strong {
+  color: #ffe0a0;
+  font-size: 12px;
+}
+
+.dish-tab-bar {
+  min-height: 42px;
+  padding: 4px;
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 5px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 14px;
+  background: rgba(15,30,41,.84);
+}
+
+.dish-tab-bar button {
+  min-height: 32px;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(232,240,243,.64);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.dish-tab-bar button.is-active {
+  color: #fff1c9;
+  background: rgba(202,146,56,.18);
+  box-shadow: inset 0 0 0 1px rgba(255,211,119,.24);
+}
+
+.dish-panel-host,
+.dish-module-panel {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dish-module-panel {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0,.9fr) minmax(0,1.45fr);
+  gap: 7px;
+}
+
+.dish-research-panel {
+  grid-template-columns: minmax(0,.75fr) minmax(0,1.25fr);
+  grid-template-rows: minmax(0,1fr) auto;
+}
+
+.dish-list-card,
+.dish-detail-card,
+.research-method-card,
+.research-ingredient-card {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dish-selector-list {
+  min-height: 0;
+  margin-top: 8px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.dish-selector-list::-webkit-scrollbar {
+  display: none;
+}
+
+.dish-selector-list button {
+  width: 100%;
+  min-height: 48px;
+  padding: 7px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  background: transparent;
+  color: #edf3f5;
+  text-align: left;
+}
+
+.dish-selector-list button.is-active {
+  border-radius: 10px;
+  background: rgba(88,171,151,.13);
+  box-shadow: inset 0 0 0 1px rgba(109,211,186,.22);
+}
+
+.dish-selector-list button > div {
+  min-width: 0;
+}
+
+.dish-selector-list strong,
+.dish-selector-list small {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dish-selector-list strong {
+  font-size: 10px;
+}
+
+.dish-selector-list small {
+  margin-top: 4px;
+  color: rgba(231,239,243,.55);
+  font-size: 7px;
+}
+
+.dish-selector-list span {
+  flex: 0 0 auto;
+  color: #ffe0a0;
+  font-size: 8px;
+}
+
+.dish-detail-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dish-detail-head > div:first-child {
+  min-width: 0;
+}
+
+.dish-detail-head h2 {
+  margin: 4px 0 0;
+  overflow: hidden;
+  font-size: 17px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dish-detail-head p {
+  margin: 5px 0 0;
+  color: rgba(231,239,243,.58);
+  font-size: 8px;
+}
+
+.dish-detail-badge {
+  flex: 0 0 auto;
+  min-width: 66px;
+  padding: 7px;
+  border-radius: 11px;
+  background: rgba(255,211,119,.10);
+  text-align: center;
+}
+
+.dish-detail-badge strong,
+.dish-detail-badge small {
+  display: block;
+}
+
+.dish-detail-badge strong {
+  color: #ffe0a0;
+  font-size: 10px;
+}
+
+.dish-detail-badge small {
+  margin-top: 4px;
+  font-size: 7px;
+}
+
+.dish-detail-stats {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 5px;
+}
+
+.dish-detail-stats > div {
+  min-width: 0;
+  padding: 6px;
+  border-radius: 9px;
+  background: rgba(255,255,255,.045);
+}
+
+.dish-detail-stats span,
+.dish-detail-stats strong {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dish-detail-stats span {
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+}
+
+.dish-detail-stats strong {
+  margin-top: 4px;
+  font-size: 9px;
+}
+
+.dish-price-control {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  align-items: center;
+  gap: 7px;
+}
+
+.dish-price-control > div:first-child {
+  min-width: 66px;
+}
+
+.dish-price-control small,
+.dish-price-control strong {
+  display: block;
+}
+
+.dish-price-control strong {
+  margin-top: 3px;
+  color: #ffe0a0;
+  font-size: 12px;
+}
+
+.dish-price-buttons {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 4px;
+}
+
+.dish-price-buttons button {
+  min-height: 32px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+  color: #eef3f5;
+  font-size: 8px;
+}
+
+.dish-recipe-section {
+  min-height: 0;
+  margin-top: 9px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dish-recipe-list {
+  min-height: 0;
+  margin-top: 6px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.dish-recipe-list::-webkit-scrollbar {
+  display: none;
+}
+
+.dish-recipe-row {
+  min-height: 42px;
+  padding: 6px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.dish-recipe-row.is-short {
+  background: rgba(143,76,43,.10);
+}
+
+.dish-recipe-row > div {
+  min-width: 0;
+}
+
+.dish-recipe-row strong,
+.dish-recipe-row small {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dish-recipe-row strong {
+  font-size: 9px;
+}
+
+.dish-recipe-row small {
+  margin-top: 3px;
+  color: rgba(231,239,243,.54);
+  font-size: 7px;
+}
+
+.dish-recipe-row > span {
+  flex: 0 0 auto;
+  color: #dce9ec;
+  font-size: 8px;
+}
+
+.research-result-banner {
+  grid-column: 1 / -1;
+  min-height: 52px;
+  padding: 9px 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.research-result-banner strong,
+.research-result-banner small {
+  display: block;
+}
+
+.research-result-banner span {
+  color: #ffe0a0;
+  font-size: 8px;
+}
+
+.research-method-strip {
+  min-height: 0;
+  margin-top: 8px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.research-method-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.research-method-strip button {
+  width: 100%;
+  min-height: 44px;
+  padding: 7px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  background: transparent;
+  color: #edf3f5;
+}
+
+.research-method-strip button.is-active {
+  border-radius: 9px;
+  background: rgba(88,171,151,.13);
+}
+
+.research-method-strip strong {
+  font-size: 9px;
+}
+
+.research-method-strip small {
+  font-size: 7px;
+}
+
+.research-ingredient-grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 5px;
+}
+
+.research-ingredient-grid button {
+  min-width: 0;
+  min-height: 46px;
+  padding: 7px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 9px;
+  background: rgba(255,255,255,.04);
+  color: #edf3f5;
+  text-align: left;
+}
+
+.research-ingredient-grid button.is-active {
+  border-color: rgba(109,211,186,.36);
+  background: rgba(88,171,151,.13);
+}
+
+.research-ingredient-grid strong,
+.research-ingredient-grid small {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.research-ingredient-grid strong {
+  font-size: 9px;
+}
+
+.research-ingredient-grid small {
+  margin-top: 4px;
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+}
+
+.research-confirm-card {
+  grid-column: 1 / -1;
+  min-height: 96px;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.research-generated-name {
+  min-width: 0;
+}
+
+.research-generated-name small,
+.research-generated-name strong {
+  display: block;
+}
+
+.research-generated-name strong {
+  margin-top: 4px;
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.research-generated-name p {
+  margin: 5px 0 0;
+  color: rgba(231,239,243,.55);
+  font-size: 7px;
+  line-height: 1.35;
+}
+
+.dish-feedback {
+  flex: 0 0 auto;
+}
+
+@media (max-height: 760px) {
+  .primary-page-dishes {
+    gap: 5px;
+  }
+
+  .dish-page-title {
+    min-height: 58px;
+  }
+
+  .dish-tab-bar {
+    min-height: 36px;
+  }
+
+  .dish-tab-bar button {
+    min-height: 28px;
+  }
+
+  .dish-module-panel {
+    gap: 5px;
+  }
+
+  .dish-detail-stats {
+    margin-top: 5px;
+  }
+
+  .dish-price-control,
+  .dish-recipe-section {
+    margin-top: 5px;
+  }
+}
