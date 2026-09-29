@@ -78,7 +78,13 @@ function createMobileGameController(
     staffingRecommendationSystem,
     marketActionSystem,
     trafficDemandSystem,
-    reviewInsightSystem
+    reviewInsightSystem,
+    renovationSystem,
+    renovationEditorSystem,
+    renovationPlanningSystem,
+    renovationConstructionSystem,
+    layoutFlowSystem,
+    serviceCapacitySystem
   } =
     app.systems;
 
@@ -109,6 +115,13 @@ function createMobileGameController(
     tab: "team",
     selectedEmployeeId: null,
     selectedCandidateId: null
+  };
+
+  const moreUi = {
+    tab: "system",
+    selectedTemplateId: null,
+    facilityCategory: "all",
+    selectedFurnitureId: null
   };
 
   function getRestaurant() {
@@ -3570,6 +3583,717 @@ function createMobileGameController(
       `已解除 ${employee.name} 的雇佣关系`;
   }
 
+  function getFacilityCategory(
+    definition
+  ) {
+    if (
+      definition.type ===
+      "table"
+    ) {
+      return "dining";
+    }
+
+    if (
+      definition.type ===
+        "kitchen" ||
+      definition.type ===
+        "kitchen_support"
+    ) {
+      return "kitchen";
+    }
+
+    if (
+      renovationSystem
+        .hasFurnitureRole(
+          definition,
+          "waiting"
+        )
+    ) {
+      return "waiting";
+    }
+
+    if (
+      definition.type ===
+      "service"
+    ) {
+      return "service";
+    }
+
+    return "decor";
+  }
+
+  function setMoreTab(
+    restaurantId,
+    tab
+  ) {
+    if (
+      ![
+        "renovation",
+        "system"
+      ].includes(
+        tab
+      )
+    ) {
+      throw new Error(
+        "未知更多子页面"
+      );
+    }
+
+    moreUi.tab =
+      tab;
+
+    if (
+      tab ===
+      "renovation"
+    ) {
+      renovationSystem
+        .requireLayout(
+          restaurantId
+        );
+
+      lastMessage =
+        "装修与设施";
+    } else {
+      lastMessage =
+        "时间与存档";
+    }
+  }
+
+  function getRenovationModel(
+    restaurantId
+  ) {
+    let summary =
+      renovationSystem
+        .getSummary(
+          restaurantId
+        );
+
+    if (
+      moreUi.tab ===
+        "renovation" &&
+      !summary.initialized
+    ) {
+      renovationSystem
+        .requireLayout(
+          restaurantId
+        );
+
+      summary =
+        renovationSystem
+          .getSummary(
+            restaurantId
+          );
+    }
+
+    if (
+      !summary.initialized
+    ) {
+      return {
+        initialized:
+          false,
+        summary,
+        analysis:
+          null,
+        construction:
+          null,
+        progress:
+          null,
+        templates: [],
+        selectedTemplate:
+          null,
+        categories: [],
+        facilityCategory:
+          moreUi
+            .facilityCategory,
+        facilities: [],
+        selectedFacility:
+          null,
+        serviceCapacity:
+          null
+      };
+    }
+
+    const status =
+      renovationConstructionSystem
+        .getStatus(
+          restaurantId
+        );
+
+    const currentConstruction =
+      renovationConstructionSystem
+        .getCurrent(
+          restaurantId
+        );
+
+    const recommendations =
+      renovationPlanningSystem
+        .getTemplateRecommendations(
+          restaurantId,
+          {
+            includeUnavailable:
+              true
+          }
+        );
+
+    if (
+      !recommendations
+        .items
+        .some(
+          item =>
+            item.id ===
+            moreUi
+              .selectedTemplateId
+        )
+    ) {
+      moreUi
+        .selectedTemplateId =
+        recommendations
+          .recommendedTemplateId ??
+        recommendations
+          .items[0]?.id ??
+        null;
+    }
+
+    const selectedTemplate =
+      recommendations
+        .items
+        .find(
+          item =>
+            item.id ===
+            moreUi
+              .selectedTemplateId
+        ) ??
+      null;
+
+    const layout =
+      renovationSystem
+        .getLayout(
+          restaurantId
+        );
+
+    const installedCounts =
+      new Map();
+
+    for (
+      const placement
+      of layout?.placements ??
+      []
+    ) {
+      installedCounts.set(
+        placement.furnitureId,
+        (
+          installedCounts.get(
+            placement.furnitureId
+          ) ??
+          0
+        ) +
+          1
+      );
+    }
+
+    const catalog =
+      renovationSystem
+        .getCatalog(
+          restaurantId
+        )
+        .map(
+          item => ({
+            ...item,
+            category:
+              getFacilityCategory(
+                item
+              ),
+            installedCount:
+              installedCounts.get(
+                item.id
+              ) ??
+              0,
+            affordable:
+              financeSystem
+                .getBalance(
+                  restaurantId
+                ) >=
+              item.cost
+          })
+        );
+
+    const categories =
+      [
+        ...new Set(
+          catalog.map(
+            item =>
+              item.category
+          )
+        )
+      ];
+
+    if (
+      moreUi
+        .facilityCategory !==
+        "all" &&
+      !categories.includes(
+        moreUi
+          .facilityCategory
+      )
+    ) {
+      moreUi
+        .facilityCategory =
+        "all";
+    }
+
+    const facilities =
+      catalog
+        .filter(
+          item =>
+            moreUi
+              .facilityCategory ===
+              "all" ||
+            item.category ===
+              moreUi
+                .facilityCategory
+        )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            Number(
+              b.unlocked
+            ) -
+              Number(
+                a.unlocked
+              ) ||
+            a.unlockLevel -
+              b.unlockLevel ||
+            a.cost -
+              b.cost ||
+            a.name.localeCompare(
+              b.name,
+              "zh-CN"
+            )
+        );
+
+    if (
+      !facilities.some(
+        item =>
+          item.id ===
+          moreUi
+            .selectedFurnitureId
+      )
+    ) {
+      moreUi
+        .selectedFurnitureId =
+        facilities.find(
+          item =>
+            item.unlocked
+        )?.id ??
+        facilities[0]?.id ??
+        null;
+    }
+
+    const selectedFacility =
+      facilities.find(
+        item =>
+          item.id ===
+          moreUi
+            .selectedFurnitureId
+      ) ??
+      null;
+
+    let analysis = null;
+
+    try {
+      analysis =
+        renovationPlanningSystem
+          .getAnalysis(
+            restaurantId
+          );
+    } catch {
+      analysis = null;
+    }
+
+    let serviceCapacity = null;
+
+    try {
+      serviceCapacity =
+        serviceCapacitySystem
+          .getHourlyCapacity(
+            restaurantId
+          );
+    } catch {
+      serviceCapacity = null;
+    }
+
+    return {
+      initialized:
+        true,
+      summary,
+      analysis,
+      construction:
+        status
+          .construction,
+      currentConstruction,
+      progress:
+        status.progress,
+      templates:
+        recommendations
+          .items,
+      selectedTemplate,
+      categories,
+      facilityCategory:
+        moreUi
+          .facilityCategory,
+      facilities,
+      selectedFacility,
+      serviceCapacity,
+      canEdit:
+        !currentConstruction,
+      layoutEmpty:
+        (
+          layout?.placements ??
+          []
+        ).length ===
+        0
+    };
+  }
+
+  function selectRenovationTemplate(
+    restaurantId,
+    templateId
+  ) {
+    const template =
+      renovationPlanningSystem
+        .getTemplate(
+          templateId
+        );
+
+    moreUi
+      .selectedTemplateId =
+      template.id;
+
+    lastMessage =
+      `已选择装修方案：${template.name}`;
+  }
+
+  function startRenovationTemplate(
+    restaurantId
+  ) {
+    if (
+      renovationConstructionSystem
+        .getCurrent(
+          restaurantId
+        )
+    ) {
+      throw new Error(
+        "当前已有装修施工任务"
+      );
+    }
+
+    const model =
+      getRenovationModel(
+        restaurantId
+      );
+
+    const template =
+      model.selectedTemplate;
+
+    if (!template) {
+      throw new Error(
+        "请选择装修方案"
+      );
+    }
+
+    if (
+      !template.executable
+    ) {
+      throw new Error(
+        `装修方案当前不可执行：${template.reasons.join(
+          ","
+        )}`
+      );
+    }
+
+    if (
+      renovationEditorSystem
+        .hasSession(
+          restaurantId
+        )
+    ) {
+      renovationEditorSystem
+        .discard(
+          restaurantId
+        );
+    }
+
+    try {
+      renovationEditorSystem
+        .open(
+          restaurantId
+        );
+
+      renovationEditorSystem
+        .applyTemplate(
+          restaurantId,
+          template.id
+        );
+
+      const started =
+        renovationConstructionSystem
+          .startFromEditor(
+            restaurantId
+          );
+
+      lastMessage =
+        `装修已开工：${template.name}，预计 ${started.construction.durationDays} 天`;
+
+      return started;
+    } catch (error) {
+      if (
+        renovationEditorSystem
+          .hasSession(
+            restaurantId
+          )
+      ) {
+        renovationEditorSystem
+          .discard(
+            restaurantId
+          );
+      }
+
+      throw error;
+    }
+  }
+
+  function setFacilityCategory(
+    restaurantId,
+    category
+  ) {
+    const model =
+      getRenovationModel(
+        restaurantId
+      );
+
+    const valid =
+      new Set([
+        "all",
+        ...model.categories
+      ]);
+
+    if (
+      !valid.has(
+        category
+      )
+    ) {
+      throw new Error(
+        "未知设施分类"
+      );
+    }
+
+    moreUi
+      .facilityCategory =
+      category;
+
+    moreUi
+      .selectedFurnitureId =
+      null;
+
+    getRenovationModel(
+      restaurantId
+    );
+
+    lastMessage =
+      category ===
+        "all"
+        ? "全部设施"
+        : "已切换设施分类";
+  }
+
+  function selectFacility(
+    restaurantId,
+    furnitureId
+  ) {
+    const definition =
+      renovationSystem
+        .getFurnitureDefinition(
+          furnitureId
+        );
+
+    moreUi
+      .selectedFurnitureId =
+      definition.id;
+
+    lastMessage =
+      `已选择设施：${definition.name}`;
+  }
+
+  function installSelectedFacility(
+    restaurantId
+  ) {
+    if (
+      renovationConstructionSystem
+        .getCurrent(
+          restaurantId
+        )
+    ) {
+      throw new Error(
+        "施工期间不能追加设施"
+      );
+    }
+
+    const model =
+      getRenovationModel(
+        restaurantId
+      );
+
+    if (
+      model.layoutEmpty
+    ) {
+      throw new Error(
+        "请先完成首套装修方案"
+      );
+    }
+
+    const selected =
+      model.selectedFacility;
+
+    if (!selected) {
+      throw new Error(
+        "请选择设施"
+      );
+    }
+
+    if (!selected.unlocked) {
+      throw new Error(
+        `设施将在门店 Lv.${selected.unlockLevel} 解锁`
+      );
+    }
+
+    if (
+      renovationEditorSystem
+        .hasSession(
+          restaurantId
+        )
+    ) {
+      renovationEditorSystem
+        .discard(
+          restaurantId
+        );
+    }
+
+    renovationEditorSystem
+      .open(
+        restaurantId
+      );
+
+    const draft =
+      renovationEditorSystem
+        .getDraftLayout(
+          restaurantId
+        );
+
+    const candidates =
+      renovationPlanningSystem
+        .getCandidateCoordinates(
+          draft,
+          selected.id
+        );
+
+    let placed = false;
+
+    for (
+      const candidate
+      of candidates
+    ) {
+      try {
+        renovationEditorSystem
+          .addItem(
+            restaurantId,
+            selected.id,
+            candidate
+          );
+
+        placed = true;
+        break;
+      } catch {
+        placed = false;
+      }
+    }
+
+    if (!placed) {
+      renovationEditorSystem
+        .discard(
+          restaurantId
+        );
+
+      throw new Error(
+        "当前店面没有满足限制的可安装位置"
+      );
+    }
+
+    try {
+      const page =
+        renovationEditorSystem
+          .getPageState(
+            restaurantId
+          );
+
+      if (
+        !page.budget
+          .affordable
+      ) {
+        throw new Error(
+          "装修资金不足"
+        );
+      }
+
+      const started =
+        renovationConstructionSystem
+          .startFromEditor(
+            restaurantId
+          );
+
+      lastMessage =
+        `设施升级已开工：${selected.name}，预计 ${started.construction.durationDays} 天`;
+
+      return started;
+    } catch (error) {
+      if (
+        renovationEditorSystem
+          .hasSession(
+            restaurantId
+          )
+      ) {
+        renovationEditorSystem
+          .discard(
+            restaurantId
+          );
+      }
+
+      throw error;
+    }
+  }
+
+  function inspectRenovation(
+    restaurantId
+  ) {
+    const completed =
+      renovationConstructionSystem
+        .inspect(
+          restaurantId
+        );
+
+    const analysis =
+      layoutFlowSystem
+        .getAnalysis(
+          restaurantId
+        );
+
+    lastMessage =
+      `装修验收完成：布局评分 ${analysis.flowScore ?? analysis.score ?? "-"}`;
+
+    return completed;
+  }
+
   function getViewModel() {
     const {
       restaurant
@@ -3733,6 +4457,11 @@ function createMobileGameController(
         restaurant.id
       );
 
+    const renovation =
+      getRenovationModel(
+        restaurant.id
+      );
+
     return {
       restaurant,
       finance,
@@ -3748,6 +4477,11 @@ function createMobileGameController(
       business,
       dishes,
       staff,
+      more: {
+        tab:
+          moreUi.tab
+      },
+      renovation,
 
       employees:
         employeeSystem
@@ -4378,6 +5112,87 @@ function createMobileGameController(
               getViewModel()
           };
 
+        case "more-tab":
+          setMoreTab(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "renovation-template-select":
+          selectRenovationTemplate(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "renovation-start-template":
+          startRenovationTemplate(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "renovation-facility-category":
+          setFacilityCategory(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "renovation-facility-select":
+          selectFacility(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "renovation-install-facility":
+          installSelectedFacility(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "renovation-inspect":
+          inspectRenovation(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
         case "advance-hour":
           return {
             ok: true,
@@ -4422,7 +5237,8 @@ function createMobileGameController(
     getProcurementCatalog,
     getDishModel,
     getEmployeeModel,
-    getMarketingModel
+    getMarketingModel,
+    getRenovationModel
   });
 }
 
