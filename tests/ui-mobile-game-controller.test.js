@@ -1863,3 +1863,466 @@ test(
     );
   }
 );
+
+test(
+  "fixed renovation template pays starts construction inspects and survives save reload",
+  () => {
+    resetFoundation();
+
+    const slot =
+      "t09-renovation";
+
+    app.core
+      .saveSystem
+      .remove(
+        slot
+      );
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    const open =
+      controller
+        .performAction(
+          "more-tab",
+          "renovation"
+        );
+
+    assert.equal(
+      open.ok,
+      true
+    );
+
+    const template =
+      open
+        .viewModel
+        .renovation
+        .selectedTemplate;
+
+    assert.ok(
+      template
+    );
+
+    assert.equal(
+      template.executable,
+      true
+    );
+
+    const balanceBefore =
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        );
+
+    const started =
+      controller
+        .performAction(
+          "renovation-start-template"
+        );
+
+    assert.equal(
+      started.ok,
+      true
+    );
+
+    const construction =
+      started
+        .viewModel
+        .renovation
+        .currentConstruction;
+
+    assert.ok(
+      construction
+    );
+
+    assert.equal(
+      construction.status,
+      "building"
+    );
+
+    assert.ok(
+      construction.durationDays >=
+      3
+    );
+
+    assert.equal(
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        ),
+      balanceBefore -
+        construction.projectCost
+    );
+
+    let layout =
+      app.systems
+        .renovationSystem
+        .getLayout(
+          restaurant.id
+        );
+
+    assert.equal(
+      layout.active,
+      false
+    );
+
+    assert.ok(
+      layout.placements.length >
+      0
+    );
+
+    app.core
+      .timeSystem
+      .advance(
+        construction.durationDays *
+        1440
+      );
+
+    app.systems
+      .renovationConstructionSystem
+      .processDay(
+        app.core
+          .gameState
+          .getSection(
+            "time"
+          )
+          .day
+      );
+
+    const ready =
+      controller
+        .getViewModel();
+
+    assert.equal(
+      ready
+        .renovation
+        .currentConstruction
+        .status,
+      "ready_for_inspection"
+    );
+
+    const inspected =
+      controller
+        .performAction(
+          "renovation-inspect"
+        );
+
+    assert.equal(
+      inspected.ok,
+      true
+    );
+
+    const modifiers =
+      app.systems
+        .renovationSystem
+        .getOperationalModifiers(
+          restaurant.id
+        );
+
+    assert.equal(
+      modifiers.active,
+      true
+    );
+
+    assert.ok(
+      modifiers.seats >=
+      2
+    );
+
+    assert.ok(
+      modifiers
+        .kitchenStations >=
+      1
+    );
+
+    const capacity =
+      app.systems
+        .serviceCapacitySystem
+        .getHourlyCapacity(
+          restaurant.id
+        );
+
+    assert.equal(
+      capacity
+        .renovation
+        .active,
+      true
+    );
+
+    app.core
+      .saveSystem
+      .save(
+        slot
+      );
+
+    const placementCount =
+      app.systems
+        .renovationSystem
+        .getLayout(
+          restaurant.id
+        )
+        .placements
+        .length;
+
+    app.core
+      .gameState
+      .reset();
+
+    app.core
+      .saveSystem
+      .load(
+        slot
+      );
+
+    layout =
+      app.systems
+        .renovationSystem
+        .getLayout(
+          restaurant.id
+        );
+
+    assert.equal(
+      layout.active,
+      true
+    );
+
+    assert.equal(
+      layout.placements.length,
+      placementCount
+    );
+
+    assert.equal(
+      app.systems
+        .renovationConstructionSystem
+        .getLatest(
+          restaurant.id
+        )
+        .status,
+      "completed"
+    );
+
+    app.core
+      .saveSystem
+      .remove(
+        slot
+      );
+  }
+);
+
+
+test(
+  "fixed facility upgrade auto places one real item and uses construction again",
+  () => {
+    resetFoundation();
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    controller
+      .performAction(
+        "more-tab",
+        "renovation"
+      );
+
+    const initial =
+      controller
+        .performAction(
+          "renovation-start-template"
+        );
+
+    assert.equal(
+      initial.ok,
+      true
+    );
+
+    let construction =
+      initial
+        .viewModel
+        .renovation
+        .currentConstruction;
+
+    app.core
+      .timeSystem
+      .advance(
+        construction.durationDays *
+        1440
+      );
+
+    app.systems
+      .renovationConstructionSystem
+      .processDay(
+        app.core
+          .gameState
+          .getSection(
+            "time"
+          )
+          .day
+      );
+
+    assert.equal(
+      controller
+        .performAction(
+          "renovation-inspect"
+        )
+        .ok,
+      true
+    );
+
+    const beforeLayout =
+      app.systems
+        .renovationSystem
+        .getLayout(
+          restaurant.id
+        );
+
+    const beforeCount =
+      beforeLayout
+        .placements
+        .length;
+
+    const balanceBefore =
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        );
+
+    assert.equal(
+      controller
+        .performAction(
+          "renovation-facility-select",
+          "decor_plant"
+        )
+        .ok,
+      true
+    );
+
+    const upgrade =
+      controller
+        .performAction(
+          "renovation-install-facility"
+        );
+
+    assert.equal(
+      upgrade.ok,
+      true
+    );
+
+    construction =
+      upgrade
+        .viewModel
+        .renovation
+        .currentConstruction;
+
+    assert.equal(
+      construction.status,
+      "building"
+    );
+
+    const duringLayout =
+      app.systems
+        .renovationSystem
+        .getLayout(
+          restaurant.id
+        );
+
+    assert.equal(
+      duringLayout
+        .placements
+        .length,
+      beforeCount + 1
+    );
+
+    assert.equal(
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        ),
+      balanceBefore -
+        construction.projectCost
+    );
+
+    assert.equal(
+      construction
+        .baseConstructionCost,
+      0
+    );
+
+    app.core
+      .timeSystem
+      .advance(
+        construction.durationDays *
+        1440
+      );
+
+    app.systems
+      .renovationConstructionSystem
+      .processDay(
+        app.core
+          .gameState
+          .getSection(
+            "time"
+          )
+          .day
+      );
+
+    const completed =
+      controller
+        .performAction(
+          "renovation-inspect"
+        );
+
+    assert.equal(
+      completed.ok,
+      true
+    );
+
+    assert.equal(
+      app.systems
+        .renovationSystem
+        .getOperationalModifiers(
+          restaurant.id
+        )
+        .active,
+      true
+    );
+
+    const decorCount =
+      app.systems
+        .renovationSystem
+        .getLayout(
+          restaurant.id
+        )
+        .placements
+        .filter(
+          item =>
+            item.furnitureId ===
+            "decor_plant"
+        )
+        .length;
+
+    assert.ok(
+      decorCount >=
+      1
+    );
+  }
+);
