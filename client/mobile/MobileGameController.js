@@ -3060,11 +3060,16 @@ function createMobileGameController(
       60;
 
     const endMinute =
-      (
-        schedule?.closeHour ??
-        22
-      ) *
-      60;
+      Math.min(
+        (
+          schedule?.closeHour ??
+          22
+        ) *
+        60,
+        startMinute +
+          8 *
+          60
+      );
 
     employeeStaffingSystem
       .setShift({
@@ -3106,28 +3111,43 @@ function createMobileGameController(
       60;
 
     const endMinute =
-      (
-        schedule?.closeHour ??
-        22
-      ) *
-      60;
+      Math.min(
+        (
+          schedule?.closeHour ??
+          22
+        ) *
+        60,
+        startMinute +
+          8 *
+          60
+      );
 
     for (
       let weekday = 1;
       weekday <= 7;
       weekday += 1
     ) {
-      employeeStaffingSystem
-        .setShift({
-          employeeId,
-          weekday,
-          startMinute,
-          endMinute
-        });
+      if (
+        weekday <= 5
+      ) {
+        employeeStaffingSystem
+          .setShift({
+            employeeId,
+            weekday,
+            startMinute,
+            endMinute
+          });
+      } else {
+        employeeStaffingSystem
+          .removeShift(
+            employeeId,
+            weekday
+          );
+      }
     }
 
     lastMessage =
-      "已按门店营业时间排满 7 天";
+      "已生成周一至周五标准 8 小时班次";
   }
 
   function clearEmployeeSchedule(
