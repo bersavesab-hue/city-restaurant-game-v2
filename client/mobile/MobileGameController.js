@@ -940,10 +940,100 @@ function createMobileGameController(
       ) ??
       null;
 
+    const inventorySummary =
+      inventorySystem
+        .getSummary(
+          restaurantId
+        );
+
+    const inventoryIds =
+      new Set([
+        ...catalog.map(
+          ingredient =>
+            ingredient.id
+        ),
+        ...inventorySummary.map(
+          item =>
+            item.ingredientId
+        )
+      ]);
+
+    const inventoryCatalog =
+      [
+        ...inventoryIds
+      ]
+        .map(
+          ingredientId => {
+            const ingredient =
+              ingredientCatalogSystem
+                .get(
+                  ingredientId
+                );
+
+            if (!ingredient) {
+              return null;
+            }
+
+            const summary =
+              inventorySummary.find(
+                item =>
+                  item.ingredientId ===
+                  ingredientId
+              );
+
+            return {
+              ...ingredient,
+              currentQuantity:
+                summary
+                  ?.usableQuantity ??
+                0,
+              totalQuantity:
+                summary
+                  ?.totalQuantity ??
+                0,
+              spoiledQuantity:
+                summary
+                  ?.spoiledQuantity ??
+                0,
+              batches:
+                summary
+                  ?.batches ??
+                0,
+              pendingQuantity:
+                procurementSystem
+                  .getPendingQuantity(
+                    restaurantId,
+                    ingredientId
+                  )
+            };
+          }
+        )
+        .filter(
+          Boolean
+        )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            Number(
+              b.totalQuantity >
+              0
+            ) -
+              Number(
+                a.totalQuantity >
+                0
+              ) ||
+            a.name.localeCompare(
+              b.name,
+              "zh-CN"
+            )
+        );
+
     if (
       !businessUi
         .inventoryIngredientId ||
-      !catalog.some(
+      !inventoryCatalog.some(
         ingredient =>
           ingredient.id ===
           businessUi
@@ -953,12 +1043,13 @@ function createMobileGameController(
       businessUi
         .inventoryIngredientId =
         selectedIngredient?.id ??
-        catalog[0]?.id ??
+        inventoryCatalog[0]
+          ?.id ??
         null;
     }
 
     const inventoryIngredient =
-      catalog.find(
+      inventoryCatalog.find(
         ingredient =>
           ingredient.id ===
           businessUi
@@ -1054,6 +1145,7 @@ function createMobileGameController(
       tab:
         businessUi.tab,
       catalog,
+      inventoryCatalog,
       selectedIngredient,
       supplierOptions,
       selectedSupplier,
