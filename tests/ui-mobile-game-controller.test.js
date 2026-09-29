@@ -1680,3 +1680,186 @@ test(
       );
   }
 );
+
+test(
+  "marketing discount changes actual order revenue and review campaign reaches customer experience",
+  () => {
+    resetFoundation();
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    controller
+      .getViewModel();
+
+    controller
+      .performAction(
+        "marketing-select",
+        "flash_coupon"
+      );
+
+    const discountStart =
+      controller
+        .performAction(
+          "marketing-start"
+        );
+
+    assert.equal(
+      discountStart.ok,
+      true
+    );
+
+    controller
+      .performAction(
+        "toggle-restaurant"
+      );
+
+    const menuItem =
+      app.systems
+        .menuSystem
+        .listByRestaurant(
+          restaurant.id,
+          {
+            activeOnly:
+              true
+          }
+        )[0];
+
+    const order =
+      app.systems
+        .orderSystem
+        .place({
+          restaurantId:
+            restaurant.id,
+          items: [
+            {
+              menuItemId:
+                menuItem.id,
+              quantity:
+                1
+            }
+          ]
+        });
+
+    assert.equal(
+      order.items[0]
+        .unitPrice,
+      Math.max(
+        1,
+        Math.round(
+          menuItem.price *
+          .9
+        )
+      )
+    );
+
+    assert.equal(
+      order.totalRevenue,
+      order.items[0]
+        .unitPrice
+    );
+
+    resetFoundation();
+
+    const reviewController =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant:
+        reviewRestaurant
+    } =
+      reviewController
+        .ensureStarterState();
+
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        reviewRestaurant.id,
+        500
+      );
+
+    reviewController
+      .getViewModel();
+
+    reviewController
+      .performAction(
+        "marketing-select",
+        "nearby_search_boost"
+      );
+
+    const reviewStart =
+      reviewController
+        .performAction(
+          "marketing-start"
+        );
+
+    assert.equal(
+      reviewStart.ok,
+      true
+    );
+
+    const beforeReviews =
+      app.systems
+        .restaurantSystem
+        .get(
+          reviewRestaurant.id
+        )
+        .totalReviews;
+
+    const experience =
+      app.systems
+        .customerExperienceSystem
+        .recordHour({
+          restaurantId:
+            reviewRestaurant.id,
+          demand: {
+            segments: []
+          },
+          result: {
+            visitors:
+              1,
+            completedOrders:
+              1,
+            rejectedVisitors:
+              0,
+            failedOrders:
+              0,
+            queuedVisitors:
+              0,
+            averageQuality:
+              80,
+            estimatedWaitMinutes:
+              0,
+            queuePatienceMinutes:
+              12
+          }
+        });
+
+    assert.equal(
+      experience
+        .marketingEffects
+        .reviewPropensityMultiplier,
+      1.05
+    );
+
+    assert.ok(
+      app.systems
+        .restaurantSystem
+        .get(
+          reviewRestaurant.id
+        )
+        .totalReviews >
+      beforeReviews
+    );
+  }
+);
