@@ -1523,81 +1523,387 @@ function renderBusinessPage(
   `;
 }
 
-function renderResearchPage(
-  vm
+function dishCategoryLabel(
+  category
 ) {
-  const bestDish =
-    vm.research
-      ?.bestDish;
+  return (
+    {
+      rice: "米饭主食",
+      noodle: "粉面",
+      dumpling_bun: "面点",
+      stir_fry: "热炒",
+      cold_dish: "凉菜",
+      soup: "汤羹",
+      hotpot: "锅物",
+      barbecue: "烧烤",
+      breakfast: "早餐",
+      snack: "小吃",
+      fast_food: "快捷餐食",
+      set_meal: "套餐",
+      dessert: "甜品",
+      beverage: "饮品",
+      bakery: "烘焙",
+      specialty: "特色菜"
+    }[category] ??
+    category ??
+    "未分类"
+  );
+}
+
+function renderDishTabs(
+  dishes
+) {
+  return `
+    <div
+      class="dish-tab-bar"
+      role="tablist"
+      aria-label="菜品模块"
+    >
+      ${[
+        [
+          "menu",
+          "营业菜单"
+        ],
+        [
+          "library",
+          "菜品库"
+        ],
+        [
+          "research",
+          "研发"
+        ]
+      ]
+        .map(
+          (
+            [
+              id,
+              label
+            ]
+          ) => `
+            <button
+              type="button"
+              class="${dishes.tab ===
+                id
+                  ? "is-active"
+                  : ""}"
+              data-game-action="dish-tab"
+              data-game-value="${id}"
+            >
+              ${label}
+            </button>
+          `
+        )
+        .join(
+          ""
+        )}
+    </div>
+  `;
+}
+
+function renderDishSelector(
+  items,
+  selectedDish
+) {
+  if (
+    items.length ===
+      0
+  ) {
+    return `
+      <div class="formal-empty">
+        当前没有符合条件的菜品
+      </div>
+    `;
+  }
 
   return `
-    <section
-      class="primary-page"
-      data-primary-page="research"
-    >
-      <header class="primary-page-title">
-        <div>
-          <small>菜品中心</small>
-          <h1>菜单与研发</h1>
-        </div>
-        <strong>
-          ${vm.menu.length}
-          道在售
-        </strong>
-      </header>
+    <div class="dish-selector-list">
+      ${items
+        .map(
+          dish => `
+            <button
+              type="button"
+              class="${dish.id ===
+                selectedDish?.id
+                  ? "is-active"
+                  : ""}"
+              data-game-action="dish-select"
+              data-game-value="${escapeHtml(
+                dish.id
+              )}"
+            >
+              <div>
+                <strong>
+                  ${escapeHtml(
+                    dish.name
+                  )}
+                </strong>
+                <small>
+                  ${dishCategoryLabel(
+                    dish.category
+                  )}
+                  ${dish.custom
+                    ? " · 自研"
+                    : ""}
+                </small>
+              </div>
 
-      <section class="formal-card research-summary-card">
-        <div>
-          <small>已研究菜品</small>
-          <strong>
-            ${vm.research
-              ?.total ??
-              0}
-          </strong>
+              <span>
+                ${dish.onMenu
+                  ? dish.active
+                    ? "在售"
+                    : "已下架"
+                  : `¥${money(
+                      dish.basePrice
+                    )}`}
+              </span>
+            </button>
+          `
+        )
+        .join(
+          ""
+        )}
+    </div>
+  `;
+}
+
+function renderDishDetail(
+  vm,
+  dish
+) {
+  if (!dish) {
+    return `
+      <section class="formal-card dish-detail-card">
+        <div class="formal-empty">
+          请选择一个菜品
         </div>
+      </section>
+    `;
+  }
+
+  const recipe =
+    dish.recipe;
+
+  const progress =
+    dish.progress;
+
+  return `
+    <section class="formal-card dish-detail-card">
+      <div class="dish-detail-head">
         <div>
-          <small>当前招牌</small>
+          <small>
+            ${dish.custom
+              ? "自研菜品"
+              : "标准菜品"}
+          </small>
+          <h2>
+            ${escapeHtml(
+              dish.name
+            )}
+          </h2>
+          <p>
+            ${dishCategoryLabel(
+              dish.category
+            )}
+            ·
+            ${recipe
+              ? `${escapeHtml(
+                  recipe.method
+                )} / ${recipe.cookingMinutes}分钟`
+              : "无可用配方"}
+          </p>
+        </div>
+
+        <div class="dish-detail-badge">
           <strong>
             ${escapeHtml(
-              bestDish?.name ??
-              "尚未形成"
+              progress
+                ?.dishRankName ??
+              "未培养"
+            )}
+          </strong>
+          <small>
+            熟练 Lv.${progress
+              ?.masteryLevel ??
+              1}
+          </small>
+        </div>
+      </div>
+
+      <div class="dish-detail-stats">
+        <div>
+          <span>建议基价</span>
+          <strong>
+            ¥${money(
+              dish.basePrice
             )}
           </strong>
         </div>
-      </section>
+        <div>
+          <span>累计销量</span>
+          <strong>
+            ${dish.soldCount}
+          </strong>
+        </div>
+        <div>
+          <span>累计营收</span>
+          <strong>
+            ¥${money(
+              dish.totalRevenue
+            )}
+          </strong>
+        </div>
+        <div>
+          <span>配方质量</span>
+          <strong>
+            ${Math.round(
+              progress
+                ?.recipeQualityScore ??
+              dish.researchScore ??
+              60
+            )}
+          </strong>
+        </div>
+      </div>
 
-      <section class="formal-card formal-list-card">
+      ${dish.menuItem
+        ? `
+          <div class="dish-price-control">
+            <div>
+              <small>当前售价</small>
+              <strong>
+                ¥${money(
+                  dish.currentPrice
+                )}
+              </strong>
+            </div>
+
+            <div class="dish-price-buttons">
+              ${[
+                [
+                  "minus5",
+                  "-5"
+                ],
+                [
+                  "minus1",
+                  "-1"
+                ],
+                [
+                  "plus1",
+                  "+1"
+                ],
+                [
+                  "plus5",
+                  "+5"
+                ]
+              ]
+                .map(
+                  (
+                    [
+                      id,
+                      label
+                    ]
+                  ) => `
+                    <button
+                      type="button"
+                      data-game-action="dish-price"
+                      data-game-value="${id}"
+                    >
+                      ${label}
+                    </button>
+                  `
+                )
+                .join(
+                  ""
+                )}
+            </div>
+
+            <button
+              type="button"
+              class="${dish.active
+                ? "danger-soft-button"
+                : "formal-primary-button"}"
+              data-game-action="dish-toggle-active"
+            >
+              ${dish.active
+                ? "下架"
+                : "重新上架"}
+            </button>
+          </div>
+        `
+        : `
+          <button
+            type="button"
+            class="formal-primary-button"
+            data-game-action="dish-add-menu"
+            ${vm.dishes
+              .menuItems
+              .length >=
+            vm.dishes.menuLimit
+              ? "disabled"
+              : ""}
+          >
+            ${vm.dishes
+              .menuItems
+              .length >=
+            vm.dishes.menuLimit
+              ? `菜单栏位已满 ${vm.dishes.menuLimit}/${vm.dishes.menuLimit}`
+              : "加入营业菜单"}
+          </button>
+        `}
+
+      <div class="dish-recipe-section">
         <div class="formal-card-head">
           <div>
-            <small>营业菜单</small>
+            <small>配方需求</small>
             <strong>
-              实时售价与销量
+              ${recipe
+                ? `${recipe.ingredients.length} 种原料`
+                : "无配方"}
             </strong>
           </div>
+          <span>
+            ${recipe
+              ? `难度 ${recipe.difficulty}`
+              : ""}
+          </span>
         </div>
 
-        <div class="formal-scroll-list">
-          ${vm.menu.length
-            ? vm.menu
+        <div class="dish-recipe-list">
+          ${dish.ingredients
+            .length
+            ? dish.ingredients
               .map(
-                item => `
-                  <div class="formal-list-row">
+                ingredient => `
+                  <div
+                    class="dish-recipe-row ${ingredient.stock <
+                    ingredient.quantity
+                      ? "is-short"
+                      : ""}"
+                  >
                     <div>
                       <strong>
                         ${escapeHtml(
-                          item.dishName
+                          ingredient.name
                         )}
                       </strong>
                       <small>
-                        已售
-                        ${item.soldCount ??
-                          0}
-                        份
+                        单份需要
+                        ${quantity(
+                          ingredient.quantity
+                        )}
+                        ${unitLabel(
+                          ingredient.unit
+                        )}
                       </small>
                     </div>
+
                     <span>
-                      ¥${money(
-                        item.price
+                      库存
+                      ${quantity(
+                        ingredient.stock
+                      )}
+                      ${unitLabel(
+                        ingredient.unit
                       )}
                     </span>
                   </div>
@@ -1608,15 +1914,354 @@ function renderResearchPage(
               )
             : `
               <div class="formal-empty">
-                当前没有营业菜品
+                当前没有配方数据
               </div>
             `}
         </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderMenuDishPanel(
+  vm
+) {
+  const menuDishes =
+    vm.dishes.dishes
+      .filter(
+        dish =>
+          dish.onMenu
+      );
+
+  return `
+    <section
+      class="dish-module-panel dish-menu-panel"
+      data-dish-panel="menu"
+    >
+      <section class="formal-card dish-list-card">
+        <div class="formal-card-head">
+          <div>
+            <small>营业菜单</small>
+            <strong>
+              ${vm.dishes.activeMenuCount}
+              道在售
+            </strong>
+          </div>
+          <span>
+            栏位
+            ${vm.dishes.menuItems.length}
+            /
+            ${vm.dishes.menuLimit}
+          </span>
+        </div>
+
+        ${renderDishSelector(
+          menuDishes,
+          vm.dishes.selectedDish
+        )}
       </section>
 
-      <p class="primary-page-note">
-        菜品研发操作在 T09 接入；本页目前只展示真实菜品与研发状态。
-      </p>
+      ${renderDishDetail(
+        vm,
+        vm.dishes.selectedDish
+      )}
+    </section>
+  `;
+}
+
+function renderDishLibraryPanel(
+  vm
+) {
+  const last =
+    vm.dishes.research
+      .lastResult;
+
+  return `
+    <section
+      class="dish-module-panel dish-library-panel"
+      data-dish-panel="library"
+    >
+      ${last
+        ? `
+          <section class="formal-card research-result-banner">
+            <div>
+              <small>最近研发完成</small>
+              <strong>
+                ${escapeHtml(
+                  last.name
+                )}
+              </strong>
+            </div>
+            <span>
+              评分
+              ${last.researchScore}
+              ·
+              成本 ¥${money(
+                last.researchCost
+              )}
+            </span>
+          </section>
+        `
+        : ""}
+
+      <section class="formal-card dish-list-card">
+        <div class="formal-card-head">
+          <div>
+            <small>当前可用菜品</small>
+            <strong>
+              ${vm.dishes.dishes.length}
+              道
+            </strong>
+          </div>
+          <span>
+            Lv.${vm.restaurant.level}
+            解锁范围
+          </span>
+        </div>
+
+        ${renderDishSelector(
+          vm.dishes.dishes,
+          vm.dishes.selectedDish
+        )}
+      </section>
+
+      ${renderDishDetail(
+        vm,
+        vm.dishes.selectedDish
+      )}
+    </section>
+  `;
+}
+
+function renderDishResearchPanel(
+  vm
+) {
+  const research =
+    vm.dishes.research;
+
+  return `
+    <section
+      class="dish-module-panel dish-research-panel"
+      data-dish-panel="research"
+    >
+      <section class="formal-card research-method-card">
+        <div class="formal-card-head">
+          <div>
+            <small>烹饪方式</small>
+            <strong>
+              ${escapeHtml(
+                research
+                  .selectedMethod
+                  ?.name ??
+                "未选择"
+              )}
+            </strong>
+          </div>
+          <span>
+            ${research.methods.length}
+            种方法
+          </span>
+        </div>
+
+        <div class="research-method-strip">
+          ${research.methods
+            .map(
+              method => `
+                <button
+                  type="button"
+                  class="${method.id ===
+                    research
+                      .methodId
+                    ? "is-active"
+                    : ""}"
+                  data-game-action="dish-research-method"
+                  data-game-value="${escapeHtml(
+                    method.id
+                  )}"
+                >
+                  <strong>
+                    ${escapeHtml(
+                      method.icon
+                    )}
+                    ${escapeHtml(
+                      method.name
+                    )}
+                  </strong>
+                  <small>
+                    ${method.baseMinutes}
+                    分钟
+                  </small>
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+      </section>
+
+      <section class="formal-card research-ingredient-card">
+        <div class="formal-card-head">
+          <div>
+            <small>研发原料</small>
+            <strong>
+              已选
+              ${research
+                .ingredientIds
+                .length}
+              / 2–6
+            </strong>
+          </div>
+          <span>
+            点击选择
+          </span>
+        </div>
+
+        <div class="research-ingredient-grid formal-scroll-list">
+          ${research.ingredients
+            .map(
+              ingredient => {
+                const chosen =
+                  research
+                    .ingredientIds
+                    .includes(
+                      ingredient.id
+                    );
+
+                return `
+                  <button
+                    type="button"
+                    class="${chosen
+                      ? "is-active"
+                      : ""}"
+                    data-game-action="dish-research-ingredient"
+                    data-game-value="${escapeHtml(
+                      ingredient.id
+                    )}"
+                  >
+                    <strong>
+                      ${escapeHtml(
+                        ingredient.name
+                      )}
+                    </strong>
+                    <small>
+                      ${escapeHtml(
+                        ingredient.category
+                      )}
+                      ·
+                      ${unitLabel(
+                        ingredient.unit
+                      )}
+                    </small>
+                  </button>
+                `;
+              }
+            )
+            .join(
+              ""
+            )}
+        </div>
+      </section>
+
+      <section class="formal-card research-confirm-card">
+        <div class="research-generated-name">
+          <small>预计命名</small>
+          <strong>
+            ${escapeHtml(
+              research
+                .generatedName
+            )}
+          </strong>
+          <p>
+            研发会真实扣除研发费用；评分、建议售价和灵感存在实际随机波动。
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="formal-primary-button"
+          data-game-action="dish-research"
+          ${research
+            .ingredientIds
+            .length >=
+            2 &&
+          research
+            .ingredientIds
+            .length <=
+            6 &&
+          research
+            .selectedMethod
+            ? ""
+            : "disabled"}
+        >
+          开始真实研发
+        </button>
+      </section>
+    </section>
+  `;
+}
+
+function renderResearchPage(
+  vm
+) {
+  return `
+    <section
+      class="primary-page primary-page-dishes"
+      data-primary-page="research"
+    >
+      <header class="primary-page-title dish-page-title">
+        <div>
+          <small>菜品中心</small>
+          <h1>菜单与研发</h1>
+        </div>
+
+        <div class="dish-title-stats">
+          <span>
+            在售
+            <strong>
+              ${vm.dishes
+                .activeMenuCount}
+            </strong>
+          </span>
+          <span>
+            自研
+            <strong>
+              ${vm.research
+                ?.total ??
+                0}
+            </strong>
+          </span>
+        </div>
+      </header>
+
+      ${renderDishTabs(
+        vm.dishes
+      )}
+
+      <div class="dish-panel-host">
+        ${vm.dishes.tab ===
+          "research"
+          ? renderDishResearchPanel(
+              vm
+            )
+          : vm.dishes.tab ===
+              "library"
+            ? renderDishLibraryPanel(
+                vm
+              )
+            : renderMenuDishPanel(
+                vm
+              )}
+      </div>
+
+      <output
+        class="home-status-feedback dish-feedback"
+        data-game-feedback
+      >
+        ${escapeHtml(
+          vm.lastMessage
+        )}
+      </output>
     </section>
   `;
 }
