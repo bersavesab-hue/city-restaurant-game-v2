@@ -782,7 +782,7 @@ function renderProcurementPanel(
         </div>
 
         <div class="business-chip-strip">
-          ${business.catalog
+          ${business.inventoryCatalog
             .map(
               ingredient => `
                 <button
@@ -1114,7 +1114,7 @@ function renderInventoryPanel(
       .inventoryIngredient;
 
   const current =
-    business.catalog.find(
+    business.inventoryCatalog.find(
       ingredient =>
         ingredient.id ===
         selected?.id
@@ -1130,7 +1130,7 @@ function renderInventoryPanel(
           <div>
             <small>库存总览</small>
             <strong>
-              ${business.catalog.length}
+              ${business.inventoryCatalog.length}
               类原料
             </strong>
           </div>
