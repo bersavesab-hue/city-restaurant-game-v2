@@ -3266,3 +3266,400 @@ button {
     margin-top: 5px;
   }
 }
+
+/* T09-5 fixed renovation, construction and facility upgrades. */
+.primary-page-more {
+  display: grid;
+  grid-template-rows:
+    auto
+    auto
+    minmax(0,1fr)
+    auto;
+}
+
+.more-tab-bar {
+  min-height: 40px;
+  padding: 4px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0,1fr)
+    );
+  gap: 5px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 14px;
+  background: rgba(15,30,41,.84);
+}
+
+.more-tab-bar button {
+  min-height: 31px;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(232,240,243,.64);
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.more-tab-bar button.is-active {
+  color: #fff1c9;
+  background: rgba(202,146,56,.18);
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(255,211,119,.24);
+}
+
+.more-panel-host,
+.more-panel {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.more-system-panel {
+  height: 100%;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.renovation-panel {
+  height: 100%;
+  display: grid;
+  grid-template-columns:
+    minmax(0,1fr)
+    minmax(0,1.55fr);
+  grid-template-rows:
+    auto
+    minmax(0,1fr);
+  gap: 7px;
+}
+
+.renovation-overview-card,
+.renovation-construction-card {
+  min-height: 0;
+}
+
+.renovation-overview-card {
+  grid-column: 1 / -1;
+}
+
+.renovation-construction-card {
+  grid-column: 1 / -1;
+}
+
+.renovation-overview-head,
+.renovation-template-head,
+.facility-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.renovation-overview-head small,
+.renovation-overview-head strong {
+  display: block;
+}
+
+.renovation-overview-head strong {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.renovation-grade-badge,
+.renovation-cost-badge {
+  flex: 0 0 auto;
+  min-width: 62px;
+  padding: 7px;
+  border-radius: 10px;
+  background: rgba(255,211,119,.10);
+  text-align: center;
+}
+
+.renovation-grade-badge small,
+.renovation-grade-badge strong,
+.renovation-cost-badge small,
+.renovation-cost-badge strong {
+  display: block;
+}
+
+.renovation-grade-badge strong,
+.renovation-cost-badge strong {
+  margin-top: 4px;
+  color: #ffe0a0;
+  font-size: 12px;
+}
+
+.renovation-stat-grid,
+.renovation-cost-grid,
+.renovation-construction-grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
+  gap: 5px;
+}
+
+.renovation-construction-grid {
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0,1fr)
+    );
+}
+
+.renovation-stat-grid > div,
+.renovation-cost-grid > div,
+.renovation-construction-grid > div {
+  min-width: 0;
+  padding: 6px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+}
+
+.renovation-stat-grid span,
+.renovation-stat-grid strong,
+.renovation-cost-grid span,
+.renovation-cost-grid strong,
+.renovation-construction-grid span,
+.renovation-construction-grid strong {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.renovation-stat-grid span,
+.renovation-cost-grid span,
+.renovation-construction-grid span {
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+}
+
+.renovation-stat-grid strong,
+.renovation-cost-grid strong,
+.renovation-construction-grid strong {
+  margin-top: 4px;
+  font-size: 9px;
+}
+
+.renovation-progress-track {
+  height: 7px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.07);
+}
+
+.renovation-progress-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+  color: rgba(109,211,186,.72);
+}
+
+.renovation-inspect-button {
+  margin-top: 8px;
+}
+
+.renovation-inline-note {
+  margin: 8px 0 0;
+  color: rgba(231,239,243,.54);
+  font-size: 7px;
+  line-height: 1.4;
+}
+
+.renovation-template-panel,
+.renovation-facility-panel {
+  grid-column: 1 / -1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns:
+    minmax(0,.9fr)
+    minmax(0,1.35fr);
+  gap: 7px;
+  overflow: hidden;
+}
+
+.renovation-template-list-card,
+.renovation-template-detail-card,
+.facility-list-card,
+.facility-detail-card {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.renovation-template-list,
+.facility-list {
+  min-height: 0;
+  margin-top: 7px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.renovation-template-list::-webkit-scrollbar,
+.facility-list::-webkit-scrollbar,
+.facility-category-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.renovation-template-list button,
+.facility-list button {
+  width: 100%;
+  min-height: 50px;
+  padding: 7px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  background: transparent;
+  color: #eef3f5;
+  text-align: left;
+}
+
+.renovation-template-list button.is-active,
+.facility-list button.is-active {
+  border-radius: 10px;
+  background: rgba(88,171,151,.13);
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(109,211,186,.22);
+}
+
+.renovation-template-list button > div,
+.facility-list button > div {
+  min-width: 0;
+}
+
+.renovation-template-list strong,
+.renovation-template-list small,
+.facility-list strong,
+.facility-list small {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.renovation-template-list strong,
+.facility-list strong {
+  font-size: 9px;
+}
+
+.renovation-template-list small,
+.facility-list small {
+  margin-top: 4px;
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+}
+
+.renovation-template-list > button > span,
+.facility-list > button > span {
+  flex: 0 0 auto;
+  color: #ffe0a0;
+  font-size: 8px;
+}
+
+.renovation-template-head > div:first-child,
+.facility-detail-head > div:first-child {
+  min-width: 0;
+}
+
+.renovation-template-head h2,
+.facility-detail-head h2 {
+  margin: 4px 0 0;
+  overflow: hidden;
+  font-size: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.renovation-template-head p,
+.facility-detail-head p {
+  margin: 5px 0 0;
+  color: rgba(231,239,243,.55);
+  font-size: 8px;
+}
+
+.renovation-reason-list,
+.facility-effect-strip {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.renovation-reason-list span,
+.facility-effect-strip span {
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.055);
+  color: rgba(234,240,243,.7);
+  font-size: 7px;
+}
+
+.renovation-reason-list span {
+  background: rgba(181,91,69,.12);
+  color: #ffc5b7;
+}
+
+.facility-category-strip {
+  margin-top: 7px;
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.facility-category-strip button {
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 0 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 999px;
+  background: rgba(255,255,255,.04);
+  color: rgba(235,241,244,.66);
+  font-size: 7px;
+}
+
+.facility-category-strip button.is-active {
+  border-color: rgba(255,211,119,.28);
+  background: rgba(190,134,44,.14);
+  color: #ffe0a0;
+}
+
+@media (max-height: 760px) {
+  .primary-page-more {
+    gap: 5px;
+  }
+
+  .more-tab-bar {
+    min-height: 35px;
+  }
+
+  .more-tab-bar button {
+    min-height: 27px;
+  }
+
+  .renovation-panel,
+  .renovation-template-panel,
+  .renovation-facility-panel {
+    gap: 5px;
+  }
+
+  .renovation-stat-grid,
+  .renovation-cost-grid {
+    margin-top: 5px;
+  }
+
+  .renovation-template-head h2,
+  .facility-detail-head h2 {
+    font-size: 14px;
+  }
+}
