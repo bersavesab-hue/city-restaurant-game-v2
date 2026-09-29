@@ -2361,3 +2361,342 @@ test(
     );
   }
 );
+
+test(
+  "launch progression gates curated content from street survival to city signature",
+  () => {
+    resetFoundation();
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    let view =
+      controller
+        .getViewModel();
+
+    assert.equal(
+      view.launch.id,
+      "street_survival"
+    );
+
+    assert.equal(
+      view.launch.stageNumber,
+      1
+    );
+
+    assert.equal(
+      view.launch.totalStages,
+      3
+    );
+
+    assert.equal(
+      view.restaurant.level,
+      1
+    );
+
+    assert.equal(
+      view.business
+        .marketing
+        .unlocked,
+      false
+    );
+
+    assert.equal(
+      view.dishes
+        .research
+        .unlocked,
+      false
+    );
+
+    const stage1 =
+      app.systems
+        .launchProgressionSystem
+        .getCumulativeContent(
+          1
+        );
+
+    const stage1DishIds =
+      new Set(
+        stage1.dishIds
+      );
+
+    assert.equal(
+      view.dishes
+        .dishes
+        .filter(
+          dish =>
+            !dish.custom
+        )
+        .length,
+      6
+    );
+
+    assert.ok(
+      view.dishes
+        .dishes
+        .filter(
+          dish =>
+            !dish.custom
+        )
+        .every(
+          dish =>
+            stage1DishIds.has(
+              dish.id
+            ) &&
+            dish.unlockLevel <=
+              1
+        )
+    );
+
+    const stage1IngredientCategories =
+      new Set(
+        stage1
+          .ingredientCategories
+      );
+
+    assert.ok(
+      view.business
+        .catalog
+        .every(
+          ingredient =>
+            stage1IngredientCategories
+              .has(
+                ingredient.category
+              )
+        )
+    );
+
+    const stage1SupplierIds =
+      new Set(
+        stage1.supplierIds
+      );
+
+    assert.ok(
+      view.business
+        .supplierOptions
+        .every(
+          supplier =>
+            stage1SupplierIds.has(
+              supplier.id
+            )
+        )
+    );
+
+    const stage1RoleIds =
+      new Set(
+        stage1
+          .employeeRoleIds
+      );
+
+    assert.ok(
+      view.staff
+        .candidates
+        .every(
+          candidate =>
+            stage1RoleIds.has(
+              candidate.roleId
+            )
+        )
+    );
+
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        restaurant.id,
+        1500
+      );
+
+    view =
+      controller
+        .getViewModel();
+
+    assert.equal(
+      view.restaurant.level,
+      3
+    );
+
+    assert.equal(
+      view.launch.id,
+      "street_survival"
+    );
+
+    assert.equal(
+      view.business
+        .marketing
+        .unlocked,
+      true
+    );
+
+    assert.deepEqual(
+      new Set(
+        view.business
+          .marketing
+          .actions
+          .map(
+            action =>
+              action.id
+          )
+      ),
+      new Set([
+        "local_ads",
+        "flash_coupon"
+      ])
+    );
+
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        restaurant.id,
+        2000
+      );
+
+    view =
+      controller
+        .getViewModel();
+
+    assert.equal(
+      view.restaurant.level,
+      4
+    );
+
+    assert.equal(
+      view.launch.id,
+      "district_growth"
+    );
+
+    assert.equal(
+      view.launch.stageNumber,
+      2
+    );
+
+    assert.equal(
+      view.launch
+        .contentCounts
+        .dishes,
+      14
+    );
+
+    assert.equal(
+      view.launch
+        .contentCounts
+        .ingredientCategories,
+      10
+    );
+
+    assert.equal(
+      view.dishes
+        .dishes
+        .filter(
+          dish =>
+            !dish.custom
+        )
+        .length,
+      12
+    );
+
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        restaurant.id,
+        3500
+      );
+
+    view =
+      controller
+        .getViewModel();
+
+    assert.equal(
+      view.restaurant.level,
+      5
+    );
+
+    assert.equal(
+      view.dishes
+        .research
+        .unlocked,
+      true
+    );
+
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        restaurant.id,
+        13000
+      );
+
+    view =
+      controller
+        .getViewModel();
+
+    assert.equal(
+      view.restaurant.level,
+      7
+    );
+
+    assert.equal(
+      view.launch.id,
+      "city_signature"
+    );
+
+    assert.equal(
+      view.launch.stageNumber,
+      3
+    );
+
+    assert.equal(
+      view.launch
+        .contentCounts
+        .dishes,
+      18
+    );
+
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        restaurant.id,
+        55000
+      );
+
+    view =
+      controller
+        .getViewModel();
+
+    assert.equal(
+      view.restaurant.level,
+      10
+    );
+
+    assert.equal(
+      view.launch
+        .experience
+        .progress,
+      1
+    );
+
+    assert.equal(
+      view.launch
+        .experience
+        .remainingExperience,
+      0
+    );
+
+    assert.equal(
+      view.dishes
+        .dishes
+        .filter(
+          dish =>
+            !dish.custom
+        )
+        .length,
+      18
+    );
+  }
+);
