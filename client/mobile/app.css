@@ -3763,3 +3763,38 @@ button {
     font-size: 6px;
   }
 }
+
+.marketing-locked-panel {
+  grid-template-columns:
+    minmax(0,1fr);
+  place-items: center;
+}
+
+.marketing-unlock-card {
+  width: min(100%, 420px);
+  align-self: center;
+  text-align: center;
+}
+
+.marketing-unlock-card > small {
+  display: block;
+  color: rgba(231,239,243,.52);
+  font-size: 8px;
+}
+
+.marketing-unlock-card > h2 {
+  margin: 8px 0 0;
+  color: #ffe0a0;
+  font-size: 17px;
+}
+
+.marketing-unlock-card > p {
+  margin: 8px 0 0;
+  color: rgba(231,239,243,.62);
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.dish-tab-bar button:disabled {
+  opacity: .42;
+}
