@@ -46,7 +46,7 @@ const STRATEGIES =
       label:
         "营销拉客",
       price:
-        24,
+        22,
       marketingActionId:
         "local_ads"
     }
@@ -205,8 +205,14 @@ test(
 
     assert.ok(
       byId.value.orders >
+      byId.balanced.orders,
+      "低价策略应以更多订单换取更低毛利"
+    );
+
+    assert.ok(
+      byId.value.orders >
       byId.premium.orders,
-      "低价策略应以更多订单换取更低客单价"
+      "低价策略应明显高于提价策略客流"
     );
 
     assert.ok(
@@ -222,6 +228,18 @@ test(
         .marketingRuns >
       0,
       "营销策略必须实际产生营销投入"
+    );
+
+    assert.ok(
+      byId.promotion.orders >
+      byId.balanced.orders,
+      "营销策略应以营销成本换取更多订单"
+    );
+
+    assert.ok(
+      byId.balanced.profit >
+      byId.value.profit,
+      "稳健定价应比低价策略保留更多利润"
     );
   }
 );
