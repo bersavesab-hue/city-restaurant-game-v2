@@ -764,29 +764,219 @@ OperatingCycleSystem 的每日 onDay 已调用 MarketActionSystem.processDay：
 - 浏览器移动 UI：成功；
 - Android APK：成功。
 
+## T09-5 装修 / 设施完整闭环
+
+### 首发方案
+T09-5 不接自由摆放编辑器作为玩家主玩法。
+
+玩家侧采用：
+1. 固定装修模板；
+2. 系统自动摆位；
+3. 真实施工；
+4. 完工验收；
+5. 后续固定设施升级继续自动找合法位置。
+
+底层现有 RenovationEditorSystem 仍保留，用作自动布局与规则执行，不直接暴露自由编辑操作。
+
+### 首次装修
+当前可读取 24 套 RenovationPlanningSystem 固定模板。
+
+模板真实判断：
+- 门店等级；
+- 可用面积；
+- 设施是否解锁；
+- 资金；
+- 当前布局是否为空；
+- 商业定位匹配；
+- 面积匹配；
+- 预算匹配。
+
+移动端显示：
+- 模板名称；
+- 最低等级；
+- 最低 / 理想面积；
+- 匹配分；
+- 家具设施成本；
+- 基础施工成本；
+- 项目总预算；
+- 当前资金；
+- 不可施工原因。
+
+开始装修后：
+- RenovationEditorSystem 自动生成合法摆位；
+- 真实购买家具 / 设备；
+- RenovationRealityCostSystem 计算基础施工费；
+- RenovationConstructionSystem 创建施工任务；
+- 装修布局在施工期间保持未启用；
+- 不允许同时开启第二个施工项目。
+
+### 施工
+施工周期继续使用底层 estimateDurationDays：
+- 最短 3 天；
+- 最长 10 天；
+- 面积和设施数量共同决定工期。
+
+UI 显示：
+- 当前阶段；
+- 施工进度；
+- 开工日；
+- 预计完工日；
+- 总工期；
+- 剩余天数；
+- 项目总额。
+
+每日 OperatingCycleSystem 继续调用 RenovationConstructionSystem.processDay。
+
+施工到期后进入 ready_for_inspection，不自动启用。
+
+### 验收
+玩家点击“验收并启用装修”后调用 RenovationConstructionSystem.inspect。
+
+验收会：
+- 检查施工是否完成；
+- 检查布局 revision 是否被非法改变；
+- 调用 RenovationSystem.activateLayout；
+- 将 construction 标记 completed；
+- 开启真实装修经营修正。
+
+### 固定设施升级
+首套装修完成后，页面切换为“固定设施升级”。
+
+设施按以下分类显示：
+- 桌椅；
+- 厨房；
+- 服务；
+- 等候；
+- 装饰。
+
+每项显示：
+- 名称；
+- 规格；
+- 价格；
+- 解锁等级；
+- 已安装数量；
+- 餐位；
+- 厨房工位；
+- 厨房效率；
+- 服务效率；
+- 排队效率；
+- 等候容量；
+- 吸引力；
+- 舒适度。
+
+玩家选择设施后不进入自由摆放。
+
+控制器会：
+1. 打开 RenovationEditorSystem 临时会话；
+2. 调用 RenovationPlanningSystem.getCandidateCoordinates；
+3. 逐个尝试合法位置；
+4. 由 RenovationEditorSystem.addItem 执行真实碰撞、边界、店面结构、门店上限检查；
+5. 找到合法位置后保存；
+6. 再次进入真实施工流程。
+
+没有合法位置时直接拒绝安装，不强行重叠或越界。
+
+### 装修真实经营效果
+验收后继续由既有系统读取装修结果。
+
+RenovationSystem：
+- seats；
+- tables；
+- kitchenStations；
+- kitchenEfficiency；
+- serviceEfficiency；
+- queueEfficiency；
+- queueCapacityBonus；
+- appealMultiplier；
+- comfortBonus。
+
+LayoutFlowSystem：
+- 厨房动线；
+- 前厅动线；
+- 密度；
+- 通道效率；
+- 舒适度；
+- 等候支持；
+- flowScore；
+- 布局问题诊断。
+
+SeatingSystem 继续读取真实餐位与排队修正。
+
+ServiceCapacitySystem 继续读取：
+- renovationKitchenGuests；
+- renovationServiceGuests；
+- workforce；
+- equipmentCapacity；
+并参与真实厨房 / 前厅 / 收银产能限制。
+
+本阶段将 ServiceCapacitySystem 正式暴露到 app.systems，移动控制器不复制第二套产能公式。
+
+### 测试门店修正
+T04 测试桥接原先单纯选择“最便宜铺位”，可能落到 cloud_kitchen。
+
+为了使装修试玩链成立，测试桥接现在优先选择：
+- 可用面积 >= 36㎡；
+- 非 cloud_kitchen；
+- 非 stall；
+- 再按租金从低到高选择。
+
+这只影响 T04 / T09 试玩桥接，不替代正式首发的新手选址 / 租赁流程。
+
+### 已验证真实链
+自动测试已证明：
+- 首次进入装修页会创建真实 renovation_layout；
+- 至少存在一套真实可执行模板；
+- 模板开工后家具与基础施工真实扣款；
+- renovation_construction 状态为 building；
+- 施工期 layout.active=false；
+- 施工时间推进后变为 ready_for_inspection；
+- 验收后 layout.active=true；
+- 餐位 >= 2；
+- 厨房工位 >= 1；
+- ServiceCapacitySystem 能读取 active renovation；
+- 完成后的装修布局、设施和施工状态经过 SaveSystem 保存、GameState 清空、重新 load 后仍恢复正确；
+- 已完成首装后可选择单个固定设施；
+- 系统会自动找合法位置；
+- 新设施会真实写入 placements；
+- 后续设施升级再次进入施工；
+- 首次基础施工已支付后，后续单设施升级 baseConstructionCost=0；
+- 再次验收后装修效果继续生效。
+
+### T09-5 装修 APK
+- workflow run：`36512178887`
+- APK artifact：`11010180850`
+- artifact 名：`restaurant-playtest-94e228916e52a7e17fa2dfe9fe14f5fc5597266a`
+- APK SHA-256：`4954a345d4e60d766be7c031f08b2b97ca771bfceb73bb94cb537dab1880d004`
+- Android：BUILD SUCCESSFUL
+- 签名：`android-debug`
+
+本节点完整门禁：
+- 核心 / 时间 / 结算：15/15；
+- 存档兼容 / 恢复：11/11；
+- UI / 路由 / 适配 / 资产 / 采购 / 菜品 / 员工 / 活动 / 装修：68/68；
+- 浏览器移动 UI：成功；
+- Android APK：成功。
+
 ## 当前状态
-T09 总任务仍在进行中：
+T09 经营模块 UI 补齐已经全部完成：
 - T09-1 采购 / 库存：VERIFIED
 - T09-2 菜品：VERIFIED
 - T09-3 员工：VERIFIED
-- T09-4 活动：VERIFIED
-- T09-5 装修：下一阶段
+- T09-4 活动 / 营销：VERIFIED
+- T09-5 装修 / 设施：VERIFIED
+- T09：VERIFIED
 
-已完成模块只修真机发现的问题，不再重新设计业务链。
+已完成经营链只修真实回归问题，不再重做接口。
 
 ## 下一任务
-**T09-5：装修 / 设施升级完整闭环。**
+**T10：首发成长与内容填充。**
 
-首发仍按之前冻结的“固定升级 / 设施页”方向推进，不先上自由摆放编辑器。
+重点：
+1. 固定首发 3 个单店成长阶段；
+2. 检查菜品数量是否达到首发预算；
+3. 检查原料、供应商、员工、活动、装修内容是否在各阶段合理解锁；
+4. 将门店等级、经验、阶段目标、功能解锁串成明确成长节奏；
+5. 补足真正影响玩法的事件 / 目标，不增加无意义页面；
+6. 首发字段冻结，避免内容阶段继续扩散接口。
 
-范围：
-1. 当前装修状态；
-2. 可升级设施；
-3. 升级成本；
-4. 建造/升级时间；
-5. 施工状态；
-6. 装修对容量、舒适度、吸引力、服务/动线等真实经营指标的影响；
-7. 升级完成；
-8. 保存恢复。
-
-验收继续执行“入口 → 查看 → 操作 → 状态变化 → 保存恢复”。
+完成 T10 后进入 T11 数值模拟与平衡。
