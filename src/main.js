@@ -198,6 +198,7 @@ function bootstrap() {
       renovationConstructionSystem,
       equipmentMaintenanceSystem,
       layoutFlowSystem,
+      serviceCapacitySystem,
       renovationPlanningSystem,
       renovationEditorSystem,
       dailySettlementSystem,
