@@ -75,7 +75,10 @@ function createMobileGameController(
     employeeStaffingSystem,
     employeeCareerSystem,
     employeeDynamicsSystem,
-    staffingRecommendationSystem
+    staffingRecommendationSystem,
+    marketActionSystem,
+    trafficDemandSystem,
+    reviewInsightSystem
   } =
     app.systems;
 
@@ -89,7 +92,9 @@ function createMobileGameController(
     quantity: null,
     paymentMode: "cash",
     quote: null,
-    inventoryIngredientId: null
+    inventoryIngredientId: null,
+    marketingCategory: "all",
+    marketActionId: null
   };
 
   const dishUi = {
@@ -1209,8 +1214,343 @@ function createMobileGameController(
             total +
             batch.quantity,
           0
+        ),
+      marketing:
+        getMarketingModel(
+          restaurantId,
+          time
         )
     };
+  }
+
+  function getMarketingModel(
+    restaurantId,
+    time
+  ) {
+    const status =
+      marketActionSystem
+        .getStatus(
+          restaurantId
+        );
+
+    const categories =
+      [
+        ...new Set(
+          status.available.map(
+            action =>
+              action.category
+          )
+        )
+      ];
+
+    if (
+      businessUi
+        .marketingCategory !==
+        "all" &&
+      !categories.includes(
+        businessUi
+          .marketingCategory
+      )
+    ) {
+      businessUi
+        .marketingCategory =
+        "all";
+    }
+
+    const visible =
+      status.available
+        .filter(
+          action =>
+            businessUi
+              .marketingCategory ===
+              "all" ||
+            action.category ===
+              businessUi
+                .marketingCategory
+        )
+        .map(
+          action => {
+            const active =
+              status.active.find(
+                item =>
+                  item.type ===
+                  action.id
+              ) ??
+              null;
+
+            const last =
+              marketActionSystem
+                .getLastRun(
+                  restaurantId,
+                  action.id
+                );
+
+            return {
+              ...action,
+              active,
+              last,
+              remainingDays:
+                active
+                  ? Math.max(
+                      0,
+                      active.endDay -
+                        time.day +
+                        1
+                    )
+                  : 0,
+              cooldownRemaining:
+                Math.max(
+                  0,
+                  action
+                    .availability
+                    .availableDay -
+                    time.day
+                )
+            };
+          }
+        )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            Number(
+              Boolean(
+                b.active
+              )
+            ) -
+              Number(
+                Boolean(
+                  a.active
+                )
+              ) ||
+            Number(
+              b
+                .availability
+                .canStart
+            ) -
+              Number(
+                a
+                  .availability
+                  .canStart
+              ) ||
+            a
+              .minRestaurantLevel -
+              b
+                .minRestaurantLevel ||
+            a.cost -
+              b.cost ||
+            a.name.localeCompare(
+              b.name,
+              "zh-CN"
+            )
+        );
+
+    if (
+      !visible.some(
+        action =>
+          action.id ===
+          businessUi
+            .marketActionId
+      )
+    ) {
+      businessUi
+        .marketActionId =
+        visible[0]?.id ??
+        null;
+    }
+
+    const selectedAction =
+      visible.find(
+        action =>
+          action.id ===
+          businessUi
+            .marketActionId
+      ) ??
+      null;
+
+    const history =
+      marketActionSystem
+        .getHistory(
+          restaurantId
+        )
+        .slice()
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            b.startDay -
+            a.startDay
+        )
+        .slice(
+          0,
+          20
+        );
+
+    const noonDemand =
+      trafficDemandSystem
+        .getHourlyDemand(
+          restaurantId,
+          12
+        );
+
+    const diagnosis =
+      reviewInsightSystem
+        .getDiagnosis(
+          restaurantId
+        );
+
+    return {
+      categories,
+      category:
+        businessUi
+          .marketingCategory,
+      actions:
+        visible,
+      selectedAction,
+      active:
+        status.active.map(
+          action => ({
+            ...action,
+            remainingDays:
+              Math.max(
+                0,
+                action.endDay -
+                  time.day +
+                  1
+              )
+          })
+        ),
+      history,
+      modifiers:
+        status.modifiers,
+      noonExpectedVisitors:
+        Number(
+          (
+            noonDemand
+              .expectedVisitors ??
+            0
+          ).toFixed(
+            1
+          )
+        ),
+      topReviewIssue:
+        diagnosis
+          .topIssue,
+      topReviewPositive:
+        diagnosis
+          .topPositive,
+      activeLimit:
+        2
+    };
+  }
+
+  function setMarketingCategory(
+    restaurantId,
+    category
+  ) {
+    const valid =
+      new Set([
+        "all",
+        ...marketActionSystem
+          .getDefinitions()
+          .map(
+            action =>
+              action.category
+          )
+      ]);
+
+    if (
+      !valid.has(
+        category
+      )
+    ) {
+      throw new Error(
+        "未知活动分类"
+      );
+    }
+
+    businessUi
+      .marketingCategory =
+      category;
+
+    businessUi
+      .marketActionId =
+      null;
+
+    getMarketingModel(
+      restaurantId,
+      gameState
+        .getSection(
+          "time"
+        )
+    );
+
+    lastMessage =
+      category ===
+        "all"
+        ? "全部营销活动"
+        : "已切换活动分类";
+  }
+
+  function selectMarketAction(
+    restaurantId,
+    actionId
+  ) {
+    const action =
+      marketActionSystem
+        .getDefinitions()
+        .find(
+          item =>
+            item.id ===
+            actionId
+        );
+
+    if (!action) {
+      throw new Error(
+        "营销活动不存在"
+      );
+    }
+
+    businessUi
+      .marketActionId =
+      actionId;
+
+    lastMessage =
+      `已选择活动：${action.name}`;
+  }
+
+  function startSelectedMarketAction(
+    restaurantId
+  ) {
+    const actionId =
+      businessUi
+        .marketActionId;
+
+    if (!actionId) {
+      throw new Error(
+        "请选择营销活动"
+      );
+    }
+
+    const definition =
+      marketActionSystem
+        .getDefinition(
+          actionId
+        );
+
+    const started =
+      marketActionSystem
+        .startAction(
+          restaurantId,
+          actionId
+        );
+
+    lastMessage =
+      `活动已开始：${definition.name}，持续 ${definition.durationDays} 天`;
+
+    return started;
   }
 
   function selectProcurementIngredient(
@@ -1659,7 +1999,8 @@ function createMobileGameController(
       ![
         "procurement",
         "inventory",
-        "orders"
+        "orders",
+        "marketing"
       ].includes(
         tab
       )
@@ -1679,7 +2020,10 @@ function createMobileGameController(
         : tab ===
             "inventory"
           ? "库存中心"
-          : "采购单中心";
+          : tab ===
+              "marketing"
+            ? "活动与营销"
+            : "采购单中心";
   }
 
   function getDishMenuItem(
@@ -3642,6 +3986,41 @@ function createMobileGameController(
               getViewModel()
           };
 
+        case "marketing-category":
+          setMarketingCategory(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "marketing-select":
+          selectMarketAction(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "marketing-start":
+          startSelectedMarketAction(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
         case "procurement-ingredient":
           selectProcurementIngredient(
             getRestaurant().id,
@@ -4029,7 +4408,8 @@ function createMobileGameController(
     getProcurementTarget,
     getProcurementCatalog,
     getDishModel,
-    getEmployeeModel
+    getEmployeeModel,
+    getMarketingModel
   });
 }
 
