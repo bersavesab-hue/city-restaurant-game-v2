@@ -967,3 +967,360 @@ test(
       );
   }
 );
+
+test(
+  "employee workflow hires trains adjusts salary and creates a real five-day schedule",
+  () => {
+    resetFoundation();
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    let view =
+      controller
+        .getViewModel();
+
+    assert.equal(
+      view.staff
+        .employees
+        .length,
+      3
+    );
+
+    assert.ok(
+      view.staff
+        .candidates
+        .length >
+      0
+    );
+
+    const candidate =
+      view.staff
+        .selectedCandidate;
+
+    const hire =
+      controller
+        .performAction(
+          "staff-hire-candidate"
+        );
+
+    assert.equal(
+      hire.ok,
+      true
+    );
+
+    assert.equal(
+      app.systems
+        .employeeSystem
+        .listByRestaurant(
+          restaurant.id
+        )
+        .length,
+      4
+    );
+
+    assert.equal(
+      app.core
+        .entitySystem
+        .get(
+          "employee_candidate",
+          candidate.id
+        )
+        .status,
+      "hired"
+    );
+
+    view =
+      hire.viewModel;
+
+    const employee =
+      view.staff
+        .selectedEmployee;
+
+    const training =
+      employee
+        .trainingPrograms
+        .find(
+          program =>
+            program.unlocked
+        );
+
+    assert.ok(
+      training
+    );
+
+    const balanceBefore =
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        );
+
+    const trainingCountBefore =
+      employee
+        .trainingCount ??
+      0;
+
+    const trained =
+      controller
+        .performAction(
+          "staff-train",
+          training.id
+        );
+
+    assert.equal(
+      trained.ok,
+      true
+    );
+
+    const employeeAfterTraining =
+      app.systems
+        .employeeSystem
+        .get(
+          employee.id
+        );
+
+    assert.equal(
+      employeeAfterTraining
+        .trainingCount,
+      trainingCountBefore +
+        1
+    );
+
+    assert.ok(
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        ) <
+      balanceBefore
+    );
+
+    const salaryBefore =
+      employeeAfterTraining
+        .salary;
+
+    const salary =
+      controller
+        .performAction(
+          "staff-salary",
+          "plus100"
+        );
+
+    assert.equal(
+      salary.ok,
+      true
+    );
+
+    assert.equal(
+      app.systems
+        .employeeSystem
+        .get(
+          employee.id
+        )
+        .salary,
+      salaryBefore + 100
+    );
+
+    const scheduled =
+      controller
+        .performAction(
+          "staff-schedule-all"
+        );
+
+    assert.equal(
+      scheduled.ok,
+      true
+    );
+
+    const shifts =
+      app.systems
+        .employeeStaffingSystem
+        .getSchedule(
+          restaurant.id
+        )
+        .filter(
+          shift =>
+            shift.employeeId ===
+            employee.id
+        );
+
+    assert.equal(
+      shifts.length,
+      5
+    );
+
+    assert.deepEqual(
+      shifts.map(
+        shift =>
+          shift.weekday
+      ),
+      [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    );
+
+    assert.ok(
+      shifts.every(
+        shift =>
+          shift.plannedMinutes ===
+          480
+      )
+    );
+  }
+);
+
+
+test(
+  "employee salary schedule and hired candidate survive save reload",
+  () => {
+    resetFoundation();
+
+    const slot =
+      "t09-staff";
+
+    app.core
+      .saveSystem
+      .remove(
+        slot
+      );
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    let view =
+      controller
+        .getViewModel();
+
+    const starter =
+      view.staff
+        .selectedEmployee;
+
+    const starterSalary =
+      starter.salary;
+
+    controller
+      .performAction(
+        "staff-salary",
+        "plus500"
+      );
+
+    controller
+      .performAction(
+        "staff-schedule-all"
+      );
+
+    const candidateId =
+      view.staff
+        .selectedCandidate
+        .id;
+
+    const hired =
+      controller
+        .performAction(
+          "staff-hire-candidate"
+        );
+
+    assert.equal(
+      hired.ok,
+      true
+    );
+
+    const hiredEmployeeId =
+      hired
+        .viewModel
+        .staff
+        .selectedEmployee
+        .id;
+
+    app.core
+      .saveSystem
+      .save(
+        slot
+      );
+
+    app.core
+      .gameState
+      .reset();
+
+    app.core
+      .saveSystem
+      .load(
+        slot
+      );
+
+    assert.equal(
+      app.systems
+        .employeeSystem
+        .get(
+          starter.id
+        )
+        .salary,
+      starterSalary + 500
+    );
+
+    const restoredShifts =
+      app.systems
+        .employeeStaffingSystem
+        .getSchedule(
+          restaurant.id
+        )
+        .filter(
+          shift =>
+            shift.employeeId ===
+            starter.id
+        );
+
+    assert.equal(
+      restoredShifts.length,
+      5
+    );
+
+    assert.equal(
+      app.core
+        .entitySystem
+        .get(
+          "employee_candidate",
+          candidateId
+        )
+        .status,
+      "hired"
+    );
+
+    assert.equal(
+      app.systems
+        .employeeSystem
+        .get(
+          hiredEmployeeId
+        )
+        .status,
+      "active"
+    );
+
+    app.core
+      .saveSystem
+      .remove(
+        slot
+      );
+  }
+);
