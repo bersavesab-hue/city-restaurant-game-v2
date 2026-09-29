@@ -3,6 +3,8 @@ name: Mobile UI Playtest
 on:
   workflow_dispatch:
   push:
+    branches:
+      - "playtest-*"
     tags:
       - "playtest-*"
 
