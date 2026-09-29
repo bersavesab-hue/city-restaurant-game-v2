@@ -582,106 +582,862 @@ function renderStorePage(
   `;
 }
 
-function renderBusinessPage(
+function unitLabel(
+  unit
+) {
+  return (
+    {
+      g: "克",
+      kg: "千克",
+      ml: "毫升",
+      l: "升",
+      piece: "个",
+      portion: "份"
+    }[unit] ??
+    unit ??
+    ""
+  );
+}
+
+function qualityLabel(
+  quality
+) {
+  return (
+    {
+      1: "普通",
+      2: "合格",
+      3: "优良",
+      4: "精品",
+      5: "顶级"
+    }[quality] ??
+    `${quality ?? "-"}级`
+  );
+}
+
+function freshnessLabel(
+  state
+) {
+  return (
+    {
+      fresh: "新鲜",
+      normal: "正常",
+      aging: "临期",
+      spoiled: "腐坏"
+    }[state] ??
+    state ??
+    "-"
+  );
+}
+
+function orderStatusLabel(
+  status
+) {
+  return (
+    {
+      pending: "配送中",
+      delivered: "已到货",
+      cancelled: "已取消"
+    }[status] ??
+    status
+  );
+}
+
+function minuteLabel(
+  minutes
+) {
+  const value =
+    Math.max(
+      0,
+      Math.round(
+        Number(minutes) ||
+        0
+      )
+    );
+
+  if (
+    value <
+    60
+  ) {
+    return `${value}分钟`;
+  }
+
+  const hours =
+    Math.floor(
+      value /
+      60
+    );
+
+  const rest =
+    value %
+    60;
+
+  return rest
+    ? `${hours}小时${rest}分`
+    : `${hours}小时`;
+}
+
+function renderBusinessTabs(
+  business
+) {
+  return `
+    <div
+      class="business-tab-bar"
+      role="tablist"
+      aria-label="经营模块"
+    >
+      ${[
+        [
+          "procurement",
+          "采购"
+        ],
+        [
+          "inventory",
+          "库存"
+        ],
+        [
+          "orders",
+          "采购单"
+        ]
+      ]
+        .map(
+          (
+            [
+              id,
+              label
+            ]
+          ) => `
+            <button
+              type="button"
+              class="${business.tab ===
+                id
+                  ? "is-active"
+                  : ""}"
+              data-game-action="business-tab"
+              data-game-value="${id}"
+            >
+              ${label}
+            </button>
+          `
+        )
+        .join(
+          ""
+        )}
+    </div>
+  `;
+}
+
+function renderProcurementPanel(
   vm
 ) {
-  const procurement =
-    vm.procurement;
+  const business =
+    vm.business;
+
+  const selectedIngredient =
+    business
+      .selectedIngredient;
+
+  const selectedSupplier =
+    business
+      .selectedSupplier;
+
+  const quote =
+    business.quote;
+
+  const quantityValue =
+    Number(
+      business.quantity
+    ) ||
+    0;
+
+  const cashEnough =
+    business
+      .paymentMode ===
+      "credit" ||
+    !quote ||
+    vm.finance.balance >=
+      quote.totalPrice;
 
   return `
     <section
-      class="primary-page"
-      data-primary-page="business"
+      class="business-module-panel procurement-panel"
+      data-business-panel="procurement"
     >
-      <header class="primary-page-title">
-        <div>
-          <small>经营中心</small>
-          <h1>采购与库存</h1>
-        </div>
-        <strong>
-          ¥${money(
-            vm.finance.balance
-          )}
-        </strong>
-      </header>
-
-      <section class="formal-card business-procurement-card">
+      <section class="formal-card procurement-picker-card">
         <div class="formal-card-head">
           <div>
-            <small>推荐采购</small>
+            <small>选择原料</small>
             <strong>
-              ${procurement
-                ? escapeHtml(
-                    procurement
-                      .ingredientName
-                  )
-                : "暂无采购建议"}
+              ${escapeHtml(
+                selectedIngredient
+                  ?.name ??
+                "暂无可采购原料"
+              )}
             </strong>
           </div>
+
           <span>
-            ${vm.pendingDeliveries}
-            笔在途
+            ${business.catalog.length}
+            类可采购
           </span>
         </div>
 
-        <p>
-          ${procurement
-            ? `当前库存 ${quantity(
-                procurement
-                  .currentQuantity
-              )}，建议采购 ${quantity(
-                procurement
-                  .quantity
-              )}`
-            : "当前菜单所需原料暂不需要补货"}
-        </p>
-
-        <button
-          class="formal-primary-button"
-          type="button"
-          data-game-action="purchase"
-          ${procurement
-            ? ""
-            : "disabled"}
-        >
-          采购推荐原料
-        </button>
+        <div class="business-chip-strip">
+          ${business.catalog
+            .map(
+              ingredient => `
+                <button
+                  type="button"
+                  class="${ingredient.id ===
+                    selectedIngredient
+                      ?.id
+                    ? "is-active"
+                    : ""}"
+                  data-game-action="procurement-ingredient"
+                  data-game-value="${escapeHtml(
+                    ingredient.id
+                  )}"
+                >
+                  <strong>
+                    ${escapeHtml(
+                      ingredient.name
+                    )}
+                  </strong>
+                  <small>
+                    库存
+                    ${quantity(
+                      ingredient
+                        .currentQuantity
+                    )}
+                    ${ingredient.pendingQuantity >
+                    0
+                      ? ` · 在途 ${quantity(
+                          ingredient
+                            .pendingQuantity
+                        )}`
+                      : ""}
+                  </small>
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
       </section>
 
-      <section class="formal-card formal-list-card">
+      <section class="formal-card supplier-picker-card">
         <div class="formal-card-head">
           <div>
-            <small>实时库存</small>
+            <small>供应商</small>
             <strong>
-              ${vm.inventory.length}
-              类原料
+              ${escapeHtml(
+                selectedSupplier
+                  ?.name ??
+                "暂无可用供应商"
+              )}
             </strong>
+          </div>
+
+          <span>
+            ${business
+              .supplierOptions
+              .length}
+            家
+          </span>
+        </div>
+
+        <div class="supplier-option-list">
+          ${business
+            .supplierOptions
+            .map(
+              supplier => `
+                <button
+                  type="button"
+                  class="${supplier.id ===
+                    selectedSupplier
+                      ?.id
+                    ? "is-active"
+                    : ""}"
+                  data-game-action="procurement-supplier"
+                  data-game-value="${escapeHtml(
+                    supplier.id
+                  )}"
+                >
+                  <div>
+                    <strong>
+                      ${escapeHtml(
+                        supplier.name
+                      )}
+                    </strong>
+                    <small>
+                      关系
+                      ${supplier.relationship}
+                      ·
+                      可靠
+                      ${supplier.reliability}%
+                    </small>
+                  </div>
+
+                  <span>
+                    起订
+                    ${quantity(
+                      supplier
+                        .minimumOrder
+                    )}
+                  </span>
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+      </section>
+
+      <section class="formal-card procurement-order-card">
+        <div class="procurement-quantity-row">
+          <div>
+            <small>采购数量</small>
+            <strong>
+              ${quantity(
+                quantityValue
+              )}
+              ${unitLabel(
+                selectedIngredient
+                  ?.unit
+              )}
+            </strong>
+          </div>
+
+          <div class="quantity-stepper">
+            <button
+              type="button"
+              data-game-action="procurement-quantity"
+              data-game-value="minimum"
+            >
+              最低
+            </button>
+            <button
+              type="button"
+              data-game-action="procurement-quantity"
+              data-game-value="decrease"
+              aria-label="减少采购量"
+            >
+              −
+            </button>
+            <span>
+              ${quantity(
+                quantityValue
+              )}
+            </span>
+            <button
+              type="button"
+              data-game-action="procurement-quantity"
+              data-game-value="increase"
+              aria-label="增加采购量"
+            >
+              ＋
+            </button>
+            <button
+              type="button"
+              data-game-action="procurement-quantity"
+              data-game-value="maximum"
+            >
+              今日上限
+            </button>
           </div>
         </div>
 
-        <div class="formal-scroll-list">
-          ${vm.inventory.length
-            ? vm.inventory
+        ${selectedSupplier
+          ? `
+            <div class="procurement-limits">
+              <span>
+                今日剩余额度
+                <strong>
+                  ${quantity(
+                    selectedSupplier
+                      .remainingCapacity
+                  )}
+                </strong>
+              </span>
+              <span>
+                常规配送
+                <strong>
+                  ${minuteLabel(
+                    selectedSupplier
+                      .deliveryMinutes
+                  )}
+                </strong>
+              </span>
+              <span>
+                品质
+                <strong>
+                  ${qualityLabel(
+                    selectedSupplier
+                      .qualityMin
+                  )}
+                  ~
+                  ${qualityLabel(
+                    selectedSupplier
+                      .qualityMax
+                  )}
+                </strong>
+              </span>
+            </div>
+          `
+          : ""}
+
+        <div class="payment-choice">
+          <button
+            type="button"
+            class="${business.paymentMode ===
+              "cash"
+                ? "is-active"
+                : ""}"
+            data-game-action="procurement-payment"
+            data-game-value="cash"
+          >
+            现付
+          </button>
+
+          <button
+            type="button"
+            class="${business.paymentMode ===
+              "credit"
+                ? "is-active"
+                : ""}"
+            data-game-action="procurement-payment"
+            data-game-value="credit"
+            ${business
+              .canUseCredit
+              ? ""
+              : "disabled"}
+          >
+            ${business
+              .canUseCredit
+              ? `${business.creditDays}天账期`
+              : "无账期"}
+          </button>
+        </div>
+
+        ${quote
+          ? `
+            <div class="quote-result">
+              <div>
+                <span>锁定报价</span>
+                <strong>
+                  ¥${money(
+                    quote.totalPrice
+                  )}
+                </strong>
+              </div>
+              <div>
+                <span>单价</span>
+                <strong>
+                  ¥${Number(
+                    quote.unitPrice
+                  ).toFixed(
+                    2
+                  )}
+                  /${unitLabel(
+                    quote.unit
+                  )}
+                </strong>
+              </div>
+              <div>
+                <span>到货品质</span>
+                <strong>
+                  ${qualityLabel(
+                    quote.quality
+                  )}
+                </strong>
+              </div>
+              <div>
+                <span>预计配送</span>
+                <strong>
+                  ${minuteLabel(
+                    quote
+                      .deliveryMinutes
+                  )}
+                </strong>
+              </div>
+            </div>
+
+            <div class="quote-action-row">
+              <button
+                type="button"
+                data-game-action="procurement-quote"
+              >
+                重新报价
+              </button>
+              <button
+                type="button"
+                class="is-primary"
+                data-game-action="procurement-purchase"
+                ${cashEnough
+                  ? ""
+                  : "disabled"}
+              >
+                ${cashEnough
+                  ? "确认下单"
+                  : "资金不足"}
+              </button>
+            </div>
+          `
+          : `
+            <button
+              type="button"
+              class="formal-primary-button"
+              data-game-action="procurement-quote"
+              ${selectedSupplier &&
+              quantityValue >
+                0
+                ? ""
+                : "disabled"}
+            >
+              获取本次报价
+            </button>
+          `}
+      </section>
+    </section>
+  `;
+}
+
+function renderInventoryPanel(
+  vm
+) {
+  const business =
+    vm.business;
+
+  const selected =
+    business
+      .inventoryIngredient;
+
+  const current =
+    business.catalog.find(
+      ingredient =>
+        ingredient.id ===
+        selected?.id
+    );
+
+  return `
+    <section
+      class="business-module-panel inventory-panel"
+      data-business-panel="inventory"
+    >
+      <section class="formal-card inventory-summary-card">
+        <div class="formal-card-head">
+          <div>
+            <small>库存总览</small>
+            <strong>
+              ${business.catalog.length}
+              类原料
+            </strong>
+          </div>
+
+          <button
+            type="button"
+            class="danger-soft-button"
+            data-game-action="inventory-discard-spoiled"
+            ${business
+              .spoiledBatches
+              .length
+              ? ""
+              : "disabled"}
+          >
+            清理腐坏
+            ${business
+              .spoiledBatches
+              .length}
+            批
+          </button>
+        </div>
+
+        <div class="business-chip-strip inventory-chip-strip">
+          ${business.catalog
+            .map(
+              ingredient => `
+                <button
+                  type="button"
+                  class="${ingredient.id ===
+                    selected?.id
+                    ? "is-active"
+                    : ""}"
+                  data-game-action="inventory-select"
+                  data-game-value="${escapeHtml(
+                    ingredient.id
+                  )}"
+                >
+                  <strong>
+                    ${escapeHtml(
+                      ingredient.name
+                    )}
+                  </strong>
+                  <small>
+                    ${quantity(
+                      ingredient
+                        .currentQuantity
+                    )}
+                    ${unitLabel(
+                      ingredient.unit
+                    )}
+                  </small>
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+      </section>
+
+      <section class="formal-card inventory-detail-card">
+        <div class="formal-card-head">
+          <div>
+            <small>批次详情</small>
+            <strong>
+              ${escapeHtml(
+                selected?.name ??
+                "暂无库存"
+              )}
+            </strong>
+          </div>
+
+          <span>
+            可用
+            ${quantity(
+              current
+                ?.currentQuantity ??
+              0
+            )}
+            ${unitLabel(
+              selected?.unit
+            )}
+          </span>
+        </div>
+
+        <div class="inventory-batch-list formal-scroll-list">
+          ${business.batches.length
+            ? business.batches
               .map(
-                item => `
-                  <div class="formal-list-row">
-                    <div>
+                batch => {
+                  const daysLeft =
+                    Math.max(
+                      0,
+                      (
+                        batch.expiresAt -
+                        vm.time
+                          .totalMinutes
+                      ) /
+                        1440
+                    );
+
+                  return `
+                    <article
+                      class="inventory-batch-row ${batch.spoiled
+                        ? "is-spoiled"
+                        : ""}"
+                    >
+                      <div>
+                        <strong>
+                          ${quantity(
+                            batch.quantity
+                          )}
+                          ${unitLabel(
+                            batch.unit
+                          )}
+                        </strong>
+                        <small>
+                          ${qualityLabel(
+                            batch.quality
+                          )}
+                          ·
+                          ${freshnessLabel(
+                            batch
+                              .freshnessState
+                          )}
+                          ·
+                          新鲜度
+                          ${Math.round(
+                            batch.freshness
+                          )}%
+                        </small>
+                      </div>
+
+                      <div class="batch-expiry">
+                        <strong>
+                          ${batch.spoiled
+                            ? "已腐坏"
+                            : `约 ${daysLeft.toFixed(
+                                1
+                              )} 天`}
+                        </strong>
+                        <small>
+                          成本
+                          ¥${Number(
+                            batch.unitCost ??
+                            0
+                          ).toFixed(
+                            2
+                          )}
+                          /${unitLabel(
+                            batch.unit
+                          )}
+                        </small>
+                      </div>
+
+                      ${batch.spoiled
+                        ? `
+                          <button
+                            type="button"
+                            data-game-action="inventory-discard-batch"
+                            data-game-value="${escapeHtml(
+                              batch.id
+                            )}"
+                          >
+                            清理
+                          </button>
+                        `
+                        : ""}
+                    </article>
+                  `;
+                }
+              )
+              .join(
+                ""
+              )
+            : `
+              <div class="formal-empty">
+                该原料当前没有有效库存批次
+              </div>
+            `}
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderOrdersPanel(
+  vm
+) {
+  const orders =
+    vm.business.orders;
+
+  return `
+    <section
+      class="business-module-panel orders-panel"
+      data-business-panel="orders"
+    >
+      <section class="formal-card orders-summary-card">
+        <div>
+          <small>配送中</small>
+          <strong>
+            ${vm.business
+              .pendingOrders
+              .length}
+          </strong>
+        </div>
+        <div>
+          <small>全部采购单</small>
+          <strong>
+            ${orders.length}
+          </strong>
+        </div>
+        <div>
+          <small>在途原料</small>
+          <strong>
+            ${quantity(
+              vm.business
+                .pendingOrders
+                .reduce(
+                  (
+                    total,
+                    order
+                  ) =>
+                    total +
+                    order.quantity,
+                  0
+                )
+            )}
+          </strong>
+        </div>
+      </section>
+
+      <section class="formal-card formal-list-card procurement-orders-card">
+        <div class="formal-scroll-list">
+          ${orders.length
+            ? orders
+              .map(
+                order => `
+                  <article class="procurement-order-row">
+                    <div class="procurement-order-main">
                       <strong>
                         ${escapeHtml(
-                          item.name
+                          order
+                            .ingredientName
+                        )}
+                        ×
+                        ${quantity(
+                          order.quantity
                         )}
                       </strong>
                       <small>
-                        ${item.batches}
-                        个批次
+                        ${escapeHtml(
+                          order
+                            .supplierName
+                        )}
+                        ·
+                        ¥${money(
+                          order
+                            .totalPrice
+                        )}
+                        ·
+                        ${order.paymentMode ===
+                          "credit"
+                          ? `${order.creditDays}天账期`
+                          : "现付"}
                       </small>
                     </div>
-                    <span>
-                      ${quantity(
-                        item.usableQuantity
-                      )}
-                    </span>
-                  </div>
+
+                    <div
+                      class="procurement-order-status is-${escapeHtml(
+                        order.status
+                      )}"
+                    >
+                      <strong>
+                        ${orderStatusLabel(
+                          order.status
+                        )}
+                      </strong>
+                      <small>
+                        ${order.status ===
+                          "pending"
+                          ? `约 ${minuteLabel(
+                              order
+                                .remainingMinutes
+                            )}`
+                          : order.status ===
+                              "delivered"
+                            ? "已入库存批次"
+                            : "款项已处理"}
+                      </small>
+                    </div>
+
+                    ${order.status ===
+                      "pending"
+                      ? `
+                        <button
+                          type="button"
+                          data-game-action="procurement-cancel"
+                          data-game-value="${escapeHtml(
+                            order.id
+                          )}"
+                        >
+                          取消
+                        </button>
+                      `
+                      : ""}
+                  </article>
                 `
               )
               .join(
@@ -689,11 +1445,80 @@ function renderBusinessPage(
               )
             : `
               <div class="formal-empty">
-                当前没有库存
+                尚无采购单
               </div>
             `}
         </div>
       </section>
+    </section>
+  `;
+}
+
+function renderBusinessPage(
+  vm
+) {
+  const business =
+    vm.business;
+
+  return `
+    <section
+      class="primary-page primary-page-business"
+      data-primary-page="business"
+    >
+      <header class="primary-page-title business-page-title">
+        <div>
+          <small>经营中心</small>
+          <h1>采购与库存</h1>
+        </div>
+
+        <div class="business-title-stats">
+          <span>
+            资金
+            <strong>
+              ¥${money(
+                vm.finance
+                  .balance
+              )}
+            </strong>
+          </span>
+          <span>
+            在途
+            <strong>
+              ${vm.pendingDeliveries}
+              笔
+            </strong>
+          </span>
+        </div>
+      </header>
+
+      ${renderBusinessTabs(
+        business
+      )}
+
+      <div class="business-panel-host">
+        ${business.tab ===
+          "inventory"
+          ? renderInventoryPanel(
+              vm
+            )
+          : business.tab ===
+              "orders"
+            ? renderOrdersPanel(
+                vm
+              )
+            : renderProcurementPanel(
+                vm
+              )}
+      </div>
+
+      <output
+        class="home-status-feedback business-feedback"
+        data-game-feedback
+      >
+        ${escapeHtml(
+          vm.lastMessage
+        )}
+      </output>
     </section>
   `;
 }
