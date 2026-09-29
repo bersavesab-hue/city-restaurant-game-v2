@@ -1609,6 +1609,269 @@ test(
 
 
 test(
+  "renovation more subpage exposes fixed template facility and inspection actions",
+  () => {
+    const vm =
+      fixture();
+
+    vm.more = {
+      tab:
+        "renovation"
+    };
+
+    const template = {
+      id:
+        "balanced",
+      name:
+        "均衡小店",
+      minLevel:
+        1,
+      minArea:
+        36,
+      idealArea:
+        68,
+      items: [
+        "kitchen_station",
+        "cashier_counter",
+        "table_4"
+      ],
+      furnitureCost:
+        12000,
+      constructionCost:
+        48000,
+      estimatedTotalCost:
+        60000,
+      availableBalance:
+        123456,
+      fitScore:
+        92,
+      executable:
+        true,
+      reasons: []
+    };
+
+    vm.renovation = {
+      initialized:
+        true,
+      summary: {
+        active:
+          false,
+        placements:
+          0,
+        totalSpent:
+          0,
+        modifiers: {
+          seats:
+            0,
+          tables:
+            0,
+          kitchenStations:
+            0
+        }
+      },
+      analysis: {
+        grade:
+          "B",
+        scores: {
+          comfort:
+            80,
+          flow:
+            84
+        }
+      },
+      construction:
+        null,
+      currentConstruction:
+        null,
+      progress:
+        null,
+      templates: [
+        template
+      ],
+      selectedTemplate:
+        template,
+      categories: [
+        "dining",
+        "kitchen"
+      ],
+      facilityCategory:
+        "all",
+      facilities: [],
+      selectedFacility:
+        null,
+      serviceCapacity: {
+        kitchenGuests:
+          20,
+        serviceGuests:
+          18
+      },
+      canEdit:
+        true,
+      layoutEmpty:
+        true
+    };
+
+    const initial =
+      renderHomePage(
+        vm,
+        "more"
+      );
+
+    assert.match(
+      initial,
+      /data-game-action="more-tab"/
+    );
+
+    assert.match(
+      initial,
+      /data-game-action="renovation-template-select"/
+    );
+
+    assert.match(
+      initial,
+      /data-game-action="renovation-start-template"/
+    );
+
+    assert.match(
+      initial,
+      /均衡小店/
+    );
+
+    const facility = {
+      id:
+        "decor_plant",
+      name:
+        "基础绿植",
+      category:
+        "decor",
+      width:
+        1,
+      height:
+        1,
+      cost:
+        500,
+      unlockLevel:
+        1,
+      unlocked:
+        true,
+      affordable:
+        true,
+      installedCount:
+        2,
+      appeal:
+        .006,
+      comfort:
+        .008
+    };
+
+    vm.renovation.layoutEmpty =
+      false;
+
+    vm.renovation.summary = {
+      active:
+        true,
+      placements:
+        8,
+      totalSpent:
+        60500,
+      modifiers: {
+        seats:
+          10,
+        tables:
+          3,
+        kitchenStations:
+          1
+      }
+    };
+
+    vm.renovation.categories = [
+      "decor"
+    ];
+
+    vm.renovation.facilities = [
+      facility
+    ];
+
+    vm.renovation.selectedFacility =
+      facility;
+
+    const upgrade =
+      renderHomePage(
+        vm,
+        "more"
+      );
+
+    assert.match(
+      upgrade,
+      /data-game-action="renovation-facility-category"/
+    );
+
+    assert.match(
+      upgrade,
+      /data-game-action="renovation-facility-select"/
+    );
+
+    assert.match(
+      upgrade,
+      /data-game-action="renovation-install-facility"/
+    );
+
+    assert.match(
+      upgrade,
+      /系统自动布置/
+    );
+
+    vm.renovation.currentConstruction = {
+      status:
+        "ready_for_inspection",
+      startDay:
+        2,
+      endDay:
+        5,
+      durationDays:
+        3,
+      projectCost:
+        60500
+    };
+
+    vm.renovation.construction =
+      vm.renovation
+        .currentConstruction;
+
+    vm.renovation.progress = {
+      progress:
+        100,
+      remainingDays:
+        0,
+      phaseLabel:
+        "等待完工验收"
+    };
+
+    const ready =
+      renderHomePage(
+        vm,
+        "more"
+      );
+
+    assert.match(
+      ready,
+      /data-game-action="renovation-inspect"/
+    );
+
+    assert.match(
+      ready,
+      /验收并启用装修/
+    );
+
+    assert.match(
+      css,
+      /\.renovation-panel[\s\S]*?grid-template-columns/
+    );
+  }
+);
+
+
+test(
   "mobile runtime owns route state and keeps one reusable render path",
   () => {
     assert.match(
