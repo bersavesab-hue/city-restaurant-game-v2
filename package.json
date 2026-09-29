@@ -39,8 +39,9 @@
     "build:mobile-ui": "node scripts/build-mobile-ui.mjs",
     "check:version": "node scripts/check-version-sync.mjs",
     "test:core:smoke": "node --test tests/foundation-v2-smoke.test.js tests/procurement-flow.test.js tests/operating-day-e2e.test.js tests/finance-settlement.test.js tests/runtime-session.test.js tests/simulation-clock.test.js",
-    "test:ci": "npm run check:version && npm run check:assets && npm run test:core:smoke && npm run test:save-compat && npm run test:ui && npm run build:mobile-ui",
-    "check:assets": "node scripts/check-ui-assets.mjs"
+    "test:ci": "npm run check:version && npm run check:assets && npm run test:core:smoke && npm run test:save-compat && npm run test:launch && npm run test:ui && npm run build:mobile-ui",
+    "check:assets": "node scripts/check-ui-assets.mjs",
+    "test:launch": "node --test tests/launch-content.test.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
