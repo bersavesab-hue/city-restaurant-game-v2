@@ -395,6 +395,291 @@ function fixture() {
       }
     },
 
+    schedule: {
+      openHour: 9,
+      closeHour: 22,
+      enabled: true
+    },
+
+    staff: {
+      tab: "team",
+      employeeLimit: 6,
+      monthlyPayroll: 15000,
+      totalArrears: 0,
+      nextPayrollDay: 30,
+      payrollHistory: [],
+      schedule: [],
+      selectedSchedule: [],
+      recommendation: {
+        roles: [
+          {
+            roleId:
+              "chef",
+            current:
+              1,
+            recommended:
+              1,
+            reason:
+              "当前厨师配置合理"
+          }
+        ]
+      },
+      employees: [
+        {
+          id:
+            "employee_1",
+          name:
+            "张师傅",
+          roleId:
+            "chef",
+          level:
+            2,
+          status:
+            "active",
+          salary:
+            6500,
+          mood:
+            70,
+          loyalty:
+            62,
+          fatigue:
+            18,
+          potentialName:
+            "良好",
+          trainingCount:
+            1,
+          skills: {
+            cooking:
+              48,
+            speed:
+              35,
+            quality:
+              42
+          },
+          rank: {
+            id:
+              "apprentice",
+            name:
+              "学徒"
+          },
+          dynamics: {
+            satisfaction: {
+              score:
+                72,
+              label:
+                "满意"
+            },
+            training: {
+              label:
+                "1/3次培训"
+            }
+          },
+          turnover: {
+            score:
+              18,
+            level:
+              "low"
+          },
+          salarySatisfaction: {
+            score:
+              70,
+            recommended:
+              6800
+          },
+          promotion: {
+            eligible:
+              false,
+            maxRank:
+              false,
+            next: {
+              name:
+                "熟手"
+            }
+          },
+          trainingPrograms: [
+            {
+              id:
+                "basic_training",
+              name:
+                "基础岗位训练",
+              cost:
+                600,
+              experience:
+                120,
+              fatigueGain:
+                6,
+              unlocked:
+                true,
+              unlockRank: {
+                name:
+                  "学徒"
+              }
+            }
+          ]
+        }
+      ],
+      selectedEmployee: {
+        id:
+          "employee_1",
+        name:
+          "张师傅",
+        roleId:
+          "chef",
+        level:
+          2,
+        status:
+          "active",
+        salary:
+          6500,
+        mood:
+          70,
+        loyalty:
+          62,
+        fatigue:
+          18,
+        potentialName:
+          "良好",
+        trainingCount:
+          1,
+        skills: {
+          cooking:
+            48,
+          speed:
+            35,
+          quality:
+            42
+        },
+        rank: {
+          id:
+            "apprentice",
+          name:
+            "学徒"
+        },
+        dynamics: {
+          satisfaction: {
+            score:
+              72,
+            label:
+              "满意"
+          },
+          training: {
+            label:
+              "1/3次培训"
+          }
+        },
+        turnover: {
+          score:
+            18,
+          level:
+            "low"
+        },
+        salarySatisfaction: {
+          score:
+            70,
+          recommended:
+            6800
+        },
+        promotion: {
+          eligible:
+            false,
+          maxRank:
+            false,
+          next: {
+            name:
+              "熟手"
+          }
+        },
+        trainingPrograms: [
+          {
+            id:
+              "basic_training",
+            name:
+              "基础岗位训练",
+            cost:
+              600,
+            experience:
+              120,
+            fatigueGain:
+              6,
+            unlocked:
+              true,
+            unlockRank: {
+              name:
+                "学徒"
+            }
+          }
+        ]
+      },
+      candidates: [
+        {
+          id:
+            "candidate_1",
+          name:
+            "李师傅",
+          roleId:
+            "chef",
+          roleName:
+            "厨师",
+          age:
+            28,
+          experienceMonths:
+            48,
+          potentialName:
+            "优秀",
+          profileName:
+            "稳健型",
+          expectedSalary:
+            7200,
+          stability:
+            78,
+          learning:
+            72,
+          stressTolerance:
+            70,
+          teamwork:
+            76,
+          initiative:
+            68,
+          traits: [
+            "稳定"
+          ]
+        }
+      ],
+      selectedCandidate: {
+        id:
+          "candidate_1",
+        name:
+          "李师傅",
+        roleId:
+          "chef",
+        roleName:
+          "厨师",
+        age:
+          28,
+        experienceMonths:
+          48,
+        potentialName:
+          "优秀",
+        profileName:
+          "稳健型",
+        expectedSalary:
+          7200,
+        stability:
+          78,
+        learning:
+          72,
+        stressTolerance:
+          70,
+        teamwork:
+          76,
+        initiative:
+          68,
+        traits: [
+          "稳定"
+        ]
+      }
+    },
+
     procurement: {
       ingredientName:
         "大米",
@@ -958,6 +1243,136 @@ test(
     assert.match(
       css,
       /\.dish-panel-host[\s\S]*?overflow:\s*hidden/
+    );
+  }
+);
+
+
+test(
+  "staff route exposes team recruitment schedule and payroll actions",
+  () => {
+    const team =
+      renderHomePage(
+        fixture(),
+        "staff"
+      );
+
+    for (
+      const action
+      of [
+        "staff-tab",
+        "staff-select",
+        "staff-train",
+        "staff-promote"
+      ]
+    ) {
+      assert.match(
+        team,
+        new RegExp(
+          `data-game-action="${action}"`
+        )
+      );
+    }
+
+    const recruitFixture =
+      fixture();
+
+    recruitFixture
+      .staff
+      .tab =
+      "recruit";
+
+    const recruit =
+      renderHomePage(
+        recruitFixture,
+        "staff"
+      );
+
+    for (
+      const action
+      of [
+        "staff-candidate-select",
+        "staff-refresh-candidates",
+        "staff-hire-candidate"
+      ]
+    ) {
+      assert.match(
+        recruit,
+        new RegExp(
+          `data-game-action="${action}"`
+        )
+      );
+    }
+
+    const scheduleFixture =
+      fixture();
+
+    scheduleFixture
+      .staff
+      .tab =
+      "schedule";
+
+    scheduleFixture
+      .staff
+      .selectedSchedule = [
+        {
+          weekday:
+            1,
+          startClock:
+            "09:00",
+          endClock:
+            "17:00"
+        }
+      ];
+
+    const schedule =
+      renderHomePage(
+        scheduleFixture,
+        "staff"
+      );
+
+    assert.match(
+      schedule,
+      /data-game-action="staff-shift-toggle"/
+    );
+
+    assert.match(
+      schedule,
+      /data-game-action="staff-schedule-all"/
+    );
+
+    assert.match(
+      schedule,
+      /09:00-17:00/
+    );
+
+    const payrollFixture =
+      fixture();
+
+    payrollFixture
+      .staff
+      .tab =
+      "payroll";
+
+    const payroll =
+      renderHomePage(
+        payrollFixture,
+        "staff"
+      );
+
+    assert.match(
+      payroll,
+      /data-game-action="staff-salary"/
+    );
+
+    assert.match(
+      payroll,
+      /data-game-action="staff-fire"/
+    );
+
+    assert.match(
+      css,
+      /\.staff-panel-host[\s\S]*?overflow:\s*hidden/
     );
   }
 );
