@@ -3663,3 +3663,103 @@ button {
     font-size: 14px;
   }
 }
+
+/* T10 launch growth stages. */
+.launch-growth-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.launch-stage-copy {
+  margin: 6px 0 0;
+  color: rgba(231,239,243,.58);
+  font-size: 7px;
+  line-height: 1.35;
+}
+
+.launch-stage-meta {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  color: rgba(231,239,243,.62);
+  font-size: 7px;
+}
+
+.launch-objective-grid {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0,1fr)
+    );
+  gap: 4px;
+}
+
+.launch-objective-grid span {
+  min-width: 0;
+  padding: 4px 5px;
+  overflow: hidden;
+  border-radius: 7px;
+  background: rgba(255,255,255,.04);
+  color: rgba(232,239,242,.62);
+  font-size: 6.5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.launch-objective-grid span.is-complete {
+  background: rgba(88,171,151,.12);
+  color: #c8ece3;
+}
+
+.launch-content-counts {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0,1fr)
+    );
+  gap: 4px;
+}
+
+.launch-content-counts span {
+  min-width: 0;
+  padding: 4px 5px;
+  border-radius: 7px;
+  background: rgba(190,134,44,.09);
+  color: #ffe2a6;
+  font-size: 6.5px;
+  text-align: center;
+}
+
+.launch-next-stage {
+  margin-top: 5px;
+  overflow: hidden;
+  color: rgba(231,239,243,.5);
+  font-size: 6.5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-height: 760px) {
+  .launch-stage-copy {
+    margin-top: 4px;
+  }
+
+  .launch-stage-meta,
+  .launch-objective-grid,
+  .launch-content-counts {
+    margin-top: 4px;
+  }
+
+  .launch-objective-grid span,
+  .launch-content-counts span,
+  .launch-next-stage {
+    font-size: 6px;
+  }
+}
