@@ -1587,9 +1587,21 @@ function createMobileGameController(
             actionId
         );
 
-    if (!action) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    if (
+      !action ||
+      !launchProgressionSystem
+        .isMarketingActionAllowed(
+          restaurant.level,
+          actionId
+        )
+    ) {
       throw new Error(
-        "营销活动不存在"
+        "营销活动不存在或当前阶段未开放"
       );
     }
 
@@ -2542,16 +2554,36 @@ function createMobileGameController(
         dishId
       );
 
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
     if (
       !dish ||
       (
         dish.custom &&
         dish.ownerRestaurantId !==
           restaurantId
+      ) ||
+      (
+        !dish.custom &&
+        (
+          (
+            dish.unlockLevel ??
+            1
+          ) >
+            restaurant.level ||
+          !launchProgressionSystem
+            .isDishAllowed(
+              restaurant.level,
+              dish.id
+            )
+        )
       )
     ) {
       throw new Error(
-        "菜品不存在或不属于当前门店"
+        "菜品不存在或当前阶段未开放"
       );
     }
 
@@ -2737,14 +2769,26 @@ function createMobileGameController(
   function toggleResearchIngredient(
     ingredientId
   ) {
-    if (
-      !ingredientCatalogSystem
-        .exists(
+    const ingredient =
+      ingredientCatalogSystem
+        .get(
           ingredientId
+        );
+
+    const restaurant =
+      getRestaurant();
+
+    if (
+      !ingredient ||
+      !restaurant ||
+      !launchProgressionSystem
+        .isIngredientCategoryAllowed(
+          restaurant.level,
+          ingredient.category
         )
     ) {
       throw new Error(
-        "研发原料不存在"
+        "研发原料不存在或当前阶段未开放"
       );
     }
 
@@ -3243,9 +3287,21 @@ function createMobileGameController(
             candidateId
         );
 
-    if (!candidate) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    if (
+      !candidate ||
+      !launchProgressionSystem
+        .isEmployeeRoleAllowed(
+          restaurant.level,
+          candidate.roleId
+        )
+    ) {
       throw new Error(
-        "候选人已失效"
+        "候选人已失效或岗位当前阶段未开放"
       );
     }
 
@@ -4142,6 +4198,23 @@ function createMobileGameController(
         .getTemplate(
           templateId
         );
+
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    if (
+      !launchProgressionSystem
+        .isRenovationTemplateAllowed(
+          restaurant.level,
+          template.id
+        )
+    ) {
+      throw new Error(
+        "装修方案当前阶段未开放"
+      );
+    }
 
     moreUi
       .selectedTemplateId =
