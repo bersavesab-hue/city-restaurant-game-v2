@@ -1785,7 +1785,7 @@ test(
       .storeProgressSystem
       .addExperience(
         reviewRestaurant.id,
-        500
+        3500
       );
 
     reviewController
@@ -1794,7 +1794,7 @@ test(
     reviewController
       .performAction(
         "marketing-select",
-        "nearby_search_boost"
+        "quality_campaign"
       );
 
     const reviewStart =
@@ -1849,7 +1849,7 @@ test(
       experience
         .marketingEffects
         .reviewPropensityMultiplier,
-      1.05
+      1.08
     );
 
     assert.ok(
