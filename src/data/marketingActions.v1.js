@@ -78,7 +78,7 @@ export const MARKETING_ACTIONS_V1 =
       name: "本地广告",
       category: "local_acquisition",
       description: "在门店周边投放基础曝光，稳定提升新客到店。",
-      cost: 2000,
+      cost: 1800,
       durationDays: 5,
       cooldownDays: 5,
       minRestaurantLevel: 1,
