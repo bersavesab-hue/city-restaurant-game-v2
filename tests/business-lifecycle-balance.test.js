@@ -92,8 +92,8 @@ import {
 import "../src/systems/CustomerLoyaltyIntegrationSystem.js";
 
 import {
-  financeCenterPageSystem
-} from "../src/ui/pages/finance/FinanceCenterPageSystem.js";
+  economicBalanceSystem
+} from "../src/systems/EconomicBalanceSystem.js";
 
 import {
   DISH_SCHEMA_VERSION,
@@ -715,6 +715,135 @@ function advanceManagedDays(
   );
 }
 
+function getRecentFinance(
+  restaurantId,
+  periodDays = 30
+) {
+  const currentDay =
+    gameState
+      .getSection("time")
+      .day;
+
+  const startDay =
+    Math.max(
+      1,
+      currentDay -
+        periodDays
+    );
+
+  const transactions =
+    financeSystem
+      .getTransactions(
+        restaurantId
+      )
+      .filter(
+        item =>
+          item.day >=
+          startDay &&
+          item.day <
+          currentDay
+      );
+
+  let income = 0;
+  let expense = 0;
+  const expenseByCategory =
+    new Map();
+
+  for (
+    const item
+    of transactions
+  ) {
+    if (
+      item.transactionType ===
+      "income"
+    ) {
+      income +=
+        item.amount;
+    }
+
+    if (
+      [
+        "expense",
+        "apply_hold"
+      ].includes(
+        item.transactionType
+      )
+    ) {
+      expense +=
+        item.amount;
+
+      expenseByCategory.set(
+        item.category,
+        (
+          expenseByCategory.get(
+            item.category
+          ) ??
+          0
+        ) +
+          item.amount
+      );
+    }
+  }
+
+  const summary = {
+    income,
+    expense,
+    profit:
+      income -
+      expense,
+    profitMargin:
+      income > 0
+        ? Number(
+            (
+              (
+                income -
+                expense
+              ) /
+              income
+            ).toFixed(
+              4
+            )
+          )
+        : 0
+  };
+
+  const categories =
+    [
+      ...expenseByCategory
+        .entries()
+    ].map(
+      (
+        [
+          category,
+          value
+        ]
+      ) => ({
+        category,
+        expense:
+          value
+      })
+    );
+
+  const health =
+    economicBalanceSystem
+      .analyze({
+        balance:
+          financeSystem
+            .getBalance(
+              restaurantId
+            ),
+        summary,
+        categories,
+        periodDays
+      });
+
+  return {
+    summary,
+    categories,
+    health
+  };
+}
+
 function getCheckpoint(
   restaurantId,
   elapsedDays
@@ -730,14 +859,10 @@ function getCheckpoint(
     );
 
   const financePage =
-    financeCenterPageSystem
-      .getPage(
-        restaurantId,
-        {
-          period:
-            "month"
-        }
-      );
+    getRecentFinance(
+      restaurantId,
+      30
+    );
 
   const lease =
     leaseSystem.getByRestaurant(
