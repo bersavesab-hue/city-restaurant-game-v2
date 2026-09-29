@@ -173,7 +173,114 @@ function fixture() {
       day:
         18,
       clock:
-        "12:25"
+        "12:25",
+      totalMinutes:
+        1800
+    },
+
+    business: {
+      tab:
+        "procurement",
+      catalog: [
+        {
+          id:
+            "rice",
+          name:
+            "大米",
+          unit:
+            "kg",
+          currentQuantity:
+            12,
+          pendingQuantity:
+            0,
+          requiredByMenu:
+            true
+        }
+      ],
+      selectedIngredient: {
+        id:
+          "rice",
+        name:
+          "大米",
+        unit:
+          "kg",
+        currentQuantity:
+          12,
+        pendingQuantity:
+          0
+      },
+      supplierOptions: [
+        {
+          id:
+            "supplier_a",
+          name:
+            "测试供应商",
+          relationship:
+            60,
+          reliability:
+            90,
+          minimumOrder:
+            5,
+          remainingCapacity:
+            100,
+          deliveryMinutes:
+            120,
+          qualityMin:
+            2,
+          qualityMax:
+            4,
+          maxCreditDays:
+            7
+        }
+      ],
+      selectedSupplier: {
+        id:
+          "supplier_a",
+        name:
+          "测试供应商",
+        relationship:
+          60,
+        reliability:
+          90,
+        minimumOrder:
+          5,
+        remainingCapacity:
+          100,
+        deliveryMinutes:
+          120,
+        qualityMin:
+          2,
+        qualityMax:
+          4,
+        maxCreditDays:
+          7
+      },
+      quantity:
+        5,
+      paymentMode:
+        "cash",
+      quote:
+        null,
+      quoteLocked:
+        false,
+      canUseCredit:
+        true,
+      creditDays:
+        7,
+      orders: [],
+      pendingOrders: [],
+      inventoryIngredient: {
+        id:
+          "rice",
+        name:
+          "大米",
+        unit:
+          "kg"
+      },
+      batches: [],
+      spoiledBatches: [],
+      spoiledQuantity:
+        0
     },
 
     runtime: {
@@ -321,9 +428,54 @@ test(
         "more"
       );
 
+    for (
+      const action
+      of [
+        "business-tab",
+        "procurement-ingredient",
+        "procurement-supplier",
+        "procurement-quantity",
+        "procurement-payment",
+        "procurement-quote"
+      ]
+    ) {
+      assert.match(
+        business,
+        new RegExp(
+          `data-game-action="${action}"`
+        )
+      );
+    }
+
+    const quotedFixture =
+      fixture();
+
+    quotedFixture.business.quote = {
+      unitPrice:
+        8.5,
+      totalPrice:
+        42,
+      quality:
+        3,
+      unit:
+        "kg",
+      deliveryMinutes:
+        120
+    };
+
+    quotedFixture.business
+      .quoteLocked =
+      true;
+
+    const quotedBusiness =
+      renderHomePage(
+        quotedFixture,
+        "business"
+      );
+
     assert.match(
-      business,
-      /data-game-action="purchase"/
+      quotedBusiness,
+      /data-game-action="procurement-purchase"/
     );
 
     assert.match(
@@ -349,6 +501,129 @@ test(
     assert.doesNotMatch(
       homePage,
       /购买成功|保存成功|营业成功/
+    );
+  }
+);
+
+
+test(
+  "business route renders procurement inventory and order subpages without whole-page scrolling",
+  () => {
+    const inventoryFixture =
+      fixture();
+
+    inventoryFixture
+      .business
+      .tab =
+      "inventory";
+
+    inventoryFixture
+      .business
+      .batches = [
+        {
+          id:
+            "batch_1",
+          quantity:
+            4,
+          unit:
+            "kg",
+          quality:
+            3,
+          freshness:
+            0,
+          freshnessState:
+            "spoiled",
+          spoiled:
+            true,
+          expiresAt:
+            1500,
+          unitCost:
+            6
+        }
+      ];
+
+    inventoryFixture
+      .business
+      .spoiledBatches =
+      inventoryFixture
+        .business
+        .batches;
+
+    const inventoryHtml =
+      renderHomePage(
+        inventoryFixture,
+        "business"
+      );
+
+    assert.match(
+      inventoryHtml,
+      /data-business-panel="inventory"/
+    );
+
+    assert.match(
+      inventoryHtml,
+      /data-game-action="inventory-discard-batch"/
+    );
+
+    const ordersFixture =
+      fixture();
+
+    ordersFixture
+      .business
+      .tab =
+      "orders";
+
+    ordersFixture
+      .business
+      .orders = [
+        {
+          id:
+            "order_1",
+          ingredientName:
+            "大米",
+          supplierName:
+            "测试供应商",
+          quantity:
+            5,
+          totalPrice:
+            42,
+          status:
+            "pending",
+          paymentMode:
+            "cash",
+          creditDays:
+            0,
+          remainingMinutes:
+            60
+        }
+      ];
+
+    ordersFixture
+      .business
+      .pendingOrders =
+      ordersFixture
+        .business
+        .orders;
+
+    const ordersHtml =
+      renderHomePage(
+        ordersFixture,
+        "business"
+      );
+
+    assert.match(
+      ordersHtml,
+      /data-business-panel="orders"/
+    );
+
+    assert.match(
+      ordersHtml,
+      /data-game-action="procurement-cancel"/
+    );
+
+    assert.match(
+      css,
+      /\.business-panel-host[\s\S]*?overflow:\s*hidden/
     );
   }
 );
