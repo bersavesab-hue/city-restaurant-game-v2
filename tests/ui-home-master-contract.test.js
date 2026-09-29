@@ -150,6 +150,251 @@ function fixture() {
       }
     },
 
+    dishes: {
+      tab:
+        "menu",
+      activeMenuCount:
+        1,
+      menuLimit:
+        4,
+      menuItems: [
+        {
+          id:
+            "menu_1",
+          dishId:
+            "rice_bowl",
+          price:
+            28,
+          active:
+            true
+        }
+      ],
+      dishes: [
+        {
+          id:
+            "rice_bowl",
+          name:
+            "招牌盖饭",
+          category:
+            "rice",
+          basePrice:
+            28,
+          custom:
+            false,
+          onMenu:
+            true,
+          active:
+            true,
+          currentPrice:
+            28,
+          soldCount:
+            12,
+          totalRevenue:
+            336,
+          menuItem: {
+            id:
+              "menu_1",
+            price:
+              28,
+            active:
+              true
+          },
+          progress: {
+            dishRankName:
+              "家常",
+            masteryLevel:
+              1,
+            recipeQualityScore:
+              62
+          },
+          recipe: {
+            id:
+              "recipe_1",
+            method:
+              "stir_fry",
+            cookingMinutes:
+              12,
+            difficulty:
+              30,
+            ingredients: [
+              {
+                ingredientId:
+                  "rice",
+                quantity:
+                  1
+              }
+            ]
+          },
+          ingredients: [
+            {
+              ingredientId:
+                "rice",
+              name:
+                "大米",
+              quantity:
+                1,
+              unit:
+                "kg",
+              stock:
+                12
+            }
+          ]
+        }
+      ],
+      selectedDish: {
+        id:
+          "rice_bowl",
+        name:
+          "招牌盖饭",
+        category:
+          "rice",
+        basePrice:
+          28,
+        custom:
+          false,
+        onMenu:
+          true,
+        active:
+          true,
+        currentPrice:
+          28,
+        soldCount:
+          12,
+        totalRevenue:
+          336,
+        menuItem: {
+          id:
+            "menu_1",
+          price:
+            28,
+          active:
+            true
+        },
+        progress: {
+          dishRankName:
+            "家常",
+          masteryLevel:
+            1,
+          recipeQualityScore:
+            62
+        },
+        recipe: {
+          id:
+            "recipe_1",
+          method:
+            "stir_fry",
+          cookingMinutes:
+            12,
+          difficulty:
+            30,
+          ingredients: [
+            {
+              ingredientId:
+                "rice",
+              quantity:
+                1
+            }
+          ]
+        },
+        ingredients: [
+          {
+            ingredientId:
+              "rice",
+            name:
+              "大米",
+            quantity:
+              1,
+            unit:
+              "kg",
+            stock:
+              12
+          }
+        ]
+      },
+      research: {
+        methods: [
+          {
+            id:
+              "stir_fry",
+            name:
+              "炒制",
+            icon:
+              "炒",
+            baseMinutes:
+              12,
+            defaultCategory:
+              "stir_fry"
+          }
+        ],
+        ingredients: [
+          {
+            id:
+              "rice",
+            name:
+              "大米",
+            category:
+              "grain",
+            unit:
+              "kg"
+          },
+          {
+            id:
+              "pork",
+            name:
+              "猪肉",
+            category:
+              "meat",
+            unit:
+              "kg"
+          }
+        ],
+        methodId:
+          "stir_fry",
+        selectedMethod: {
+          id:
+            "stir_fry",
+          name:
+            "炒制",
+          icon:
+            "炒",
+          baseMinutes:
+            12,
+          defaultCategory:
+            "stir_fry"
+        },
+        ingredientIds: [
+          "rice",
+          "pork"
+        ],
+        selectedIngredients: [
+          {
+            id:
+              "rice",
+            name:
+              "大米",
+            category:
+              "grain",
+            unit:
+              "kg"
+          },
+          {
+            id:
+              "pork",
+            name:
+              "猪肉",
+            category:
+              "meat",
+            unit:
+              "kg"
+          }
+        ],
+        generatedName:
+          "炒制大米猪肉",
+        lastResult:
+          null
+      }
+    },
+
     procurement: {
       ingredientName:
         "大米",
@@ -644,6 +889,75 @@ test(
     assert.match(
       css,
       /\.business-panel-host[\s\S]*?overflow:\s*hidden/
+    );
+  }
+);
+
+
+test(
+  "dish route renders menu library and research actions from one real-data model",
+  () => {
+    const menuHtml =
+      renderHomePage(
+        fixture(),
+        "research"
+      );
+
+    for (
+      const action
+      of [
+        "dish-tab",
+        "dish-select",
+        "dish-price",
+        "dish-toggle-active"
+      ]
+    ) {
+      assert.match(
+        menuHtml,
+        new RegExp(
+          `data-game-action="${action}"`
+        )
+      );
+    }
+
+    const researchFixture =
+      fixture();
+
+    researchFixture
+      .dishes
+      .tab =
+      "research";
+
+    const researchHtml =
+      renderHomePage(
+        researchFixture,
+        "research"
+      );
+
+    for (
+      const action
+      of [
+        "dish-research-method",
+        "dish-research-ingredient",
+        "dish-research"
+      ]
+    ) {
+      assert.match(
+        researchHtml,
+        new RegExp(
+          `data-game-action="${action}"`
+        )
+      );
+    }
+
+    assert.match(
+      researchHtml,
+      /炒制大米猪肉/
+    );
+
+    assert.match(
+      css,
+      /\.dish-panel-host[\s\S]*?overflow:\s*hidden/
     );
   }
 );
