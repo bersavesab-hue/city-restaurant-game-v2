@@ -1872,6 +1872,142 @@ test(
 
 
 test(
+  "formal homepage shows launch stage goals and feature locks",
+  () => {
+    const vm =
+      fixture();
+
+    vm.launch = {
+      id:
+        "street_survival",
+      name:
+        "街坊立足",
+      subtitle:
+        "先把一家小店真正经营活下来",
+      stageNumber:
+        1,
+      totalStages:
+        3,
+      objectiveCompleted:
+        2,
+      objectiveTotal:
+        4,
+      objectives: [
+        {
+          label:
+            "营业菜单达到 4 道",
+          complete:
+            true
+        },
+        {
+          label:
+            "在册员工达到 3 人",
+          complete:
+            true
+        },
+        {
+          label:
+            "完成并启用首次装修",
+          complete:
+            false
+        },
+        {
+          label:
+            "星级评价达到 3.8",
+          complete:
+            false
+        }
+      ],
+      contentCounts: {
+        dishes:
+          8,
+        suppliers:
+          4,
+        marketingActions:
+          2
+      },
+      experience: {
+        progress:
+          .4,
+        nextStageName:
+          "商圈成长",
+        remainingExperience:
+          2100
+      }
+    };
+
+    const home =
+      renderHomePage(
+        vm,
+        "store"
+      );
+
+    assert.match(
+      home,
+      /成长阶段 1\/3/
+    );
+
+    assert.match(
+      home,
+      /街坊立足/
+    );
+
+    assert.match(
+      home,
+      /目标\s*2\/4/
+    );
+
+    assert.match(
+      home,
+      /下一阶段：商圈成长/
+    );
+
+    vm.dishes.research.unlocked =
+      false;
+
+    vm.dishes.research.unlockLevel =
+      5;
+
+    const dishes =
+      renderHomePage(
+        vm,
+        "research"
+      );
+
+    assert.match(
+      dishes,
+      /研发 Lv\.5/
+    );
+
+    vm.business.tab =
+      "marketing";
+
+    vm.business.marketing.unlocked =
+      false;
+
+    vm.business.marketing.unlockLevel =
+      3;
+
+    const marketing =
+      renderHomePage(
+        vm,
+        "business"
+      );
+
+    assert.match(
+      marketing,
+      /门店 Lv\.3 解锁/
+    );
+
+    assert.match(
+      css,
+      /\.launch-objective-grid/
+    );
+  }
+);
+
+
+test(
   "mobile runtime owns route state and keeps one reusable render path",
   () => {
     assert.match(
