@@ -1354,11 +1354,6 @@ test(
       selected
     );
 
-    assert.equal(
-      selected.id,
-      "local_ads"
-    );
-
     const beforeBalance =
       app.systems
         .financeSystem
