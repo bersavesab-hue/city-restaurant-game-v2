@@ -1863,3 +1863,121 @@ test(
     );
   }
 );
+
+test(
+  "discount marketing changes the real transaction price instead of only the preview",
+  () => {
+    resetFoundation();
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    controller
+      .getViewModel();
+
+    const select =
+      controller
+        .performAction(
+          "marketing-select",
+          "flash_coupon"
+        );
+
+    assert.equal(
+      select.ok,
+      true
+    );
+
+    const start =
+      controller
+        .performAction(
+          "marketing-start"
+        );
+
+    assert.equal(
+      start.ok,
+      true
+    );
+
+    const modifiers =
+      app.systems
+        .marketActionSystem
+        .getModifiers(
+          restaurant.id
+        );
+
+    assert.equal(
+      modifiers.priceMultiplier,
+      0.9
+    );
+
+    const menuItem =
+      app.systems
+        .menuSystem
+        .listByRestaurant(
+          restaurant.id,
+          {
+            activeOnly:
+              true
+          }
+        )[0];
+
+    assert.ok(
+      menuItem
+    );
+
+    const open =
+      controller
+        .performAction(
+          "toggle-restaurant"
+        );
+
+    assert.equal(
+      open.ok,
+      true
+    );
+
+    const order =
+      app.systems
+        .orderSystem
+        .place({
+          restaurantId:
+            restaurant.id,
+          items: [
+            {
+              menuItemId:
+                menuItem.id,
+              quantity:
+                1
+            }
+          ]
+        });
+
+    const expectedUnitPrice =
+      Math.max(
+        1,
+        Math.round(
+          menuItem.price *
+          0.9
+        )
+      );
+
+    assert.equal(
+      order.items[0]
+        .unitPrice,
+      expectedUnitPrice
+    );
+
+    assert.equal(
+      order.totalRevenue,
+      expectedUnitPrice
+    );
+  }
+);
