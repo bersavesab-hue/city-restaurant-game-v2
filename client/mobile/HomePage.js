@@ -1707,6 +1707,28 @@ function renderMarketingPanel(
     vm.business
       .marketing;
 
+  if (
+    marketing.unlocked ===
+    false
+  ) {
+    return `
+      <section
+        class="business-module-panel marketing-panel marketing-locked-panel"
+        data-business-panel="marketing"
+      >
+        <section class="formal-card marketing-unlock-card">
+          <small>活动与营销</small>
+          <h2>
+            门店 Lv.${marketing.unlockLevel} 解锁
+          </h2>
+          <p>
+            先把基础经营跑稳。达到解锁等级后，可使用首发精选营销活动主动拉动客流、成交与评价。
+          </p>
+        </section>
+      </section>
+    `;
+  }
+
   const selected =
     marketing
       .selectedAction;
@@ -2263,8 +2285,21 @@ function renderDishTabs(
                   : ""}"
               data-game-action="dish-tab"
               data-game-value="${id}"
+              ${id ===
+                "research" &&
+              dishes.research
+                ?.unlocked ===
+                false
+                ? "disabled"
+                : ""}
             >
-              ${label}
+              ${id ===
+                "research" &&
+              dishes.research
+                ?.unlocked ===
+                false
+                ? `${label} Lv.${dishes.research.unlockLevel}`
+                : label}
             </button>
           `
         )
