@@ -1524,6 +1524,19 @@ function createMobileGameController(
   function startSelectedMarketAction(
     restaurantId
   ) {
+    if (
+      !businessUi
+        .marketActionId
+    ) {
+      getMarketingModel(
+        restaurantId,
+        gameState
+          .getSection(
+            "time"
+          )
+      );
+    }
+
     const actionId =
       businessUi
         .marketActionId;
