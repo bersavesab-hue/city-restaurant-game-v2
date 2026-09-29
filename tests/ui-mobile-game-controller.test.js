@@ -1324,3 +1324,364 @@ test(
       );
   }
 );
+
+test(
+  "marketing workflow deducts cost and changes real demand through active modifiers",
+  () => {
+    resetFoundation();
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    let view =
+      controller
+        .getViewModel();
+
+    const selected =
+      view.business
+        .marketing
+        .selectedAction;
+
+    assert.ok(
+      selected
+    );
+
+    assert.equal(
+      selected.id,
+      "local_ads"
+    );
+
+    const beforeBalance =
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        );
+
+    const beforeDemand =
+      app.systems
+        .trafficDemandSystem
+        .getHourlyDemand(
+          restaurant.id,
+          12
+        )
+        .expectedVisitors;
+
+    const result =
+      controller
+        .performAction(
+          "marketing-start"
+        );
+
+    assert.equal(
+      result.ok,
+      true
+    );
+
+    assert.equal(
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        ),
+      beforeBalance -
+        selected.cost
+    );
+
+    const active =
+      app.systems
+        .marketActionSystem
+        .getActiveActions(
+          restaurant.id
+        );
+
+    assert.equal(
+      active.length,
+      1
+    );
+
+    assert.equal(
+      active[0].type,
+      selected.id
+    );
+
+    const modifiers =
+      app.systems
+        .marketActionSystem
+        .getModifiers(
+          restaurant.id
+        );
+
+    assert.ok(
+      modifiers
+        .demandMultiplier >
+      1
+    );
+
+    const afterDemand =
+      app.systems
+        .trafficDemandSystem
+        .getHourlyDemand(
+          restaurant.id,
+          12
+        )
+        .expectedVisitors;
+
+    assert.ok(
+      afterDemand >
+      beforeDemand
+    );
+
+    view =
+      result.viewModel;
+
+    assert.equal(
+      view.business
+        .marketing
+        .active
+        .length,
+      1
+    );
+
+    assert.ok(
+      view.business
+        .marketing
+        .history
+        .some(
+          item =>
+            item.type ===
+              selected.id &&
+            item.status ===
+              "started"
+        )
+    );
+  }
+);
+
+
+test(
+  "marketing expiry and cooldown use the real market action rules",
+  () => {
+    resetFoundation();
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    const action =
+      app.systems
+        .marketActionSystem
+        .startAction(
+          restaurant.id,
+          "local_ads"
+        );
+
+    const dayAfterEnd =
+      action.endDay + 1;
+
+    app.systems
+      .marketActionSystem
+      .processDay(
+        dayAfterEnd
+      );
+
+    assert.equal(
+      app.systems
+        .marketActionSystem
+        .getActiveActions(
+          restaurant.id,
+          dayAfterEnd
+        )
+        .length,
+      0
+    );
+
+    const cooling =
+      app.systems
+        .marketActionSystem
+        .getAvailability(
+          restaurant.id,
+          "local_ads",
+          dayAfterEnd
+        );
+
+    assert.equal(
+      cooling.canStart,
+      false
+    );
+
+    assert.ok(
+      cooling.reasons
+        .includes(
+          "cooldown"
+        )
+    );
+
+    const ready =
+      app.systems
+        .marketActionSystem
+        .getAvailability(
+          restaurant.id,
+          "local_ads",
+          cooling.availableDay
+        );
+
+    assert.equal(
+      ready.canStart,
+      true
+    );
+
+    const history =
+      app.systems
+        .marketActionSystem
+        .getHistory(
+          restaurant.id
+        );
+
+    assert.equal(
+      history[0].status,
+      "ended"
+    );
+  }
+);
+
+
+test(
+  "active marketing action history and paid balance survive save reload",
+  () => {
+    resetFoundation();
+
+    const slot =
+      "t09-marketing";
+
+    app.core
+      .saveSystem
+      .remove(
+        slot
+      );
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    const before =
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        );
+
+    const start =
+      controller
+        .performAction(
+          "marketing-start"
+        );
+
+    assert.equal(
+      start.ok,
+      true
+    );
+
+    const action =
+      start
+        .viewModel
+        .business
+        .marketing
+        .active[0];
+
+    const paidBalance =
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        );
+
+    assert.ok(
+      paidBalance <
+      before
+    );
+
+    app.core
+      .saveSystem
+      .save(
+        slot
+      );
+
+    app.core
+      .gameState
+      .reset();
+
+    app.core
+      .saveSystem
+      .load(
+        slot
+      );
+
+    const restoredActive =
+      app.systems
+        .marketActionSystem
+        .getActiveActions(
+          restaurant.id
+        );
+
+    assert.equal(
+      restoredActive.length,
+      1
+    );
+
+    assert.equal(
+      restoredActive[0].id,
+      action.id
+    );
+
+    assert.equal(
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        ),
+      paidBalance
+    );
+
+    assert.ok(
+      app.systems
+        .marketActionSystem
+        .getHistory(
+          restaurant.id
+        )
+        .some(
+          item =>
+            item.id ===
+            action.id
+        )
+    );
+
+    app.core
+      .saveSystem
+      .remove(
+        slot
+      );
+  }
+);
