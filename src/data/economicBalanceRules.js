@@ -103,7 +103,7 @@ export const FINANCIAL_HEALTH_POLICY =
     costRatioWarning:
       Object.freeze({
         ingredient: 0.45,
-        salary: 0.35,
+        salary: 0.45,
         rent: 0.2,
         utilities: 0.08,
         marketing: 0.15,
