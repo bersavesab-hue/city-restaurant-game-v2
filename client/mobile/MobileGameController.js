@@ -69,7 +69,9 @@ function createMobileGameController(
     operatingScheduleSystem,
     propertySystem,
     districtSystem,
-    dishResearchSystem
+    dishResearchSystem,
+    restaurantDishSystem,
+    dishGrowthSystem
   } =
     app.systems;
 
@@ -84,6 +86,14 @@ function createMobileGameController(
     paymentMode: "cash",
     quote: null,
     inventoryIngredientId: null
+  };
+
+  const dishUi = {
+    tab: "menu",
+    selectedDishId: null,
+    researchMethodId: null,
+    researchIngredientIds: [],
+    lastResearchResult: null
   };
 
   function getRestaurant() {
@@ -1662,6 +1672,747 @@ function createMobileGameController(
           : "采购单中心";
   }
 
+  function getDishMenuItem(
+    restaurantId,
+    dishId
+  ) {
+    return (
+      menuSystem
+        .listByRestaurant(
+          restaurantId
+        )
+        .find(
+          item =>
+            item.dishId ===
+            dishId
+        ) ??
+      null
+    );
+  }
+
+  function getDishRecipe(
+    dish
+  ) {
+    if (!dish) {
+      return null;
+    }
+
+    const recipeId =
+      dish.recipeId ??
+      dish.defaultRecipeId ??
+      recipeSystem
+        .getByDish(
+          dish.id
+        )[0]?.id ??
+      null;
+
+    return recipeId
+      ? recipeSystem.get(
+          recipeId
+        )
+      : null;
+  }
+
+  function decorateDish(
+    restaurantId,
+    dish
+  ) {
+    const menuItem =
+      getDishMenuItem(
+        restaurantId,
+        dish.id
+      );
+
+    const recipe =
+      menuItem?.recipeId
+        ? recipeSystem.get(
+            menuItem.recipeId
+          )
+        : getDishRecipe(
+            dish
+          );
+
+    const progress =
+      restaurantDishSystem
+        .get(
+          restaurantId,
+          dish.id
+        );
+
+    return {
+      ...dish,
+      menuItem,
+      recipe,
+      progress,
+      onMenu:
+        Boolean(
+          menuItem
+        ),
+      active:
+        Boolean(
+          menuItem?.active
+        ),
+      currentPrice:
+        menuItem?.price ??
+        dish.basePrice,
+      soldCount:
+        menuItem?.soldCount ??
+        0,
+      totalRevenue:
+        menuItem?.totalRevenue ??
+        0,
+      ingredients:
+        (
+          recipe?.ingredients ??
+          []
+        ).map(
+          item => {
+            const ingredient =
+              ingredientCatalogSystem
+                .get(
+                  item.ingredientId
+                );
+
+            return {
+              ...item,
+              name:
+                ingredient
+                  ?.name ??
+                item.ingredientId,
+              unit:
+                ingredient
+                  ?.unit ??
+                "",
+              stock:
+                inventorySystem
+                  .getAvailableQuantity(
+                    restaurantId,
+                    item.ingredientId
+                  )
+            };
+          }
+        )
+    };
+  }
+
+  function ensureDishResearchDraft() {
+    const methods =
+      dishResearchSystem
+        .getAvailableMethods();
+
+    if (
+      !methods.some(
+        method =>
+          method.id ===
+          dishUi
+            .researchMethodId
+      )
+    ) {
+      dishUi
+        .researchMethodId =
+        methods[0]?.id ??
+        null;
+    }
+
+    const ingredients =
+      ingredientCatalogSystem
+        .getAll();
+
+    const validIds =
+      new Set(
+        ingredients.map(
+          item =>
+            item.id
+        )
+      );
+
+    dishUi
+      .researchIngredientIds =
+      dishUi
+        .researchIngredientIds
+        .filter(
+          id =>
+            validIds.has(
+              id
+            )
+        );
+
+    if (
+      dishUi
+        .researchIngredientIds
+        .length <
+      2
+    ) {
+      dishUi
+        .researchIngredientIds =
+        ingredients
+          .slice(
+            0,
+            Math.min(
+              3,
+              ingredients.length
+            )
+          )
+          .map(
+            item =>
+              item.id
+          );
+    }
+
+    return {
+      methods,
+      ingredients
+    };
+  }
+
+  function getDishModel(
+    restaurantId
+  ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    const allMenuItems =
+      menuSystem
+        .listByRestaurant(
+          restaurantId
+        );
+
+    const dishes =
+      dishCatalogSystem
+        .getAll()
+        .filter(
+          dish =>
+            dish.custom
+              ? dish
+                  .ownerRestaurantId ===
+                restaurantId
+              : (
+                  dish.unlockLevel ??
+                  1
+                ) <=
+                restaurant.level
+        )
+        .map(
+          dish =>
+            decorateDish(
+              restaurantId,
+              dish
+            )
+        )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            Number(
+              b.active
+            ) -
+              Number(
+                a.active
+              ) ||
+            Number(
+              b.onMenu
+            ) -
+              Number(
+                a.onMenu
+              ) ||
+            Number(
+              b.custom
+            ) -
+              Number(
+                a.custom
+              ) ||
+            a.name.localeCompare(
+              b.name,
+              "zh-CN"
+            )
+        );
+
+    if (
+      !dishes.some(
+        dish =>
+          dish.id ===
+          dishUi
+            .selectedDishId
+      )
+    ) {
+      dishUi.selectedDishId =
+        dishes[0]?.id ??
+        null;
+    }
+
+    const selectedDish =
+      dishes.find(
+        dish =>
+          dish.id ===
+          dishUi
+            .selectedDishId
+      ) ??
+      null;
+
+    const researchDraft =
+      ensureDishResearchDraft();
+
+    const selectedResearchIngredients =
+      dishUi
+        .researchIngredientIds
+        .map(
+          id =>
+            ingredientCatalogSystem
+              .get(
+                id
+              )
+        )
+        .filter(
+          Boolean
+        );
+
+    const selectedMethod =
+      researchDraft.methods
+        .find(
+          method =>
+            method.id ===
+            dishUi
+              .researchMethodId
+        ) ??
+      null;
+
+    const generatedResearchName =
+      selectedMethod &&
+      selectedResearchIngredients
+        .length >=
+        2
+        ? `${selectedMethod.name}${selectedResearchIngredients[0].name}${selectedResearchIngredients[1].name}`
+        : "待研发菜品";
+
+    const limits =
+      storeProgressSystem
+        .getLimits(
+          restaurantId
+        );
+
+    return {
+      tab:
+        dishUi.tab,
+      dishes,
+      selectedDish,
+      menuItems:
+        allMenuItems,
+      activeMenuCount:
+        allMenuItems.filter(
+          item =>
+            item.active
+        ).length,
+      menuLimit:
+        limits.menuItems,
+      research: {
+        methods:
+          researchDraft.methods,
+        ingredients:
+          researchDraft
+            .ingredients,
+        methodId:
+          dishUi
+            .researchMethodId,
+        selectedMethod,
+        ingredientIds: [
+          ...dishUi
+            .researchIngredientIds
+        ],
+        selectedIngredients:
+          selectedResearchIngredients,
+        generatedName:
+          generatedResearchName,
+        lastResult:
+          dishUi
+            .lastResearchResult
+      }
+    };
+  }
+
+  function setDishTab(
+    tab
+  ) {
+    if (
+      ![
+        "menu",
+        "library",
+        "research"
+      ].includes(
+        tab
+      )
+    ) {
+      throw new Error(
+        "未知菜品子页面"
+      );
+    }
+
+    dishUi.tab =
+      tab;
+
+    lastMessage =
+      tab ===
+        "research"
+        ? "菜品研发"
+        : tab ===
+            "library"
+          ? "菜品库"
+          : "营业菜单";
+  }
+
+  function selectDish(
+    restaurantId,
+    dishId
+  ) {
+    const dish =
+      dishCatalogSystem.get(
+        dishId
+      );
+
+    if (
+      !dish ||
+      (
+        dish.custom &&
+        dish.ownerRestaurantId !==
+          restaurantId
+      )
+    ) {
+      throw new Error(
+        "菜品不存在或不属于当前门店"
+      );
+    }
+
+    dishUi
+      .selectedDishId =
+      dishId;
+
+    lastMessage =
+      `已选择菜品：${dish.name}`;
+  }
+
+  function adjustDishPrice(
+    restaurantId,
+    mode
+  ) {
+    const dish =
+      getDishModel(
+        restaurantId
+      ).selectedDish;
+
+    if (
+      !dish?.menuItem
+    ) {
+      throw new Error(
+        "菜品尚未加入菜单"
+      );
+    }
+
+    const current =
+      dish.menuItem.price;
+
+    const steps = {
+      minus5: -5,
+      minus1: -1,
+      plus1: 1,
+      plus5: 5
+    };
+
+    if (
+      !Object.prototype
+        .hasOwnProperty.call(
+          steps,
+          mode
+        )
+    ) {
+      throw new Error(
+        "未知价格调整操作"
+      );
+    }
+
+    const next =
+      Math.max(
+        1,
+        current +
+          steps[mode]
+      );
+
+    menuSystem.setPrice(
+      dish.menuItem.id,
+      next
+    );
+
+    lastMessage =
+      `${dish.name} 售价调整为 ¥${next}`;
+  }
+
+  function toggleDishActive(
+    restaurantId
+  ) {
+    const dish =
+      getDishModel(
+        restaurantId
+      ).selectedDish;
+
+    if (
+      !dish?.menuItem
+    ) {
+      throw new Error(
+        "菜品尚未加入菜单"
+      );
+    }
+
+    const active =
+      !dish.menuItem.active;
+
+    menuSystem.setActive(
+      dish.menuItem.id,
+      active
+    );
+
+    lastMessage =
+      active
+        ? `${dish.name} 已恢复上架`
+        : `${dish.name} 已下架`;
+  }
+
+  function addSelectedDishToMenu(
+    restaurantId
+  ) {
+    const model =
+      getDishModel(
+        restaurantId
+      );
+
+    const dish =
+      model.selectedDish;
+
+    if (!dish) {
+      throw new Error(
+        "请选择菜品"
+      );
+    }
+
+    if (
+      dish.menuItem
+    ) {
+      throw new Error(
+        "菜品已经在菜单中"
+      );
+    }
+
+    if (
+      model.menuItems
+        .length >=
+      model.menuLimit
+    ) {
+      throw new Error(
+        `菜单栏位已满：${model.menuLimit}`
+      );
+    }
+
+    const recipe =
+      getDishRecipe(
+        dish
+      );
+
+    if (!recipe) {
+      throw new Error(
+        "菜品没有可用配方"
+      );
+    }
+
+    menuSystem.addItem({
+      restaurantId,
+      dishId:
+        dish.id,
+      recipeId:
+        recipe.id,
+      price:
+        dish.basePrice
+    });
+
+    lastMessage =
+      `${dish.name} 已加入菜单`;
+  }
+
+  function setResearchMethod(
+    methodId
+  ) {
+    const method =
+      dishResearchSystem
+        .getAvailableMethods()
+        .find(
+          item =>
+            item.id ===
+            methodId
+        );
+
+    if (!method) {
+      throw new Error(
+        "烹饪方式不存在"
+      );
+    }
+
+    dishUi
+      .researchMethodId =
+      methodId;
+
+    lastMessage =
+      `研发方式：${method.name}`;
+  }
+
+  function toggleResearchIngredient(
+    ingredientId
+  ) {
+    if (
+      !ingredientCatalogSystem
+        .exists(
+          ingredientId
+        )
+    ) {
+      throw new Error(
+        "研发原料不存在"
+      );
+    }
+
+    const current =
+      new Set(
+        dishUi
+          .researchIngredientIds
+      );
+
+    if (
+      current.has(
+        ingredientId
+      )
+    ) {
+      if (
+        current.size <=
+        2
+      ) {
+        throw new Error(
+          "研发至少需要 2 种原料"
+        );
+      }
+
+      current.delete(
+        ingredientId
+      );
+    } else {
+      if (
+        current.size >=
+        6
+      ) {
+        throw new Error(
+          "研发最多选择 6 种原料"
+        );
+      }
+
+      current.add(
+        ingredientId
+      );
+    }
+
+    dishUi
+      .researchIngredientIds =
+      [
+        ...current
+      ];
+
+    dishUi
+      .lastResearchResult =
+      null;
+
+    lastMessage =
+      `研发原料已选择 ${current.size} 种`;
+  }
+
+  function researchSelectedDish(
+    restaurantId
+  ) {
+    const draft =
+      getDishModel(
+        restaurantId
+      ).research;
+
+    if (
+      !draft.selectedMethod ||
+      draft
+        .selectedIngredients
+        .length <
+        2
+    ) {
+      throw new Error(
+        "研发条件不足"
+      );
+    }
+
+    const ingredients =
+      draft
+        .selectedIngredients
+        .map(
+          ingredient => ({
+            ingredientId:
+              ingredient.id,
+            quantity:
+              dishResearchSystem
+                .getRandomQuantity(
+                  ingredient
+                )
+          })
+        );
+
+    const result =
+      dishResearchSystem
+        .research({
+          restaurantId,
+          name:
+            draft
+              .generatedName,
+          category:
+            draft
+              .selectedMethod
+              .defaultCategory,
+          method:
+            draft
+              .selectedMethod
+              .id,
+          ingredients
+        });
+
+    dishUi
+      .selectedDishId =
+      result.dish.id;
+
+    dishUi.tab =
+      "library";
+
+    dishUi
+      .lastResearchResult =
+      {
+        dishId:
+          result.dish.id,
+        name:
+          result.dish.name,
+        researchScore:
+          result.analysis
+            .researchScore,
+        researchCost:
+          result.analysis
+            .researchCost,
+        suggestedPrice:
+          result.analysis
+            .suggestedPrice
+      };
+
+    lastMessage =
+      `研发完成：${result.dish.name}，评分 ${result.analysis.researchScore}`;
+
+    return result;
+  }
+
   function getViewModel() {
     const {
       restaurant
@@ -1815,6 +2566,11 @@ function createMobileGameController(
         time
       );
 
+    const dishes =
+      getDishModel(
+        restaurant.id
+      );
+
     return {
       restaurant,
       finance,
@@ -1828,6 +2584,7 @@ function createMobileGameController(
       research,
       schedule,
       business,
+      dishes,
 
       employees:
         employeeSystem
@@ -2196,6 +2953,96 @@ function createMobileGameController(
               getViewModel()
           };
 
+        case "dish-tab":
+          setDishTab(
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "dish-select":
+          selectDish(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "dish-price":
+          adjustDishPrice(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "dish-toggle-active":
+          toggleDishActive(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "dish-add-menu":
+          addSelectedDishToMenu(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "dish-research-method":
+          setResearchMethod(
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "dish-research-ingredient":
+          toggleResearchIngredient(
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "dish-research":
+          researchSelectedDish(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
         case "advance-hour":
           return {
             ok: true,
@@ -2237,7 +3084,8 @@ function createMobileGameController(
     getViewModel,
     performAction,
     getProcurementTarget,
-    getProcurementCatalog
+    getProcurementCatalog,
+    getDishModel
   });
 }
 
