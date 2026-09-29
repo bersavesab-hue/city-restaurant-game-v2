@@ -2606,6 +2606,7 @@ function createMobileGameController(
                     shift.endMinute
                   )
               })
+            )
         : [];
 
     const recommendation =
