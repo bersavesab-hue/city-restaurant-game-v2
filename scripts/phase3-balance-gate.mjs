@@ -4,6 +4,7 @@ import {
 
 const tests = [
   "tests/business-lifecycle-balance.test.js",
+  "tests/launch-balance-strategies.test.js",
   "tests/formal-economic-balance-data.test.js",
   "tests/store-progression-integration.test.js",
   "tests/pricing-decision-impact.test.js",
