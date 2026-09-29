@@ -2968,14 +2968,8 @@ function createMobileGameController(
     const next =
       Math.max(
         1000,
-        Math.round(
-          (
-            employee.salary +
-            steps[mode]
-          ) /
-          100
-        ) *
-        100
+        employee.salary +
+          steps[mode]
       );
 
     employeeSystem
