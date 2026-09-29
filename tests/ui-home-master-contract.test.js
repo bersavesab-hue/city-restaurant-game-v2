@@ -209,6 +209,26 @@ function fixture() {
         pendingQuantity:
           0
       },
+      inventoryCatalog: [
+        {
+          id:
+            "rice",
+          name:
+            "大米",
+          unit:
+            "kg",
+          currentQuantity:
+            12,
+          totalQuantity:
+            12,
+          spoiledQuantity:
+            0,
+          batches:
+            1,
+          pendingQuantity:
+            0
+        }
+      ],
       supplierOptions: [
         {
           id:
