@@ -647,29 +647,146 @@ OperatingCycleSystem 的每日 onDay 已调用 MarketActionSystem.processDay：
 - 浏览器移动 UI：成功；
 - Android APK：成功。
 
+## T09-4 活动 / 营销完整闭环
+
+### 正式活动入口
+活动没有新增第六个一级入口，而是作为“经营”一级页的第 4 个子页：
+1. 采购
+2. 库存
+3. 采购单
+4. 活动
+
+主页“活动”快捷入口会直接打开“经营 → 活动”，主页“仓储”快捷入口会直接打开“经营 → 库存”。
+
+### 活动列表与限制
+当前 UI 直接读取 MarketActionSystem 的 9 类营销活动：
+- 本地获客；
+- 优惠转化；
+- 品牌建设；
+- 内容社交；
+- 外卖增长；
+- 社区活动；
+- 会员复购；
+- 团体业务；
+- 节日主题。
+
+每个活动真实展示：
+- 成本；
+- 持续游戏日；
+- 冷却游戏日；
+- 门店等级要求；
+- 目标客群；
+- 所需销售渠道；
+- 当前是否可启动；
+- 不可启动原因；
+- 活动剩余时间；
+- 历史状态。
+
+系统继续使用底层既有约束：
+- 最多同时 2 个活动；
+- 同一 exclusiveGroup 不能同时叠加；
+- 等级不足不能开启；
+- 资金不足不能开启；
+- 所需渠道未开启不能开启；
+- 冷却期内不能重复开启。
+
+### 开始与结束
+开始活动直接调用 MarketActionSystem.startAction：
+- FinanceSystem 真实扣除营销成本；
+- 写入 activeMarketActions；
+- 写入 marketActionHistory；
+- 立即进入经营修正模型。
+
+本阶段没有增加“随时取消并退款”这种底层不存在的规则。
+
+活动按游戏日自动到期：
+- MarketActionSystem.processDay 处理结束；
+- OperatingCycleSystem 已在每日推进中调用；
+- 到期后从 activeMarketActions 移除；
+- 历史状态更新为 ended；
+- 随后进入真实 cooldown。
+
+### 对经营的真实影响
+活动效果不是 UI 预览数字，已经进入实际经营链：
+
+**客流**
+- TrafficDemandSystem 读取 demandMultiplier；
+- 分客群 segmentMultipliers；
+- 分渠道 channelMultipliers；
+- marketAppealMultiplier 进入吸引力与竞争计算。
+
+**实际成交收入**
+- OrderSystem 读取 priceMultiplier；
+- 优惠活动会改变真实订单 unitPrice 和 totalRevenue；
+- 测试已证明 flash_coupon 的 0.9 倍成交价实际进入真实订单，而不只是界面显示。
+
+**品质 / 服务 / 复购 / 评价**
+- CustomerExperienceSystem 读取 qualityBonus；
+- serviceCapacityMultiplier；
+- repeatIntentMultiplier；
+- reviewPropensityMultiplier；
+- 评价数量与顾客体验因此真实变化。
+
+### 活动页实时信息
+当前活动页面显示：
+- 当前进行中活动数 / 上限；
+- 午间预估客流；
+- 当前所有活动综合效果；
+- 活动分类筛选；
+- 活动详情；
+- 成本 / 持续 / 冷却 / 等级要求；
+- 具体客流、成交价、吸引力、复购、评价意愿、服务能力、品质效果；
+- 不可开始原因；
+- 最近活动历史；
+- 活动剩余游戏日。
+
+### 保存恢复
+自动测试已经证明：
+- 活动开始后真实扣款；
+- activeMarketActions 可保存；
+- marketActionHistory 可保存；
+- 保存后清空 GameState 再 load；
+- 进行中活动、历史和已扣余额都正确恢复。
+
+### T09-4 活动 APK
+- workflow run：`36510957604`
+- APK artifact：`11009053259`
+- artifact 名：`restaurant-playtest-e2d8f1f0392c11d1344a0eac4940b03a3ab48637`
+- APK SHA-256：`2c2ba2df5fe0725de4ce02712be9110f664f5a814237cb8da6e3ead2ce6bbbf0`
+- Android：BUILD SUCCESSFUL
+- 签名：`android-debug`
+
+本节点完整门禁：
+- 资产：14 文件 / 8 槽位；
+- 核心/时间/结算：15/15；
+- 存档兼容/恢复：11/11；
+- UI/路由/适配/资产/采购/菜品/员工/活动：65/65；
+- 浏览器移动 UI：成功；
+- Android APK：成功。
+
 ## 当前状态
 T09 总任务仍在进行中：
 - T09-1 采购 / 库存：VERIFIED
 - T09-2 菜品：VERIFIED
 - T09-3 员工：VERIFIED
-- T09-4 活动 / 营销：VERIFIED
+- T09-4 活动：VERIFIED
 - T09-5 装修：下一阶段
 
 已完成模块只修真机发现的问题，不再重新设计业务链。
 
 ## 下一任务
-**T09-5：装修 / 设施完整闭环。**
+**T09-5：装修 / 设施升级完整闭环。**
+
+首发仍按之前冻结的“固定升级 / 设施页”方向推进，不先上自由摆放编辑器。
 
 范围：
-1. 当前门店装修状态；
-2. 固定设施 / 装修项目；
-3. 价格与施工条件；
-4. 开始施工；
-5. 施工时间；
-6. 完工；
-7. 餐位、厨房工位、效率、环境等真实经营修正；
+1. 当前装修状态；
+2. 可升级设施；
+3. 升级成本；
+4. 建造/升级时间；
+5. 施工状态；
+6. 装修对容量、舒适度、吸引力、服务/动线等真实经营指标的影响；
+7. 升级完成；
 8. 保存恢复。
-
-首发继续采用“固定升级 / 固定设施”方向，不在 T09-5 强行加入自由摆放编辑器。
 
 验收继续执行“入口 → 查看 → 操作 → 状态变化 → 保存恢复”。
