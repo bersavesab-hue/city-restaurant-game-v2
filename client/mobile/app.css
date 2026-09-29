@@ -1136,7 +1136,7 @@ button {
   display: grid;
   grid-template-columns:
     repeat(
-      3,
+      4,
       minmax(0, 1fr)
     );
   gap: 5px;
@@ -2890,5 +2890,379 @@ button {
         7,
         minmax(0,1fr)
       );
+  }
+}
+
+/* T09-4 marketing activity workflow. */
+.marketing-panel {
+  display: grid;
+  grid-template-columns:
+    minmax(0,.82fr)
+    minmax(0,1.28fr);
+  grid-template-rows:
+    minmax(0,1fr)
+    auto;
+  gap: 7px;
+}
+
+.marketing-list-card,
+.marketing-detail-card,
+.marketing-history-card {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.marketing-history-card {
+  grid-column: 1 / -1;
+  max-height: 122px;
+}
+
+.marketing-category-strip {
+  margin-top: 8px;
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.marketing-category-strip::-webkit-scrollbar,
+.marketing-action-list::-webkit-scrollbar,
+.marketing-history-list::-webkit-scrollbar {
+  display: none;
+}
+
+.marketing-category-strip button {
+  flex: 0 0 auto;
+  min-height: 29px;
+  padding: 0 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 999px;
+  background: rgba(255,255,255,.04);
+  color: rgba(235,241,244,.68);
+  font-size: 7px;
+  font-weight: 720;
+}
+
+.marketing-category-strip button.is-active {
+  border-color: rgba(255,211,119,.3);
+  background: rgba(190,134,44,.14);
+  color: #ffe2a3;
+}
+
+.marketing-action-list {
+  min-height: 0;
+  margin-top: 7px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.marketing-action-list button {
+  width: 100%;
+  min-height: 52px;
+  padding: 7px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  background: transparent;
+  color: #eef3f5;
+  text-align: left;
+}
+
+.marketing-action-list button.is-active {
+  border-radius: 10px;
+  background: rgba(88,171,151,.13);
+  box-shadow: inset 0 0 0 1px rgba(109,211,186,.22);
+}
+
+.marketing-action-list button > div {
+  min-width: 0;
+}
+
+.marketing-action-list strong,
+.marketing-action-list small {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.marketing-action-list strong {
+  font-size: 9px;
+}
+
+.marketing-action-list small {
+  margin-top: 4px;
+  color: rgba(231,239,243,.54);
+  font-size: 7px;
+}
+
+.marketing-action-list > button > span {
+  flex: 0 0 auto;
+  min-width: 46px;
+  padding: 5px 6px;
+  border-radius: 8px;
+  font-size: 7px;
+  text-align: center;
+}
+
+.marketing-action-list span.is-ready {
+  background: rgba(88,171,151,.14);
+  color: #bfe9dc;
+}
+
+.marketing-action-list span.is-running {
+  background: rgba(190,134,44,.16);
+  color: #ffe0a0;
+}
+
+.marketing-action-list span.is-locked {
+  background: rgba(255,255,255,.045);
+  color: rgba(231,239,243,.44);
+}
+
+.marketing-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.marketing-detail-head > div:first-child {
+  min-width: 0;
+}
+
+.marketing-detail-head h2 {
+  margin: 4px 0 0;
+  overflow: hidden;
+  font-size: 17px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.marketing-detail-head p {
+  margin: 5px 0 0;
+  color: rgba(231,239,243,.58);
+  font-size: 8px;
+  line-height: 1.35;
+}
+
+.marketing-cost-badge {
+  flex: 0 0 auto;
+  min-width: 72px;
+  padding: 7px;
+  border-radius: 10px;
+  background: rgba(255,211,119,.10);
+  text-align: center;
+}
+
+.marketing-cost-badge strong,
+.marketing-cost-badge small {
+  display: block;
+}
+
+.marketing-cost-badge strong {
+  color: #ffe0a0;
+  font-size: 11px;
+}
+
+.marketing-cost-badge small {
+  margin-top: 4px;
+  font-size: 7px;
+}
+
+.marketing-effect-grid {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.marketing-effect-grid span {
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: rgba(88,171,151,.11);
+  color: #cdebe3;
+  font-size: 7px;
+}
+
+.marketing-effect-grid.is-live span {
+  background: rgba(190,134,44,.11);
+  color: #ffe3a8;
+}
+
+.marketing-meta-grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
+  gap: 5px;
+}
+
+.marketing-meta-grid > div {
+  min-width: 0;
+  padding: 6px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.04);
+}
+
+.marketing-meta-grid span,
+.marketing-meta-grid strong {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.marketing-meta-grid span {
+  color: rgba(231,239,243,.5);
+  font-size: 7px;
+}
+
+.marketing-meta-grid strong {
+  margin-top: 4px;
+  font-size: 9px;
+}
+
+.marketing-running-card,
+.marketing-start-state,
+.marketing-live-impact,
+.marketing-review-hint {
+  margin-top: 8px;
+}
+
+.marketing-running-card {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 10px;
+  background: rgba(190,134,44,.12);
+}
+
+.marketing-running-card small,
+.marketing-running-card strong {
+  display: block;
+}
+
+.marketing-running-card strong {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+.marketing-running-card > span {
+  color: #ffe0a0;
+  font-size: 8px;
+}
+
+.marketing-start-state p {
+  margin: 0 0 7px;
+  color: rgba(231,239,243,.55);
+  font-size: 7px;
+  line-height: 1.35;
+}
+
+.marketing-live-impact {
+  padding-top: 7px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+
+.marketing-review-hint {
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 9px;
+  background: rgba(255,255,255,.04);
+}
+
+.marketing-review-hint span {
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+}
+
+.marketing-review-hint strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 9px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.marketing-history-list {
+  min-height: 0;
+  margin-top: 6px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.marketing-history-row {
+  min-height: 38px;
+  padding: 5px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.marketing-history-row > div {
+  min-width: 0;
+}
+
+.marketing-history-row strong,
+.marketing-history-row small {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.marketing-history-row strong {
+  font-size: 8px;
+}
+
+.marketing-history-row small {
+  margin-top: 3px;
+  color: rgba(231,239,243,.5);
+  font-size: 7px;
+}
+
+.marketing-history-row > span {
+  flex: 0 0 auto;
+  color: #ffe0a0;
+  font-size: 7px;
+}
+
+@media (max-height: 760px) {
+  .marketing-panel {
+    gap: 5px;
+  }
+
+  .marketing-history-card {
+    max-height: 92px;
+  }
+
+  .marketing-detail-head h2 {
+    font-size: 14px;
+  }
+
+  .marketing-meta-grid {
+    margin-top: 5px;
+  }
+
+  .marketing-effect-grid,
+  .marketing-running-card,
+  .marketing-start-state,
+  .marketing-live-impact,
+  .marketing-review-hint {
+    margin-top: 5px;
   }
 }
