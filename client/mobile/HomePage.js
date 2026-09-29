@@ -794,7 +794,7 @@ function renderProcurementPanel(
         </div>
 
         <div class="business-chip-strip">
-          ${business.inventoryCatalog
+          ${business.catalog
             .map(
               ingredient => `
                 <button
@@ -1166,7 +1166,7 @@ function renderInventoryPanel(
         </div>
 
         <div class="business-chip-strip inventory-chip-strip">
-          ${business.catalog
+          ${business.inventoryCatalog
             .map(
               ingredient => `
                 <button
@@ -2021,6 +2021,582 @@ function renderMarketingPanel(
   `;
 }
 
+function marketingCategoryLabel(
+  category
+) {
+  return (
+    {
+      all: "全部",
+      local_acquisition:
+        "本地获客",
+      discount_conversion:
+        "优惠转化",
+      brand_building:
+        "品牌建设",
+      content_social:
+        "内容传播",
+      delivery_growth:
+        "外卖增长",
+      community_scene:
+        "社区活动",
+      member_retention:
+        "会员留存",
+      group_business:
+        "团体业务",
+      seasonal_event:
+        "主题活动"
+    }[category] ??
+    category
+  );
+}
+
+function marketingReasonLabel(
+  reason
+) {
+  return (
+    {
+      restaurant_level:
+        "门店等级不足",
+      insufficient_funds:
+        "资金不足",
+      active_limit:
+        "同时最多进行2个活动",
+      already_active:
+        "活动正在进行",
+      exclusive_group:
+        "与当前同类活动冲突",
+      required_channel:
+        "所需销售渠道未启用",
+      cooldown:
+        "冷却中"
+    }[reason] ??
+    reason
+  );
+}
+
+function marketingChannelLabel(
+  channelId
+) {
+  return (
+    {
+      dine_in: "堂食",
+      pickup: "到店自取",
+      delivery: "外卖",
+      reservation: "预约"
+    }[channelId] ??
+    channelId
+  );
+}
+
+function marketingMultiplierText(
+  value
+) {
+  const number =
+    Number(value) ||
+    1;
+
+  const delta =
+    Math.round(
+      (
+        number -
+        1
+      ) *
+      100
+    );
+
+  if (
+    delta ===
+    0
+  ) {
+    return "不变";
+  }
+
+  return delta >
+    0
+    ? `+${delta}%`
+    : `${delta}%`;
+}
+
+function renderMarketingEffectGrid(
+  action
+) {
+  const modifiers =
+    action?.modifiers ??
+    {};
+
+  return `
+    <div class="marketing-effect-grid">
+      <div>
+        <span>总需求</span>
+        <strong>
+          ${marketingMultiplierText(
+            modifiers
+              .demandMultiplier
+          )}
+        </strong>
+      </div>
+      <div>
+        <span>成交价</span>
+        <strong>
+          ${marketingMultiplierText(
+            modifiers
+              .priceMultiplier
+          )}
+        </strong>
+      </div>
+      <div>
+        <span>门店吸引</span>
+        <strong>
+          ${marketingMultiplierText(
+            modifiers
+              .marketAppealMultiplier
+          )}
+        </strong>
+      </div>
+      <div>
+        <span>复购倾向</span>
+        <strong>
+          ${marketingMultiplierText(
+            modifiers
+              .repeatIntentMultiplier
+          )}
+        </strong>
+      </div>
+      <div>
+        <span>评价意愿</span>
+        <strong>
+          ${marketingMultiplierText(
+            modifiers
+              .reviewPropensityMultiplier
+          )}
+        </strong>
+      </div>
+      <div>
+        <span>服务能力</span>
+        <strong>
+          ${marketingMultiplierText(
+            modifiers
+              .serviceCapacityMultiplier
+          )}
+        </strong>
+      </div>
+      <div>
+        <span>品质加成</span>
+        <strong>
+          ${Number(
+            modifiers
+              .qualityBonus ??
+            0
+          ) >=
+          0
+            ? "+"
+            : ""}${Number(
+            modifiers
+              .qualityBonus ??
+            0
+          )}
+        </strong>
+      </div>
+    </div>
+  `;
+}
+
+function renderMarketingPanel(
+  vm
+) {
+  const marketing =
+    vm.business
+      .marketing;
+
+  const selected =
+    marketing
+      .selectedAction;
+
+  const reasons =
+    selected
+      ?.availability
+      ?.reasons ??
+    [];
+
+  return `
+    <section
+      class="business-module-panel marketing-panel"
+      data-business-panel="marketing"
+    >
+      <section class="formal-card marketing-live-card">
+        <div class="marketing-live-grid">
+          <div>
+            <small>进行中</small>
+            <strong>
+              ${marketing.active.length}
+              /
+              ${marketing.activeLimit}
+            </strong>
+          </div>
+          <div>
+            <small>午间预计客流</small>
+            <strong>
+              ${Number(
+                marketing
+                  .noonExpectedVisitors ??
+                0
+              ).toFixed(
+                1
+              )}
+            </strong>
+          </div>
+          <div>
+            <small>需求综合效果</small>
+            <strong>
+              ${marketingMultiplierText(
+                marketing
+                  .modifiers
+                  .demandMultiplier
+              )}
+            </strong>
+          </div>
+          <div>
+            <small>成交价效果</small>
+            <strong>
+              ${marketingMultiplierText(
+                marketing
+                  .modifiers
+                  .priceMultiplier
+              )}
+            </strong>
+          </div>
+          <div>
+            <small>评价意愿</small>
+            <strong>
+              ${marketingMultiplierText(
+                marketing
+                  .modifiers
+                  .reviewPropensityMultiplier
+              )}
+            </strong>
+          </div>
+        </div>
+
+        ${marketing.active.length
+          ? `
+            <div class="marketing-active-strip">
+              ${marketing.active
+                .map(
+                  action => `
+                    <div>
+                      <strong>
+                        ${escapeHtml(
+                          action.name
+                        )}
+                      </strong>
+                      <small>
+                        剩余
+                        ${action.remainingDays}
+                        天 · 第
+                        ${action.endDay}
+                        天自动结束
+                      </small>
+                    </div>
+                  `
+                )
+                .join(
+                  ""
+                )}
+            </div>
+          `
+          : `
+            <p class="marketing-empty-active">
+              当前没有进行中的营销活动。
+            </p>
+          `}
+      </section>
+
+      <section class="formal-card marketing-list-card">
+        <div class="marketing-category-strip">
+          ${[
+            "all",
+            ...marketing
+              .categories
+          ]
+            .map(
+              category => `
+                <button
+                  type="button"
+                  class="${marketing.category ===
+                    category
+                      ? "is-active"
+                      : ""}"
+                  data-game-action="marketing-category"
+                  data-game-value="${escapeHtml(
+                    category
+                  )}"
+                >
+                  ${escapeHtml(
+                    marketingCategoryLabel(
+                      category
+                    )
+                  )}
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+
+        <div class="marketing-action-list">
+          ${marketing.actions
+            .map(
+              action => `
+                <button
+                  type="button"
+                  class="${selected?.id ===
+                    action.id
+                      ? "is-active"
+                      : ""}"
+                  data-game-action="marketing-select"
+                  data-game-value="${escapeHtml(
+                    action.id
+                  )}"
+                >
+                  <div>
+                    <strong>
+                      ${escapeHtml(
+                        action.name
+                      )}
+                    </strong>
+                    <small>
+                      ${escapeHtml(
+                        marketingCategoryLabel(
+                          action.category
+                        )
+                      )}
+                      ·
+                      ${action.durationDays}
+                      天
+                    </small>
+                  </div>
+
+                  <span>
+                    ${action.active
+                      ? `剩${action.remainingDays}天`
+                      : action.cooldownRemaining >
+                          0
+                        ? `冷却${action.cooldownRemaining}天`
+                        : `¥${money(
+                            action.cost
+                          )}`}
+                  </span>
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+      </section>
+
+      <section class="formal-card marketing-detail-card">
+        ${selected
+          ? `
+            <div class="marketing-detail-head">
+              <div>
+                <small>
+                  ${escapeHtml(
+                    marketingCategoryLabel(
+                      selected.category
+                    )
+                  )}
+                </small>
+                <h2>
+                  ${escapeHtml(
+                    selected.name
+                  )}
+                </h2>
+                <p>
+                  ${escapeHtml(
+                    selected.description
+                  )}
+                </p>
+              </div>
+
+              <div class="marketing-cost-badge">
+                <small>投入</small>
+                <strong>
+                  ¥${money(
+                    selected.cost
+                  )}
+                </strong>
+              </div>
+            </div>
+
+            <div class="marketing-rule-grid">
+              <div>
+                <span>持续</span>
+                <strong>
+                  ${selected.durationDays}
+                  天
+                </strong>
+              </div>
+              <div>
+                <span>冷却</span>
+                <strong>
+                  ${selected.cooldownDays}
+                  天
+                </strong>
+              </div>
+              <div>
+                <span>等级</span>
+                <strong>
+                  Lv.${selected.minRestaurantLevel}
+                </strong>
+              </div>
+              <div>
+                <span>目标客群</span>
+                <strong>
+                  ${selected
+                    .targetSegments
+                    .length ||
+                    "通用"}
+                </strong>
+              </div>
+            </div>
+
+            ${renderMarketingEffectGrid(
+              selected
+            )}
+
+            ${selected.requiredChannels.length
+              ? `
+                <div class="marketing-required-row">
+                  <span>
+                    所需渠道
+                  </span>
+                  <strong>
+                    ${selected
+                      .requiredChannels
+                      .map(
+                        marketingChannelLabel
+                      )
+                      .join(
+                        " / "
+                      )}
+                  </strong>
+                </div>
+              `
+              : ""}
+
+            ${reasons.length
+              ? `
+                <div class="marketing-block-reasons">
+                  ${reasons
+                    .map(
+                      reason => `
+                        <span>
+                          ${escapeHtml(
+                            marketingReasonLabel(
+                              reason
+                            )
+                          )}
+                        </span>
+                      `
+                    )
+                    .join(
+                      ""
+                    )}
+                </div>
+              `
+              : ""}
+
+            <button
+              type="button"
+              class="formal-primary-button marketing-start-button"
+              data-game-action="marketing-start"
+              ${selected
+                .availability
+                .canStart
+                ? ""
+                : "disabled"}
+            >
+              ${selected.active
+                ? `进行中 · 剩余 ${selected.remainingDays} 天`
+                : selected.cooldownRemaining >
+                    0
+                  ? `冷却中 · ${selected.cooldownRemaining} 天`
+                  : selected
+                      .availability
+                      .canStart
+                    ? `投入 ¥${money(
+                        selected.cost
+                      )} 开始活动`
+                    : "当前不可开始"}
+            </button>
+
+            <p class="marketing-auto-end-note">
+              活动按游戏日自动到期结束；结束后按该活动冷却规则重新开放。
+            </p>
+
+            <div class="marketing-history-section">
+              <div class="formal-card-head">
+                <div>
+                  <small>最近活动记录</small>
+                  <strong>
+                    ${marketing.history.length}
+                    条
+                  </strong>
+                </div>
+              </div>
+
+              <div class="marketing-history-list">
+                ${marketing.history.length
+                  ? marketing.history
+                    .slice(
+                      0,
+                      6
+                    )
+                    .map(
+                      item => `
+                        <div>
+                          <strong>
+                            ${escapeHtml(
+                              item.name
+                            )}
+                          </strong>
+                          <small>
+                            第
+                            ${item.startDay}
+                            –
+                            ${item.endDay}
+                            天 ·
+                            ${item.status ===
+                              "ended"
+                              ? "已结束"
+                              : "已开始"}
+                          </small>
+                        </div>
+                      `
+                    )
+                    .join(
+                      ""
+                    )
+                  : `
+                    <div class="formal-empty">
+                      尚无营销活动记录
+                    </div>
+                  `}
+              </div>
+            </div>
+          `
+          : `
+            <div class="formal-empty">
+              当前分类没有可选活动
+            </div>
+          `}
+      </section>
+    </section>
+  `;
+}
+
 function renderBusinessPage(
   vm
 ) {
@@ -2049,10 +2625,16 @@ function renderBusinessPage(
             </strong>
           </span>
           <span>
-            在途
+            活动
             <strong>
-              ${vm.pendingDeliveries}
-              笔
+              ${business
+                .marketing
+                .active
+                .length}
+              /
+              ${business
+                .marketing
+                .activeLimit}
             </strong>
           </span>
         </div>
