@@ -337,6 +337,16 @@ class LaunchProgressionSystem {
 
     return {
       ...stage,
+      stageNumber:
+        LAUNCH_STAGES
+          .findIndex(
+            item =>
+              item.id ===
+              stage.id
+          ) +
+        1,
+      totalStages:
+        LAUNCH_STAGES.length,
       experience,
       objectives,
       objectiveCompleted:
