@@ -549,3 +549,118 @@ test(
     );
   }
 );
+
+test(
+  "formal procurement order and paid balance survive save and reload",
+  () => {
+    resetFoundation();
+
+    const slot =
+      "t09-procurement";
+
+    app.core
+      .saveSystem
+      .remove(
+        slot
+      );
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    controller
+      .performAction(
+        "procurement-quote"
+      );
+
+    const purchase =
+      controller
+        .performAction(
+          "procurement-purchase"
+        );
+
+    assert.equal(
+      purchase.ok,
+      true
+    );
+
+    const pending =
+      purchase
+        .viewModel
+        .business
+        .pendingOrders[0];
+
+    assert.ok(
+      pending
+    );
+
+    const savedBalance =
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        );
+
+    app.core
+      .saveSystem
+      .save(
+        slot
+      );
+
+    app.core
+      .gameState
+      .reset();
+
+    assert.equal(
+      app.systems
+        .restaurantSystem
+        .list()
+        .length,
+      0
+    );
+
+    const loaded =
+      app.core
+        .saveSystem
+        .load(
+          slot
+        );
+
+    assert.equal(
+      loaded.source,
+      "primary"
+    );
+
+    assert.equal(
+      app.systems
+        .procurementSystem
+        .get(
+          pending.id
+        )
+        .status,
+      "pending"
+    );
+
+    assert.equal(
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        ),
+      savedBalance
+    );
+
+    app.core
+      .saveSystem
+      .remove(
+        slot
+      );
+  }
+);
