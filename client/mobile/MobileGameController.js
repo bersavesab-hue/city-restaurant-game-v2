@@ -71,7 +71,11 @@ function createMobileGameController(
     districtSystem,
     dishResearchSystem,
     restaurantDishSystem,
-    dishGrowthSystem
+    dishGrowthSystem,
+    employeeStaffingSystem,
+    employeeCareerSystem,
+    employeeDynamicsSystem,
+    staffingRecommendationSystem
   } =
     app.systems;
 
@@ -94,6 +98,12 @@ function createMobileGameController(
     researchMethodId: null,
     researchIngredientIds: [],
     lastResearchResult: null
+  };
+
+  const staffUi = {
+    tab: "team",
+    selectedEmployeeId: null,
+    selectedCandidateId: null
   };
 
   function getRestaurant() {
@@ -2413,6 +2423,781 @@ function createMobileGameController(
     return result;
   }
 
+  function minuteToClock(
+    value
+  ) {
+    const minute =
+      Math.max(
+        0,
+        Math.min(
+          1440,
+          Number(value) || 0
+        )
+      );
+
+    const hour =
+      Math.floor(
+        minute /
+        60
+      );
+
+    const rest =
+      minute %
+      60;
+
+    return (
+      String(hour)
+        .padStart(
+          2,
+          "0"
+        ) +
+      ":" +
+      String(rest)
+        .padStart(
+          2,
+          "0"
+        )
+    );
+  }
+
+  function getEmployeeModel(
+    restaurantId
+  ) {
+    let employees =
+      employeeSystem
+        .listByRestaurant(
+          restaurantId
+        );
+
+    if (
+      !employees.some(
+        employee =>
+          employee.id ===
+          staffUi
+            .selectedEmployeeId
+      )
+    ) {
+      staffUi
+        .selectedEmployeeId =
+        employees[0]?.id ??
+        null;
+    }
+
+    const profiles =
+      employees.map(
+        employee => {
+          const career =
+            employeeCareerSystem
+              .getProfile(
+                employee.id
+              );
+
+          const dynamics =
+            employeeDynamicsSystem
+              .getProfile(
+                employee.id
+              );
+
+          const turnover =
+            employeeStaffingSystem
+              .getTurnoverRisk(
+                employee.id
+              );
+
+          return {
+            ...employee,
+            role:
+              career.role,
+            rank:
+              career.rank,
+            promotion:
+              career.promotion,
+            salarySatisfaction:
+              career
+                .salarySatisfaction,
+            trainingPrograms:
+              career
+                .trainingPrograms,
+            dynamics,
+            turnover
+          };
+        }
+      );
+
+    employees =
+      profiles;
+
+    const selectedEmployee =
+      profiles.find(
+        employee =>
+          employee.id ===
+          staffUi
+            .selectedEmployeeId
+      ) ??
+      null;
+
+    let candidates =
+      employeeStaffingSystem
+        .listCandidates(
+          restaurantId
+        );
+
+    if (
+      candidates.length ===
+      0
+    ) {
+      candidates =
+        employeeStaffingSystem
+          .refreshTalentPool(
+            restaurantId,
+            {
+              count: 10,
+              replace: false
+            }
+          );
+    }
+
+    if (
+      !candidates.some(
+        candidate =>
+          candidate.id ===
+          staffUi
+            .selectedCandidateId
+      )
+    ) {
+      staffUi
+        .selectedCandidateId =
+        candidates[0]?.id ??
+        null;
+    }
+
+    const selectedCandidate =
+      candidates.find(
+        candidate =>
+          candidate.id ===
+          staffUi
+            .selectedCandidateId
+      ) ??
+      null;
+
+    const schedule =
+      employeeStaffingSystem
+        .getSchedule(
+          restaurantId
+        );
+
+    const selectedSchedule =
+      selectedEmployee
+        ? schedule
+            .filter(
+              shift =>
+                shift.employeeId ===
+                selectedEmployee.id
+            )
+            .map(
+              shift => ({
+                ...shift,
+                startClock:
+                  minuteToClock(
+                    shift.startMinute
+                  ),
+                endClock:
+                  minuteToClock(
+                    shift.endMinute
+                  )
+              })
+        : [];
+
+    const recommendation =
+      staffingRecommendationSystem
+        .getRecommendation(
+          restaurantId
+        );
+
+    const payrollHistory =
+      employeeStaffingSystem
+        .getPayrollHistory(
+          restaurantId
+        );
+
+    const currentDay =
+      gameState
+        .getSection(
+          "time"
+        )
+        .day;
+
+    const nextPayrollDay =
+      Math.ceil(
+        Math.max(
+          1,
+          currentDay
+        ) /
+        30
+      ) *
+      30;
+
+    return {
+      tab:
+        staffUi.tab,
+      employees:
+        profiles,
+      selectedEmployee,
+      candidates,
+      selectedCandidate,
+      employeeLimit:
+        storeProgressSystem
+          .getLimits(
+            restaurantId
+          )
+          .employees,
+      monthlyPayroll:
+        employeeSystem
+          .getPayroll(
+            restaurantId
+          ),
+      totalArrears:
+        profiles.reduce(
+          (
+            sum,
+            employee
+          ) =>
+            sum +
+            (
+              employee
+                .salaryArrears ??
+              0
+            ),
+          0
+        ),
+      schedule,
+      selectedSchedule,
+      recommendation,
+      payrollHistory,
+      nextPayrollDay
+    };
+  }
+
+  function setStaffTab(
+    tab
+  ) {
+    if (
+      ![
+        "team",
+        "recruit",
+        "schedule",
+        "payroll"
+      ].includes(
+        tab
+      )
+    ) {
+      throw new Error(
+        "未知员工子页面"
+      );
+    }
+
+    staffUi.tab =
+      tab;
+
+    lastMessage =
+      tab ===
+        "recruit"
+        ? "人才市场"
+        : tab ===
+            "schedule"
+          ? "员工排班"
+          : tab ===
+              "payroll"
+            ? "薪资与人工成本"
+            : "员工团队";
+  }
+
+  function selectEmployee(
+    restaurantId,
+    employeeId
+  ) {
+    const employee =
+      employeeSystem.get(
+        employeeId
+      );
+
+    if (
+      employee.restaurantId !==
+        restaurantId ||
+      employee.status ===
+        "fired"
+    ) {
+      throw new Error(
+        "员工不属于当前门店"
+      );
+    }
+
+    staffUi
+      .selectedEmployeeId =
+      employeeId;
+
+    lastMessage =
+      `已选择员工：${employee.name}`;
+  }
+
+  function selectCandidate(
+    restaurantId,
+    candidateId
+  ) {
+    const candidate =
+      employeeStaffingSystem
+        .listCandidates(
+          restaurantId
+        )
+        .find(
+          item =>
+            item.id ===
+            candidateId
+        );
+
+    if (!candidate) {
+      throw new Error(
+        "候选人已失效"
+      );
+    }
+
+    staffUi
+      .selectedCandidateId =
+      candidateId;
+
+    lastMessage =
+      `已选择候选人：${candidate.name}`;
+  }
+
+  function refreshCandidates(
+    restaurantId
+  ) {
+    const candidates =
+      employeeStaffingSystem
+        .refreshTalentPool(
+          restaurantId,
+          {
+            count: 10,
+            replace: true
+          }
+        );
+
+    staffUi
+      .selectedCandidateId =
+      candidates[0]?.id ??
+      null;
+
+    lastMessage =
+      `人才市场已刷新，共 ${candidates.length} 名候选人`;
+
+    return candidates;
+  }
+
+  function hireSelectedCandidate(
+    restaurantId
+  ) {
+    if (
+      !staffUi
+        .selectedCandidateId
+    ) {
+      throw new Error(
+        "请选择候选人"
+      );
+    }
+
+    const hired =
+      employeeStaffingSystem
+        .hireCandidate({
+          restaurantId,
+          candidateId:
+            staffUi
+              .selectedCandidateId
+        });
+
+    staffUi
+      .selectedEmployeeId =
+      hired.id;
+
+    staffUi
+      .selectedCandidateId =
+      null;
+
+    staffUi.tab =
+      "team";
+
+    lastMessage =
+      `已招聘：${hired.name}`;
+
+    return hired;
+  }
+
+  function trainSelectedEmployee(
+    restaurantId,
+    programId
+  ) {
+    const employeeId =
+      staffUi
+        .selectedEmployeeId;
+
+    if (!employeeId) {
+      throw new Error(
+        "请选择员工"
+      );
+    }
+
+    const employee =
+      employeeSystem.get(
+        employeeId
+      );
+
+    if (
+      employee.restaurantId !==
+        restaurantId
+    ) {
+      throw new Error(
+        "员工不属于当前门店"
+      );
+    }
+
+    const result =
+      employeeCareerSystem
+        .train(
+          employeeId,
+          programId
+        );
+
+    lastMessage =
+      `${employee.name} 完成培训：${result.program.name}`;
+
+    return result;
+  }
+
+  function promoteSelectedEmployee(
+    restaurantId
+  ) {
+    const employeeId =
+      staffUi
+        .selectedEmployeeId;
+
+    if (!employeeId) {
+      throw new Error(
+        "请选择员工"
+      );
+    }
+
+    const employee =
+      employeeSystem.get(
+        employeeId
+      );
+
+    if (
+      employee.restaurantId !==
+        restaurantId
+    ) {
+      throw new Error(
+        "员工不属于当前门店"
+      );
+    }
+
+    const promoted =
+      employeeCareerSystem
+        .promote(
+          employeeId
+        );
+
+    lastMessage =
+      `${employee.name} 已晋升`;
+
+    return promoted;
+  }
+
+  function adjustEmployeeSalary(
+    restaurantId,
+    mode
+  ) {
+    const employeeId =
+      staffUi
+        .selectedEmployeeId;
+
+    if (!employeeId) {
+      throw new Error(
+        "请选择员工"
+      );
+    }
+
+    const employee =
+      employeeSystem.get(
+        employeeId
+      );
+
+    if (
+      employee.restaurantId !==
+        restaurantId
+    ) {
+      throw new Error(
+        "员工不属于当前门店"
+      );
+    }
+
+    const steps = {
+      minus500: -500,
+      minus100: -100,
+      plus100: 100,
+      plus500: 500,
+      recommended:
+        employeeCareerSystem
+          .getRecommendedSalary(
+            employee
+          ) -
+        employee.salary
+    };
+
+    if (
+      !Object.prototype
+        .hasOwnProperty.call(
+          steps,
+          mode
+        )
+    ) {
+      throw new Error(
+        "未知薪资调整操作"
+      );
+    }
+
+    const next =
+      Math.max(
+        1000,
+        Math.round(
+          (
+            employee.salary +
+            steps[mode]
+          ) /
+          100
+        ) *
+        100
+      );
+
+    employeeSystem
+      .setSalary(
+        employeeId,
+        next
+      );
+
+    lastMessage =
+      `${employee.name} 月薪调整为 ¥${next}`;
+  }
+
+  function toggleEmployeeShift(
+    restaurantId,
+    weekday
+  ) {
+    const employeeId =
+      staffUi
+        .selectedEmployeeId;
+
+    if (!employeeId) {
+      throw new Error(
+        "请选择员工"
+      );
+    }
+
+    const employee =
+      employeeSystem.get(
+        employeeId
+      );
+
+    if (
+      employee.restaurantId !==
+        restaurantId
+    ) {
+      throw new Error(
+        "员工不属于当前门店"
+      );
+    }
+
+    const day =
+      Number(
+        weekday
+      );
+
+    const existing =
+      employeeStaffingSystem
+        .getSchedule(
+          restaurantId
+        )
+        .find(
+          shift =>
+            shift.employeeId ===
+              employeeId &&
+            shift.weekday ===
+              day
+        );
+
+    if (existing) {
+      employeeStaffingSystem
+        .removeShift(
+          employeeId,
+          day
+        );
+
+      lastMessage =
+        `${employee.name} 周${day}已休息`;
+
+      return;
+    }
+
+    const schedule =
+      operatingScheduleSystem
+        .get(
+          restaurantId
+        );
+
+    const startMinute =
+      (
+        schedule?.openHour ??
+        9
+      ) *
+      60;
+
+    const endMinute =
+      (
+        schedule?.closeHour ??
+        22
+      ) *
+      60;
+
+    employeeStaffingSystem
+      .setShift({
+        employeeId,
+        weekday:
+          day,
+        startMinute,
+        endMinute
+      });
+
+    lastMessage =
+      `${employee.name} 周${day}已按营业时间排班`;
+  }
+
+  function scheduleEmployeeAllWeek(
+    restaurantId
+  ) {
+    const employeeId =
+      staffUi
+        .selectedEmployeeId;
+
+    if (!employeeId) {
+      throw new Error(
+        "请选择员工"
+      );
+    }
+
+    const schedule =
+      operatingScheduleSystem
+        .get(
+          restaurantId
+        );
+
+    const startMinute =
+      (
+        schedule?.openHour ??
+        9
+      ) *
+      60;
+
+    const endMinute =
+      (
+        schedule?.closeHour ??
+        22
+      ) *
+      60;
+
+    for (
+      let weekday = 1;
+      weekday <= 7;
+      weekday += 1
+    ) {
+      employeeStaffingSystem
+        .setShift({
+          employeeId,
+          weekday,
+          startMinute,
+          endMinute
+        });
+    }
+
+    lastMessage =
+      "已按门店营业时间排满 7 天";
+  }
+
+  function clearEmployeeSchedule(
+    restaurantId
+  ) {
+    const employeeId =
+      staffUi
+        .selectedEmployeeId;
+
+    if (!employeeId) {
+      throw new Error(
+        "请选择员工"
+      );
+    }
+
+    for (
+      let weekday = 1;
+      weekday <= 7;
+      weekday += 1
+    ) {
+      employeeStaffingSystem
+        .removeShift(
+          employeeId,
+          weekday
+        );
+    }
+
+    lastMessage =
+      "已清空该员工本周排班";
+  }
+
+  function fireSelectedEmployee(
+    restaurantId
+  ) {
+    const employeeId =
+      staffUi
+        .selectedEmployeeId;
+
+    if (!employeeId) {
+      throw new Error(
+        "请选择员工"
+      );
+    }
+
+    const employee =
+      employeeSystem.get(
+        employeeId
+      );
+
+    if (
+      employee.restaurantId !==
+        restaurantId
+    ) {
+      throw new Error(
+        "员工不属于当前门店"
+      );
+    }
+
+    employeeSystem.fire(
+      employeeId
+    );
+
+    staffUi
+      .selectedEmployeeId =
+      null;
+
+    lastMessage =
+      `已解除 ${employee.name} 的雇佣关系`;
+  }
+
   function getViewModel() {
     const {
       restaurant
@@ -2571,6 +3356,11 @@ function createMobileGameController(
         restaurant.id
       );
 
+    const staff =
+      getEmployeeModel(
+        restaurant.id
+      );
+
     return {
       restaurant,
       finance,
@@ -2585,6 +3375,7 @@ function createMobileGameController(
       schedule,
       business,
       dishes,
+      staff,
 
       employees:
         employeeSystem
@@ -3043,6 +3834,143 @@ function createMobileGameController(
               getViewModel()
           };
 
+        case "staff-tab":
+          setStaffTab(
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-select":
+          selectEmployee(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-candidate-select":
+          selectCandidate(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-refresh-candidates":
+          refreshCandidates(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-hire-candidate":
+          hireSelectedCandidate(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-train":
+          trainSelectedEmployee(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-promote":
+          promoteSelectedEmployee(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-salary":
+          adjustEmployeeSalary(
+            getRestaurant().id,
+            String(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-shift-toggle":
+          toggleEmployeeShift(
+            getRestaurant().id,
+            Number(value)
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-schedule-all":
+          scheduleEmployeeAllWeek(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-schedule-clear":
+          clearEmployeeSchedule(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
+        case "staff-fire":
+          fireSelectedEmployee(
+            getRestaurant().id
+          );
+
+          return {
+            ok: true,
+            viewModel:
+              getViewModel()
+          };
+
         case "advance-hour":
           return {
             ok: true,
@@ -3085,7 +4013,8 @@ function createMobileGameController(
     performAction,
     getProcurementTarget,
     getProcurementCatalog,
-    getDishModel
+    getDishModel,
+    getEmployeeModel
   });
 }
 
