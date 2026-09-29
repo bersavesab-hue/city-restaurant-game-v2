@@ -556,6 +556,8 @@ function renderStorePage(
         <button
           type="button"
           data-nav="business"
+          data-route-action="business-tab"
+          data-route-value="marketing"
           data-asset-slot="home.quick.activity"
         >
           <span>◎</span>
@@ -566,6 +568,8 @@ function renderStorePage(
         <button
           type="button"
           data-nav="business"
+          data-route-action="business-tab"
+          data-route-value="inventory"
           data-asset-slot="home.quick.storage"
         >
           <span>▦</span>
@@ -701,6 +705,10 @@ function renderBusinessTabs(
         [
           "orders",
           "采购单"
+        ],
+        [
+          "marketing",
+          "活动"
         ]
       ]
         .map(
@@ -1458,6 +1466,561 @@ function renderOrdersPanel(
   `;
 }
 
+function marketingCategoryLabel(
+  category
+) {
+  return (
+    {
+      all: "全部",
+      local_acquisition: "本地获客",
+      discount_conversion: "优惠转化",
+      brand_building: "品牌建设",
+      content_social: "内容社交",
+      delivery_growth: "外卖增长",
+      community_scene: "社区活动",
+      member_retention: "会员复购",
+      group_business: "团体业务",
+      seasonal_event: "节日主题"
+    }[category] ??
+    category ??
+    "其他"
+  );
+}
+
+function marketingReasonLabel(
+  reason
+) {
+  return (
+    {
+      restaurant_level:
+        "门店等级不足",
+      insufficient_funds:
+        "资金不足",
+      active_limit:
+        "同时最多 2 个活动",
+      already_active:
+        "活动正在进行",
+      exclusive_group:
+        "与当前活动类型冲突",
+      required_channel:
+        "缺少所需销售渠道",
+      cooldown:
+        "活动冷却中"
+    }[reason] ??
+    reason
+  );
+}
+
+function marketingEffectText(
+  modifiers
+) {
+  const items = [];
+
+  const addMultiplier =
+    (
+      label,
+      value
+    ) => {
+      if (
+        !Number.isFinite(
+          value
+        ) ||
+        Math.abs(
+          value - 1
+        ) <
+          .001
+      ) {
+        return;
+      }
+
+      const percentValue =
+        Math.round(
+          (
+            value -
+            1
+          ) *
+          100
+        );
+
+      items.push(
+        `${label} ${percentValue >=
+        0
+          ? "+"
+          : ""}${percentValue}%`
+      );
+    };
+
+  addMultiplier(
+    "客流",
+    modifiers
+      .demandMultiplier
+  );
+
+  addMultiplier(
+    "成交价",
+    modifiers
+      .priceMultiplier
+  );
+
+  addMultiplier(
+    "吸引力",
+    modifiers
+      .marketAppealMultiplier
+  );
+
+  addMultiplier(
+    "复购",
+    modifiers
+      .repeatIntentMultiplier
+  );
+
+  addMultiplier(
+    "评价意愿",
+    modifiers
+      .reviewPropensityMultiplier
+  );
+
+  addMultiplier(
+    "服务容量",
+    modifiers
+      .serviceCapacityMultiplier
+  );
+
+  if (
+    Number(
+      modifiers
+        .qualityBonus
+    )
+  ) {
+    items.push(
+      `品质 +${Math.round(
+        modifiers
+          .qualityBonus
+      )}`
+    );
+  }
+
+  return items;
+}
+
+function renderMarketingPanel(
+  vm
+) {
+  const marketing =
+    vm.business
+      .marketing;
+
+  const selected =
+    marketing
+      .selectedAction;
+
+  const selectedEffects =
+    selected
+      ? marketingEffectText(
+          selected.modifiers
+        )
+      : [];
+
+  const activeEffects =
+    marketingEffectText(
+      marketing.modifiers
+    );
+
+  const canStart =
+    Boolean(
+      selected
+        ?.availability
+        ?.canStart
+    );
+
+  return `
+    <section
+      class="business-module-panel marketing-panel"
+      data-business-panel="marketing"
+    >
+      <section class="formal-card marketing-list-card">
+        <div class="formal-card-head">
+          <div>
+            <small>活动中心</small>
+            <strong>
+              ${marketing.active.length}
+              /
+              ${marketing.activeLimit}
+              个进行中
+            </strong>
+          </div>
+
+          <span>
+            午间预估
+            ${marketing
+              .noonExpectedVisitors}
+            人/小时
+          </span>
+        </div>
+
+        <div class="marketing-category-strip">
+          ${[
+            "all",
+            ...marketing
+              .categories
+          ]
+            .map(
+              category => `
+                <button
+                  type="button"
+                  class="${marketing.category ===
+                    category
+                    ? "is-active"
+                    : ""}"
+                  data-game-action="marketing-category"
+                  data-game-value="${escapeHtml(
+                    category
+                  )}"
+                >
+                  ${escapeHtml(
+                    marketingCategoryLabel(
+                      category
+                    )
+                  )}
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+
+        <div class="marketing-action-list formal-scroll-list">
+          ${marketing.actions
+            .map(
+              action => `
+                <button
+                  type="button"
+                  class="${action.id ===
+                    selected?.id
+                    ? "is-active"
+                    : ""}"
+                  data-game-action="marketing-select"
+                  data-game-value="${escapeHtml(
+                    action.id
+                  )}"
+                >
+                  <div>
+                    <strong>
+                      ${escapeHtml(
+                        action.name
+                      )}
+                    </strong>
+                    <small>
+                      ${marketingCategoryLabel(
+                        action.category
+                      )}
+                      ·
+                      ${action.durationDays}
+                      天
+                      ·
+                      ¥${money(
+                        action.cost
+                      )}
+                    </small>
+                  </div>
+
+                  <span class="${action.active
+                    ? "is-running"
+                    : action
+                        .availability
+                        .canStart
+                      ? "is-ready"
+                      : "is-locked"}">
+                    ${action.active
+                      ? `${action.remainingDays}天`
+                      : action
+                          .availability
+                          .canStart
+                        ? "可开始"
+                        : action.cooldownRemaining >
+                            0
+                          ? `冷却${action.cooldownRemaining}天`
+                          : `Lv.${action.minRestaurantLevel}`}
+                  </span>
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+      </section>
+
+      <section class="formal-card marketing-detail-card">
+        ${selected
+          ? `
+            <div class="marketing-detail-head">
+              <div>
+                <small>
+                  ${marketingCategoryLabel(
+                    selected.category
+                  )}
+                </small>
+                <h2>
+                  ${escapeHtml(
+                    selected.name
+                  )}
+                </h2>
+                <p>
+                  ${escapeHtml(
+                    selected.description
+                  )}
+                </p>
+              </div>
+
+              <div class="marketing-cost-badge">
+                <strong>
+                  ¥${money(
+                    selected.cost
+                  )}
+                </strong>
+                <small>
+                  ${selected.durationDays}
+                  天活动
+                </small>
+              </div>
+            </div>
+
+            <div class="marketing-effect-grid">
+              ${selectedEffects
+                .length
+                ? selectedEffects
+                  .map(
+                    effect => `
+                      <span>
+                        ${escapeHtml(
+                          effect
+                        )}
+                      </span>
+                    `
+                  )
+                  .join(
+                    ""
+                  )
+                : `
+                  <span>
+                    定向客群 / 渠道活动
+                  </span>
+                `}
+            </div>
+
+            <div class="marketing-meta-grid">
+              <div>
+                <span>门店要求</span>
+                <strong>
+                  Lv.${selected
+                    .minRestaurantLevel}
+                </strong>
+              </div>
+              <div>
+                <span>持续</span>
+                <strong>
+                  ${selected.durationDays}
+                  天
+                </strong>
+              </div>
+              <div>
+                <span>冷却</span>
+                <strong>
+                  ${selected.cooldownDays}
+                  天
+                </strong>
+              </div>
+              <div>
+                <span>目标客群</span>
+                <strong>
+                  ${selected
+                    .targetSegments
+                    .length ||
+                  "全体"}
+                </strong>
+              </div>
+            </div>
+
+            ${selected.active
+              ? `
+                <div class="marketing-running-card">
+                  <div>
+                    <small>活动进行中</small>
+                    <strong>
+                      剩余
+                      ${selected.remainingDays}
+                      个游戏日
+                    </strong>
+                  </div>
+                  <span>
+                    第${selected.active.startDay}
+                    天 →
+                    第${selected.active.endDay}
+                    天
+                  </span>
+                </div>
+              `
+              : `
+                <div class="marketing-start-state">
+                  ${canStart
+                    ? `
+                      <p>
+                        当前资金
+                        ¥${money(
+                          vm.finance.balance
+                        )}
+                        ，活动开始后立即扣除费用。
+                      </p>
+                    `
+                    : `
+                      <p>
+                        ${selected
+                          .availability
+                          .reasons
+                          .map(
+                            marketingReasonLabel
+                          )
+                          .join(
+                            " · "
+                          ) ||
+                        "当前不可开始"}
+                      </p>
+                    `}
+
+                  <button
+                    type="button"
+                    class="formal-primary-button"
+                    data-game-action="marketing-start"
+                    ${canStart
+                      ? ""
+                      : "disabled"}
+                  >
+                    ${canStart
+                      ? `投入 ¥${money(
+                          selected.cost
+                        )} 开始活动`
+                      : "暂不可开始"}
+                  </button>
+                </div>
+              `}
+
+            <div class="marketing-live-impact">
+              <div class="formal-card-head">
+                <div>
+                  <small>当前所有活动综合影响</small>
+                  <strong>
+                    ${marketing.active.length
+                      ? `${marketing.active.length} 个活动叠加`
+                      : "暂无活动效果"}
+                  </strong>
+                </div>
+              </div>
+
+              <div class="marketing-effect-grid is-live">
+                ${activeEffects
+                  .length
+                  ? activeEffects
+                    .map(
+                      effect => `
+                        <span>
+                          ${escapeHtml(
+                            effect
+                          )}
+                        </span>
+                      `
+                    )
+                    .join(
+                      ""
+                    )
+                  : `
+                    <span>
+                      当前经营指标无营销加成
+                    </span>
+                  `}
+              </div>
+            </div>
+
+            <div class="marketing-review-hint">
+              <span>
+                评价诊断
+              </span>
+              <strong>
+                ${escapeHtml(
+                  marketing
+                    .topReviewIssue
+                    ?.label ??
+                  marketing
+                    .topReviewPositive
+                    ?.label ??
+                  "暂无明显评价倾向"
+                )}
+              </strong>
+            </div>
+          `
+          : `
+            <div class="formal-empty">
+              当前分类暂无活动
+            </div>
+          `}
+      </section>
+
+      <section class="formal-card marketing-history-card">
+        <div class="formal-card-head">
+          <div>
+            <small>活动记录</small>
+            <strong>
+              最近
+              ${marketing.history.length}
+              条
+            </strong>
+          </div>
+        </div>
+
+        <div class="marketing-history-list formal-scroll-list">
+          ${marketing.history
+            .length
+            ? marketing.history
+              .map(
+                item => `
+                  <div class="marketing-history-row">
+                    <div>
+                      <strong>
+                        ${escapeHtml(
+                          item.name
+                        )}
+                      </strong>
+                      <small>
+                        第${item.startDay}
+                        天 -
+                        第${item.endDay}
+                        天
+                      </small>
+                    </div>
+                    <span>
+                      ${item.status ===
+                        "ended"
+                        ? "已结束"
+                        : "已开始"}
+                    </span>
+                  </div>
+                `
+              )
+              .join(
+                ""
+              )
+            : `
+              <div class="formal-empty">
+                尚未开展营销活动
+              </div>
+            `}
+        </div>
+      </section>
+    </section>
+  `;
+}
+
 function renderBusinessPage(
   vm
 ) {
@@ -1472,7 +2035,7 @@ function renderBusinessPage(
       <header class="primary-page-title business-page-title">
         <div>
           <small>经营中心</small>
-          <h1>采购与库存</h1>
+          <h1>经营与活动</h1>
         </div>
 
         <div class="business-title-stats">
@@ -1510,9 +2073,14 @@ function renderBusinessPage(
             ? renderOrdersPanel(
                 vm
               )
-            : renderProcurementPanel(
-                vm
-              )}
+            : business.tab ===
+                "marketing"
+              ? renderMarketingPanel(
+                  vm
+                )
+              : renderProcurementPanel(
+                  vm
+                )}
       </div>
 
       <output
