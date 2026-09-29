@@ -31,6 +31,7 @@ import { employeeCareerSystem } from "./systems/EmployeeCareerSystem.js";
 import { employeeDynamicsSystem } from "./systems/EmployeeDynamicsSystem.js";
 import { staffingRecommendationSystem } from "./systems/StaffingRecommendationSystem.js";
 import { storeProgressSystem } from "./systems/StoreProgressSystem.js";
+import { launchProgressionSystem } from "./systems/LaunchProgressionSystem.js";
 import { lateGameInvestmentSystem } from "./systems/LateGameInvestmentSystem.js";
 import { onboardingSystem } from "./systems/OnboardingSystem.js";
 import { operatingAdvisorSystem } from "./systems/OperatingAdvisorSystem.js";
@@ -142,6 +143,7 @@ function bootstrap() {
       employeeDynamicsSystem,
       staffingRecommendationSystem,
       storeProgressSystem,
+      launchProgressionSystem,
       lateGameInvestmentSystem,
       onboardingSystem,
       operatingAdvisorSystem,
