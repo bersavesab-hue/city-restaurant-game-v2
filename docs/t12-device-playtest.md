@@ -5,6 +5,23 @@
 基线：T11 VERIFIED / package 0.16.2。
 原则：T12 只修真机体验、适配、交互和回归问题，不新增系统，不凭感觉改经济公式。
 
+## 当前 T12-A 测试包
+- workflow：`36603537454`
+- artifact：`11049788586`
+- branch：`playtest-t12-a`
+- commit：`0aed7eb3a6816b972c1965f3c208d755d4696775`
+- versionName：`0.16.2`
+- versionCode：`1602`
+- APK 大小：1,518,854 bytes
+- APK SHA-256：`416c428392e08f4460bdb72cbfa23ed2c10c0f7365e8c6b893285d7960cabf81`
+- Android 构建：SUCCESS
+- focused CI gate：SUCCESS
+- 签名：android-debug
+- productionReady：false
+- 说明：仅用于真机测试；正式上架前仍必须替换为生产签名证书。
+
+T12-A 当前状态：READY_FOR_DEVICE_TEST。
+
 ## A — 安装、启动、首页与基础触控
 目标：先确认 APK 在真实 Android 设备上可以正常进入并完成最基础操作。
 
