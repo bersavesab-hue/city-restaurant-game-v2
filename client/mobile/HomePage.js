@@ -4062,24 +4062,190 @@ function renderStaffPage(
   `;
 }
 
-function renderMorePage(
+function renovationTemplateReasonLabel(
+  reason
+) {
+  return (
+    {
+      store_level:
+        "门店等级不足",
+      usable_area:
+        "店面面积不足",
+      furniture_locked:
+        "包含未解锁设施",
+      budget:
+        "资金不足",
+      layout_not_empty:
+        "已有装修，模板仅用于首次装修"
+    }[reason] ??
+    reason
+  );
+}
+
+function facilityCategoryLabel(
+  category
+) {
+  return (
+    {
+      all: "全部",
+      dining: "桌椅",
+      kitchen: "厨房",
+      service: "服务",
+      waiting: "等候",
+      decor: "装饰"
+    }[category] ??
+    category
+  );
+}
+
+function constructionStatusLabel(
+  status
+) {
+  return (
+    {
+      building:
+        "施工中",
+      ready_for_inspection:
+        "待验收",
+      completed:
+        "已完工"
+    }[status] ??
+    "暂无施工"
+  );
+}
+
+function facilityEffectList(
+  item
+) {
+  if (!item) {
+    return [];
+  }
+
+  const effects = [];
+
+  if (item.seats) {
+    effects.push(
+      `餐位 +${item.seats}`
+    );
+  }
+
+  if (
+    item.kitchenStations
+  ) {
+    effects.push(
+      `厨房工位 +${item.kitchenStations}`
+    );
+  }
+
+  const percent =
+    (
+      label,
+      value
+    ) => {
+      if (
+        !Number.isFinite(
+          value
+        ) ||
+        value === 0
+      ) {
+        return;
+      }
+
+      effects.push(
+        `${label} +${Math.round(
+          value *
+          100
+        )}%`
+      );
+    };
+
+  percent(
+    "厨房效率",
+    item.kitchenEfficiency
+  );
+
+  percent(
+    "服务效率",
+    item.serviceEfficiency
+  );
+
+  percent(
+    "排队效率",
+    item.queueEfficiency
+  );
+
+  percent(
+    "吸引力",
+    item.appeal
+  );
+
+  percent(
+    "舒适",
+    item.comfort
+  );
+
+  if (
+    item.queueCapacityBonus
+  ) {
+    effects.push(
+      `等候容量 +${item.queueCapacityBonus}`
+    );
+  }
+
+  return effects;
+}
+
+function renderMoreTabs(
+  more
+) {
+  return `
+    <div
+      class="more-tab-bar"
+      role="tablist"
+      aria-label="更多模块"
+    >
+      ${[
+        [
+          "system",
+          "系统"
+        ],
+        [
+          "renovation",
+          "装修"
+        ]
+      ]
+        .map(
+          (
+            [
+              id,
+              label
+            ]
+          ) => `
+            <button
+              type="button"
+              class="${more.tab ===
+                id
+                  ? "is-active"
+                  : ""}"
+              data-game-action="more-tab"
+              data-game-value="${id}"
+            >
+              ${label}
+            </button>
+          `
+        )
+        .join(
+          ""
+        )}
+    </div>
+  `;
+}
+
+function renderSystemPanel(
   vm
 ) {
   return `
-    <section
-      class="primary-page"
-      data-primary-page="more"
-    >
-      <header class="primary-page-title">
-        <div>
-          <small>更多</small>
-          <h1>时间与存档</h1>
-        </div>
-        <strong>
-          第${vm.time.day}天
-        </strong>
-      </header>
-
+    <div class="more-panel more-system-panel">
       <section class="formal-card time-control-card">
         <div class="formal-card-head">
           <div>
@@ -4155,6 +4321,728 @@ function renderMorePage(
           </strong>
         </button>
       </section>
+    </div>
+  `;
+}
+
+function renderRenovationConstruction(
+  renovation
+) {
+  const construction =
+    renovation
+      .currentConstruction ??
+    renovation
+      .construction;
+
+  if (!construction) {
+    return "";
+  }
+
+  const progress =
+    renovation.progress ??
+    {
+      progress: 0,
+      remainingDays: 0,
+      phaseLabel:
+        "暂无施工"
+    };
+
+  return `
+    <section class="formal-card renovation-construction-card">
+      <div class="formal-card-head">
+        <div>
+          <small>
+            ${constructionStatusLabel(
+              construction.status
+            )}
+          </small>
+          <strong>
+            ${escapeHtml(
+              progress.phaseLabel
+            )}
+          </strong>
+        </div>
+
+        <span>
+          ${progress.progress}%
+        </span>
+      </div>
+
+      <div class="renovation-progress-track">
+        <span
+          style="width:${Math.max(
+            0,
+            Math.min(
+              100,
+              progress.progress
+            )
+          )}%"
+        ></span>
+      </div>
+
+      <div class="renovation-construction-grid">
+        <div>
+          <span>开工</span>
+          <strong>
+            第${construction.startDay}天
+          </strong>
+        </div>
+        <div>
+          <span>预计完工</span>
+          <strong>
+            第${construction.endDay}天
+          </strong>
+        </div>
+        <div>
+          <span>工期</span>
+          <strong>
+            ${construction.durationDays}天
+          </strong>
+        </div>
+        <div>
+          <span>剩余</span>
+          <strong>
+            ${progress.remainingDays}天
+          </strong>
+        </div>
+        <div>
+          <span>项目总额</span>
+          <strong>
+            ¥${money(
+              construction.projectCost
+            )}
+          </strong>
+        </div>
+      </div>
+
+      ${construction.status ===
+        "ready_for_inspection"
+        ? `
+          <button
+            type="button"
+            class="formal-primary-button renovation-inspect-button"
+            data-game-action="renovation-inspect"
+          >
+            验收并启用装修
+          </button>
+        `
+        : `
+          <p class="renovation-inline-note">
+            施工按游戏日自动推进；完工后需要验收才会启用新设施效果。
+          </p>
+        `}
+    </section>
+  `;
+}
+
+function renderRenovationTemplatePanel(
+  vm
+) {
+  const renovation =
+    vm.renovation;
+
+  const selected =
+    renovation
+      .selectedTemplate;
+
+  if (
+    !renovation.layoutEmpty
+  ) {
+    return "";
+  }
+
+  return `
+    <section class="renovation-template-panel">
+      <section class="formal-card renovation-template-list-card">
+        <div class="formal-card-head">
+          <div>
+            <small>固定装修方案</small>
+            <strong>
+              ${renovation.templates.length}
+              套
+            </strong>
+          </div>
+          <span>
+            首次装修
+          </span>
+        </div>
+
+        <div class="renovation-template-list formal-scroll-list">
+          ${renovation.templates
+            .map(
+              item => `
+                <button
+                  type="button"
+                  class="${item.id ===
+                    selected?.id
+                    ? "is-active"
+                    : ""}"
+                  data-game-action="renovation-template-select"
+                  data-game-value="${escapeHtml(
+                    item.id
+                  )}"
+                >
+                  <div>
+                    <strong>
+                      ${escapeHtml(
+                        item.name
+                      )}
+                    </strong>
+                    <small>
+                      Lv.${item.minLevel}
+                      ·
+                      ${item.minArea}㎡起
+                      ·
+                      适配
+                      ${item.fitScore}
+                    </small>
+                  </div>
+                  <span>
+                    ¥${money(
+                      item.estimatedTotalCost
+                    )}
+                  </span>
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+      </section>
+
+      <section class="formal-card renovation-template-detail-card">
+        ${selected
+          ? `
+            <div class="renovation-template-head">
+              <div>
+                <small>装修方案</small>
+                <h2>
+                  ${escapeHtml(
+                    selected.name
+                  )}
+                </h2>
+                <p>
+                  理想面积
+                  ${selected.idealArea}㎡
+                  ·
+                  家具
+                  ${selected.items.length}
+                  件
+                </p>
+              </div>
+
+              <div class="renovation-grade-badge">
+                <small>匹配</small>
+                <strong>
+                  ${selected.fitScore}
+                </strong>
+              </div>
+            </div>
+
+            <div class="renovation-cost-grid">
+              <div>
+                <span>家具设施</span>
+                <strong>
+                  ¥${money(
+                    selected.furnitureCost
+                  )}
+                </strong>
+              </div>
+              <div>
+                <span>基础施工</span>
+                <strong>
+                  ¥${money(
+                    selected.constructionCost
+                  )}
+                </strong>
+              </div>
+              <div>
+                <span>总预算</span>
+                <strong>
+                  ¥${money(
+                    selected.estimatedTotalCost
+                  )}
+                </strong>
+              </div>
+              <div>
+                <span>当前资金</span>
+                <strong>
+                  ¥${money(
+                    selected.availableBalance
+                  )}
+                </strong>
+              </div>
+            </div>
+
+            ${selected.reasons.length
+              ? `
+                <div class="renovation-reason-list">
+                  ${selected.reasons
+                    .map(
+                      reason => `
+                        <span>
+                          ${escapeHtml(
+                            renovationTemplateReasonLabel(
+                              reason
+                            )
+                          )}
+                        </span>
+                      `
+                    )
+                    .join(
+                      ""
+                    )}
+                </div>
+              `
+              : ""}
+
+            <button
+              type="button"
+              class="formal-primary-button"
+              data-game-action="renovation-start-template"
+              ${selected.executable &&
+              renovation.canEdit
+                ? ""
+                : "disabled"}
+            >
+              ${selected.executable
+                ? `投入 ¥${money(
+                    selected.estimatedTotalCost
+                  )} 开始施工`
+                : "当前不可施工"}
+            </button>
+          `
+          : `
+            <div class="formal-empty">
+              当前没有可用装修方案
+            </div>
+          `}
+      </section>
+    </section>
+  `;
+}
+
+function renderFacilityPanel(
+  vm
+) {
+  const renovation =
+    vm.renovation;
+
+  if (
+    renovation.layoutEmpty
+  ) {
+    return "";
+  }
+
+  const selected =
+    renovation
+      .selectedFacility;
+
+  const effects =
+    facilityEffectList(
+      selected
+    );
+
+  return `
+    <section class="renovation-facility-panel">
+      <section class="formal-card facility-list-card">
+        <div class="formal-card-head">
+          <div>
+            <small>固定设施升级</small>
+            <strong>
+              系统自动布置
+            </strong>
+          </div>
+          <span>
+            ${renovation
+              .summary
+              .placements}
+            件已安装
+          </span>
+        </div>
+
+        <div class="facility-category-strip">
+          ${[
+            "all",
+            ...renovation
+              .categories
+          ]
+            .map(
+              category => `
+                <button
+                  type="button"
+                  class="${renovation.facilityCategory ===
+                    category
+                    ? "is-active"
+                    : ""}"
+                  data-game-action="renovation-facility-category"
+                  data-game-value="${escapeHtml(
+                    category
+                  )}"
+                >
+                  ${escapeHtml(
+                    facilityCategoryLabel(
+                      category
+                    )
+                  )}
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+
+        <div class="facility-list formal-scroll-list">
+          ${renovation.facilities
+            .map(
+              item => `
+                <button
+                  type="button"
+                  class="${item.id ===
+                    selected?.id
+                    ? "is-active"
+                    : ""}"
+                  data-game-action="renovation-facility-select"
+                  data-game-value="${escapeHtml(
+                    item.id
+                  )}"
+                >
+                  <div>
+                    <strong>
+                      ${escapeHtml(
+                        item.name
+                      )}
+                    </strong>
+                    <small>
+                      ${facilityCategoryLabel(
+                        item.category
+                      )}
+                      ·
+                      已装
+                      ${item.installedCount}
+                      ·
+                      Lv.${item.unlockLevel}
+                    </small>
+                  </div>
+                  <span>
+                    ¥${money(
+                      item.cost
+                    )}
+                  </span>
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+      </section>
+
+      <section class="formal-card facility-detail-card">
+        ${selected
+          ? `
+            <div class="facility-detail-head">
+              <div>
+                <small>
+                  ${facilityCategoryLabel(
+                    selected.category
+                  )}
+                </small>
+                <h2>
+                  ${escapeHtml(
+                    selected.name
+                  )}
+                </h2>
+                <p>
+                  ${selected.width}
+                  ×
+                  ${selected.height}
+                  格
+                  ·
+                  已安装
+                  ${selected.installedCount}
+                </p>
+              </div>
+
+              <div class="renovation-cost-badge">
+                <small>设备价</small>
+                <strong>
+                  ¥${money(
+                    selected.cost
+                  )}
+                </strong>
+              </div>
+            </div>
+
+            <div class="facility-effect-strip">
+              ${effects.length
+                ? effects
+                  .map(
+                    effect => `
+                      <span>
+                        ${escapeHtml(
+                          effect
+                        )}
+                      </span>
+                    `
+                  )
+                  .join(
+                    ""
+                  )
+                : `
+                  <span>
+                    基础功能设施
+                  </span>
+                `}
+            </div>
+
+            ${!selected.unlocked
+              ? `
+                <p class="renovation-inline-note">
+                  门店达到 Lv.${selected.unlockLevel} 后解锁。
+                </p>
+              `
+              : !selected.affordable
+                ? `
+                  <p class="renovation-inline-note">
+                    当前资金不足以购买该设施。
+                  </p>
+                `
+                : `
+                  <p class="renovation-inline-note">
+                    确认后由系统自动寻找合法位置，并进入真实施工流程。
+                  </p>
+                `}
+
+            <button
+              type="button"
+              class="formal-primary-button"
+              data-game-action="renovation-install-facility"
+              ${selected.unlocked &&
+              selected.affordable &&
+              renovation.canEdit
+                ? ""
+                : "disabled"}
+            >
+              安装并施工
+            </button>
+          `
+          : `
+            <div class="formal-empty">
+              当前没有可选设施
+            </div>
+          `}
+      </section>
+    </section>
+  `;
+}
+
+function renderRenovationPanel(
+  vm
+) {
+  const renovation =
+    vm.renovation;
+
+  if (
+    !renovation
+      ?.initialized
+  ) {
+    return `
+      <div class="more-panel renovation-panel">
+        <section class="formal-card">
+          <div class="formal-empty">
+            当前门店暂不可装修
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  const modifiers =
+    renovation
+      .summary
+      .modifiers;
+
+  const capacity =
+    renovation
+      .serviceCapacity;
+
+  return `
+    <div class="more-panel renovation-panel">
+      <section class="formal-card renovation-overview-card">
+        <div class="renovation-overview-head">
+          <div>
+            <small>门店装修状态</small>
+            <strong>
+              ${renovation.summary.active
+                ? "已启用"
+                : renovation
+                    .currentConstruction
+                  ? constructionStatusLabel(
+                      renovation
+                        .currentConstruction
+                        .status
+                    )
+                  : renovation.layoutEmpty
+                    ? "尚未装修"
+                    : "方案未启用"}
+            </strong>
+          </div>
+
+          <div class="renovation-grade-badge">
+            <small>布局</small>
+            <strong>
+              ${escapeHtml(
+                renovation
+                  .analysis
+                  ?.grade ??
+                "-"
+              )}
+            </strong>
+          </div>
+        </div>
+
+        <div class="renovation-stat-grid">
+          <div>
+            <span>餐位</span>
+            <strong>
+              ${modifiers.seats ??
+                0}
+            </strong>
+          </div>
+          <div>
+            <span>餐桌</span>
+            <strong>
+              ${modifiers.tables ??
+                0}
+            </strong>
+          </div>
+          <div>
+            <span>厨房工位</span>
+            <strong>
+              ${modifiers.kitchenStations ??
+                0}
+            </strong>
+          </div>
+          <div>
+            <span>厨房产能</span>
+            <strong>
+              ${capacity
+                ?.kitchenGuests ??
+                "-"}
+            </strong>
+          </div>
+          <div>
+            <span>服务产能</span>
+            <strong>
+              ${capacity
+                ?.serviceGuests ??
+                "-"}
+            </strong>
+          </div>
+          <div>
+            <span>舒适度</span>
+            <strong>
+              ${renovation
+                .analysis
+                ?.scores
+                ?.comfort ??
+                renovation
+                  .analysis
+                  ?.comfortScore ??
+                "-"}
+            </strong>
+          </div>
+          <div>
+            <span>动线</span>
+            <strong>
+              ${renovation
+                .analysis
+                ?.scores
+                ?.flow ??
+                renovation
+                  .analysis
+                  ?.flowScore ??
+                "-"}
+            </strong>
+          </div>
+          <div>
+            <span>累计投入</span>
+            <strong>
+              ¥${money(
+                renovation
+                  .summary
+                  .totalSpent
+              )}
+            </strong>
+          </div>
+        </div>
+      </section>
+
+      ${renderRenovationConstruction(
+        renovation
+      )}
+
+      ${!renovation
+        .currentConstruction
+        ? renovation.layoutEmpty
+          ? renderRenovationTemplatePanel(
+              vm
+            )
+          : renderFacilityPanel(
+              vm
+            )
+        : ""}
+    </div>
+  `;
+}
+
+function renderMorePage(
+  vm
+) {
+  const more =
+    vm.more ??
+    {
+      tab:
+        "system"
+    };
+
+  return `
+    <section
+      class="primary-page primary-page-more"
+      data-primary-page="more"
+    >
+      <header class="primary-page-title more-page-title">
+        <div>
+          <small>更多</small>
+          <h1>
+            ${more.tab ===
+              "renovation"
+              ? "装修与设施"
+              : "时间与存档"}
+          </h1>
+        </div>
+        <strong>
+          第${vm.time.day}天
+        </strong>
+      </header>
+
+      ${renderMoreTabs(
+        more
+      )}
+
+      <div class="more-panel-host">
+        ${more.tab ===
+          "renovation"
+          ? renderRenovationPanel(
+              vm
+            )
+          : renderSystemPanel(
+              vm
+            )}
+      </div>
 
       <output
         class="home-status-feedback"
