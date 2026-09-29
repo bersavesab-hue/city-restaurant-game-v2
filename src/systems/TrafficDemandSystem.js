@@ -920,7 +920,7 @@ class TrafficDemandSystem {
                 .priceSensitivity /
               100
             ) *
-            0.35 +
+            0.9 +
           (
             segment.spendingPower -
             50
