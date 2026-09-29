@@ -42,7 +42,7 @@
     "test:ci": "npm run check:version && npm run check:assets && npm run test:core:smoke && npm run test:save-compat && npm run test:launch && npm run test:balance && npm run test:ui && npm run build:mobile-ui",
     "check:assets": "node scripts/check-ui-assets.mjs",
     "test:launch": "node --test tests/launch-content.test.js",
-    "test:balance": "PHASE3_BALANCE_DAYS=90 node scripts/phase3-balance-gate.mjs"
+    "test:balance": "PHASE3_BALANCE_DAYS=365 node scripts/phase3-balance-gate.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"
