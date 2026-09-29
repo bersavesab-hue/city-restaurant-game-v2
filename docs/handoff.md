@@ -1017,6 +1017,15 @@ LaunchProgressionSystem 已接入：
 - UI / 路由 / 模块 / 成长：70/70；
 - 浏览器移动 UI 构建：成功。
 
+### T10 试玩 APK
+- workflow run：`36561370598`
+- APK artifact：`11030485571`
+- artifact 名：`restaurant-playtest-1be16983bedbc9603d491c6ca7c549fbb6d52715`
+- APK SHA-256：`c68bc542cde6f6d13658726ebfdfa1b6dc37c271abb3b98301f88e286c6e0722`
+- Android：BUILD SUCCESSFUL
+- 签名：`android-debug`
+- 本次出包门禁：核心 15/15、存档 11/11、首发内容 5/5、UI/成长 70/70。
+
 ## 当前状态
 T10：VERIFIED。
 
