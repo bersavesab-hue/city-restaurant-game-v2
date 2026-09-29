@@ -84,7 +84,8 @@ function createMobileGameController(
     renovationPlanningSystem,
     renovationConstructionSystem,
     layoutFlowSystem,
-    serviceCapacitySystem
+    serviceCapacitySystem,
+    launchProgressionSystem
   } =
     app.systems;
 
@@ -466,14 +467,15 @@ function createMobileGameController(
         b.available
     );
 
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
     const suppliers =
-      supplierSystem
-        .list()
-        .filter(
-          supplier =>
-            supplier.status ===
-            "active"
-        );
+      getUnlockedSuppliers(
+        restaurant
+      );
 
     for (
       const candidate
@@ -578,6 +580,14 @@ function createMobileGameController(
             restaurant.level ??
             1
           )
+      )
+      .filter(
+        supplier =>
+          launchProgressionSystem
+            .isSupplierAllowed(
+              restaurant.level,
+              supplier.id
+            )
       );
   }
 
@@ -649,7 +659,12 @@ function createMobileGameController(
         ingredient =>
           supplied.has(
             ingredient.id
-          )
+          ) &&
+          launchProgressionSystem
+            .isIngredientCategoryAllowed(
+              restaurant.level,
+              ingredient.category
+            )
       )
       .map(
         ingredient => ({
@@ -1283,10 +1298,25 @@ function createMobileGameController(
           restaurantId
         );
 
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    const launchAvailable =
+      status.available.filter(
+        action =>
+          launchProgressionSystem
+            .isMarketingActionAllowed(
+              restaurant.level,
+              action.id
+            )
+      );
+
     const categories =
       [
         ...new Set(
-          status.available.map(
+          launchAvailable.map(
             action =>
               action.category
           )
@@ -1308,7 +1338,7 @@ function createMobileGameController(
     }
 
     const visible =
-      status.available
+      launchAvailable
         .filter(
           action =>
             businessUi
@@ -2212,7 +2242,9 @@ function createMobileGameController(
     };
   }
 
-  function ensureDishResearchDraft() {
+  function ensureDishResearchDraft(
+    restaurantId
+  ) {
     const methods =
       dishResearchSystem
         .getAvailableMethods();
@@ -2231,9 +2263,22 @@ function createMobileGameController(
         null;
     }
 
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
     const ingredients =
       ingredientCatalogSystem
-        .getAll();
+        .getAll()
+        .filter(
+          ingredient =>
+            launchProgressionSystem
+              .isIngredientCategoryAllowed(
+                restaurant.level,
+                ingredient.category
+              )
+        );
 
     const validIds =
       new Set(
@@ -2306,10 +2351,17 @@ function createMobileGameController(
                   .ownerRestaurantId ===
                 restaurantId
               : (
-                  dish.unlockLevel ??
-                  1
-                ) <=
-                restaurant.level
+                  (
+                    dish.unlockLevel ??
+                    1
+                  ) <=
+                    restaurant.level &&
+                  launchProgressionSystem
+                    .isDishAllowed(
+                      restaurant.level,
+                      dish.id
+                    )
+                )
         )
         .map(
           dish =>
@@ -2370,7 +2422,9 @@ function createMobileGameController(
       null;
 
     const researchDraft =
-      ensureDishResearchDraft();
+      ensureDishResearchDraft(
+        restaurantId
+      );
 
     const selectedResearchIngredients =
       dishUi
@@ -2943,10 +2997,30 @@ function createMobileGameController(
       ) ??
       null;
 
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    const allowedRoleIds =
+      new Set(
+        launchProgressionSystem
+          .getCumulativeContent(
+            restaurant.level
+          )
+          .employeeRoleIds
+      );
+
     let candidates =
       employeeStaffingSystem
         .listCandidates(
           restaurantId
+        )
+        .filter(
+          candidate =>
+            allowedRoleIds.has(
+              candidate.roleId
+            )
         );
 
     if (
@@ -2958,9 +3032,15 @@ function createMobileGameController(
           .refreshTalentPool(
             restaurantId,
             {
-              count: 10,
+              count: 14,
               replace: false
             }
+          )
+          .filter(
+            candidate =>
+              allowedRoleIds.has(
+                candidate.roleId
+              )
           );
     }
 
@@ -3180,14 +3260,34 @@ function createMobileGameController(
   function refreshCandidates(
     restaurantId
   ) {
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    const allowedRoleIds =
+      new Set(
+        launchProgressionSystem
+          .getCumulativeContent(
+            restaurant.level
+          )
+          .employeeRoleIds
+      );
+
     const candidates =
       employeeStaffingSystem
         .refreshTalentPool(
           restaurantId,
           {
-            count: 10,
+            count: 14,
             replace: true
           }
+        )
+        .filter(
+          candidate =>
+            allowedRoleIds.has(
+              candidate.roleId
+            )
         );
 
     staffUi
@@ -3762,7 +3862,12 @@ function createMobileGameController(
           restaurantId
         );
 
-    const recommendations =
+    const restaurant =
+      restaurantSystem.get(
+        restaurantId
+      );
+
+    const rawRecommendations =
       renovationPlanningSystem
         .getTemplateRecommendations(
           restaurantId,
@@ -3771,6 +3876,40 @@ function createMobileGameController(
               true
           }
         );
+
+    const allowedTemplateIds =
+      new Set(
+        launchProgressionSystem
+          .getCumulativeContent(
+            restaurant.level
+          )
+          .renovationTemplateIds
+      );
+
+    const recommendations = {
+      ...rawRecommendations,
+      items:
+        rawRecommendations
+          .items
+          .filter(
+            item =>
+              allowedTemplateIds.has(
+                item.id
+              )
+          ),
+      recommendedTemplateId:
+        rawRecommendations
+          .items
+          .find(
+            item =>
+              allowedTemplateIds.has(
+                item.id
+              ) &&
+              item.executable
+          )
+          ?.id ??
+        null
+    };
 
     if (
       !recommendations
@@ -4381,6 +4520,12 @@ function createMobileGameController(
           restaurant.id
         );
 
+    const launch =
+      launchProgressionSystem
+        .getStageModel(
+          restaurant.id
+        );
+
     const inventory =
       inventorySystem
         .getSummary(
@@ -4503,6 +4648,7 @@ function createMobileGameController(
       restaurant,
       finance,
       progress,
+      launch,
       inventory,
       menu,
       latestSettlement,
