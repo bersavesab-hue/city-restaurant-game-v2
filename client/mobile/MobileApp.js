@@ -165,6 +165,22 @@ root.addEventListener(
         activePage =
           nextPage;
 
+        const routeAction =
+          nav.dataset
+            .routeAction;
+
+        if (
+          routeAction
+        ) {
+          gameController
+            .performAction(
+              routeAction,
+              nav.dataset
+                .routeValue ??
+              null
+            );
+        }
+
         render();
       }
 
