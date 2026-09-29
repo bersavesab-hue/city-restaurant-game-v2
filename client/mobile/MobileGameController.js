@@ -187,26 +187,63 @@ function createMobileGameController(
       };
     }
 
-    const property =
+    const availableProperties =
       propertySystem
         .list({
           availableOnly:
             true
-        })
-        .sort(
-          (
-            a,
-            b
-          ) =>
+        });
+
+    const property =
+      (
+        availableProperties
+          .filter(
+            item =>
+              (
+                item.usableArea ??
+                item.area ??
+                0
+              ) >=
+                36 &&
+              ![
+                "cloud_kitchen",
+                "stall"
+              ].includes(
+                item.venueTypeId ??
+                item.tags?.[0] ??
+                ""
+              )
+          )
+          .sort(
             (
-              a.monthlyRent ??
-              Infinity
-            ) -
+              a,
+              b
+            ) =>
+              (
+                a.monthlyRent ??
+                Infinity
+              ) -
+              (
+                b.monthlyRent ??
+                Infinity
+              )
+          )[0] ??
+        availableProperties
+          .sort(
             (
-              b.monthlyRent ??
-              Infinity
-            )
-        )[0] ??
+              a,
+              b
+            ) =>
+              (
+                a.monthlyRent ??
+                Infinity
+              ) -
+              (
+                b.monthlyRent ??
+                Infinity
+              )
+          )[0]
+      ) ??
       null;
 
     const restaurant =
