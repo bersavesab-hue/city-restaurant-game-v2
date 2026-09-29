@@ -2181,3 +2181,714 @@ button {
     margin-top: 5px;
   }
 }
+
+/* T09-3 employee team recruitment schedule and payroll workflow. */
+.primary-page-staff {
+  display: grid;
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr)
+    auto;
+}
+
+.staff-page-title {
+  min-height: 66px;
+}
+
+.staff-title-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.staff-title-stats > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: rgba(231,239,243,.58);
+  font-size: 8px;
+  text-align: right;
+}
+
+.staff-title-stats strong {
+  color: #ffe0a0;
+  font-size: 12px;
+}
+
+.staff-tab-bar {
+  min-height: 42px;
+  padding: 4px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
+  gap: 5px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 14px;
+  background: rgba(15,30,41,.84);
+}
+
+.staff-tab-bar button {
+  min-height: 32px;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(232,240,243,.64);
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.staff-tab-bar button.is-active {
+  color: #fff1c9;
+  background: rgba(202,146,56,.18);
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(255,211,119,.24);
+}
+
+.staff-panel-host,
+.staff-module-panel {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.staff-module-panel {
+  height: 100%;
+  display: grid;
+  gap: 7px;
+}
+
+.staff-team-panel,
+.staff-recruit-panel,
+.staff-schedule-panel {
+  grid-template-columns:
+    minmax(0,.84fr)
+    minmax(0,1.46fr);
+}
+
+.staff-payroll-panel {
+  grid-template-columns:
+    minmax(0,1fr)
+    minmax(0,1.25fr);
+  grid-template-rows:
+    auto
+    minmax(0,1fr);
+}
+
+.employee-list-card,
+.employee-detail-card,
+.candidate-list-card,
+.candidate-detail-card,
+.schedule-employee-card,
+.schedule-week-card,
+.payroll-employee-card,
+.payroll-history-card {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.employee-selector-list,
+.candidate-list {
+  min-height: 0;
+  margin-top: 8px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.employee-selector-list::-webkit-scrollbar,
+.candidate-list::-webkit-scrollbar,
+.employee-training-list::-webkit-scrollbar {
+  display: none;
+}
+
+.employee-selector-list button,
+.candidate-list button {
+  width: 100%;
+  min-height: 50px;
+  padding: 7px 8px;
+  display: grid;
+  grid-template-columns:
+    auto
+    minmax(0,1fr)
+    auto;
+  align-items: center;
+  gap: 8px;
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.07);
+  background: transparent;
+  color: #edf3f5;
+  text-align: left;
+}
+
+.employee-selector-list button.is-active,
+.candidate-list button.is-active {
+  border-radius: 10px;
+  background: rgba(88,171,151,.13);
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(109,211,186,.22);
+}
+
+.employee-selector-list button > div,
+.candidate-list button > div {
+  min-width: 0;
+}
+
+.employee-selector-list strong,
+.employee-selector-list small,
+.candidate-list strong,
+.candidate-list small {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.employee-selector-list strong,
+.candidate-list strong {
+  font-size: 10px;
+}
+
+.employee-selector-list small,
+.candidate-list small {
+  margin-top: 4px;
+  color: rgba(231,239,243,.55);
+  font-size: 7px;
+}
+
+.employee-selector-list em,
+.candidate-list span {
+  flex: 0 0 auto;
+  color: #cbe5de;
+  font-size: 8px;
+  font-style: normal;
+}
+
+.staff-avatar {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255,211,119,.13);
+  color: #ffe0a0;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.staff-avatar-large {
+  width: 44px;
+  height: 44px;
+  font-size: 15px;
+}
+
+.employee-detail-head,
+.candidate-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.employee-detail-identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.employee-detail-identity > div,
+.candidate-detail-head > div:first-child {
+  min-width: 0;
+}
+
+.employee-detail-head h2,
+.candidate-detail-head h2 {
+  margin: 4px 0 0;
+  overflow: hidden;
+  font-size: 17px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.employee-detail-head p,
+.candidate-detail-head p {
+  margin: 5px 0 0;
+  color: rgba(231,239,243,.58);
+  font-size: 8px;
+}
+
+.employee-satisfaction-badge {
+  flex: 0 0 auto;
+  min-width: 58px;
+  padding: 7px;
+  border-radius: 11px;
+  background: rgba(88,171,151,.13);
+  text-align: center;
+}
+
+.employee-satisfaction-badge strong,
+.employee-satisfaction-badge small {
+  display: block;
+}
+
+.employee-satisfaction-badge strong {
+  color: #bfe9dc;
+  font-size: 16px;
+}
+
+.employee-satisfaction-badge small {
+  margin-top: 3px;
+  font-size: 7px;
+}
+
+.employee-stat-grid,
+.candidate-stat-grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
+  gap: 5px;
+}
+
+.candidate-stat-grid {
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0,1fr)
+    );
+}
+
+.employee-stat-grid > div,
+.candidate-stat-grid > div {
+  min-width: 0;
+  padding: 6px 5px;
+  border-radius: 9px;
+  background: rgba(255,255,255,.045);
+}
+
+.employee-stat-grid span,
+.employee-stat-grid strong,
+.candidate-stat-grid span,
+.candidate-stat-grid strong {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.employee-stat-grid span,
+.candidate-stat-grid span {
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+}
+
+.employee-stat-grid strong,
+.candidate-stat-grid strong {
+  margin-top: 4px;
+  font-size: 9px;
+}
+
+.employee-skill-section,
+.employee-training-section {
+  margin-top: 8px;
+}
+
+.employee-skill-grid {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0,1fr)
+    );
+  gap: 5px;
+}
+
+.employee-skill-grid > div {
+  min-width: 0;
+  padding: 6px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.04);
+}
+
+.employee-skill-grid span,
+.employee-skill-grid strong {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.employee-skill-grid span {
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+}
+
+.employee-skill-grid strong {
+  margin-top: 3px;
+  font-size: 9px;
+}
+
+.employee-training-list {
+  max-height: 145px;
+  margin-top: 6px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.employee-training-list button {
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.06);
+  background: transparent;
+  color: #edf3f5;
+  text-align: left;
+}
+
+.employee-training-list button > div {
+  min-width: 0;
+}
+
+.employee-training-list strong,
+.employee-training-list small {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.employee-training-list strong {
+  font-size: 9px;
+}
+
+.employee-training-list small {
+  margin-top: 3px;
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+}
+
+.employee-training-list span {
+  flex: 0 0 auto;
+  color: #ffe0a0;
+  font-size: 8px;
+}
+
+.employee-training-list button:disabled {
+  opacity: .38;
+}
+
+.employee-promotion-row {
+  margin-top: 8px;
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-top:
+    1px solid
+    rgba(255,255,255,.07);
+}
+
+.employee-promotion-row small,
+.employee-promotion-row strong {
+  display: block;
+}
+
+.employee-promotion-row strong {
+  margin-top: 3px;
+  font-size: 9px;
+}
+
+.employee-promotion-row button,
+.candidate-list-card .formal-card-head button,
+.schedule-action-row button,
+.salary-adjust-grid button,
+.staff-fire-button {
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 9px;
+  background: rgba(255,255,255,.055);
+  color: #eef3f5;
+  font-size: 8px;
+  font-weight: 720;
+}
+
+.employee-promotion-row button:disabled {
+  opacity: .38;
+}
+
+.candidate-detail-head > div:last-child {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.candidate-detail-head > div:last-child strong,
+.candidate-detail-head > div:last-child small {
+  display: block;
+}
+
+.candidate-detail-head > div:last-child strong {
+  margin-top: 4px;
+  color: #ffe0a0;
+  font-size: 12px;
+}
+
+.candidate-traits {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.candidate-traits span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.055);
+  color: rgba(236,242,245,.72);
+  font-size: 7px;
+}
+
+.candidate-role-plan {
+  margin-top: 9px;
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+}
+
+.candidate-role-plan small,
+.candidate-role-plan strong {
+  display: block;
+}
+
+.candidate-role-plan strong {
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+.candidate-role-plan p {
+  margin: 4px 0 0;
+  color: rgba(231,239,243,.54);
+  font-size: 7px;
+  line-height: 1.35;
+}
+
+.schedule-employee-card .employee-selector-list,
+.payroll-employee-card .employee-selector-list {
+  max-height: 125px;
+}
+
+.schedule-week-card {
+  justify-content: flex-start;
+}
+
+.schedule-week-grid {
+  margin-top: 9px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
+  gap: 6px;
+}
+
+.schedule-week-grid button {
+  min-height: 58px;
+  padding: 7px 5px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+  color: #edf3f5;
+}
+
+.schedule-week-grid button.is-active {
+  border-color: rgba(109,211,186,.34);
+  background: rgba(88,171,151,.13);
+}
+
+.schedule-week-grid strong,
+.schedule-week-grid small {
+  display: block;
+}
+
+.schedule-week-grid strong {
+  font-size: 9px;
+}
+
+.schedule-week-grid small {
+  margin-top: 5px;
+  color: rgba(231,239,243,.54);
+  font-size: 7px;
+}
+
+.schedule-action-row {
+  margin-top: 9px;
+  display: grid;
+  grid-template-columns:
+    1fr
+    1fr;
+  gap: 6px;
+}
+
+.staff-inline-note {
+  margin: 8px 0 0;
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+  line-height: 1.35;
+}
+
+.payroll-summary-card {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
+  gap: 6px;
+}
+
+.payroll-summary-card > div,
+.salary-control-card > div {
+  min-width: 0;
+  padding: 7px;
+  border-radius: 9px;
+  background: rgba(255,255,255,.045);
+}
+
+.payroll-summary-card small,
+.payroll-summary-card strong,
+.salary-control-card small,
+.salary-control-card strong {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.payroll-summary-card small,
+.salary-control-card small {
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+}
+
+.payroll-summary-card strong,
+.salary-control-card strong {
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+.salary-control-card {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0,1fr)
+    );
+  gap: 5px;
+}
+
+.salary-adjust-grid {
+  margin-top: 7px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0,1fr)
+    );
+  gap: 4px;
+}
+
+.staff-fire-button {
+  width: 100%;
+  margin-top: 8px;
+  color: #ffc1b2;
+}
+
+.payroll-history-row {
+  min-height: 44px;
+  padding: 7px 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.06);
+}
+
+.payroll-history-row strong,
+.payroll-history-row small {
+  display: block;
+}
+
+.payroll-history-row strong {
+  font-size: 9px;
+}
+
+.payroll-history-row small {
+  margin-top: 3px;
+  color: rgba(231,239,243,.52);
+  font-size: 7px;
+}
+
+.payroll-history-row > span {
+  color: #ffe0a0;
+  font-size: 9px;
+}
+
+.staff-feedback {
+  flex: 0 0 auto;
+}
+
+@media (max-height: 760px) {
+  .primary-page-staff {
+    gap: 5px;
+  }
+
+  .staff-page-title {
+    min-height: 58px;
+  }
+
+  .staff-tab-bar {
+    min-height: 36px;
+  }
+
+  .staff-tab-bar button {
+    min-height: 28px;
+  }
+
+  .staff-module-panel {
+    gap: 5px;
+  }
+
+  .employee-training-list {
+    max-height: 110px;
+  }
+
+  .schedule-week-grid {
+    grid-template-columns:
+      repeat(
+        7,
+        minmax(0,1fr)
+      );
+  }
+}
