@@ -3,6 +3,8 @@ name: Mobile UI Playtest
 on:
   workflow_dispatch:
   push:
+    branches:
+      - "ai/baseline-freeze-20260929"
     tags:
       - "playtest-*"
 
