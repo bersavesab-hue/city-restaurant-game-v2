@@ -34,7 +34,8 @@ export const BALANCE_INITIAL_CAPITAL =
 
 export function setupLaunchBalanceScenario({
   seed,
-  price = 22
+  price = 22,
+  trafficIndex = 100
 }) {
   gameState.reset();
 
@@ -49,8 +50,7 @@ export function setupLaunchBalanceScenario({
           "t11_balance_district",
         name:
           "T11平衡商圈",
-        trafficIndex:
-          100,
+        trafficIndex,
         rentMultiplier:
           1,
         spendingPower:
