@@ -302,3 +302,250 @@ test(
     );
   }
 );
+
+test(
+  "formal procurement draft locks one quote then creates and cancels a real order",
+  () => {
+    resetFoundation();
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    const initial =
+      controller
+        .getViewModel();
+
+    assert.ok(
+      initial.business
+        .selectedIngredient
+    );
+
+    assert.ok(
+      initial.business
+        .selectedSupplier
+    );
+
+    const balanceBefore =
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        );
+
+    const quoteResult =
+      controller
+        .performAction(
+          "procurement-quote"
+        );
+
+    assert.equal(
+      quoteResult.ok,
+      true
+    );
+
+    const quote =
+      quoteResult
+        .viewModel
+        .business
+        .quote;
+
+    assert.ok(
+      quote
+    );
+
+    assert.ok(
+      quote.totalPrice >
+      0
+    );
+
+    const rerenderedQuote =
+      controller
+        .getViewModel()
+        .business
+        .quote;
+
+    assert.equal(
+      rerenderedQuote
+        .totalPrice,
+      quote.totalPrice
+    );
+
+    assert.equal(
+      rerenderedQuote
+        .quality,
+      quote.quality
+    );
+
+    const purchaseResult =
+      controller
+        .performAction(
+          "procurement-purchase"
+        );
+
+    assert.equal(
+      purchaseResult.ok,
+      true
+    );
+
+    const pending =
+      app.systems
+        .procurementSystem
+        .listByRestaurant(
+          restaurant.id,
+          "pending"
+        );
+
+    assert.equal(
+      pending.length,
+      1
+    );
+
+    assert.equal(
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        ),
+      balanceBefore -
+        pending[0]
+          .totalPrice
+    );
+
+    const cancelResult =
+      controller
+        .performAction(
+          "procurement-cancel",
+          pending[0].id
+        );
+
+    assert.equal(
+      cancelResult.ok,
+      true
+    );
+
+    assert.equal(
+      app.systems
+        .procurementSystem
+        .get(
+          pending[0].id
+        )
+        .status,
+      "cancelled"
+    );
+
+    assert.equal(
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        ),
+      balanceBefore
+    );
+  }
+);
+
+
+test(
+  "formal procurement order reaches inventory through the real scheduler",
+  () => {
+    resetFoundation();
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    let view =
+      controller
+        .getViewModel();
+
+    const ingredientId =
+      view.business
+        .selectedIngredient
+        .id;
+
+    const before =
+      app.systems
+        .inventorySystem
+        .getAvailableQuantity(
+          restaurant.id,
+          ingredientId
+        );
+
+    controller
+      .performAction(
+        "procurement-quote"
+      );
+
+    const purchase =
+      controller
+        .performAction(
+          "procurement-purchase"
+        );
+
+    assert.equal(
+      purchase.ok,
+      true
+    );
+
+    view =
+      purchase.viewModel;
+
+    const pending =
+      view.business
+        .pendingOrders[0];
+
+    assert.ok(
+      pending
+    );
+
+    app.core
+      .timeSystem
+      .advance(
+        pending
+          .deliveryMinutes
+      );
+
+    const delivered =
+      app.systems
+        .procurementSystem
+        .get(
+          pending.id
+        );
+
+    assert.equal(
+      delivered.status,
+      "delivered"
+    );
+
+    assert.ok(
+      delivered
+        .inventoryBatchId
+    );
+
+    assert.equal(
+      app.systems
+        .inventorySystem
+        .getAvailableQuantity(
+          restaurant.id,
+          ingredientId
+        ),
+      before +
+        delivered.quantity
+    );
+  }
+);
