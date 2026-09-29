@@ -32,7 +32,11 @@ const ROLE_NAMES =
     chef: "厨师",
     server: "服务员",
     cashier: "收银员",
-    cleaner: "清洁"
+    kitchen_assistant:
+      "后厨帮工",
+    cleaner: "保洁员",
+    delivery: "配送员",
+    manager: "店长"
   });
 
 function escapeHtml(
@@ -2266,78 +2270,617 @@ function renderResearchPage(
   `;
 }
 
-function renderStaffPage(
+function employeeStatusLabel(
+  status
+) {
+  return (
+    {
+      active: "在岗",
+      resting: "休息",
+      off_duty: "下班",
+      fired: "已离职"
+    }[status] ??
+    status
+  );
+}
+
+function turnoverLabel(
+  level
+) {
+  return (
+    {
+      low: "低",
+      medium: "中",
+      high: "高",
+      critical: "极高"
+    }[level] ??
+    level
+  );
+}
+
+function weekdayLabel(
+  day
+) {
+  return (
+    [
+      "",
+      "一",
+      "二",
+      "三",
+      "四",
+      "五",
+      "六",
+      "日"
+    ][day] ??
+    day
+  );
+}
+
+function renderStaffTabs(
+  staff
+) {
+  return `
+    <div
+      class="staff-tab-bar"
+      role="tablist"
+      aria-label="员工模块"
+    >
+      ${[
+        [
+          "team",
+          "团队"
+        ],
+        [
+          "recruit",
+          "招聘"
+        ],
+        [
+          "schedule",
+          "排班"
+        ],
+        [
+          "payroll",
+          "薪资"
+        ]
+      ]
+        .map(
+          (
+            [
+              id,
+              label
+            ]
+          ) => `
+            <button
+              type="button"
+              class="${staff.tab ===
+                id
+                  ? "is-active"
+                  : ""}"
+              data-game-action="staff-tab"
+              data-game-value="${id}"
+            >
+              ${label}
+            </button>
+          `
+        )
+        .join(
+          ""
+        )}
+    </div>
+  `;
+}
+
+function renderEmployeeSelector(
+  staff
+) {
+  return `
+    <div class="employee-selector-list">
+      ${staff.employees
+        .map(
+          employee => `
+            <button
+              type="button"
+              class="${employee.id ===
+                staff
+                  .selectedEmployee
+                  ?.id
+                  ? "is-active"
+                  : ""}"
+              data-game-action="staff-select"
+              data-game-value="${escapeHtml(
+                employee.id
+              )}"
+            >
+              <span class="staff-avatar">
+                ${escapeHtml(
+                  employee.name
+                    ?.slice(
+                      0,
+                      1
+                    ) ??
+                  "员"
+                )}
+              </span>
+
+              <div>
+                <strong>
+                  ${escapeHtml(
+                    employee.name
+                  )}
+                </strong>
+                <small>
+                  ${escapeHtml(
+                    ROLE_NAMES[
+                      employee.roleId
+                    ] ??
+                    employee.roleId
+                  )}
+                  ·
+                  ${escapeHtml(
+                    employee.rank
+                      ?.name ??
+                    "学徒"
+                  )}
+                </small>
+              </div>
+
+              <em>
+                ${employeeStatusLabel(
+                  employee.status
+                )}
+              </em>
+            </button>
+          `
+        )
+        .join(
+          ""
+        )}
+    </div>
+  `;
+}
+
+function renderEmployeeDetail(
+  vm
+) {
+  const employee =
+    vm.staff
+      .selectedEmployee;
+
+  if (!employee) {
+    return `
+      <section class="formal-card employee-detail-card">
+        <div class="formal-empty">
+          当前没有在册员工
+        </div>
+      </section>
+    `;
+  }
+
+  const skills =
+    Object.entries(
+      employee.skills ??
+      {}
+    ).sort(
+      (
+        a,
+        b
+      ) =>
+        b[1] -
+        a[1]
+    );
+
+  return `
+    <section class="formal-card employee-detail-card">
+      <div class="employee-detail-head">
+        <div class="employee-detail-identity">
+          <span class="staff-avatar staff-avatar-large">
+            ${escapeHtml(
+              employee.name
+                ?.slice(
+                  0,
+                  1
+                ) ??
+              "员"
+            )}
+          </span>
+
+          <div>
+            <small>
+              ${escapeHtml(
+                ROLE_NAMES[
+                  employee.roleId
+                ] ??
+                employee.roleId
+              )}
+            </small>
+            <h2>
+              ${escapeHtml(
+                employee.name
+              )}
+            </h2>
+            <p>
+              ${escapeHtml(
+                employee.rank
+                  ?.name ??
+                "学徒"
+              )}
+              ·
+              Lv.${employee.level}
+              ·
+              ${employee.age
+                ? `${employee.age}岁`
+                : "年龄未录入"}
+            </p>
+          </div>
+        </div>
+
+        <div class="employee-satisfaction-badge">
+          <strong>
+            ${employee
+              .dynamics
+              ?.satisfaction
+              ?.score ??
+              0}
+          </strong>
+          <small>
+            ${escapeHtml(
+              employee
+                .dynamics
+                ?.satisfaction
+                ?.label ??
+              "稳定"
+            )}
+          </small>
+        </div>
+      </div>
+
+      <div class="employee-stat-grid">
+        <div>
+          <span>心情</span>
+          <strong>
+            ${Math.round(
+              employee.mood ??
+              0
+            )}
+          </strong>
+        </div>
+        <div>
+          <span>忠诚</span>
+          <strong>
+            ${Math.round(
+              employee.loyalty ??
+              0
+            )}
+          </strong>
+        </div>
+        <div>
+          <span>疲劳</span>
+          <strong>
+            ${Math.round(
+              employee.fatigue ??
+              0
+            )}
+          </strong>
+        </div>
+        <div>
+          <span>离职风险</span>
+          <strong>
+            ${turnoverLabel(
+              employee
+                .turnover
+                ?.level
+            )}
+            ${employee
+              .turnover
+              ?.score ??
+              0}
+          </strong>
+        </div>
+      </div>
+
+      <div class="employee-skill-section">
+        <div class="formal-card-head">
+          <div>
+            <small>岗位技能</small>
+            <strong>
+              潜力
+              ${escapeHtml(
+                employee
+                  .potentialName ??
+                "良好"
+              )}
+            </strong>
+          </div>
+          <span>
+            培训
+            ${employee
+              .trainingCount ??
+              0}
+            次
+          </span>
+        </div>
+
+        <div class="employee-skill-grid">
+          ${skills
+            .slice(
+              0,
+              6
+            )
+            .map(
+              (
+                [
+                  name,
+                  score
+                ]
+              ) => `
+                <div>
+                  <span>
+                    ${escapeHtml(
+                      name
+                    )}
+                  </span>
+                  <strong>
+                    ${Math.round(
+                      score
+                    )}
+                  </strong>
+                </div>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+      </div>
+
+      <div class="employee-training-section">
+        <div class="formal-card-head">
+          <div>
+            <small>培训</small>
+            <strong>
+              ${escapeHtml(
+                employee
+                  .dynamics
+                  ?.training
+                  ?.label ??
+                "0次培训"
+              )}
+            </strong>
+          </div>
+
+          <span>
+            余额
+            ¥${money(
+              vm.finance.balance
+            )}
+          </span>
+        </div>
+
+        <div class="employee-training-list">
+          ${employee
+            .trainingPrograms
+            .map(
+              program => `
+                <button
+                  type="button"
+                  data-game-action="staff-train"
+                  data-game-value="${escapeHtml(
+                    program.id
+                  )}"
+                  ${program.unlocked &&
+                  vm.finance.balance >=
+                    program.cost &&
+                  employee.fatigue <
+                    90
+                    ? ""
+                    : "disabled"}
+                >
+                  <div>
+                    <strong>
+                      ${escapeHtml(
+                        program.name
+                      )}
+                    </strong>
+                    <small>
+                      经验 +
+                      ${program.experience}
+                      ·
+                      疲劳 +
+                      ${program.fatigueGain}
+                    </small>
+                  </div>
+                  <span>
+                    ${program.unlocked
+                      ? `¥${money(
+                          program.cost
+                        )}`
+                      : `${escapeHtml(
+                          program
+                            .unlockRank
+                            ?.name ??
+                          "未解锁"
+                        )}解锁`}
+                  </span>
+                </button>
+              `
+            )
+            .join(
+              ""
+            )}
+        </div>
+      </div>
+
+      <div class="employee-promotion-row">
+        <div>
+          <small>职业晋升</small>
+          <strong>
+            ${employee
+              .promotion
+              ?.next
+              ? `${escapeHtml(
+                  employee
+                    .rank
+                    ?.name
+                )} → ${escapeHtml(
+                  employee
+                    .promotion
+                    .next
+                    .name
+                )}`
+              : "已到最高职级"}
+          </strong>
+        </div>
+
+        <button
+          type="button"
+          data-game-action="staff-promote"
+          ${employee
+            .promotion
+            ?.eligible
+            ? ""
+            : "disabled"}
+        >
+          ${employee
+            .promotion
+            ?.eligible
+            ? "晋升"
+            : employee
+                .promotion
+                ?.maxRank
+              ? "已满级"
+              : "条件未达"}
+        </button>
+      </div>
+    </section>
+  `;
+}
+
+function renderTeamPanel(
   vm
 ) {
   return `
     <section
-      class="primary-page"
-      data-primary-page="staff"
+      class="staff-module-panel staff-team-panel"
+      data-staff-panel="team"
     >
-      <header class="primary-page-title">
-        <div>
-          <small>员工中心</small>
-          <h1>门店团队</h1>
+      <section class="formal-card employee-list-card">
+        <div class="formal-card-head">
+          <div>
+            <small>在册员工</small>
+            <strong>
+              ${vm.staff.employees.length}
+              /
+              ${vm.staff.employeeLimit}
+              人
+            </strong>
+          </div>
+          <span>
+            月工资
+            ¥${money(
+              vm.staff.monthlyPayroll
+            )}
+          </span>
         </div>
-        <strong>
-          ${vm.employees.length}
-          人
-        </strong>
-      </header>
 
-      <section class="formal-card formal-list-card staff-list-card">
-        <div class="formal-scroll-list">
-          ${vm.employees
+        ${renderEmployeeSelector(
+          vm.staff
+        )}
+      </section>
+
+      ${renderEmployeeDetail(
+        vm
+      )}
+    </section>
+  `;
+}
+
+function renderRecruitPanel(
+  vm
+) {
+  const staff =
+    vm.staff;
+
+  const candidate =
+    staff
+      .selectedCandidate;
+
+  const rolePlan =
+    candidate
+      ? staff
+          .recommendation
+          .roles
+          .find(
+            role =>
+              role.roleId ===
+              candidate.roleId
+          )
+      : null;
+
+  return `
+    <section
+      class="staff-module-panel staff-recruit-panel"
+      data-staff-panel="recruit"
+    >
+      <section class="formal-card candidate-list-card">
+        <div class="formal-card-head">
+          <div>
+            <small>人才市场</small>
+            <strong>
+              ${staff.candidates.length}
+              名候选人
+            </strong>
+          </div>
+
+          <button
+            type="button"
+            data-game-action="staff-refresh-candidates"
+          >
+            刷新人才
+          </button>
+        </div>
+
+        <div class="candidate-list">
+          ${staff.candidates
             .map(
-              employee => `
-                <div class="staff-row">
-                  <div class="staff-avatar">
-                    ${escapeHtml(
-                      employee.name
-                        ?.slice(
-                          0,
-                          1
-                        ) ??
-                      "员"
-                    )}
-                  </div>
-
-                  <div class="staff-copy">
+              item => `
+                <button
+                  type="button"
+                  class="${item.id ===
+                    candidate?.id
+                    ? "is-active"
+                    : ""}"
+                  data-game-action="staff-candidate-select"
+                  data-game-value="${escapeHtml(
+                    item.id
+                  )}"
+                >
+                  <div>
                     <strong>
                       ${escapeHtml(
-                        employee.name
+                        item.name
                       )}
                     </strong>
                     <small>
                       ${escapeHtml(
                         ROLE_NAMES[
-                          employee.roleId
+                          item.roleId
                         ] ??
-                        employee.roleId
+                        item.roleName
                       )}
-                      · Lv.${employee.level}
+                      ·
+                      ${item.age}岁
+                      ·
+                      ${item.experienceMonths}
+                      月经验
                     </small>
                   </div>
 
-                  <div class="staff-state">
-                    <strong>
-                      ${employee.status ===
-                        "active"
-                          ? "在岗"
-                          : escapeHtml(
-                              employee
-                                .status
-                            )}
-                    </strong>
-                    <small>
-                      心情
-                      ${Math.round(
-                        employee.mood ??
-                        0
-                      )}
-                    </small>
-                  </div>
-                </div>
+                  <span>
+                    ${escapeHtml(
+                      item.potentialName
+                    )}
+                  </span>
+                </button>
               `
             )
             .join(
@@ -2346,9 +2889,601 @@ function renderStaffPage(
         </div>
       </section>
 
-      <p class="primary-page-note">
-        招聘、培训、薪资和排班在 T09 继续接入；现有员工数据均来自真实员工系统。
-      </p>
+      <section class="formal-card candidate-detail-card">
+        ${candidate
+          ? `
+            <div class="candidate-detail-head">
+              <div>
+                <small>候选人</small>
+                <h2>
+                  ${escapeHtml(
+                    candidate.name
+                  )}
+                </h2>
+                <p>
+                  ${escapeHtml(
+                    ROLE_NAMES[
+                      candidate.roleId
+                    ] ??
+                    candidate.roleName
+                  )}
+                  ·
+                  ${escapeHtml(
+                    candidate.profileName
+                  )}
+                  ·
+                  ${escapeHtml(
+                    candidate.potentialName
+                  )}
+                </p>
+              </div>
+
+              <div>
+                <small>期望月薪</small>
+                <strong>
+                  ¥${money(
+                    candidate.expectedSalary
+                  )}
+                </strong>
+              </div>
+            </div>
+
+            <div class="candidate-stat-grid">
+              <div>
+                <span>稳定</span>
+                <strong>
+                  ${candidate.stability}
+                </strong>
+              </div>
+              <div>
+                <span>学习</span>
+                <strong>
+                  ${candidate.learning}
+                </strong>
+              </div>
+              <div>
+                <span>抗压</span>
+                <strong>
+                  ${candidate.stressTolerance}
+                </strong>
+              </div>
+              <div>
+                <span>协作</span>
+                <strong>
+                  ${candidate.teamwork}
+                </strong>
+              </div>
+              <div>
+                <span>主动</span>
+                <strong>
+                  ${candidate.initiative}
+                </strong>
+              </div>
+            </div>
+
+            <div class="candidate-traits">
+              ${(
+                candidate.traits ??
+                []
+              )
+                .map(
+                  trait => `
+                    <span>
+                      ${escapeHtml(
+                        trait
+                      )}
+                    </span>
+                  `
+                )
+                .join(
+                  ""
+                )}
+            </div>
+
+            <div class="candidate-role-plan">
+              <small>岗位建议</small>
+              <strong>
+                ${rolePlan
+                  ? `当前 ${rolePlan.current} / 建议 ${rolePlan.recommended}`
+                  : "暂无建议数据"}
+              </strong>
+              <p>
+                ${escapeHtml(
+                  rolePlan
+                    ?.reason ??
+                  "按门店当前规模招聘"
+                )}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="formal-primary-button"
+              data-game-action="staff-hire-candidate"
+              ${staff.employees.length >=
+              staff.employeeLimit
+                ? "disabled"
+                : ""}
+            >
+              ${staff.employees.length >=
+              staff.employeeLimit
+                ? `员工上限 ${staff.employeeLimit}/${staff.employeeLimit}`
+                : `按期望薪资招聘 ¥${money(
+                    candidate.expectedSalary
+                  )}/月`}
+            </button>
+          `
+          : `
+            <div class="formal-empty">
+              当前没有可用候选人
+            </div>
+          `}
+      </section>
+    </section>
+  `;
+}
+
+function renderSchedulePanel(
+  vm
+) {
+  const staff =
+    vm.staff;
+
+  const employee =
+    staff
+      .selectedEmployee;
+
+  const shiftMap =
+    new Map(
+      staff
+        .selectedSchedule
+        .map(
+          shift => [
+            shift.weekday,
+            shift
+          ]
+        )
+    );
+
+  return `
+    <section
+      class="staff-module-panel staff-schedule-panel"
+      data-staff-panel="schedule"
+    >
+      <section class="formal-card schedule-employee-card">
+        <div class="formal-card-head">
+          <div>
+            <small>排班员工</small>
+            <strong>
+              ${escapeHtml(
+                employee
+                  ?.name ??
+                "暂无员工"
+              )}
+            </strong>
+          </div>
+          <span>
+            门店
+            ${vm.schedule
+              ? `${String(
+                  vm.schedule
+                    .openHour
+                ).padStart(
+                  2,
+                  "0"
+                )}:00-${String(
+                  vm.schedule
+                    .closeHour
+                ).padStart(
+                  2,
+                  "0"
+                )}:00`
+              : "未设置营业时间"}
+          </span>
+        </div>
+
+        ${renderEmployeeSelector(
+          staff
+        )}
+      </section>
+
+      <section class="formal-card schedule-week-card">
+        <div class="formal-card-head">
+          <div>
+            <small>7 天排班</small>
+            <strong>
+              单班最长按 8 小时生成
+            </strong>
+          </div>
+        </div>
+
+        <div class="schedule-week-grid">
+          ${[
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+            .map(
+              day => {
+                const shift =
+                  shiftMap.get(
+                    day
+                  );
+
+                return `
+                  <button
+                    type="button"
+                    class="${shift
+                      ? "is-active"
+                      : ""}"
+                    data-game-action="staff-shift-toggle"
+                    data-game-value="${day}"
+                    ${employee
+                      ? ""
+                      : "disabled"}
+                  >
+                    <strong>
+                      周${weekdayLabel(
+                        day
+                      )}
+                    </strong>
+                    <small>
+                      ${shift
+                        ? `${shift.startClock}-${shift.endClock}`
+                        : "休息"}
+                    </small>
+                  </button>
+                `;
+              }
+            )
+            .join(
+              ""
+            )}
+        </div>
+
+        <div class="schedule-action-row">
+          <button
+            type="button"
+            data-game-action="staff-schedule-all"
+            ${employee
+              ? ""
+              : "disabled"}
+          >
+            标准周一至周五
+          </button>
+
+          <button
+            type="button"
+            data-game-action="staff-schedule-clear"
+            ${employee
+              ? ""
+              : "disabled"}
+          >
+            清空排班
+          </button>
+        </div>
+
+        <p class="staff-inline-note">
+          单日点击可切换上班/休息；自动班次从门店开门时间开始，单班最多 8 小时。
+        </p>
+      </section>
+    </section>
+  `;
+}
+
+function renderPayrollPanel(
+  vm
+) {
+  const staff =
+    vm.staff;
+
+  const employee =
+    staff
+      .selectedEmployee;
+
+  const salary =
+    employee
+      ?.salarySatisfaction;
+
+  const latest =
+    staff
+      .payrollHistory[0] ??
+    null;
+
+  return `
+    <section
+      class="staff-module-panel staff-payroll-panel"
+      data-staff-panel="payroll"
+    >
+      <section class="formal-card payroll-summary-card">
+        <div>
+          <small>当前月工资总额</small>
+          <strong>
+            ¥${money(
+              staff.monthlyPayroll
+            )}
+          </strong>
+        </div>
+        <div>
+          <small>欠薪</small>
+          <strong>
+            ¥${money(
+              staff.totalArrears
+            )}
+          </strong>
+        </div>
+        <div>
+          <small>下一工资日</small>
+          <strong>
+            第${staff.nextPayrollDay}天
+          </strong>
+        </div>
+        <div>
+          <small>最近结算</small>
+          <strong>
+            ${latest
+              ? `${latest.status ===
+                  "paid"
+                  ? "已支付"
+                  : "欠薪"} ¥${money(
+                    latest.total
+                  )}`
+              : "尚无记录"}
+          </strong>
+        </div>
+      </section>
+
+      <section class="formal-card payroll-employee-card">
+        <div class="formal-card-head">
+          <div>
+            <small>员工薪资</small>
+            <strong>
+              ${escapeHtml(
+                employee
+                  ?.name ??
+                "暂无员工"
+              )}
+            </strong>
+          </div>
+          <span>
+            ${employee
+              ? `${escapeHtml(
+                  ROLE_NAMES[
+                    employee
+                      .roleId
+                  ] ??
+                  employee
+                    .roleId
+                )}`
+              : ""}
+          </span>
+        </div>
+
+        ${renderEmployeeSelector(
+          staff
+        )}
+
+        ${employee
+          ? `
+            <div class="salary-control-card">
+              <div>
+                <small>当前月薪</small>
+                <strong>
+                  ¥${money(
+                    employee.salary
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <small>市场建议</small>
+                <strong>
+                  ¥${money(
+                    salary
+                      ?.recommended ??
+                    employee.salary
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <small>薪资满意</small>
+                <strong>
+                  ${salary
+                    ?.score ??
+                    0}
+                </strong>
+              </div>
+            </div>
+
+            <div class="salary-adjust-grid">
+              ${[
+                [
+                  "minus500",
+                  "-500"
+                ],
+                [
+                  "minus100",
+                  "-100"
+                ],
+                [
+                  "recommended",
+                  "调到建议"
+                ],
+                [
+                  "plus100",
+                  "+100"
+                ],
+                [
+                  "plus500",
+                  "+500"
+                ]
+              ]
+                .map(
+                  (
+                    [
+                      id,
+                      label
+                    ]
+                  ) => `
+                    <button
+                      type="button"
+                      data-game-action="staff-salary"
+                      data-game-value="${id}"
+                    >
+                      ${label}
+                    </button>
+                  `
+                )
+                .join(
+                  ""
+                )}
+            </div>
+
+            <button
+              type="button"
+              class="staff-fire-button"
+              data-game-action="staff-fire"
+            >
+              解除雇佣
+            </button>
+          `
+          : ""}
+      </section>
+
+      <section class="formal-card payroll-history-card">
+        <div class="formal-card-head">
+          <div>
+            <small>工资结算历史</small>
+            <strong>
+              ${staff
+                .payrollHistory
+                .length}
+              次
+            </strong>
+          </div>
+        </div>
+
+        <div class="formal-scroll-list">
+          ${staff
+            .payrollHistory
+            .length
+            ? staff
+              .payrollHistory
+              .map(
+                run => `
+                  <div class="payroll-history-row">
+                    <div>
+                      <strong>
+                        第${run.day}天
+                        ·
+                        ${run.status ===
+                          "paid"
+                          ? "已支付"
+                          : "欠薪"}
+                      </strong>
+                      <small>
+                        ${run.entries.length}
+                        名员工
+                      </small>
+                    </div>
+                    <span>
+                      ¥${money(
+                        run.total
+                      )}
+                    </span>
+                  </div>
+                `
+              )
+              .join(
+                ""
+              )
+            : `
+              <div class="formal-empty">
+                工资按每 30 个游戏日自动结算
+              </div>
+            `}
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderStaffPage(
+  vm
+) {
+  return `
+    <section
+      class="primary-page primary-page-staff"
+      data-primary-page="staff"
+    >
+      <header class="primary-page-title staff-page-title">
+        <div>
+          <small>员工中心</small>
+          <h1>团队与人力</h1>
+        </div>
+
+        <div class="staff-title-stats">
+          <span>
+            在册
+            <strong>
+              ${vm.staff
+                .employees
+                .length}
+              /
+              ${vm.staff
+                .employeeLimit}
+            </strong>
+          </span>
+          <span>
+            月工资
+            <strong>
+              ¥${money(
+                vm.staff
+                  .monthlyPayroll
+              )}
+            </strong>
+          </span>
+        </div>
+      </header>
+
+      ${renderStaffTabs(
+        vm.staff
+      )}
+
+      <div class="staff-panel-host">
+        ${vm.staff.tab ===
+          "recruit"
+          ? renderRecruitPanel(
+              vm
+            )
+          : vm.staff.tab ===
+              "schedule"
+            ? renderSchedulePanel(
+                vm
+              )
+            : vm.staff.tab ===
+                "payroll"
+              ? renderPayrollPanel(
+                  vm
+                )
+              : renderTeamPanel(
+                  vm
+                )}
+      </div>
+
+      <output
+        class="home-status-feedback staff-feedback"
+        data-game-feedback
+      >
+        ${escapeHtml(
+          vm.lastMessage
+        )}
+      </output>
     </section>
   `;
 }
