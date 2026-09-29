@@ -347,6 +347,23 @@ function renderStorePage(
   const district =
     vm.district;
 
+  const launch =
+    vm.launch ??
+    null;
+
+  const stageGrowth =
+    launch
+      ? percent(
+          (
+            launch
+              .experience
+              ?.progress ??
+            0
+          ) *
+          100
+        )
+      : growth;
+
   return `
     <section
       class="primary-page primary-page-store"
@@ -496,36 +513,116 @@ function renderStorePage(
           </div>
         </article>
 
-        <article class="formal-card growth-card">
+        <article class="formal-card growth-card launch-growth-card">
           <div class="formal-card-head">
             <div>
-              <small>门店成长</small>
+              <small>
+                ${launch
+                  ? `成长阶段 ${launch.stageNumber}/${launch.totalStages}`
+                  : "门店成长"}
+              </small>
               <strong>
                 ${escapeHtml(
+                  launch
+                    ?.name ??
                   vm.progress.title
                 )}
               </strong>
             </div>
             <span>
-              ${growth}%
+              ${stageGrowth}%
             </span>
           </div>
 
           <div class="formal-progress">
             <i
-              style="width:${growth}%"
+              style="width:${stageGrowth}%"
             ></i>
           </div>
 
-          <p>
-            ${vm.progress.maxLevel
-              ? "已达到当前最高等级"
-              : `距离 ${escapeHtml(
-                  vm.progress
-                    .nextTitle
-                )} 还需 ${vm.progress
-                  .remainingExperience} 经验`}
+          <p class="launch-stage-copy">
+            ${launch
+              ? escapeHtml(
+                  launch.subtitle
+                )
+              : vm.progress.maxLevel
+                ? "已达到当前最高等级"
+                : `距离 ${escapeHtml(
+                    vm.progress
+                      .nextTitle
+                  )} 还需 ${vm.progress
+                    .remainingExperience} 经验`}
           </p>
+
+          ${launch
+            ? `
+              <div class="launch-stage-meta">
+                <span>
+                  Lv.${vm.progress.level}
+                  ·
+                  ${escapeHtml(
+                    vm.progress.title
+                  )}
+                </span>
+                <span>
+                  目标
+                  ${launch.objectiveCompleted}/${launch.objectiveTotal}
+                </span>
+              </div>
+
+              <div class="launch-objective-grid">
+                ${launch.objectives
+                  .map(
+                    objective => `
+                      <span
+                        class="${objective.complete
+                          ? "is-complete"
+                          : ""}"
+                        title="${escapeHtml(
+                          objective.label
+                        )}"
+                      >
+                        ${objective.complete
+                          ? "✓"
+                          : "○"}
+                        ${escapeHtml(
+                          objective.label
+                        )}
+                      </span>
+                    `
+                  )
+                  .join(
+                    ""
+                  )}
+              </div>
+
+              <div class="launch-content-counts">
+                <span>
+                  菜品
+                  ${launch.contentCounts.dishes}
+                </span>
+                <span>
+                  供应商
+                  ${launch.contentCounts.suppliers}
+                </span>
+                <span>
+                  活动
+                  ${launch.contentCounts.marketingActions}
+                </span>
+              </div>
+
+              <small class="launch-next-stage">
+                ${launch.experience
+                  .nextStageName
+                  ? `下一阶段：${escapeHtml(
+                      launch.experience
+                        .nextStageName
+                    )} · 还需 ${launch.experience
+                      .remainingExperience} 经验`
+                  : "最终阶段：把单店做到城市旗舰"}
+              </small>
+            `
+            : ""}
         </article>
       </section>
 
