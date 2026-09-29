@@ -1303,15 +1303,24 @@ function createMobileGameController(
         restaurantId
       );
 
+    const featureUnlocked =
+      storeProgressSystem
+        .isUnlocked(
+          restaurantId,
+          "marketing"
+        );
+
     const launchAvailable =
-      status.available.filter(
-        action =>
-          launchProgressionSystem
-            .isMarketingActionAllowed(
-              restaurant.level,
-              action.id
-            )
-      );
+      featureUnlocked
+        ? status.available.filter(
+            action =>
+              launchProgressionSystem
+                .isMarketingActionAllowed(
+                  restaurant.level,
+                  action.id
+                )
+          )
+        : [];
 
     const categories =
       [
@@ -1482,6 +1491,13 @@ function createMobileGameController(
         );
 
     return {
+      unlocked:
+        featureUnlocked,
+      unlockLevel:
+        storeProgressSystem
+          .getUnlockLevel(
+            "marketing"
+          ),
       categories,
       category:
         businessUi
@@ -1594,6 +1610,11 @@ function createMobileGameController(
 
     if (
       !action ||
+      !storeProgressSystem
+        .isUnlocked(
+          restaurantId,
+          "marketing"
+        ) ||
       !launchProgressionSystem
         .isMarketingActionAllowed(
           restaurant.level,
@@ -2491,6 +2512,17 @@ function createMobileGameController(
       menuLimit:
         limits.menuItems,
       research: {
+        unlocked:
+          storeProgressSystem
+            .isUnlocked(
+              restaurantId,
+              "dish_research"
+            ),
+        unlockLevel:
+          storeProgressSystem
+            .getUnlockLevel(
+              "dish_research"
+            ),
         methods:
           researchDraft.methods,
         ingredients:
@@ -2516,6 +2548,7 @@ function createMobileGameController(
   }
 
   function setDishTab(
+    restaurantId,
     tab
   ) {
     if (
@@ -2529,6 +2562,22 @@ function createMobileGameController(
     ) {
       throw new Error(
         "未知菜品子页面"
+      );
+    }
+
+    if (
+      tab ===
+        "research" &&
+      !storeProgressSystem
+        .isUnlocked(
+          restaurantId,
+          "dish_research"
+        )
+    ) {
+      throw new Error(
+        `菜品研发将在门店 Lv.${storeProgressSystem.getUnlockLevel(
+          "dish_research"
+        )} 解锁`
       );
     }
 
@@ -2847,6 +2896,20 @@ function createMobileGameController(
   function researchSelectedDish(
     restaurantId
   ) {
+    if (
+      !storeProgressSystem
+        .isUnlocked(
+          restaurantId,
+          "dish_research"
+        )
+    ) {
+      throw new Error(
+        `菜品研发将在门店 Lv.${storeProgressSystem.getUnlockLevel(
+          "dish_research"
+        )} 解锁`
+      );
+    }
+
     const draft =
       getDishModel(
         restaurantId
@@ -5143,6 +5206,7 @@ function createMobileGameController(
 
         case "dish-tab":
           setDishTab(
+            getRestaurant().id,
             String(value)
           );
 
