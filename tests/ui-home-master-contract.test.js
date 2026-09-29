@@ -830,7 +830,151 @@ function fixture() {
       batches: [],
       spoiledBatches: [],
       spoiledQuantity:
-        0
+        0,
+      marketing: {
+        categories: [
+          "local_acquisition",
+          "discount_conversion"
+        ],
+        category:
+          "all",
+        activeLimit:
+          2,
+        active: [],
+        history: [],
+        modifiers: {
+          demandMultiplier:
+            1,
+          priceMultiplier:
+            1,
+          marketAppealMultiplier:
+            1,
+          repeatIntentMultiplier:
+            1,
+          reviewPropensityMultiplier:
+            1,
+          serviceCapacityMultiplier:
+            1,
+          qualityBonus:
+            0
+        },
+        noonExpectedVisitors:
+          12.4,
+        topReviewIssue:
+          null,
+        topReviewPositive:
+          null,
+        actions: [
+          {
+            id:
+              "local_ads",
+            name:
+              "本地广告",
+            category:
+              "local_acquisition",
+            description:
+              "在门店周边投放基础曝光。",
+            cost:
+              2000,
+            durationDays:
+              5,
+            cooldownDays:
+              5,
+            minRestaurantLevel:
+              1,
+            targetSegments: [
+              "resident"
+            ],
+            modifiers: {
+              demandMultiplier:
+                1.12,
+              priceMultiplier:
+                1,
+              marketAppealMultiplier:
+                1.08,
+              repeatIntentMultiplier:
+                1,
+              reviewPropensityMultiplier:
+                1,
+              serviceCapacityMultiplier:
+                1,
+              qualityBonus:
+                0
+            },
+            availability: {
+              canStart:
+                true,
+              reasons: [],
+              availableDay:
+                18,
+              currentDay:
+                18
+            },
+            active:
+              null,
+            last:
+              null,
+            remainingDays:
+              0,
+            cooldownRemaining:
+              0
+          }
+        ],
+        selectedAction: {
+          id:
+            "local_ads",
+          name:
+            "本地广告",
+          category:
+            "local_acquisition",
+          description:
+            "在门店周边投放基础曝光。",
+          cost:
+            2000,
+          durationDays:
+            5,
+          cooldownDays:
+            5,
+          minRestaurantLevel:
+            1,
+          targetSegments: [
+            "resident"
+          ],
+          modifiers: {
+            demandMultiplier:
+              1.12,
+            priceMultiplier:
+              1,
+            marketAppealMultiplier:
+              1.08,
+            repeatIntentMultiplier:
+              1,
+            reviewPropensityMultiplier:
+              1,
+            serviceCapacityMultiplier:
+              1,
+            qualityBonus:
+              0
+          },
+          availability: {
+            canStart:
+              true,
+            reasons: [],
+            availableDay:
+              18,
+            currentDay:
+              18
+          },
+          active:
+            null,
+          last:
+            null,
+          remainingDays:
+            0,
+          cooldownRemaining:
+            0
+        }
+      }
     },
 
     runtime: {
@@ -1373,6 +1517,92 @@ test(
     assert.match(
       css,
       /\.staff-panel-host[\s\S]*?overflow:\s*hidden/
+    );
+  }
+);
+
+
+test(
+  "marketing business subpage renders real activity selection effects and start action",
+  () => {
+    const vm =
+      fixture();
+
+    vm.business.tab =
+      "marketing";
+
+    const html =
+      renderHomePage(
+        vm,
+        "business"
+      );
+
+    for (
+      const action
+      of [
+        "marketing-category",
+        "marketing-select",
+        "marketing-start"
+      ]
+    ) {
+      assert.match(
+        html,
+        new RegExp(
+          `data-game-action="${action}"`
+        )
+      );
+    }
+
+    assert.match(
+      html,
+      /本地广告/
+    );
+
+    assert.match(
+      html,
+      /客流 \+12%/
+    );
+
+    assert.match(
+      html,
+      /午间预估/
+    );
+
+    assert.match(
+      html,
+      /data-business-panel="marketing"/
+    );
+
+    assert.match(
+      css,
+      /\.marketing-panel[\s\S]*?grid-template-columns/
+    );
+  }
+);
+
+
+test(
+  "home activity and storage shortcuts target the correct business subpages",
+  () => {
+    const html =
+      renderHomePage(
+        fixture(),
+        "store"
+      );
+
+    assert.match(
+      html,
+      /data-route-action="business-tab"[\s\S]*?data-route-value="marketing"[\s\S]*?data-asset-slot="home\.quick\.activity"/
+    );
+
+    assert.match(
+      html,
+      /data-route-action="business-tab"[\s\S]*?data-route-value="inventory"[\s\S]*?data-asset-slot="home\.quick\.storage"/
+    );
+
+    assert.match(
+      mobileApp,
+      /routeAction[\s\S]*?performAction/
     );
   }
 );
