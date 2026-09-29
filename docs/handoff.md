@@ -511,26 +511,165 @@ T07 最终 CI：
 - 浏览器移动 UI：成功；
 - Android APK：成功。
 
+## T09-4 活动 / 营销完整闭环
+
+### 正式活动入口
+“经营”一级页现在包含：
+1. 采购
+2. 库存
+3. 采购单
+4. 活动
+
+主页“活动”快捷入口会直接打开经营页的活动子页；“仓储”快捷入口会直接打开库存子页，不再先落到采购页。
+
+### 活动列表与分类
+活动页直接读取 MarketActionSystem / MARKETING_ACTIONS_V1，不建立第二套活动表。
+
+当前覆盖 9 类真实营销：
+- 本地获客；
+- 优惠转化；
+- 品牌建设；
+- 内容社交；
+- 外卖增长；
+- 社区活动；
+- 会员复购；
+- 团体业务；
+- 节日主题。
+
+活动列表显示：
+- 名称；
+- 类别；
+- 成本；
+- 持续天数；
+- 门店等级要求；
+- 当前是否可开始；
+- 进行中剩余天数；
+- 冷却剩余天数。
+
+### 活动开始条件
+开始活动继续由 MarketActionSystem.getAvailability 判断，UI 不复制规则。
+
+真实限制包括：
+- 门店等级；
+- 资金；
+- 同时最多 2 个活动；
+- 同一活动不能重复启动；
+- exclusiveGroup 同类互斥；
+- 所需销售渠道；
+- 活动冷却。
+
+开始后直接调用 MarketActionSystem.startAction：
+- 真实扣除 MARKETING 费用；
+- 写入 activeMarketActions；
+- 写入 marketActionHistory；
+- 记录 startDay / endDay；
+- 发出 market:actionStarted。
+
+### 活动效果
+UI 显示底层实际 modifiers，包括：
+- demandMultiplier 客流需求；
+- priceMultiplier 实际成交价；
+- marketAppealMultiplier 市场吸引；
+- repeatIntentMultiplier 复购倾向；
+- reviewPropensityMultiplier 评价意愿；
+- serviceCapacityMultiplier 服务容量；
+- qualityBonus 品质加成；
+- segmentMultipliers 指定客群；
+- channelMultipliers 指定渠道。
+
+这些值不是“说明文字”，已被现有经营系统实际读取：
+- TrafficDemandSystem 使用 demand / appeal / segment / channel 修正；
+- TrafficSystem 使用服务容量和渠道修正；
+- OrderSystem 使用 priceMultiplier 计算实际订单单价和收入；
+- CustomerExperienceSystem 使用 quality / repeat / review / service 修正评价与复购。
+
+### 活动结束与冷却
+活动不提供绕过底层规则的“手动秒结束”按钮。
+
+OperatingCycleSystem 的每日 onDay 已调用 MarketActionSystem.processDay：
+- 到 endDay 后自动结束；
+- activeMarketActions 自动清理；
+- history 状态改为 ended；
+- 发出 market:actionEnded；
+- 之后按 cooldownDays 进入冷却；
+- availableDay 到达后才允许再次开始。
+
+### 活动观察数据
+活动页会显示：
+- 当前进行中活动数 / 2；
+- 午间 12:00 实时预计客流；
+- 选中活动的具体效果；
+- 当前全部活动叠加后的综合修正；
+- 最近活动历史；
+- 当前评价诊断的主要问题/正向反馈。
+
+### 并发提交清理
+本阶段开发中出现一次并发提交把营销渲染函数重复写入 HomePage 的情况。
+
+已处理：
+- 保留并发提交对采购/库存列表数据源的正确修复；
+- 保留经营页活动统计；
+- 删除重复的 marketingCategoryLabel / marketingReasonLabel / renderMarketingPanel 等声明；
+- 没有回退有效代码。
+
+最终经营页：
+- 采购原料列表使用 business.catalog；
+- 库存列表使用 business.inventoryCatalog；
+- 营销渲染只有一套实现。
+
+### 已验证真实链
+自动测试已经证明：
+- 活动启动真实扣除资金；
+- activeMarketActions 真实新增；
+- marketActionHistory 真实写入；
+- 活动需求倍率实际改变 TrafficDemandSystem 的预计客流；
+- 限时优惠 priceMultiplier=0.9 会进入 OrderSystem，真实改变订单 unitPrice 与 totalRevenue；
+- 带评价加成的活动会进入 CustomerExperienceSystem.marketingEffects.reviewPropensityMultiplier；
+- 评价记录随 CustomerExperienceSystem 正常更新；
+- 活动到期后 processDay 会结束活动；
+- 结束后真实进入 cooldown；
+- 到 availableDay 后重新可用；
+- 进行中活动、历史记录和已扣资金经过 SaveSystem 保存、GameState 清空、重新 load 后仍正确恢复。
+
+### T09-4 活动 APK
+- workflow run：`36510957604`
+- APK artifact：`11009053259`
+- artifact 名：`restaurant-playtest-e2d8f1f0392c11d1344a0eac4940b03a3ab48637`
+- APK SHA-256：`2c2ba2df5fe0725de4ce02712be9110f664f5a814237cb8da6e3ead2ce6bbbf0`
+- Android：BUILD SUCCESSFUL
+- 签名：`android-debug`
+
+本节点完整门禁：
+- 资产：14 文件 / 8 槽位；
+- 核心/时间/结算：15/15；
+- 存档兼容/恢复：11/11；
+- UI/路由/适配/资产/采购/菜品/员工/活动：65/65；
+- 浏览器移动 UI：成功；
+- Android APK：成功。
+
 ## 当前状态
 T09 总任务仍在进行中：
 - T09-1 采购 / 库存：VERIFIED
 - T09-2 菜品：VERIFIED
 - T09-3 员工：VERIFIED
-- T09-4 活动：下一阶段
+- T09-4 活动 / 营销：VERIFIED
+- T09-5 装修：下一阶段
 
 已完成模块只修真机发现的问题，不再重新设计业务链。
 
 ## 下一任务
-**T09-4：活动 / 营销完整闭环。**
+**T09-5：装修 / 设施完整闭环。**
 
 范围：
-1. 活动列表；
-2. 活动成本；
-3. 活动持续时间；
-4. 活动效果；
-5. 冷却；
-6. 活动开始/结束；
-7. 对客流、收入、评价等真实经营指标的影响；
+1. 当前门店装修状态；
+2. 固定设施 / 装修项目；
+3. 价格与施工条件；
+4. 开始施工；
+5. 施工时间；
+6. 完工；
+7. 餐位、厨房工位、效率、环境等真实经营修正；
 8. 保存恢复。
+
+首发继续采用“固定升级 / 固定设施”方向，不在 T09-5 强行加入自由摆放编辑器。
 
 验收继续执行“入口 → 查看 → 操作 → 状态变化 → 保存恢复”。
