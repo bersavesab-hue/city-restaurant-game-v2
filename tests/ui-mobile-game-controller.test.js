@@ -664,3 +664,306 @@ test(
       );
   }
 );
+
+test(
+  "dish workflow changes price toggles sale state and researches a real custom dish",
+  () => {
+    resetFoundation();
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    let view =
+      controller
+        .getViewModel();
+
+    const starter =
+      view.dishes
+        .selectedDish;
+
+    assert.ok(
+      starter
+        ?.menuItem
+    );
+
+    const oldPrice =
+      starter
+        .menuItem
+        .price;
+
+    let result =
+      controller
+        .performAction(
+          "dish-price",
+          "plus5"
+        );
+
+    assert.equal(
+      result.ok,
+      true
+    );
+
+    assert.equal(
+      app.systems
+        .menuSystem
+        .get(
+          starter
+            .menuItem
+            .id
+        )
+        .price,
+      oldPrice + 5
+    );
+
+    result =
+      controller
+        .performAction(
+          "dish-toggle-active"
+        );
+
+    assert.equal(
+      result.ok,
+      true
+    );
+
+    assert.equal(
+      app.systems
+        .menuSystem
+        .get(
+          starter
+            .menuItem
+            .id
+        )
+        .active,
+      false
+    );
+
+    controller
+      .performAction(
+        "dish-toggle-active"
+      );
+
+    const balanceBefore =
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        );
+
+    result =
+      controller
+        .performAction(
+          "dish-research"
+        );
+
+    assert.equal(
+      result.ok,
+      true
+    );
+
+    const custom =
+      result
+        .viewModel
+        .dishes
+        .selectedDish;
+
+    assert.equal(
+      custom.custom,
+      true
+    );
+
+    assert.ok(
+      custom.recipe
+    );
+
+    assert.ok(
+      custom.progress
+    );
+
+    assert.ok(
+      app.systems
+        .financeSystem
+        .getBalance(
+          restaurant.id
+        ) <
+      balanceBefore
+    );
+
+    result =
+      controller
+        .performAction(
+          "dish-add-menu"
+        );
+
+    assert.equal(
+      result.ok,
+      true
+    );
+
+    assert.ok(
+      app.systems
+        .menuSystem
+        .listByRestaurant(
+          restaurant.id
+        )
+        .some(
+          item =>
+            item.dishId ===
+            custom.id
+        )
+    );
+  }
+);
+
+
+test(
+  "dish price active state custom research and menu placement survive save reload",
+  () => {
+    resetFoundation();
+
+    const slot =
+      "t09-dishes";
+
+    app.core
+      .saveSystem
+      .remove(
+        slot
+      );
+
+    const controller =
+      createMobileGameController(
+        app
+      );
+
+    const {
+      restaurant
+    } =
+      controller
+        .ensureStarterState();
+
+    let view =
+      controller
+        .getViewModel();
+
+    const starter =
+      view.dishes
+        .selectedDish;
+
+    controller
+      .performAction(
+        "dish-price",
+        "plus1"
+      );
+
+    controller
+      .performAction(
+        "dish-toggle-active"
+      );
+
+    const research =
+      controller
+        .performAction(
+          "dish-research"
+        );
+
+    assert.equal(
+      research.ok,
+      true
+    );
+
+    const customId =
+      research
+        .viewModel
+        .dishes
+        .selectedDish
+        .id;
+
+    const add =
+      controller
+        .performAction(
+          "dish-add-menu"
+        );
+
+    assert.equal(
+      add.ok,
+      true
+    );
+
+    app.core
+      .saveSystem
+      .save(
+        slot
+      );
+
+    app.core
+      .gameState
+      .reset();
+
+    app.core
+      .saveSystem
+      .load(
+        slot
+      );
+
+    const starterAfter =
+      app.systems
+        .menuSystem
+        .get(
+          starter
+            .menuItem
+            .id
+        );
+
+    assert.equal(
+      starterAfter.price,
+      starter
+        .menuItem
+        .price +
+        1
+    );
+
+    assert.equal(
+      starterAfter.active,
+      false
+    );
+
+    const customDish =
+      app.systems
+        .dishCatalogSystem
+        .get(
+          customId
+        );
+
+    assert.equal(
+      customDish.custom,
+      true
+    );
+
+    assert.ok(
+      app.systems
+        .menuSystem
+        .listByRestaurant(
+          restaurant.id
+        )
+        .some(
+          item =>
+            item.dishId ===
+            customId
+        )
+    );
+
+    app.core
+      .saveSystem
+      .remove(
+        slot
+      );
+  }
+);
