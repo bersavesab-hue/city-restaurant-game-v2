@@ -681,6 +681,13 @@ test(
       controller
         .ensureStarterState();
 
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        restaurant.id,
+        7000
+      );
+
     let view =
       controller
         .getViewModel();
@@ -848,6 +855,13 @@ test(
     } =
       controller
         .ensureStarterState();
+
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        restaurant.id,
+        7000
+      );
 
     let view =
       controller
@@ -1341,6 +1355,13 @@ test(
       controller
         .ensureStarterState();
 
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        restaurant.id,
+        1500
+      );
+
     let view =
       controller
         .getViewModel();
@@ -1581,6 +1602,13 @@ test(
       controller
         .ensureStarterState();
 
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        restaurant.id,
+        1500
+      );
+
     const before =
       app.systems
         .financeSystem
@@ -1696,6 +1724,13 @@ test(
     } =
       controller
         .ensureStarterState();
+
+    app.systems
+      .storeProgressSystem
+      .addExperience(
+        restaurant.id,
+        1500
+      );
 
     controller
       .getViewModel();
