@@ -328,6 +328,18 @@ button {
     rgba(255,255,255,.055);
 }
 
+button.home-status-time {
+  border: 0;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button.home-status-time:focus-visible {
+  outline: 2px solid #ffe0a0;
+  outline-offset: 2px;
+}
+
 .home-status-cell > span,
 .home-status-cell > small {
   overflow: hidden;
@@ -1136,7 +1148,7 @@ button {
   display: grid;
   grid-template-columns:
     repeat(
-      4,
+      5,
       minmax(0, 1fr)
     );
   gap: 5px;
@@ -1170,6 +1182,21 @@ button {
   min-height: 0;
   overflow: hidden;
 }
+
+.business-runtime-card { flex: 0 0 auto; }
+.business-runtime-actions { display: grid; grid-template-columns: repeat(3, 1fr) 1.6fr; gap: 6px; }
+.business-runtime-actions button { min-height: 34px; border-radius: 9px; background: rgba(255,255,255,.07); color: #edf4f8; }
+.business-runtime-actions button.is-active { background: rgba(202,146,56,.22); color: #ffe0a0; }
+.business-overview-scroll { min-height: 0; flex: 1 1 auto; overflow: auto; display: flex; flex-direction: column; gap: 8px; overscroll-behavior: contain; }
+.business-overview-scroll > .formal-card { flex: 0 0 auto; }
+.business-data-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+.business-data-grid article { min-width: 0; display: flex; flex-direction: column; gap: 5px; padding: 10px; border-radius: 10px; background: rgba(255,255,255,.04); }
+.business-data-grid span, .business-data-list dt { color: rgba(234,241,245,.68); font-size: 11px; }
+.business-data-grid strong { color: #ffe0a0; font-size: 18px; overflow-wrap: anywhere; }
+.business-data-note { margin: 7px 0 0; color: rgba(234,241,245,.58); font-size: 10px; line-height: 1.5; }
+.business-data-list { margin: 0; }
+.business-data-list > div { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+.business-data-list dd { margin: 0; color: #edf4f8; font-size: 12px; text-align: right; overflow-wrap: anywhere; }
 
 .business-module-panel {
   height: 100%;

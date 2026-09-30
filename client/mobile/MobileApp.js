@@ -92,7 +92,15 @@ const devToolkit =
       () => activePage
   });
 
+let renderedPage = null;
+
 function render() {
+  const scrollState = new Map();
+  if (renderedPage === activePage) {
+    for (const panel of root.querySelectorAll("[data-scroll-key]")) {
+      scrollState.set(panel.dataset.scrollKey, {top: panel.scrollTop, left: panel.scrollLeft});
+    }
+  }
   const viewModel =
     gameController
       .getViewModel();
@@ -122,6 +130,14 @@ function render() {
   `;
 
   devToolkit.afterRender();
+  for (const panel of root.querySelectorAll("[data-scroll-key]")) {
+    const saved = scrollState.get(panel.dataset.scrollKey);
+    if (saved) {
+      panel.scrollTop = saved.top;
+      panel.scrollLeft = saved.left;
+    }
+  }
+  renderedPage = activePage;
 }
 
 function shouldSkipRefresh() {

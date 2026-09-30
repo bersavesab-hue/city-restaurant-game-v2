@@ -200,11 +200,14 @@ function renderTopChrome(
           </small>
         </div>
 
-        <div
+        <button
+          type="button"
           class="home-status-cell home-status-time"
           data-ui-component="home-status-time"
+          data-game-action="toggle-time"
+          aria-label="${vm.runtime.paused ? "继续自动推进时间" : "暂停自动推进时间"}"
         >
-          <span>时间</span>
+          <span>${vm.runtime.paused ? "已暂停" : "时间"}</span>
           <strong>
             ${escapeHtml(
               vm.time.clock
@@ -212,10 +215,10 @@ function renderTopChrome(
           </strong>
           <small>
             ${vm.runtime.paused
-              ? "已暂停"
-              : `${vm.runtime.speed}×`}
+              ? "点此继续"
+              : `${vm.runtime.speed}×·暂停`}
           </small>
-        </div>
+        </button>
 
         <div
           class="home-status-cell home-status-money"
@@ -791,6 +794,10 @@ function renderBusinessTabs(
       aria-label="经营模块"
     >
       ${[
+        [
+          "overview",
+          "营业数据"
+        ],
         [
           "procurement",
           "采购"
@@ -2140,6 +2147,63 @@ function renderMarketingPanel(
   `;
 }
 
+function renderBusinessOverview(vm) {
+  const settlement = vm.latestSettlement;
+  const categoryNames = {
+    ingredient: "采购食材", salary: "工资", rent: "租金",
+    utilities: "水电", equipment: "设备", decoration: "装修",
+    marketing: "营销", channel: "渠道费用", research: "研发",
+    tax: "税费", other: "其他"
+  };
+  const metric = (label, value, key) => `
+    <article><span>${label}</span><strong data-business-metric="${key}">${value}</strong></article>`;
+  return `
+    <section class="business-module-panel business-overview-panel" data-business-panel="overview">
+      <section class="formal-card business-runtime-card">
+        <div class="formal-card-head">
+          <div><small>第${vm.time.day}天 · ${escapeHtml(vm.time.clock)}</small>
+            <strong>${vm.runtime.paused ? "时间已暂停" : "时间自动推进中"} · ${restaurantStatus(vm.restaurant.status)}</strong>
+          </div>
+          <button type="button" data-game-action="toggle-time">${vm.runtime.paused ? "继续时间" : "暂停时间"}</button>
+        </div>
+        <div class="business-runtime-actions">
+          ${[1, 2, 4].map(speed => `<button type="button" class="${vm.runtime.speed === speed ? "is-active" : ""}" data-game-action="speed" data-game-value="${speed}">${speed}×</button>`).join("")}
+          <button type="button" data-game-action="toggle-restaurant">${vm.restaurant.status === "open" ? "暂停营业" : "开始营业"}</button>
+        </div>
+        <p class="business-data-note">营业时段 ${String(vm.schedule?.openHour ?? 9).padStart(2, "0")}:00–${String(vm.schedule?.closeHour ?? 22).padStart(2, "0")}:00。关闭门店与暂停时间分别控制。</p>
+      </section>
+      <div class="business-overview-scroll" data-scroll-key="business-overview">
+        <section class="formal-card">
+          <div class="formal-card-head"><div><small>今日实时数据</small><strong>经营概览</strong></div></div>
+          <div class="business-data-grid">
+            ${metric("营业额", `¥${money(vm.today.revenue)}`, "revenue")}
+            ${metric("成交订单", `${vm.today.orders} 单`, "orders")}
+            ${metric("已付费用", `¥${money(vm.today.expense ?? 0)}`, "expense")}
+            ${metric("经营现金收支", `¥${money(vm.today.cashNet ?? 0)}`, "cash-net")}
+          </div>
+          <p class="business-data-note">现金收支按已收收入、费用退款与已付费用统计，包含采购和装修；不含初始资金与押金，不等于净利润。</p>
+        </section>
+        <section class="formal-card">
+          <div class="formal-card-head"><div><small>今日费用明细</small><strong>实际支出</strong></div></div>
+          <dl class="business-data-list">
+            ${(vm.today.expenseBreakdown ?? []).map(item => `<div><dt>${escapeHtml(categoryNames[item.category] ?? "其他费用")}</dt><dd>¥${money(item.amount)}</dd></div>`).join("") || "<div><dt>今日尚无费用支出</dt><dd>—</dd></div>"}
+            ${vm.today.refunds ? `<div><dt>费用退款</dt><dd>¥${money(vm.today.refunds)}</dd></div>` : ""}
+          </dl>
+        </section>
+        <section class="formal-card" data-daily-settlement>
+          <div class="formal-card-head"><div><small>最近日结</small><strong>${settlement ? `第${settlement.day}天结算` : "尚未结算"}</strong></div></div>
+          ${settlement ? `<dl class="business-data-list">
+            <div><dt>营业额 / 订单</dt><dd>¥${money(settlement.revenue)} / ${settlement.orders} 单</dd></div>
+            <div><dt>食材消耗成本</dt><dd>¥${money(settlement.ingredientCost)}</dd></div>
+            <div><dt>应计工资</dt><dd>¥${money(settlement.payrollDue ?? settlement.payroll)}</dd></div>
+            <div><dt>已付工资 / 欠薪</dt><dd>¥${money(settlement.payrollPaid)} / ¥${money(settlement.unpaidPayroll)}</dd></div>
+            <div><dt>营业贡献</dt><dd data-business-metric="settled-contribution">¥${money(settlement.operatingProfit)}</dd></div>
+          </dl><p class="business-data-note">营业贡献为营业额减食材消耗和应计工资，尚未扣除租金、水电、营销等费用。</p>` : "<p class=\"business-data-note\">完成首个营业日后显示真实结算。今日实时数据会随经营更新。</p>"}
+        </section>
+      </div>
+    </section>`;
+}
+
 function renderBusinessPage(
   vm
 ) {
@@ -2188,7 +2252,9 @@ function renderBusinessPage(
       )}
 
       <div class="business-panel-host">
-        ${business.tab ===
+        ${business.tab === "overview"
+          ? renderBusinessOverview(vm)
+          : business.tab ===
           "inventory"
           ? renderInventoryPanel(
               vm

@@ -93,7 +93,7 @@ function createMobileGameController(
     "经营系统已连接真实数据";
 
   const businessUi = {
-    tab: "procurement",
+    tab: "overview",
     ingredientId: null,
     supplierId: null,
     quantity: null,
@@ -2123,6 +2123,7 @@ function createMobileGameController(
   ) {
     if (
       ![
+        "overview",
         "procurement",
         "inventory",
         "orders",
@@ -2141,8 +2142,10 @@ function createMobileGameController(
 
     lastMessage =
       tab ===
-        "procurement"
-        ? "采购中心"
+        "overview"
+        ? "营业数据"
+        : tab === "procurement"
+          ? "采购中心"
         : tab ===
             "inventory"
           ? "库存中心"
@@ -4650,6 +4653,23 @@ function createMobileGameController(
         0
       );
 
+    const transactions = financeSystem
+      .getTransactions(restaurant.id)
+      .filter(item => item.day === time.day);
+    const transactionTotal = type => transactions
+      .filter(item => item.transactionType === type)
+      .reduce((sum, item) => sum + item.amount, 0);
+    const income = transactionTotal("income");
+    const expense = transactionTotal("expense");
+    const refunds = transactionTotal("reversal");
+    const expenseCategories = new Map();
+    for (const item of transactions) {
+      if (item.transactionType === "expense") {
+        expenseCategories.set(item.category,
+          (expenseCategories.get(item.category) ?? 0) + item.amount);
+      }
+    }
+
     const progress =
       storeProgressSystem
         .getProgress(
@@ -4829,10 +4849,17 @@ function createMobileGameController(
 
       today: {
         orders:
-          orders.length,
+          orders.reduce((sum, order) => sum + (order.orderCount ?? 1), 0),
 
         revenue:
-          todayRevenue
+          todayRevenue,
+        income,
+        expense,
+        refunds,
+        cashNet: income + refunds - expense,
+        expenseBreakdown: [...expenseCategories]
+          .map(([category, amount]) => ({category, amount}))
+          .sort((a, b) => b.amount - a.amount)
       },
 
       pendingDeliveries:
