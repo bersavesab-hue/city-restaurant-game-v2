@@ -1,56 +1,44 @@
-# 发布清单
+# 发布与测试包规范
 
-当前候选版本：**0.8.67 Playtest / versionCode 867**
+当前代码基线版本：**0.16.2 Playtest / versionCode 1602**。
 
-## CI 自动完成
+## 当前 Android 事实
+- applicationId：`com.cityrestaurant.mobileui`
+- minSdk：24
+- compileSdk：35
+- targetSdk：35
+- Android 当前仍是 WebView 测试壳，不等同于微信/抖音小游戏适配完成。
 
-每次正式流水线必须通过：
-- Playable-flow；
-- 老存档兼容；
-- 连锁扩张；
-- 第六阶段生命周期；
-- 第七阶段 UI/装修/引导；
-- 第八阶段反馈与发布 Gate；
-- 20 年性能压力；
-- 90 天经营回归；
-- 365 天长期回归；
-- Android Web Bundle；
-- Android 16 / API 36 目标版本检查；
-- Debug APK 构建。
+## 两层自动化
+普通代码改动优先运行轻量 CI：
+- 版本一致性检查；
+- 核心经管 smoke；
+- 存档兼容；
+- UI 合同测试；
+- 浏览器 UI 打包。
 
-发布产物包含：
-- `city-restaurant-v0.8.67-playtest.apk`
-- `release-metadata.json`
-- `SHA256SUMS.txt`
+试玩节点才运行 Android APK 构建。不要因为文案或小坐标调整要求玩家反复下载安装包。
 
-## 当前测试包可做
+## Playtest APK 必须包含
+- package 版本；
+- Git 提交短 SHA；
+- `build-info.json`；
+- APK SHA-256 元数据。
 
-- 内部测试；
-- 小范围外部测试；
-- 收集本机反馈报告；
-- 验证 Android 23+ 设备兼容性；
-- 验证存档、长期经营、UI 和性能。
+测试包内显示版本号与提交号，用于截图和问题反馈定位。
 
-## 正式上架前仍必须人工完成
+## 签名
+- 正式生产签名绝不能提交到仓库。
+- 仓库内现有测试签名文件不作为正式签名来源。
+- 稳定的测试升级签名应通过 GitHub Secret 或其他受控凭据提供；未配置前，不得声称跨构建升级安装已经验证。
 
-1. 确定正式应用包名。当前测试包名为 `com.cityrestaurant.v2playtest`。
-2. 创建并妥善保管**生产签名证书**。禁止把测试签名直接用于正式商店版本。
-3. 根据目标平台创建正式应用：
-   - TapTap；
-   - 抖音小游戏（需要单独适配小游戏运行环境，不等同于 APK）；
-   - Google Play（如发布，需要生成并签名 AAB）。
-4. 准备商店资料：
-   - 应用图标；
-   - 横竖宣传图；
-   - 5–8 张正式截图；
-   - 一句话介绍；
-   - 完整介绍；
-   - 更新日志；
-   - 隐私政策公开链接；
-   - 客服/反馈联系方式。
-5. 如果加入广告、支付、账号、云存档或联网反馈，重新做隐私和合规检查。
-6. 正式版本提高 `versionCode`，并保持 `package.json`、ReleaseInfo 和 Android Gradle 版本一致。
-
-## 推荐发布顺序
-
-先使用当前 Playtest APK 做封闭测试并收集反馈；修复高频问题后，再生成独立的 Release Candidate。生产签名、正式包名和平台 SDK 应只在 RC 阶段接入，避免测试阶段污染正式应用身份。
+## 正式上架前
+1. 确定正式应用名称和包名策略；包名变更会影响升级安装。
+2. 创建并离线保管生产签名证书。
+3. 按目标平台分别验证：
+   - TapTap Android 包；
+   - 微信小游戏运行环境；
+   - 抖音小游戏运行环境。
+4. 准备图标、截图、介绍、更新日志、隐私政策和客服信息。
+5. 接入广告、支付、账号、云存档或联网 SDK 后重新做隐私和权限检查。
+6. 每次正式发布递增 versionCode，并保持 package、ReleaseInfo 和 Android Gradle 一致。

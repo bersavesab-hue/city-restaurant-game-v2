@@ -5,6 +5,25 @@ import {
   build
 } from "esbuild";
 
+const packageJson =
+  JSON.parse(
+    fs.readFileSync(
+      path.resolve(
+        "package.json"
+      ),
+      "utf8"
+    )
+  );
+
+const buildGitSha =
+  (
+    process.env.GITHUB_SHA ??
+    "local"
+  ).slice(
+    0,
+    8
+  );
+
 const output =
   path.resolve(
     "dist/mobile-ui"
@@ -53,6 +72,16 @@ await build({
   target: [
     "chrome100"
   ],
+  define: {
+    __APP_VERSION__:
+      JSON.stringify(
+        packageJson.version
+      ),
+    __BUILD_GIT_SHA__:
+      JSON.stringify(
+        buildGitSha
+      )
+  },
   sourcemap: false,
   minify: true,
   logLevel: "info"
@@ -77,6 +106,28 @@ for (
     )
   );
 }
+
+const buildInfo = {
+  version:
+    packageJson.version,
+  gitSha:
+    buildGitSha,
+  builtAt:
+    new Date()
+      .toISOString()
+};
+
+fs.writeFileSync(
+  path.join(
+    output,
+    "build-info.json"
+  ),
+  JSON.stringify(
+    buildInfo,
+    null,
+    2
+  ) + "\n"
+);
 
 const mobileAssets =
   path.resolve(
@@ -116,4 +167,10 @@ console.log(
 console.log(
   "Android assets built:",
   androidAssets
+);
+
+console.log(
+  "Build:",
+  packageJson.version,
+  buildGitSha
 );

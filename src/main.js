@@ -31,6 +31,7 @@ import { employeeCareerSystem } from "./systems/EmployeeCareerSystem.js";
 import { employeeDynamicsSystem } from "./systems/EmployeeDynamicsSystem.js";
 import { staffingRecommendationSystem } from "./systems/StaffingRecommendationSystem.js";
 import { storeProgressSystem } from "./systems/StoreProgressSystem.js";
+import { launchProgressionSystem } from "./systems/LaunchProgressionSystem.js";
 import { lateGameInvestmentSystem } from "./systems/LateGameInvestmentSystem.js";
 import { onboardingSystem } from "./systems/OnboardingSystem.js";
 import { operatingAdvisorSystem } from "./systems/OperatingAdvisorSystem.js";
@@ -86,6 +87,7 @@ import { renovationSystem } from "./systems/RenovationSystem.js";
 import { renovationConstructionSystem } from "./systems/RenovationConstructionSystem.js";
 import { equipmentMaintenanceSystem } from "./systems/EquipmentMaintenanceSystem.js";
 import { layoutFlowSystem } from "./systems/LayoutFlowSystem.js";
+import { serviceCapacitySystem } from "./systems/ServiceCapacitySystem.js";
 import { renovationPlanningSystem } from "./systems/RenovationPlanningSystem.js";
 import { renovationEditorSystem } from "./systems/RenovationEditorSystem.js";
 import { dishManagementSystem } from "./systems/DishManagementSystem.js";
@@ -141,6 +143,7 @@ function bootstrap() {
       employeeDynamicsSystem,
       staffingRecommendationSystem,
       storeProgressSystem,
+      launchProgressionSystem,
       lateGameInvestmentSystem,
       onboardingSystem,
       operatingAdvisorSystem,
@@ -197,6 +200,7 @@ function bootstrap() {
       renovationConstructionSystem,
       equipmentMaintenanceSystem,
       layoutFlowSystem,
+      serviceCapacitySystem,
       renovationPlanningSystem,
       renovationEditorSystem,
       dailySettlementSystem,

@@ -35,8 +35,14 @@
     "test:phase3:longrun": "node scripts/phase3-longrun-gate.mjs",
     "test:phase3:performance": "node scripts/phase3-performance-gate.mjs",
     "test:save-compat": "node scripts/save-compatibility-gate.mjs",
-    "test:ui": "node --test tests/ui-screen-adapter.test.js tests/ui-home-master-contract.test.js tests/ui-background-layer.test.js tests/ui-dev-toolkit-contract.test.js tests/ui-mobile-keyboard.test.js tests/ui-layer-panel.test.js tests/ui-guides.test.js tests/ui-anchor-layout.test.js tests/ui-z-layer.test.js tests/ui-top-hud-preset.test.js tests/ui-component-types.test.js tests/ui-hud-local-preset.test.js",
-    "build:mobile-ui": "node scripts/build-mobile-ui.mjs"
+    "test:ui": "node --test tests/ui-screen-adapter.test.js tests/ui-home-master-contract.test.js tests/ui-background-layer.test.js tests/ui-dev-toolkit-contract.test.js tests/ui-mobile-keyboard.test.js tests/ui-layer-panel.test.js tests/ui-guides.test.js tests/ui-anchor-layout.test.js tests/ui-z-layer.test.js tests/ui-top-hud-preset.test.js tests/ui-component-types.test.js tests/ui-hud-local-preset.test.js tests/ui-mobile-game-controller.test.js tests/ui-business-data.test.js tests/ui-asset-manifest.test.js",
+    "build:mobile-ui": "node scripts/build-mobile-ui.mjs",
+    "check:version": "node scripts/check-version-sync.mjs",
+    "test:core:smoke": "node --test tests/foundation-v2-smoke.test.js tests/procurement-flow.test.js tests/operating-day-e2e.test.js tests/finance-settlement.test.js tests/runtime-session.test.js tests/simulation-clock.test.js",
+    "test:ci": "npm run check:version && npm run check:assets && npm run test:core:smoke && npm run test:save-compat && npm run test:launch && npm run test:balance && npm run test:ui && npm run build:mobile-ui",
+    "check:assets": "node scripts/check-ui-assets.mjs",
+    "test:launch": "node --test tests/launch-content.test.js",
+    "test:balance": "PHASE3_BALANCE_DAYS=90 node scripts/phase3-balance-gate.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"

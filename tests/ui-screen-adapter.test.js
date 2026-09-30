@@ -129,3 +129,77 @@ test(
     );
   }
 );
+
+test(
+  "9:16 9:19.5 and 9:20 phones share one 540-wide logical coordinate system",
+  () => {
+    const samples = [
+      {
+        viewport:
+          [
+            1080,
+            1920
+          ],
+        logicalHeight:
+          960
+      },
+      {
+        viewport:
+          [
+            1080,
+            2340
+          ],
+        logicalHeight:
+          1170
+      },
+      {
+        viewport:
+          [
+            1080,
+            2400
+          ],
+        logicalHeight:
+          1200
+      }
+    ];
+
+    for (
+      const sample
+      of samples
+    ) {
+      const metrics =
+        calculateScreenMetrics({
+          viewportWidth:
+            sample.viewport[0],
+          viewportHeight:
+            sample.viewport[1]
+        });
+
+      assert.equal(
+        metrics.scale,
+        2
+      );
+
+      assert.equal(
+        metrics.logicalWidth,
+        540
+      );
+
+      assert.equal(
+        metrics.logicalHeight,
+        sample.logicalHeight
+      );
+
+      assert.equal(
+        metrics.extraWidth,
+        0
+      );
+
+      assert.equal(
+        metrics.extraHeight,
+        sample.logicalHeight -
+          960
+      );
+    }
+  }
+);

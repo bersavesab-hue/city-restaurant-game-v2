@@ -10,6 +10,10 @@ import {
 } from "../data/randomEvents.v1.js";
 
 import {
+  LAUNCH_EVENT_IDS
+} from "../data/launchContent.v1.js";
+
+import {
   RANDOM_EVENT_MULTIPLIER_FIELDS
 } from "../data/randomEventRules.js";
 
@@ -314,8 +318,18 @@ class DistrictEventSystem {
       );
     }
 
-    const weighted =
+    const launchPool =
       RANDOM_EVENTS_V1
+        .filter(
+          item =>
+            LAUNCH_EVENT_IDS
+              .includes(
+                item.id
+              )
+        );
+
+    const weighted =
+      launchPool
         .map(
           item => ({
             value:

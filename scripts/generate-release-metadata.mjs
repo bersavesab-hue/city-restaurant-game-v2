@@ -63,6 +63,17 @@ const sha256 =
     );
 
 
+const signingMode =
+  process.env
+    .PLAYTEST_SIGNING_MODE ??
+  "android-debug";
+
+const stableUpgradeSigning =
+  process.env
+    .PLAYTEST_SIGNING_STABLE ===
+  "true";
+
+
 const metadata = {
   ...RELEASE_INFO,
 
@@ -91,13 +102,17 @@ const metadata = {
       .toISOString(),
 
   signing:
-    "stable-playtest-key",
+    signingMode,
+
+  stableUpgradeSigning,
 
   productionReady:
     false,
 
   productionBlocker:
-    "正式上架前必须替换为生产签名证书与正式包名策略"
+    stableUpgradeSigning
+      ? "正式上架前必须替换为生产签名证书并完成正式发布检查"
+      : "当前测试包未配置稳定升级签名；正式上架前还必须替换为生产签名证书"
 };
 
 
@@ -120,4 +135,12 @@ console.log(
 console.log(
   "SHA-256:",
   sha256
+);
+
+console.log(
+  "Signing:",
+  signingMode,
+  stableUpgradeSigning
+    ? "(stable playtest)"
+    : "(not stable for upgrade verification)"
 );

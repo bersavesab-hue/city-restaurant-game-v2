@@ -1,0 +1,31 @@
+name: T11 Long-Run Balance
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ai/baseline-freeze-20260929"
+    paths:
+      - ".github/workflows/t11-longrun.yml"
+
+jobs:
+  longrun:
+    name: 365-day balance simulation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run 365-day balance gate
+        run: npm run test:phase3:longrun
